@@ -226,12 +226,6 @@
     <Filter Include="Source Files\H2MOD\Modules\HitFix">
       <UniqueIdentifier>{e2beceb0-3685-4b6a-88e8-2a4b7ac4a822}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\3rdparty\opus">
-      <UniqueIdentifier>{c2d12e72-3d9f-4695-a08d-e81a5ef33724}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\3rdparty\portaudio">
-      <UniqueIdentifier>{a11687ea-ad4d-4338-be2a-8150f5fc6ff4}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\H2MOD\Modules\MapFix">
       <UniqueIdentifier>{0dcc09a4-5fd5-4f51-9344-1bee701782ef}</UniqueIdentifier>
     </Filter>
@@ -468,15 +462,6 @@
     <ClCompile Include="XLive\Voice\XHVEngine.cpp">
       <Filter>Source Files\XLive\voice</Filter>
     </ClCompile>
-    <ClCompile Include="XLive\Voice\Encoder.cpp">
-      <Filter>Source Files\XLive\voice</Filter>
-    </ClCompile>
-    <ClCompile Include="XLive\Voice\AudioDevices.cpp">
-      <Filter>Source Files\XLive\voice</Filter>
-    </ClCompile>
-    <ClCompile Include="XLive\Voice\AudioHandler.cpp">
-      <Filter>Source Files\XLive\voice</Filter>
-    </ClCompile>
     <ClCompile Include="H2MOD\Modules\MapFix\MPMapFix.cpp">
       <Filter>Source Files\H2MOD\Modules\MapFix</Filter>
     </ClCompile>
@@ -569,6 +554,18 @@
     </ClCompile>
     <ClCompile Include="XLive\XStorage\XStorage.cpp">
       <Filter>Source Files\XLive\XStorage</Filter>
+    </ClCompile>
+    <ClCompile Include="3rdparty\alt-voice\src\alt-voice.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="3rdparty\alt-voice\src\CSoundInput.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="3rdparty\alt-voice\src\CSoundOutput.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="3rdparty\alt-voice\src\CStreamPlayer.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -897,15 +894,6 @@
       <Filter>Source Files\H2MOD\Modules\HitFix</Filter>
     </ClInclude>
     <ClInclude Include="XLive\Voice\XHVEngine.h">
-      <Filter>Source Files\XLive\voice</Filter>
-    </ClInclude>
-    <ClInclude Include="XLive\Voice\Encoder.h">
-      <Filter>Source Files\XLive\voice</Filter>
-    </ClInclude>
-    <ClInclude Include="XLive\Voice\AudioDevices.h">
-      <Filter>Source Files\XLive\voice</Filter>
-    </ClInclude>
-    <ClInclude Include="XLive\Voice\AudioHandler.h">
       <Filter>Source Files\XLive\voice</Filter>
     </ClInclude>
     <ClInclude Include="H2MOD\Modules\MapFix\MPMapFix.h">
@@ -1264,6 +1252,54 @@
     </ClInclude>
     <ClInclude Include="XLive\XStorage\XStorage.h">
       <Filter>Source Files\XLive\XStorage</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\alt-voice\include\alt-voice.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\alt-voice\include\ISoundInput.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\alt-voice\include\ISoundOutput.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\alt-voice\include\IStreamPlayer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\alt-voice\include\VoiceError.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\alt-voice\src\CRingBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\alt-voice\src\CSoundInput.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\alt-voice\src\CSoundOutput.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\alt-voice\src\CStreamPlayer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\alt-voice\src\CVoiceException.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\opus\include\opus.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\opus\include\opus_custom.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\opus\include\opus_defines.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\opus\include\opus_multistream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\opus\include\opus_projection.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="3rdparty\opus\include\opus_types.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

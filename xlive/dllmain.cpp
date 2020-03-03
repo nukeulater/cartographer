@@ -37,6 +37,7 @@ void InitInstance()
 
 		InitH2Startup2();
 
+
 #ifdef _DEBUG
 		int CurrentFlags;
 		CurrentFlags = _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG);
