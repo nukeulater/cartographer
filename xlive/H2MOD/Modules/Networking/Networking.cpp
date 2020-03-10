@@ -16,10 +16,6 @@ extern XSocket* game_network_message_gateway_socket_1001;
 
 CustomNetwork *network = new CustomNetwork;
 
-const char* getNetworkMessageName(int enumVal) {
-	return network_message_name[enumVal];
-}
-
 void __cdecl request_write(bitstream* stream, int a2, int a3) {
 	stream->data_encode_integer("identifier", *(DWORD *)a3, 32);
 	stream->data_encode_integer("flags", *(DWORD *)(a3 + 4), 8);
@@ -259,6 +255,17 @@ int __cdecl QoSLookUpImpl(int a1, signed int a2, int a3, int a4)
 	return -1; // stub qos lookup function in-game between peers in a network session
 }
 
+void patchAbNetUpdate()
+{
+	PatchCall(h2mod->GetAddress(0x1B583F, 0x195C79), h2mod->GetAddress(0x1B5DF3, 0x19622D));
+	WriteJmpTo(h2mod->GetAddress(0x1AC1B6, 0x1A6B6F), h2mod->GetAddress(0x1B5DF3, 0x19622D));
+	if (h2mod->Server)
+	{
+		PatchCall(h2mod->GetAddress(0, 0xBBCC), h2mod->GetAddress(0, 0x19622D));
+		PatchCall(h2mod->GetAddress(0, 0xBBE3), h2mod->GetAddress(0, 0x19622D));
+	}
+}
+
 void applyConnectionPatches()
 {
 	//removeXNetSecurity();
@@ -284,6 +291,8 @@ void CustomNetwork::applyNetworkHooks() {
 	///////////////////////////////////////////////
 	//connection/player packet customizations below
 	///////////////////////////////////////////////
+
+	patchAbNetUpdate();
 
 	register_connection_packets_method = (register_connection_packets)DetourFunc(h2mod->GetAddress<BYTE*>(0x1F1B36, 0x1D24EF), (BYTE*)registerConnectionPackets, 5);
 	
