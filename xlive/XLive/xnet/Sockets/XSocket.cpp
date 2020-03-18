@@ -8,22 +8,19 @@
 
 #include "..\IpManagement\XnIp.h"
 
-/* TODO: handle this automatically */
-XSocket* game_network_data_gateway_socket_1000; // used for game data
-XSocket* game_network_message_gateway_socket_1001; // used for messaging like connection requests
+ModuleUPnP* upnp;
 
 void ForwardPorts()
 {
 	if (h2mod->Server)
 		return;
 
-	ModuleUPnP upnp;
+	if (upnp == nullptr)
+		upnp = new ModuleUPnP;
 
-	upnp.UPnPForwardPort(false, H2Config_base_port, H2Config_base_port, "Halo2");
-	upnp.UPnPForwardPort(false, (H2Config_base_port + 1), (H2Config_base_port + 1), "Halo2_1");
-	//upnp.UPnPForwardPort(false, (H2Config_base_port + 5), (H2Config_base_port + 5), "Halo2_2");
-	//upnp.UPnPForwardPort(false, (H2Config_base_port + 6), (H2Config_base_port + 6), "Halo2_3");
-	upnp.UPnPForwardPort(true, (H2Config_base_port + 10), (H2Config_base_port + 10), "Halo2_QoS");
+	upnp->UPnPForwardPort(false, H2Config_base_port, H2Config_base_port, "Halo2");
+	upnp->UPnPForwardPort(false, (H2Config_base_port + 1), (H2Config_base_port + 1), "Halo2_1");
+	upnp->UPnPForwardPort(true, (H2Config_base_port + 10), (H2Config_base_port + 10), "Halo2_QoS");
 
 	LOG_TRACE_NETWORK("ForwardPorts() - Finished forwarding ports.");
 }
@@ -86,7 +83,7 @@ SOCKET WINAPI XSocketCreate(int af, int type, int protocol)
 
 	if (newXSocket->isVoiceSocket)
 	{
-		LOG_TRACE_NETWORK("XSocketCreate() - Socket: {} was VDP", ret);
+		LOG_TRACE_NETWORK("XSocketCreate() - Socket: {} is VDP", ret);
 	}
 
 	ipManager.SocketPtrArray.push_back(newXSocket);
@@ -154,7 +151,11 @@ int WINAPI XSocketGetPeerName(SOCKET s, struct sockaddr *name, int *namelen)
 {
 	LOG_TRACE_NETWORK("XSocketGetPeerName()");
 	XSocket* xsocket = (XSocket*)s;
-	return getpeername(xsocket->winSockHandle, name, namelen);
+
+	if (xsocket->isTCP())
+		return getpeername(xsocket->winSockHandle, name, namelen);
+	else
+		return WSAENOTCONN;
 }
 
 
@@ -165,7 +166,10 @@ int WINAPI XSocketConnect(SOCKET s, const struct sockaddr *name, int namelen)
 	LOG_TRACE_NETWORK("XSocketConnect  (socket = {0:x}, name = {1:p}, namelen = {2})",
 		xsocket->winSockHandle, (void*)name, namelen);
 
-	return connect(xsocket->winSockHandle, name, namelen);
+	if (xsocket->isTCP())
+		return connect(xsocket->winSockHandle, name, namelen);
+	else
+		return SOCKET_ERROR;
 }
 
 
@@ -507,16 +511,14 @@ SOCKET WINAPI XSocketBind(SOCKET s, const struct sockaddr *name, int namelen)
 
 	u_short port = (((struct sockaddr_in*)name)->sin_port);
 
-	memcpy(&xsocket->socketAddress, name, sizeof(sockaddr_in));
+	memcpy(&xsocket->name, name, sizeof(sockaddr_in));
 
 	if (htons(port) == 1000) {
-		game_network_data_gateway_socket_1000 = xsocket;
 		(((struct sockaddr_in*)name)->sin_port) = ntohs(H2Config_base_port);
 		LOG_TRACE_NETWORK("XSocketBind() - replaced port {} with {}", htons(port), H2Config_base_port);
 	}
 
 	if (htons(port) == 1001) {
-		game_network_message_gateway_socket_1001 = xsocket;
 		(((struct sockaddr_in*)name)->sin_port) = ntohs(H2Config_base_port + 1);
 		LOG_TRACE_NETWORK("XSocketBind() - replaced port {} with {}", htons(port), H2Config_base_port + 1);
 	}

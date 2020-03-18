@@ -36,16 +36,11 @@ bool getNetworkAddressFromNetworkChannel(char* network_channel, network_address*
 
 void __cdecl encode_map_file_name_packet(bitstream* stream, int a2, s_custom_map_filename* data)
 {
-	stream->data_encode_bool("is-custom-map", data->is_custom_map);
-	if (data->is_custom_map == true)
-		stream->data_encode_string("map-file-name", (int)&data->file_name, 32);
+	stream->data_encode_string("map-file-name", (int)&data->file_name, 32);
 }
 bool __cdecl decode_map_file_name_packet(bitstream* stream, int a2, s_custom_map_filename* data)
 {
-	data->is_custom_map = stream->data_decode_bool("is-custom-map");
-	if (data->is_custom_map == true)
-		stream->data_decode_string("map-file-name", (int)&data->file_name, 32);
-
+	stream->data_decode_string("map-file-name", (int)&data->file_name, 32);
 	return stream->packet_is_valid() == false;
 }
 
@@ -93,7 +88,7 @@ void register_custom_packets(void* network_messages)
 	register_packet_impl(network_messages, request_map_filename, "request-map-filename", 0, sizeof(s_request_map_filename), sizeof(s_request_map_filename),
 		(void*)encode_request_map_filename_packet, (void*)decode_request_map_filename_packet, NULL);
 
-	register_packet_impl(network_messages, map_file_name, "map-file-name", 0, sizeof(s_custom_map_filename), sizeof(s_custom_map_filename),
+	register_packet_impl(network_messages, custom_map_filename, "map-file-name", 0, sizeof(s_custom_map_filename), sizeof(s_custom_map_filename),
 		(void*)encode_map_file_name_packet, (void*)decode_map_file_name_packet, NULL);
 
 	register_packet_impl(network_messages, team_change, "team-change", 0, sizeof(s_team_change), sizeof(s_team_change),
@@ -182,7 +177,7 @@ void __stdcall handle_out_of_band_message_hook(void *thisx, network_address* add
 	}*/
 
 	/* surprisingly the game doesn't use this too much, pretty much for request-join and tme-sync packets */
-	LOG_TRACE_NETWORK("handle_out_of_band_message_hook() - Received message {} from peer index: {}", getNetworkMessageName(message_type), NetworkSession::getPeerIndexFromNetworkAddress(address));
+	LOG_TRACE_NETWORK("handle_out_of_band_message_hook() - Received message: {} from peer index: {}", getNetworkMessageName(message_type), NetworkSession::getPeerIndexFromNetworkAddress(address));
 
 	p_handle_out_of_band_message(thisx, address, message_type, a4, packet);
 }
@@ -198,7 +193,8 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 
 	char* network_channel = getNetworkChannelData(network_channel_index);
 	network_address addr;
-	ZeroMemory(&addr, sizeof(network_address));
+	SecureZeroMemory(&addr, sizeof(network_address));
+	getNetworkAddressFromNetworkChannel(network_channel, &addr);
 
 	switch (message_type)
 	{
@@ -208,6 +204,8 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 		LOG_TRACE_NETWORK("[H2MOD-CustomPackets] received on handle_channel_message_hook request-map-filename from XUID: {}", received_data->user_identifier);
 		if (*(int*)(network_channel + 0x54) == 5 && getNetworkAddressFromNetworkChannel(network_channel, &addr))
 		{
+			LOG_TRACE_NETWORK("  - network address: {:x}", ntohl(addr.address.ipv4));
+
 			int peer_index = NetworkSession::getPeerIndexFromNetworkAddress(&addr);
 			network_session* session = NetworkSession::getCurrentNetworkSession();
 			if (peer_index != -1 && peer_index != session->local_peer_index)
@@ -217,36 +215,34 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 
 				std::wstring map_filename;
 				mapManager->getMapFilename(map_filename);
-				data.is_custom_map = false;
 				if (map_filename.size() > 0)
 				{
-					data.is_custom_map = true;
 					wcsncpy_s(data.file_name, map_filename.c_str(), 32);
+
+					LOG_TRACE_NETWORK(L"[H2MOD-CustomPackets] sending map file name packet to XUID: {}, peer index: {}, map name: {}", received_data->user_identifier, peer_index, map_filename.c_str());
+
+					network_observer* observer = session->network_observer_ptr;
+					peer_observer_channel* observer_channel = NetworkSession::getPeerObserverChannel(peer_index);
+
+					observer->sendNetworkMessage(session->unk_index, observer_channel->observer_index, false, custom_map_filename, sizeof(s_custom_map_filename), &data);
 				}
-
-				LOG_TRACE_NETWORK(L"[H2MOD-CustomPackets] sending map file name packet to XUID: {}, peer index: {}, map name: {}", received_data->user_identifier, peer_index, map_filename.c_str());
-
-				network_observer* observer = session->network_observer_ptr;
-				peer_observer_channel* observer_channel = NetworkSession::getPeerObserverChannel(peer_index);
-
-				observer->sendNetworkMessage(session->unk_index, observer_channel->observer_index, false, map_file_name, sizeof(s_custom_map_filename), &data);
+				else
+				{
+					LOG_TRACE_NETWORK(L"[H2MOD-CustomPackets] no map file name found, abort sending packet!", received_data->user_identifier, peer_index, map_filename.c_str());
+				}
 			}
 		}
 		
 		return;
 	}
-	case map_file_name:
+
+	case custom_map_filename:
 	{
 		if (*(int*)(network_channel + 0x54) == 5)
 		{
 			s_custom_map_filename* received_data = (s_custom_map_filename*)packet;
-			if (received_data->is_custom_map)
-			{
-				std::wstring filename_wstr(received_data->file_name);
-				std::string filename_str(filename_wstr.begin(), filename_wstr.end());
-				mapManager->setMapFileNameToDownload(filename_str);
-				LOG_TRACE_NETWORK(L"[H2MOD-CustomPackets] received on handle_out_of_band_message map_file_name: {}", received_data->file_name);
-			}
+			mapManager->setMapFileNameToDownload(received_data->file_name);
+			LOG_TRACE_NETWORK(L"[H2MOD-CustomPackets] received on handle_out_of_band_message map_file_name: {}", received_data->file_name);
 		}
 		
 		return;
@@ -278,6 +274,7 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 		break;
 	}
 
+	LOG_TRACE_NETWORK("handle_channel_message_hook() - Received message: {} from peer index: {}, address: {:x}", getNetworkMessageName(message_type), NetworkSession::getPeerIndexFromNetworkAddress(&addr), ntohl(addr.address.ipv4));
 	p_handle_channel_message(thisx, network_channel_index, message_type, dynamic_data_size, packet);
 }
 
@@ -289,26 +286,19 @@ void CustomPackets::sendRequestMapFilename()
 	{
 		XUID xuid;
 		s_request_map_filename data;
-
-		XUserGetXUID(0, &xuid);
-
-		SecureZeroMemory(&data, sizeof(s_request_map_filename));
-		data.user_identifier = xuid;
+		XUserGetXUID(0, &data.user_identifier);
 
 		network_observer* observer = session->network_observer_ptr;
 		peer_observer_channel* observer_channel = NetworkSession::getPeerObserverChannel(session->session_host_peer_index);
 
-		LOG_TRACE_NETWORK("[H2MOD-CustomPackets] Sending map name request info: session host peer index: {}, observer index {}, observer bool unk: {}, unk index: {}",
-			session->session_host_peer_index, 
-			observer_channel->observer_index,
-			observer_channel->field_1,
-			session->unk_index);
-
-		// use this check for out-of-band packets
-		//if (observer->getObserverState(observer_channel->observer_index) == 7) {
-		//}
 		if (observer_channel->field_1) {
 			observer->sendNetworkMessage(session->unk_index, observer_channel->observer_index, false, request_map_filename, sizeof(s_request_map_filename), &data);
+
+			LOG_TRACE_NETWORK("[H2MOD-CustomPackets] Sending map name request info: session host peer index: {}, observer index {}, observer bool unk: {}, unk index: {}",
+				session->session_host_peer_index,
+				observer_channel->observer_index,
+				observer_channel->field_1,
+				session->unk_index);
 		}
 	}
 }
@@ -326,11 +316,9 @@ void CustomPackets::sendTeamChange(int peerIndex, int teamIndex)
 
 		if (peerIndex != -1 && peerIndex != session->local_peer_index)
 		{
-			//if (observer->getObserverState(observer_channel->observer_index) == 7) {
-				if (observer_channel->field_1) {
-					observer->sendNetworkMessage(session->unk_index, observer_channel->observer_index, false, team_change, sizeof(s_team_change), &data);
-				}
-			//}
+			if (observer_channel->field_1) {
+				observer->sendNetworkMessage(session->unk_index, observer_channel->observer_index, false, team_change, sizeof(s_team_change), &data);
+			}
 		}
 	}
 }
@@ -345,11 +333,9 @@ void CustomPackets::sendUnitGrenadesPacket(int peerIndex, s_unit_grenades* data)
 			network_observer* observer = session->network_observer_ptr;
 			peer_observer_channel* observer_channel = NetworkSession::getPeerObserverChannel(peerIndex);
 
-			//if (observer->getObserverState(observer_channel->observer_index) == 7) {
-				if (observer_channel->field_1) {
-					observer->sendNetworkMessage(session->unk_index, observer_channel->observer_index, false, unit_grenades, sizeof(s_unit_grenades), data);
-				}
-			//}
+			if (observer_channel->field_1) {
+				observer->sendNetworkMessage(session->unk_index, observer_channel->observer_index, false, unit_grenades, sizeof(s_unit_grenades), data);
+			}
 		}
 	}
 }

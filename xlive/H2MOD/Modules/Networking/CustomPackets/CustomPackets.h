@@ -55,7 +55,7 @@ enum e_network_message_types
 	test,
 	//custom packets bellow
 	request_map_filename,
-	map_file_name,
+	custom_map_filename,
 	team_change,
 	unit_grenades,
 
@@ -119,9 +119,8 @@ static const char* network_message_name[] = {
 	"unit_grenades"
 };
 
-struct s_custom_map_filename
+struct __declspec(align(8)) s_custom_map_filename
 {
-	bool is_custom_map;
 	wchar_t file_name[32];
 };
 
