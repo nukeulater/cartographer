@@ -54,10 +54,8 @@ bool mapDownloadCountdown = false;
 auto promptOpenTime = std::chrono::high_resolution_clock::now();
 int downloadPercentage = 0;
 
-void MapManager::leaveSessionIfAFK()
-{
-	if (mapDownloadCountdown)
-	{
+void MapManager::leaveSessionIfAFK() {
+	if (mapDownloadCountdown) {
 		auto duraton = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now() - promptOpenTime);
 		if (duraton >= std::chrono::seconds(20)) {
 			h2mod->exit_game();
@@ -69,10 +67,9 @@ void MapManager::leaveSessionIfAFK()
 /**
 * Download map callback
 */
-char __cdecl handle_map_download_callback()
-{
-	mapDownloadCountdown = false;
+char __cdecl handle_map_download_callback() {
 	downloadPercentage = 0;
+	mapDownloadCountdown = false;
 
 	auto mapDownload = []()
 	{
@@ -291,8 +288,8 @@ bool MapManager::loadMapInfo(std::wstring& mapFileLocation)
 
 void MapManager::getMapFilename(std::wstring& buffer)
 {
-	network_session* session = nullptr;
 	wchar_t map_file_location[256];
+	network_session* session = nullptr;
 
 	// we want this to work in-game too
 	if (/*p_get_lobby_state() == game_lobby_states::in_lobby && */ NetworkSession::getCurrentNetworkSession(&session))
