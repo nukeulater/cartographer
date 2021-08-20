@@ -585,7 +585,7 @@ void ConsoleCommands::handle_command(std::string command) {
 
 			std::string secondArg = splitCommands[1];
 			std::string thirdArg = splitCommands[2];
-			datum object_datum;
+			datum object_datum = DATUM_NONE;
 			if (object_ids.find(secondArg) == object_ids.end()) {
 				//read from chatbox line
 				std::string secondArg = splitCommands[1];
@@ -642,6 +642,7 @@ void ConsoleCommands::handle_command(std::string command) {
 				output(L"Only host can see xyz for now...");
 				return;
 			}
+			extern bool displayXyz;
 			displayXyz = !displayXyz;
 			return;
 		}
@@ -791,6 +792,7 @@ void ConsoleCommands::handle_command(std::string command) {
 			output(result);
 
 			LOG_INFO_GAME("{} {} {}", tagName, tagType.as_string(), mapName);
+			return;
 		}
 		else if (firstCommand == "$logxnetconnections") {
 			if (splitCommands.size() != 1) {

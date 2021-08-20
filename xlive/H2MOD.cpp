@@ -8,8 +8,6 @@
 #include "H2MOD/Modules/Networking/Memory/bitstream.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Modules/Tweaks/Tweaks.h"
-#include "H2MOD/Variants/GunGame/GunGame.h"
-#include "H2MOD/Variants/H2X/H2X.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
 #include "H2MOD/Modules/MapManager/MapManager.h"
 #include "H2MOD/Modules/Stats/StatsHandler.h"
@@ -25,6 +23,8 @@
 #include "H2MOD/Modules/MainMenu/MapSlots.h"
 #include "H2MOD/Modules/GamePhysics/Patches/MeleeFix.h"
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
+#include "H2MOD/Modules/AdvLobbySettings/AdvLobbySettings.h"
+#include "Util/Hooks/Hook.h"
 
 #include "H2MOD/Engine/Engine.h"
 #include "H2MOD/Modules/Config/Config.h"
@@ -44,6 +44,7 @@ Infection* infectionHandler = new Infection();
 FireFight* fireFightHandler = new FireFight();
 HeadHunter* headHunterHandler = new HeadHunter();
 VariantPlayer* variant_player = new VariantPlayer();
+AdvLobbySettings* advLobbySettings = new AdvLobbySettings();
 StatsHandler* stats_handler; 
 
 extern int H2GetInstanceId();
@@ -55,6 +56,9 @@ bool b_FireFight = false;
 bool b_XboxTick = false;
 bool b_Infection = false;
 bool b_HeadHunter = false;
+
+// TODO: remove these
+s_datum_array* game_state_actors = nullptr;
 
 std::unordered_map<wchar_t*, bool&> GametypesMap
 {
@@ -80,11 +84,11 @@ int get_player_index_from_datum(datum unit_datum)
 #pragma region engine calls
 
 // Used to get damage on any object
-typedef void(__cdecl p_object_cause_damage)(Blam::Engine::Game::damage_data* damage_data, int damaged_object_indexes, __int16 a4, __int16 a5, __int16 a6, int a7);
+typedef void(__cdecl p_object_cause_damage)(s_damage_data* damage_data, int damaged_object_indexes, __int16 a4, __int16 a5, __int16 a6, int a7);
 p_object_cause_damage* c_object_cause_damage;
 
 // Engine call to set damage applied on an object by a projectile
-void __cdecl projectile_collision_object_cause_damage(Blam::Engine::Game::damage_data* damage_data, int damaged_object_indexes, __int16 a4, __int16 a5, __int16 a6, int a7)
+void __cdecl projectile_collision_object_cause_damage(s_damage_data* damage_data, int damaged_object_indexes, __int16 a4, __int16 a5, __int16 a6, int a7)
 {
 	// Hook on call to prevent guardian glitching on Infection gametype
 	if (b_Infection) {
@@ -385,7 +389,7 @@ BYTE* H2MOD::get_player_unit_from_player_index(int playerIndex) {
 	if (unit_datum.IsNull())
 		return nullptr;
 
-	DatumIterator<s_object_header> objectsIt(game_state_objects_header);
+	DatumIterator<s_object_header> objectsIt(get_objects_header());
 	return (BYTE*)objectsIt.get_data_at_index(unit_datum.ToAbsoluteIndex())->object;
 }
 
@@ -552,7 +556,7 @@ void H2MOD::disable_sounds(int sound_flags)
 							// disable all sounds from english to chinese
 							for (int j = 0; j < 8; j++)
 							{
-								(&general_event->sound)[j].TagIndex = datum::Null;
+								(&general_event->sound)[j].TagIndex = NONE;
 							}
 						}
 					}
@@ -732,7 +736,6 @@ int OnAutoPickUpHandler(datum player_datum, datum object_datum)
 void get_object_table_memory()
 {
 	game_state_actors = *Memory::GetAddress<s_datum_array**>(0xA965DC, 0x9A1C5C);
-	game_state_objects_header = *Memory::GetAddress<s_datum_array**>(0x4E461C, 0x50C8EC);
 }
 
 typedef bool(__cdecl *map_cache_load)(s_game_options* options);
@@ -962,7 +965,7 @@ change_team p_change_local_team;
 void __cdecl changeTeam(int localPlayerIndex, int teamIndex) 
 {
 	network_session* session = NetworkSession::getCurrentNetworkSession();
-	if ((session->parameters.field_8 == 4 && Engine::get_game_life_cycle() == life_cycle_pre_game)
+	if ((session->parameters.session_mode == 4 && Engine::get_game_life_cycle() == life_cycle_pre_game)
 		|| (StrStrIW(NetworkSession::getGameVariantName(), L"rvb") != NULL && teamIndex > 1)) {
 		//rvb mode enabled, don't change teams
 		return;
@@ -1173,10 +1176,9 @@ float get_device_acceleration_scale(datum device_datum)
 {
 	DWORD tag_data = (DWORD)tags::get_tag_data();
 	DWORD tag_instances = (DWORD)tags::get_tag_instances();
-	BYTE* game_state_objects_header_table = (BYTE*)game_state_objects_header->datum;
 
 	int device_gamestate_offset = device_datum.Index + device_datum.Index * 2;
-	DWORD device_gamestate_datum_pointer = *(DWORD*)(game_state_objects_header_table + device_gamestate_offset * 4 + 8);
+	DWORD device_gamestate_datum_pointer = *(DWORD*)((BYTE*)get_objects_header()->datum + device_gamestate_offset * 4 + 8);
 	DWORD device_control_datum = *(DWORD*)((BYTE*)device_gamestate_datum_pointer);
 
 	__int16 device_control_index = device_control_datum & 0xFFFF;

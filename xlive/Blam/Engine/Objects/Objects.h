@@ -1,7 +1,8 @@
 ﻿#pragma once
 
-#include "Blam\Maths\Maths.h"
-#include "Blam\Cache\DataTypes.h"
+#include "Blam\Math\BlamMath.h"
+
+#include "Blam\Engine\DataArray\DataArray.h"
 
 enum e_object_team : BYTE
 {
@@ -224,4 +225,18 @@ struct s_object_header {
 	char* object; //0x08 - 
 };
 CHECK_STRUCT_SIZE(s_object_header, 0xC);
-#pragma pack(pop)
+
+static s_datum_array* get_objects_header()
+{
+	return *Memory::GetAddress<s_datum_array**>(0x4E461C, 0x50C8EC);
+};
+
+static s_object_header* get_objects_header(datum object_index)
+{
+	/*
+		Gets the header of the object, containing some details
+	*/
+
+	auto objects_header = get_objects_header();
+	return (s_object_header*)(&objects_header->datum[objects_header->datum_element_size * object_index.ToAbsoluteIndex()]);
+}

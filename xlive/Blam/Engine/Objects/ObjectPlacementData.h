@@ -1,8 +1,8 @@
 #pragma once
-#include "Blam\Maths\Maths.h"
-#include "Blam\Cache\DataTypes.h"
+#include "Blam\Cache\DataTypes\BlamDataTypes.h"
+#include "Blam\Math\BlamMath.h"
 
-
+// TODO:
 struct s_object_placement_data
 {
 	datum tag_index;//0

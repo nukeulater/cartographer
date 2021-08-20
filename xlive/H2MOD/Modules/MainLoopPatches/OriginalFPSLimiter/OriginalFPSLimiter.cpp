@@ -4,6 +4,9 @@
 #include "Util\Hooks\Hook.h"
 #include "H2MOD\Modules\Config\Config.h"
 
+#include "Util/Hooks/Hook.h"
+#include "H2MOD/Modules/Config/Config.h"
+#include "Blam/Engine/Game/GameTimeGlobals.h"
 
 extern bool b_XboxTick;
 static LARGE_INTEGER frequency;
