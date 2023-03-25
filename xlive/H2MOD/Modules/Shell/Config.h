@@ -28,12 +28,6 @@ struct _H2Config_language {
 	int code_variant;
 };
 
-enum H2Config_Deadzone_Type : byte {
-	Axial,
-	Radial,
-	Both
-};
-
 enum e_override_texture_resolution : int
 {
 	tex_low,
@@ -76,14 +70,6 @@ extern int H2Config_static_lod_state;
 extern int H2Config_field_of_view;
 extern int H2Config_vehicle_field_of_view;
 extern bool H2Config_static_first_person;
-extern float H2Config_mouse_sens;
-extern bool H2Config_mouse_uniform;
-extern float H2Config_controller_sens;
-extern bool H2Config_controller_modern;
-extern H2Config_Deadzone_Type H2Config_Controller_Deadzone;
-extern float H2Config_Deadzone_A_X;
-extern float H2Config_Deadzone_A_Y;
-extern float H2Config_Deadzone_Radial;
 extern __int16 H2Config_refresh_rate;
 extern bool H2Config_hiresfix;
 extern bool H2Config_shader_lod_max;
@@ -119,15 +105,22 @@ extern int H2Config_hotkeyIdGuide;
 extern int H2Config_hotkeyIdConsole;
 extern int H2Config_minimum_player_start;
 
+extern float H2Config_mouse_sens;
+extern bool H2Config_mouse_uniform;
+extern float H2Config_controller_sens;
+extern bool H2Config_controller_modern;
+extern e_deadzone_types H2Config_Controller_Deadzone;
+extern float H2Config_Deadzone_A_X;
+extern float H2Config_Deadzone_A_Y;
+extern float H2Config_Deadzone_Radial;
+
 extern float H2Config_raw_mouse_scale;
 extern float H2Config_crosshair_scale;
-extern ControllerInput::CustomControllerLayout H2Config_CustomLayout;
 
-extern e_override_texture_resolution H2Config_Override_Shadows;
 extern e_override_texture_resolution H2Config_Override_Water;
+extern e_override_texture_resolution H2Config_Override_Shadows;
 
 extern bool H2Config_upnp_enable;
-extern bool H2Config_melee_fix;
 extern bool H2Config_no_events;
 extern bool H2Config_spooky_boy;
 

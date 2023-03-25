@@ -26,7 +26,7 @@ __int16 last_user_index;
 unsigned char* __cdecl death_cam_get_controller_input(__int16 a1)
 {
 	last_user_index = a1;
-	unsigned char* result = ControllerInput::get_controller_input(a1);
+	BYTE* result = (BYTE*)ControllerInput::get_controller_input(a1);
 	//Modifies the result for A button pressed if space is.
 	unsigned char keyboard_space_key_state = KeyboardInput::GetGameKbState(VK_SPACE);
 	if (keyboard_space_key_state > 0)
@@ -38,7 +38,7 @@ unsigned char* __cdecl death_cam_get_controller_input(__int16 a1)
 
 void __cdecl sub_B524F7(int a1)
 {
-	unsigned char* result = ControllerInput::get_controller_input(last_user_index);
+	BYTE* result = (BYTE*)ControllerInput::get_controller_input(last_user_index);
 	result[16] = 0;
 }
 

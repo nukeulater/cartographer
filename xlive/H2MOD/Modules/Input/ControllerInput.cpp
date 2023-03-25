@@ -1,6 +1,6 @@
 #include "stdafx.h"
-
 #include "ControllerInput.h"
+
 #include "H2MOD\Engine\Engine.h"
 #include "H2MOD\Modules\Shell\Config.h"
 #include "Util\Hooks\Hook.h"
@@ -8,228 +8,136 @@
 namespace ControllerInput
 {
 	namespace {
-		byte* byte_F4A5C8;
-		int* InputDevicesArray;
 		int* main_controller_index;
-		byte* byte_F4A5CE;
-		byte* button_state_array;
-		byte* byte_F4A5D0;
-		WORD* word_F4A5E0;
-		int* xinput_button_bitmask;
-		byte* unk_F4A5D2;
-		short* word_F4A5E4;
-		short* sThumbLX;
-		short* sThumbLY;
-		short* sThumbRX;
-		short* sThumbRY;
-		int* dword_F4A724;
-		int* dword_F4A720;
 
-		short baseDeadzone = 8689;
-		short* axialDeadzoneX;
-		short* axialDeadzoneY;
-		short radialDeadzone;
+		short radial_deadzone[ENGINE_MAX_LOCAL_PLAYERS];
+		s_controller_thumbsticks_points axial_deadzones[ENGINE_MAX_LOCAL_PLAYERS];
 
-		typedef int(__cdecl system_milliseconds_t)();
-		system_milliseconds_t* p_system_milliseconds;
-
-		typedef char(__cdecl* sub_B31EA2_t)(int local_player_index, byte* keybind_base, int a4, float* a5, float* a6, byte* a7);
+		typedef void(__cdecl* sub_B31EA2_t)(int local_player_index, BYTE* keybind_base, void* a4, float* a5, float* a6, BYTE* a7);
 		sub_B31EA2_t p_sub_B31EA2;
 
 		byte* default_profile;
-		byte* unk_input_struct;
 	}
 
+	const short default_radial_deadzone = 0;
+	const s_controller_thumbsticks_points default_deadzones = 
+	{ 
+		XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE,
+		XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE,
+		XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE,
+		XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE,
+	};
 
-	//Main function that iterates through all available input devices and calls update_xinput_state from the items vtable
-	void __cdecl update_xinput_devices()
+	DWORD __thiscall c_xinput_device::get_device_state(XINPUT_STATE* out_state)
 	{
-		WORD controller_button = 0;
-		auto InputDevices = Memory::GetAddress<controller_info**>(0x479F00);
-		//Game checks for only a max of 20 inputs, if someone ever exceeds this.. I'll be impressed
-		for(auto i = 0; i < 20; i++)
+		auto p_get_device_state = Memory::GetAddress<DWORD(__thiscall*)(c_xinput_device*, XINPUT_STATE*)>(0x0);
+		DWORD api_error = p_get_device_state(this, out_state);
+		if (api_error == 0)
 		{
-			auto InputDevice = InputDevices[i];
-			if (InputDevice->error_level == 0)
+			if (Engine::get_game_life_cycle() == _life_cycle_in_game 
+				|| Engine::get_current_engine_type() == _single_player)
 			{
-				(*reinterpret_cast<void(__thiscall *)(controller_info*)>(InputDevice->xinput_device_vtbl[2]))(InputDevice);
-				if (Engine::get_game_life_cycle() == _life_cycle_in_game || Engine::get_current_engine_type() == _single_player)
+				// apply button layout re-map
+				WORD layout_controller_input = 0;
+				for (int i = 0; i < _controller_input_end; i++)
 				{
-					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_UP)
-						controller_button |= H2Config_CustomLayout.DPAD_UP;
-					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_DOWN)
-						controller_button |= H2Config_CustomLayout.DPAD_DOWN;
-					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_LEFT)
-						controller_button |= H2Config_CustomLayout.DPAD_LEFT;
-					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_RIGHT)
-						controller_button |= H2Config_CustomLayout.DPAD_RIGHT;
-					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_START)
-						controller_button |= H2Config_CustomLayout.START;
-					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_BACK)
-						controller_button |= H2Config_CustomLayout.BACK;
-					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_THUMB)
-						controller_button |= H2Config_CustomLayout.LEFT_THUMB;
-					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_THUMB)
-						controller_button |= H2Config_CustomLayout.RIGHT_THUMB;
-					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER)
-						controller_button |= H2Config_CustomLayout.LEFT_SHOULDER;
-					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER)
-						controller_button |= H2Config_CustomLayout.RIGHT_SHOULDER;
-					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_A)
-						controller_button |= H2Config_CustomLayout.A;
-					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_B)
-						controller_button |= H2Config_CustomLayout.B;
-					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_X)
-						controller_button |= H2Config_CustomLayout.X;
-					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_Y)
-						controller_button |= H2Config_CustomLayout.Y;
-
-					InputDevice->xinput_state.Gamepad.wButtons = controller_button;
+					WORD buttonFlags = out_state->Gamepad.wButtons;
+					if ((buttonFlags & (1 << i)) != 0)
+					{
+						layout_controller_input |= H2Config_CustomLayout.button_layout[i];
+					}
 				}
+				out_state->Gamepad.wButtons = layout_controller_input;
 			}
 		}
-	}
 
-	// Hijacking the call to game_is_minimized to apply radial deadzone calculations instead of rewritting the main function
-	// File offset: 0x2EB1B
-	char h_game_is_minimized()
+		return api_error;
+	}
+	void __declspec(naked) get_device_state_hook(void) { __asm jmp c_xinput_device::get_device_state };
+
+	typedef void(__cdecl* user_profile_get_properties_t)(int, void*);
+	user_profile_get_properties_t p_user_profile_properties_get;
+
+	void __cdecl user_profile_properties_get_hook(int controller_index, void* out_properties)
 	{
-		// Just pulling the first controller index, if multiple controller support is added find a way to link
-		// the controller index used in ControllerInput::update_controller_input.
-		short* controller_input = (short*)ControllerInput::get_controller_input(0);
-
-		// Radial deadzone is being calculated using the Pythagorean Theorem, if the point is outside of the given
-		// Radius it is accepted as valid input otherwise it is rejected.
-		byte result = 0;
-		
-		unsigned int ar = pow(radialDeadzone, 2);
-		int lx = (int)controller_input[26];
-		int ly = (int)controller_input[27];
-		int rx = (int)controller_input[28];
-		int ry = (int)controller_input[29];
-
-		unsigned int alx = pow(lx, 2);
-		unsigned int aly = pow(ly, 2);
-		unsigned int arx = pow(rx, 2);
-		unsigned int ary = pow(ry, 2);
-
-		unsigned int lh = alx + aly;
-		unsigned int rh = arx + ary;
-
-		if (lh <= ar)
+		p_user_profile_properties_get(controller_index, out_properties);
+		s_controller_thumbsticks_points* profile_deadzones = (s_controller_thumbsticks_points*)((BYTE*)out_properties + 5752);
+		// if (modified_aiming_enabled) ?
 		{
-			*sThumbLX = 0;
-			*sThumbLY = 0;
+			*profile_deadzones = axial_deadzones[controller_index];
 		}
-		else
-			result++;
-		if(rh <= ar)
-		{
-			*sThumbRX = 0;
-			*sThumbRY = 0;
-		}
-		else
-			result++;
-
-		if (result >= 1)
-			return 0;
-		else
-			return 1;
 	}
 
-
-	static float LeftStickThrottle[2]; // [rsp+B8h] [rbp+67h]
-	static float RightStickThrottle[2]; // [rsp+C0h] [rbp+6Fh]
-	static short *InputMap; // rax
+	float normalize_thumbstick_point(float thumbstick_point, float max_point)
+	{
+		float normalized_point = thumbstick_point / max_point;
+		normalized_point = fminf(fmaxf(normalized_point, -1.0f), 1.0f);
+		return normalized_point;
+	}
 
 	// TODO: Refactor this to a General Input namespace, it's called whether or not you are using a controller.
-	void __cdecl ControllerInput::procces_input()
+	void __cdecl ControllerInput::abstraction_update()
 	{
-		unsigned int ControllerIndex = 0; // edi
-		float LeftStickX; // xmm0_4
-		float LeftStickY; // xmm0_4
-		float RightStickX; // xmm0_4
-		float RightStickY; // xmm0_4
-		signed __int64 result; // rax
+		int user_index = 0;
+		float thumbstickR[2], thumbstickL[2];
+		thumbstickR[0] = thumbstickR[1] = 0;
+		thumbstickL[0] = thumbstickL[1] = 0;
 
-		RightStickThrottle[0] = 0;
-		RightStickThrottle[1] = 0;
-		LeftStickThrottle[0] = 0;
-		LeftStickThrottle[1] = 0;
-		InputMap = (short*)ControllerInput::get_controller_input(ControllerIndex);
-		if (InputMap)
+		auto p_input_abstraction_update = Memory::GetAddress<void(__cdecl*)()>(0x628A8);
+		short* controller_input = (short*)ControllerInput::get_controller_input(user_index);
+		BYTE* unk_input_data = Memory::GetAddress<BYTE*>(0x4AE578);
+
+		s_controller_thumbsticks_points* controller_thunbstick_positions = (s_controller_thumbsticks_points*)((BYTE*)controller_input + 52);
+
+		// axial deadzones are handled by game's code
+		// 
+		if (radial_deadzone > 0)
 		{
-			LeftStickX = InputMap[26] * 0.000030518509;
-			if (LeftStickX >= -1.0)
+			// adjust the controller thumbsticks if radial deadzones are enabled
+			float deadzone_magnitude_squared = radial_deadzone[user_index] * radial_deadzone[user_index];
+			float left_thumbstick_magnitude_squared 
+				= controller_thunbstick_positions->thumbstickLX * controller_thunbstick_positions->thumbstickLX;
+			left_thumbstick_magnitude_squared += 
+				controller_thunbstick_positions->thumbstickLY * controller_thunbstick_positions->thumbstickLY;
+
+			float right_thumbstick_magnitude_squared
+				= controller_thunbstick_positions->thumbstickRX * controller_thunbstick_positions->thumbstickRX;
+			right_thumbstick_magnitude_squared *= controller_thunbstick_positions->thumbstickRY * controller_thunbstick_positions->thumbstickRY;
+
+			if (deadzone_magnitude_squared >= left_thumbstick_magnitude_squared)
 			{
-				if (LeftStickX <= 1.0)
-					RightStickThrottle[0] = InputMap[26] * 0.000030518509;
-				else
-					RightStickThrottle[0] = 1.0f;
+				controller_thunbstick_positions->thumbstickLX = 0;
+				controller_thunbstick_positions->thumbstickLY = 0;
 			}
-			else
+
+			if (deadzone_magnitude_squared >= right_thumbstick_magnitude_squared)
 			{
-				RightStickThrottle[0] = -1.0f;
-			}
-			LeftStickY = InputMap[27] * 0.000030518509;
-			if (LeftStickY >= -1.0)
-			{
-				if (LeftStickY <= 1.0)
-					RightStickThrottle[1] = InputMap[27] * 0.000030518509;
-				else
-					RightStickThrottle[1] = 1.0f;
-			}
-			else
-			{
-				RightStickThrottle[1] = -1.0f;
-			}
-			RightStickX = InputMap[28] * 0.000030518509;
-			if (RightStickX >= -1.0)
-			{
-				if (RightStickX <= 1.0)
-					LeftStickThrottle[0] = InputMap[28] * 0.000030518509;
-				else
-					LeftStickThrottle[0] = 1.0f;
-			}
-			else
-			{
-				LeftStickThrottle[0] = -1.0f;
-			}
-			RightStickY = InputMap[29] * 0.000030518509;
-			if (RightStickY >= -1.0)
-			{
-				if (RightStickY <= 1.0)
-					LeftStickThrottle[1] = InputMap[29] * 0.000030518509;
-				else
-					LeftStickThrottle[1] = 1.0f;
-			}
-			else
-			{
-				LeftStickThrottle[1] = -1.0f;
+				controller_thunbstick_positions->thumbstickRX = 0;
+				controller_thunbstick_positions->thumbstickRY = 0;
 			}
 		}
-		p_sub_B31EA2(ControllerIndex, default_profile, (int)InputMap, RightStickThrottle, LeftStickThrottle, unk_input_struct);
+
+		if (!H2Config_controller_modern)
+		{
+			// stock input handler
+			p_input_abstraction_update();
+		}
+		else 		
+		{
+			thumbstickL[0] = normalize_thumbstick_point(controller_thunbstick_positions->thumbstickLX, 32767.0f);
+			thumbstickL[1] = normalize_thumbstick_point(controller_thunbstick_positions->thumbstickLY, 32767.0f);
+			thumbstickR[0] = normalize_thumbstick_point(controller_thunbstick_positions->thumbstickRX, 32767.0f);
+			thumbstickR[1] = normalize_thumbstick_point(controller_thunbstick_positions->thumbstickRY, 32767.0f);
+
+			p_sub_B31EA2(user_index, default_profile, controller_input, thumbstickL, thumbstickR, unk_input_data);
+		}
 	}
 
-	typedef unsigned char*(__cdecl* get_controller_input_t)(__int16 a1);
-	get_controller_input_t p_get_controller_input;
-
-	unsigned char* ControllerInput::get_controller_input(__int16 index)
+	void* ControllerInput::get_controller_input(__int16 index)
 	{
+		typedef void* (__cdecl* get_controller_input_t)(__int16);
+		auto p_get_controller_input = Memory::GetAddress<get_controller_input_t>(0x2F433);
 		return p_get_controller_input(index);
-	}
-
-	void ControllerInput::ToggleModern()
-	{
-		if (Memory::IsDedicatedServer()) return;
-		if(H2Config_controller_modern)
-		{
-			PatchCall(Memory::GetAddress(0x39B82), procces_input);
-		}
-		else
-		{
-			PatchCall(Memory::GetAddress(0x39B82), Memory::GetAddress(0x628A8));
-		}
 	}
 
 	void ControllerInput::SetSensitiviy(float value)
@@ -243,53 +151,74 @@ namespace ControllerInput
 		*Memory::GetAddress<float*>(0x4A89BC) = 40.0f + 10.0f * value; //y-axis
 	}
 
-	void ControllerInput::SetDeadzones()
+	void ControllerInput::SetDeadzones(e_deadzone_types deadzone_type, float deadzoneLX, float deadzoneLY, float deadzoneRX, float deadzoneRY, float deadzoneRadial)
 	{
 		if (Memory::IsDedicatedServer()) return;
-		if (H2Config_Controller_Deadzone == Axial || H2Config_Controller_Deadzone == Both) {
-			*axialDeadzoneX = (short)((float)MAXSHORT * (H2Config_Deadzone_A_X / 100));
-			*axialDeadzoneY = (short)((float)MAXSHORT * (H2Config_Deadzone_A_Y / 100));
-			//*axialDeadzoneX = baseDeadzone * H2Config_Deadzone_A_X;
-			//*axialDeadzoneY = baseDeadzone * H2Config_Deadzone_A_Y;
+
+		if (deadzone_type == _controller_input_thumbstick_deadzone_axial
+			|| deadzone_type == _controller_input_thumbstick_deadzone_both) 
+		{
+			for (int i = 0; i < ENGINE_MAX_LOCAL_PLAYERS; i++)
+			{
+				axial_deadzones[i].thumbstickLX = (short)((float)MAXSHORT * (deadzoneLX / 100.f));
+				axial_deadzones[i].thumbstickLX = (short)((float)MAXSHORT * (deadzoneLY / 100.f));
+				axial_deadzones[i].thumbstickRX = (short)((float)MAXSHORT * (deadzoneRX / 100.f));
+				axial_deadzones[i].thumbstickRY = (short)((float)MAXSHORT * (deadzoneRY / 100.f));
+			}
+
 		}
 		else
 		{
-			*axialDeadzoneX = 0;
-			*axialDeadzoneY = 0;
+			for (int i = 0; i < ENGINE_MAX_LOCAL_PLAYERS; i++)
+			{
+				axial_deadzones[i] = { 0, 0, 0, 0 };
+			}
 		}
-		if (H2Config_Controller_Deadzone == Radial || H2Config_Controller_Deadzone == Both) {
-			radialDeadzone = (short)((float)MAXSHORT * (H2Config_Deadzone_Radial / 100));
+
+		if (deadzone_type == _controller_input_thumbstick_deadzone_radial 
+			|| deadzone_type == _controller_input_thumbstick_deadzone_both) 
+		{
+			for (int i = 0; i < ENGINE_MAX_LOCAL_PLAYERS; i++)
+				radial_deadzone[i] = (short)((float)MAXSHORT * (deadzoneRadial / 100.f));
 		} 
 		else
 		{
-			radialDeadzone = 0;
+			for (int i = 0; i < ENGINE_MAX_LOCAL_PLAYERS; i++)
+				radial_deadzone[i] = 0;
 		}
 	}
 
 	bool ControllerInput::HasInput()
 	{
-		char* cInput = (char*)ControllerInput::get_controller_input(0);
+		BYTE* controller_input = (BYTE*)ControllerInput::get_controller_input(0);
+		short* scInput = (short*)controller_input;
+
 		bool buttons = false;
-		for (auto i = 0; i < 42; i++)
-			if (cInput[i] != 0 && cInput[i] != MAXBYTE && cInput[i] != 0x40)
+		for (int i = 0; i < 42; i++)
+		{
+			if (controller_input[i] != 0 && controller_input[i] != 0xff && controller_input[i] != 0x40)
 				buttons = true;
-		short* scInput = (short*)cInput;
+		}
 
 		int thumbStickL = 0;
 		int thumbStickR = 0;
 		bool radialL = false;
 		bool radialR = false;
-		if (H2Config_Controller_Deadzone == Axial || H2Config_Controller_Deadzone == Both) {
-			if (abs(scInput[26]) >= ((float)MAXSHORT * (H2Config_Deadzone_A_X / 100)))
+
+		if (H2Config_Controller_Deadzone == _controller_input_thumbstick_deadzone_axial 
+			|| H2Config_Controller_Deadzone == _controller_input_thumbstick_deadzone_both)
+		{
+			if (abs(scInput[26]) >= ((float)MAXSHORT * (H2Config_Deadzone_A_X / 100.f)))
 				thumbStickL++;
-			if (abs(scInput[27]) >= ((float)MAXSHORT * (H2Config_Deadzone_A_Y / 100)))
+			if (abs(scInput[27]) >= ((float)MAXSHORT * (H2Config_Deadzone_A_Y / 100.f)))
 				thumbStickL++;
-			if (abs(scInput[28]) >= ((float)MAXSHORT * (H2Config_Deadzone_A_X / 100)))
+			if (abs(scInput[28]) >= ((float)MAXSHORT * (H2Config_Deadzone_A_X / 100.f)))
 				thumbStickR++;
-			if (abs(scInput[29]) >= ((float)MAXSHORT * (H2Config_Deadzone_A_Y / 100)))
+			if (abs(scInput[29]) >= ((float)MAXSHORT * (H2Config_Deadzone_A_Y / 100.f)))
 				thumbStickR++;
 		}
-		unsigned int ar = pow((short)((float)MAXSHORT * (H2Config_Deadzone_Radial / 100)), 2);
+
+		unsigned int ar = pow((short)((float)MAXSHORT * (H2Config_Deadzone_Radial / 100.f)), 2);
 		unsigned int alx = pow(scInput[26], 2);
 		unsigned int aly = pow(scInput[27], 2);
 		unsigned int arx = pow(scInput[28], 2);
@@ -306,43 +235,24 @@ namespace ControllerInput
 	void ControllerInput::Initialize()
 	{
 		if (Memory::IsDedicatedServer()) return;
-		axialDeadzoneX = Memory::GetAddress<short*>(0x4AA02C);
-		axialDeadzoneY = Memory::GetAddress<short*>(0x4AA02E);
 
-		p_get_controller_input = Memory::GetAddress<get_controller_input_t>(0x2F433);
-
-		default_profile = Memory::GetAddress<byte*>(0x4a89b0);
-		unk_input_struct = Memory::GetAddress<byte*>(0x4AE578);
+		default_profile = Memory::GetAddress<BYTE*>(0x4a89b0);
 		p_sub_B31EA2 = Memory::GetAddress<sub_B31EA2_t>(0x61EA2);
 		
-
 		//PatchCall(Memory::GetAddress(0x2e95d), sub_B31BF4);
 
-
-
-		byte_F4A5C8 = Memory::GetAddress<byte*>(0x47A5C8);
-		InputDevicesArray = Memory::GetAddress<int*>(0x479F00);
 		main_controller_index = Memory::GetAddress<int*>(0x47A714);
-		byte_F4A5CE = Memory::GetAddress<byte*>(0x47A5CE);
-		button_state_array = Memory::GetAddress<byte*>(0x47A5CC);
-		byte_F4A5D0 = Memory::GetAddress<byte*>(0x47A5D0);
-		word_F4A5E0 = Memory::GetAddress<WORD*>(0x47A5E0);
-		xinput_button_bitmask = Memory::GetAddress<int*>(0x39DEE0);
-		unk_F4A5D2 = Memory::GetAddress<byte*>(0x47A5D2);
-		word_F4A5E4 = Memory::GetAddress<short*>(0x47A5E4);
-		sThumbLX = Memory::GetAddress<short*>(0x47A600);
-		sThumbLY = Memory::GetAddress<short*>(0x47A602);
-		sThumbRX = Memory::GetAddress<short*>(0x47A604);
-		sThumbRY = Memory::GetAddress<short*>(0x47A606);
-		dword_F4A724 = Memory::GetAddress<int*>(0x47A724);
-		dword_F4A720 = Memory::GetAddress<int*>(0x47A720);
-		p_system_milliseconds = Memory::GetAddress<system_milliseconds_t*>(0x37E51);
 		//PatchCall(Memory::GetAddress(0x2FBD2), update_controller_input);
-		PatchCall(Memory::GetAddress(0x2eb1b), h_game_is_minimized);
-		PatchCall(Memory::GetAddress(0x2FA58), update_xinput_devices);
+		PatchCall(Memory::GetAddress(0x39B82), ControllerInput::abstraction_update);
+		WritePointer(Memory::GetAddress(0x3BBE0), get_device_state_hook);
 		//Codecave(Memory::GetAddress(0x2e975), apply_dead_zones, 166);
 		SetSensitiviy(H2Config_controller_sens);
-		ToggleModern();
-		SetDeadzones();
+		SetDeadzones(_controller_input_thumbstick_deadzone_axial, 
+			default_deadzones.thumbstickLX, 
+			default_deadzones.thumbstickLY, 
+			default_deadzones.thumbstickRX, 
+			default_deadzones.thumbstickRY, 
+			0.0f
+		);
 	}
 }

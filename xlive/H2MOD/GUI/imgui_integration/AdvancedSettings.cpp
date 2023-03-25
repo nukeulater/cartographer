@@ -60,7 +60,8 @@ namespace ImGuiHandler {
 
 				draw_list->AddRectFilled(ImVec2(Center.x - 100, Center.y - 100), ImVec2(Center.x + 100, Center.y + 100), ImColor(20, 20, 20));
 				draw_list->AddCircleFilled(Center, 100, ImColor(255, 255, 255), 120);
-				if (H2Config_Controller_Deadzone == Axial || H2Config_Controller_Deadzone == Both) {
+				if (H2Config_Controller_Deadzone == _controller_input_thumbstick_deadzone_axial
+					|| H2Config_Controller_Deadzone == _controller_input_thumbstick_deadzone_both) {
 					int X_Axis = (int)(100 * (H2Config_Deadzone_A_X / 100));
 					int Y_Axis = (int)(100 * (H2Config_Deadzone_A_Y / 100));
 					ImVec2 Y_TopLeft(
@@ -74,7 +75,8 @@ namespace ImGuiHandler {
 					ImVec2 X_BottomRight(Center.x + X_Axis, Center.y + 100);
 					draw_list->AddRectFilled(X_TopLeft, X_BottomRight, ImColor(20, 20, 20, 125));
 				}
-				if (H2Config_Controller_Deadzone == Radial || H2Config_Controller_Deadzone == Both) {
+				if (H2Config_Controller_Deadzone == _controller_input_thumbstick_deadzone_radial 
+					|| H2Config_Controller_Deadzone == _controller_input_thumbstick_deadzone_both) {
 					draw_list->AddCircleFilled(Center, H2Config_Deadzone_Radial, ImColor(20, 20, 20, 125), 120);
 				}
 
@@ -97,10 +99,12 @@ namespace ImGuiHandler {
 					radial_invalid = true;
 				}
 				bool valid = true;
-				if (H2Config_Controller_Deadzone == Axial || H2Config_Controller_Deadzone == Both)
+				if (H2Config_Controller_Deadzone == _controller_input_thumbstick_deadzone_axial 
+					|| H2Config_Controller_Deadzone == _controller_input_thumbstick_deadzone_both)
 					if (axial_invalid == 2)
 						valid = false;
-				if (H2Config_Controller_Deadzone == Radial || H2Config_Controller_Deadzone == Both)
+				if (H2Config_Controller_Deadzone == _controller_input_thumbstick_deadzone_radial 
+					|| H2Config_Controller_Deadzone == _controller_input_thumbstick_deadzone_both)
 					if (radial_invalid)
 						valid = false;
 
@@ -488,7 +492,6 @@ namespace ImGuiHandler {
 					if (ImGui::Combo("##C_Aiming_Style", &g_aiming, a_items, 2))
 					{
 						H2Config_controller_modern = g_aiming != 0;
-						ControllerInput::ToggleModern();
 					}
 					if (ImGui::IsItemHovered())
 					{
@@ -503,7 +506,7 @@ namespace ImGuiHandler {
 					ImGui::PushItemWidth(ImGui::GetColumnWidth());
 					if (ImGui::Combo("##C_Deadzone_Type", &g_deadzone, items, 3))
 					{
-						H2Config_Controller_Deadzone = (H2Config_Deadzone_Type)(byte)g_deadzone;
+						H2Config_Controller_Deadzone = g_deadzone;
 						ControllerInput::SetDeadzones();
 					}
 					if (ImGui::IsItemHovered())
@@ -513,7 +516,8 @@ namespace ImGuiHandler {
 					ImGui::PopItemWidth();
 					ImGui::Columns(1);
 
-					if (H2Config_Controller_Deadzone == Axial || H2Config_Controller_Deadzone == Both) {
+					if (H2Config_Controller_Deadzone == _controller_input_thumbstick_deadzone_axial 
+						|| H2Config_Controller_Deadzone == _controller_input_thumbstick_deadzone_both) {
 						ImGui::Text(GetString(axial_deadzone_X));
 						ImGui::PushItemWidth(WidthPercentage(75));
 						ImGui::SliderFloat("##C_Deadzone_A_X_1", &H2Config_Deadzone_A_X, 0, 100, "");
@@ -567,7 +571,8 @@ namespace ImGuiHandler {
 						}
 						ImGui::PopItemWidth();
 					}
-					if (H2Config_Controller_Deadzone == Radial || H2Config_Controller_Deadzone == Both) {
+					if (H2Config_Controller_Deadzone == _controller_input_thumbstick_deadzone_radial 
+						|| H2Config_Controller_Deadzone == _controller_input_thumbstick_deadzone_both) {
 						ImGui::Text(GetString(radial_deadzone_radius));
 						ImGui::PushItemWidth(WidthPercentage(75));
 						ImGui::SliderFloat("##C_Deadzone_R_1", &H2Config_Deadzone_Radial, 0, 100, "");
@@ -1088,13 +1093,13 @@ namespace ImGuiHandler {
 		}
 		void Open()
 		{
-			WORD Buttons[14];
-			H2Config_CustomLayout.ToArray(Buttons);
-			for (auto i = 0; i < 14; i++)
+			WORD button_layout[_controller_input_end];
+			H2Config_CustomLayout.GetLayout(button_layout);
+			for (int i = 0; i < _controller_input_end; i++)
 			{
-				for (auto j = 0; j < 14; j++)
+				for (int j = 0; j < _controller_input_end; j++)
 				{
-					if (button_values[j] == Buttons[i])
+					if (button_values[j] == button_layout[i])
 						button_placeholders[i] = j;
 				}
 			}

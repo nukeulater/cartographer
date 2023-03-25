@@ -20,6 +20,8 @@ unsigned long H2Config_master_ip = inet_addr("149.56.81.89");
 unsigned short H2Config_master_port_login = 27020;
 unsigned short H2Config_master_port_relay = 1001;
 
+#define IP_MAX_STR_LEN (4 * 3 + 3)
+
 //config variables
 bool H2Portable = false;//TODO
 
@@ -43,14 +45,6 @@ int H2Config_field_of_view = 70;
 int H2Config_vehicle_field_of_view = 70;
 __int16 H2Config_refresh_rate = 60;
 bool H2Config_static_first_person = false;
-float H2Config_mouse_sens = 0;
-bool H2Config_mouse_uniform = false;
-float H2Config_controller_sens = 0;
-bool H2Config_controller_modern = false;
-H2Config_Deadzone_Type H2Config_Controller_Deadzone = H2Config_Deadzone_Type::Axial;
-float H2Config_Deadzone_A_X = 26.0f;
-float H2Config_Deadzone_A_Y = 26.0f;
-float H2Config_Deadzone_Radial = 1.0f;
 float H2Config_crosshair_offset = NAN;
 bool H2Config_disable_ingame_keyboard = false;
 bool H2Config_hide_ingame_chat = false;
@@ -79,16 +73,22 @@ bool H2Config_koth_random = true;
 H2Config_Experimental_Rendering_Mode H2Config_experimental_fps = _rendering_mode_none;
 bool H2Config_anti_cheat_enabled = true;
 
+float H2Config_mouse_sens = 0;
+bool H2Config_mouse_uniform = false;
+float H2Config_controller_sens = 0;
+bool H2Config_controller_modern = false;
+e_deadzone_types H2Config_Controller_Deadzone = _controller_input_thumbstick_deadzone_axial;
+float H2Config_Deadzone_A_X = 26.51f;
+float H2Config_Deadzone_A_Y = 26.51f;
+float H2Config_Deadzone_Radial = 1.0f;
+
 float H2Config_crosshair_scale = 1.0f;
 float H2Config_raw_mouse_scale = 25.0f;
 
-e_override_texture_resolution H2Config_Override_Shadows;
 e_override_texture_resolution H2Config_Override_Water;
-
-ControllerInput::CustomControllerLayout H2Config_CustomLayout;
+e_override_texture_resolution H2Config_Override_Shadows;
 
 bool H2Config_upnp_enable = true;
-bool H2Config_melee_fix = true;
 bool H2Config_no_events = false;
 bool H2Config_spooky_boy = true;
 #ifndef NDEBUG
@@ -138,6 +138,7 @@ void SaveH2Config() {
 #pragma region Put Data To File
 		CSimpleIniA ini;
 		ini.SetUnicode();
+		const char* config_main_key = H2ConfigVersionSection.c_str();
 
 		std::fstream iniStringBuffer(fileConfig);
 		iniStringBuffer <<
@@ -416,113 +417,111 @@ void SaveH2Config() {
 				"\n\n";
 		}
 
-		ini.SetBoolValue(H2ConfigVersionSection.c_str(), "h2portable", H2Portable);
-		ini.SetLongValue(H2ConfigVersionSection.c_str(), "base_port", H2Config_base_port);
+		ini.SetBoolValue(config_main_key, "h2portable", H2Portable);
+		ini.SetLongValue(config_main_key, "base_port", H2Config_base_port);
 
-		ini.SetValue(H2ConfigVersionSection.c_str(), "wan_ip", H2Config_str_wan);
+		ini.SetValue(config_main_key, "wan_ip", H2Config_str_wan);
 
-		ini.SetValue(H2ConfigVersionSection.c_str(), "lan_ip", H2Config_str_lan);
+		ini.SetValue(config_main_key, "lan_ip", H2Config_str_lan);
 
-		ini.SetBoolValue(H2ConfigVersionSection.c_str(), "upnp", H2Config_upnp_enable);
+		ini.SetBoolValue(config_main_key, "upnp", H2Config_upnp_enable);
 
 		if (!H2IsDediServer) {
 			std::string lang_str(std::to_string(H2Config_language.code_main) + "x" + std::to_string(H2Config_language.code_variant));
-			ini.SetValue(H2ConfigVersionSection.c_str(), "language_code", lang_str.c_str());
+			ini.SetValue(config_main_key, "language_code", lang_str.c_str());
 		}
 
 		if (!H2IsDediServer) {
-			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "language_label_capture", H2Config_custom_labels_capture_missing);
+			ini.SetBoolValue(config_main_key, "language_label_capture", H2Config_custom_labels_capture_missing);
 
-			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "skip_intro", H2Config_skip_intro);
+			ini.SetBoolValue(config_main_key, "skip_intro", H2Config_skip_intro);
 
-			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "raw_mouse_input", H2Config_raw_input);
+			ini.SetBoolValue(config_main_key, "raw_mouse_input", H2Config_raw_input);
 
-			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "discord_enable", H2Config_discord_enable);
+			ini.SetBoolValue(config_main_key, "discord_enable", H2Config_discord_enable);
 
-			//ini.SetBoolValue(H2ConfigVersionSection.c_str(), "controller_aim_assist", H2Config_controller_aim_assist);
+			//ini.SetBoolValue(config_main_key, "controller_aim_assist", H2Config_controller_aim_assist);
 
-			ini.SetLongValue(H2ConfigVersionSection.c_str(), "fps_limit", H2Config_fps_limit);
+			ini.SetLongValue(config_main_key, "fps_limit", H2Config_fps_limit);
 
-			ini.SetLongValue(H2ConfigVersionSection.c_str(), "static_lod_state", H2Config_static_lod_state);
+			ini.SetLongValue(config_main_key, "static_lod_state", H2Config_static_lod_state);
 
-			ini.SetLongValue(H2ConfigVersionSection.c_str(), "field_of_view", H2Config_field_of_view);
+			ini.SetLongValue(config_main_key, "field_of_view", H2Config_field_of_view);
 
-			ini.SetLongValue(H2ConfigVersionSection.c_str(), "vehicle_field_of_view", H2Config_vehicle_field_of_view);
+			ini.SetLongValue(config_main_key, "vehicle_field_of_view", H2Config_vehicle_field_of_view);
 
-			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "static_fp_fov", H2Config_static_first_person);
+			ini.SetBoolValue(config_main_key, "static_fp_fov", H2Config_static_first_person);
 
-			ini.SetLongValue(H2ConfigVersionSection.c_str(), "refresh_rate", H2Config_refresh_rate);
+			ini.SetLongValue(config_main_key, "refresh_rate", H2Config_refresh_rate);
 
-			ini.SetValue(H2ConfigVersionSection.c_str(), "mouse_sens", std::to_string(H2Config_mouse_sens).c_str());
+			ini.SetValue(config_main_key, "mouse_sens", std::to_string(H2Config_mouse_sens).c_str());
 
-			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "mouse_uniform_sens", H2Config_mouse_uniform);
+			ini.SetBoolValue(config_main_key, "mouse_uniform_sens", H2Config_mouse_uniform);
 
-			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "hires_fix", H2Config_hiresfix);
+			ini.SetBoolValue(config_main_key, "hires_fix", H2Config_hiresfix);
 
-			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "shader_lod_max", H2Config_shader_lod_max);
+			ini.SetBoolValue(config_main_key, "shader_lod_max", H2Config_shader_lod_max);
 
-			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "light_suppressor", H2Config_light_suppressor);
+			ini.SetBoolValue(config_main_key, "light_suppressor", H2Config_light_suppressor);
 
-			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "d3dex", H2Config_d3d9ex);
+			ini.SetBoolValue(config_main_key, "d3dex", H2Config_d3d9ex);
 
-			ini.SetValue(H2ConfigVersionSection.c_str(), "controller_sens", std::to_string(H2Config_controller_sens).c_str());
+			ini.SetValue(config_main_key, "controller_sens", std::to_string(H2Config_controller_sens).c_str());
 
-			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "controller_modern", H2Config_controller_modern);
+			ini.SetBoolValue(config_main_key, "controller_modern", H2Config_controller_modern);
 
-			ini.SetValue(H2ConfigVersionSection.c_str(), "deadzone_type", std::to_string(H2Config_Controller_Deadzone).c_str());
+			ini.SetValue(config_main_key, "deadzone_type", std::to_string(H2Config_Controller_Deadzone).c_str());
 
-			ini.SetValue(H2ConfigVersionSection.c_str(), "deadzone_axial_x", std::to_string(H2Config_Deadzone_A_X).c_str());
+			ini.SetValue(config_main_key, "deadzone_axial_x", std::to_string(H2Config_Deadzone_A_X).c_str());
 
-			ini.SetValue(H2ConfigVersionSection.c_str(), "deadzone_axial_y", std::to_string(H2Config_Deadzone_A_Y).c_str());
+			ini.SetValue(config_main_key, "deadzone_axial_y", std::to_string(H2Config_Deadzone_A_Y).c_str());
 
-			ini.SetValue(H2ConfigVersionSection.c_str(), "deadzone_radial", std::to_string(H2Config_Deadzone_Radial).c_str());
+			ini.SetValue(config_main_key, "deadzone_radial", std::to_string(H2Config_Deadzone_Radial).c_str());
 			
-			//ini.SetBoolValue(H2ConfigVersionSection.c_str(), "experimental_fpx_fix", H2Config_experimental_fps);
-			ini.SetValue(H2ConfigVersionSection.c_str(), "experimental_rendering", std::to_string(H2Config_experimental_fps).c_str());
+			//ini.SetBoolValue(config_main_key, "experimental_fpx_fix", H2Config_experimental_fps);
+			ini.SetValue(config_main_key, "experimental_rendering", std::to_string(H2Config_experimental_fps).c_str());
 
 			if (FloatIsNaN(H2Config_crosshair_offset)) {
-				ini.SetValue(H2ConfigVersionSection.c_str(), "crosshair_offset", "NaN");
+				ini.SetValue(config_main_key, "crosshair_offset", "NaN");
 			}
 			else {
-				ini.SetValue(H2ConfigVersionSection.c_str(), "crosshair_offset", std::to_string(H2Config_crosshair_offset).c_str());
+				ini.SetValue(config_main_key, "crosshair_offset", std::to_string(H2Config_crosshair_offset).c_str());
 			}
 			if(FloatIsNaN(H2Config_crosshair_scale))
 			{
-				ini.SetValue(H2ConfigVersionSection.c_str(), "crosshair_scale", "NaN");
+				ini.SetValue(config_main_key, "crosshair_scale", "NaN");
 			}
 			else
 			{
-				ini.SetValue(H2ConfigVersionSection.c_str(), "crosshair_scale", std::to_string(H2Config_crosshair_scale).c_str());
+				ini.SetValue(config_main_key, "crosshair_scale", std::to_string(H2Config_crosshair_scale).c_str());
 			}
 			if(FloatIsNaN(H2Config_raw_mouse_scale))
 			{
-				ini.SetValue(H2ConfigVersionSection.c_str(), "mouse_raw_scale", "25");
+				ini.SetValue(config_main_key, "mouse_raw_scale", "25");
 			}
 			else
 			{
-				ini.SetValue(H2ConfigVersionSection.c_str(), "mouse_raw_scale", std::to_string(H2Config_raw_mouse_scale).c_str());
+				ini.SetValue(config_main_key, "mouse_raw_scale", std::to_string(H2Config_raw_mouse_scale).c_str());
 			}
 
-			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "disable_ingame_keyboard", H2Config_disable_ingame_keyboard);
+			ini.SetBoolValue(config_main_key, "disable_ingame_keyboard", H2Config_disable_ingame_keyboard);
 
-			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "hide_ingame_chat", H2Config_hide_ingame_chat);
+			ini.SetBoolValue(config_main_key, "hide_ingame_chat", H2Config_hide_ingame_chat);
 
-			ini.SetValue(H2ConfigVersionSection.c_str(), "override_shadows", std::to_string(H2Config_Override_Shadows).c_str());
-			ini.SetValue(H2ConfigVersionSection.c_str(), "override_water", std::to_string(H2Config_Override_Water).c_str());
+			ini.SetValue(config_main_key, "override_shadows", std::to_string(H2Config_Override_Shadows).c_str());
+			ini.SetValue(config_main_key, "override_water", std::to_string(H2Config_Override_Water).c_str());
 
-			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "melee_fix", H2Config_melee_fix);
+			ini.SetValue(config_main_key, "controller_layout", H2Config_CustomLayout.ToString().c_str());
 
-			ini.SetValue(H2ConfigVersionSection.c_str(), "controller_layout", H2Config_CustomLayout.ToString().c_str());
+			ini.SetBoolValue(config_main_key, "no_events", H2Config_no_events);
 
-			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "no_events", H2Config_no_events);
-
-			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "skeleton_biped", H2Config_spooky_boy);
+			ini.SetBoolValue(config_main_key, "skeleton_biped", H2Config_spooky_boy);
 #ifndef NDEBUG
-			ini.SetLongValue(H2ConfigVersionSection.c_str(), "forced_event", H2Config_forced_event);
+			ini.SetLongValue(config_main_key, "forced_event", H2Config_forced_event);
 #endif
 		}
 
-		ini.SetBoolValue(H2ConfigVersionSection.c_str(), "enable_xdelay", H2Config_xDelay);
+		ini.SetBoolValue(config_main_key, "enable_xdelay", H2Config_xDelay);
 
 		/*
 		if (H2IsDediServer) {
@@ -542,31 +541,31 @@ void SaveH2Config() {
 			fputs("\nflashlight = ", fileConfig); fputs(AdvLobbySettings_flashlight ? "1" : "0", fileConfig);
 		}*/
 
-		ini.SetBoolValue(H2ConfigVersionSection.c_str(), "debug_log", H2Config_debug_log);
+		ini.SetBoolValue(config_main_key, "debug_log", H2Config_debug_log);
 
-		ini.SetLongValue(H2ConfigVersionSection.c_str(), "debug_log_level", H2Config_debug_log_level);
+		ini.SetLongValue(config_main_key, "debug_log_level", H2Config_debug_log_level);
 
-		ini.SetBoolValue(H2ConfigVersionSection.c_str(), "debug_log_console", H2Config_debug_log_console);
+		ini.SetBoolValue(config_main_key, "debug_log_console", H2Config_debug_log_console);
 
 		if (H2IsDediServer) {
-			ini.SetValue(H2ConfigVersionSection.c_str(), "server_name", H2Config_dedi_server_name);
+			ini.SetValue(config_main_key, "server_name", H2Config_dedi_server_name);
 
-			ini.SetValue(H2ConfigVersionSection.c_str(), "server_playlist", H2Config_dedi_server_playlist);
+			ini.SetValue(config_main_key, "server_playlist", H2Config_dedi_server_playlist);
 
-			ini.SetLongValue(H2ConfigVersionSection.c_str(), "minimum_player_start", H2Config_minimum_player_start);
-			ini.SetLongValue(H2ConfigVersionSection.c_str(), "additional_pcr_time", H2Config_additional_pcr_time);
+			ini.SetLongValue(config_main_key, "minimum_player_start", H2Config_minimum_player_start);
+			ini.SetLongValue(config_main_key, "additional_pcr_time", H2Config_additional_pcr_time);
 
-			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "vip_lock", H2Config_vip_lock);
-			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "shuffle_even_teams", H2Config_even_shuffle_teams);
-			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "koth_random", H2Config_koth_random);
-			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "enable_anti_cheat", H2Config_anti_cheat_enabled);
+			ini.SetBoolValue(config_main_key, "vip_lock", H2Config_vip_lock);
+			ini.SetBoolValue(config_main_key, "shuffle_even_teams", H2Config_even_shuffle_teams);
+			ini.SetBoolValue(config_main_key, "koth_random", H2Config_koth_random);
+			ini.SetBoolValue(config_main_key, "enable_anti_cheat", H2Config_anti_cheat_enabled);
 
-			ini.SetValue(H2ConfigVersionSection.c_str(), "login_identifier", H2Config_login_identifier);
+			ini.SetValue(config_main_key, "login_identifier", H2Config_login_identifier);
 
-			ini.SetValue(H2ConfigVersionSection.c_str(), "login_password", H2Config_login_password);
-			ini.SetValue(H2ConfigVersionSection.c_str(), "stats_auth_key", H2Config_stats_authkey,
+			ini.SetValue(config_main_key, "login_password", H2Config_login_password);
+			ini.SetValue(config_main_key, "stats_auth_key", H2Config_stats_authkey,
 				"# DO NOT CHANGE THIS OR YOUR SERVER WILL NO LONGER TRACK STATS");
-			ini.SetValue(H2ConfigVersionSection.c_str(), "teams_enabled_bit_flags", H2Config_team_bit_flags_str, 
+			ini.SetValue(config_main_key, "teams_enabled_bit_flags", H2Config_team_bit_flags_str, 
 				"# teams_enabled_bit_flags (Server)"
 				"\n# By default, the game reads team bitflags from the current map."
 				"\n# With this option, you can enable which teams are enabled."
@@ -580,12 +579,12 @@ void SaveH2Config() {
 
 		if (!H2IsDediServer) {
 
-			ini.SetLongValue(H2ConfigVersionSection.c_str(), "hotkey_help", H2Config_hotkeyIdHelp, std::string("# " + GetVKeyCodeString(H2Config_hotkeyIdHelp)).c_str());
-			ini.SetLongValue(H2ConfigVersionSection.c_str(), "hotkey_align_window", H2Config_hotkeyIdAlignWindow, std::string("# " + GetVKeyCodeString(H2Config_hotkeyIdAlignWindow)).c_str());
-			ini.SetLongValue(H2ConfigVersionSection.c_str(), "hotkey_window_mode", H2Config_hotkeyIdWindowMode, std::string("# " + GetVKeyCodeString(H2Config_hotkeyIdWindowMode)).c_str());
-			ini.SetLongValue(H2ConfigVersionSection.c_str(), "hotkey_hide_ingame_chat", H2Config_hotkeyIdToggleHideIngameChat, std::string("# " + GetVKeyCodeString(H2Config_hotkeyIdToggleHideIngameChat)).c_str());
-			ini.SetLongValue(H2ConfigVersionSection.c_str(), "hotkey_guide", H2Config_hotkeyIdGuide, std::string("# " + GetVKeyCodeString(H2Config_hotkeyIdGuide)).c_str());
-			ini.SetLongValue(H2ConfigVersionSection.c_str(), "hotkey_console", H2Config_hotkeyIdConsole, std::string("# " + GetVKeyCodeString(H2Config_hotkeyIdConsole)).c_str());
+			ini.SetLongValue(config_main_key, "hotkey_help", H2Config_hotkeyIdHelp, std::string("# " + GetVKeyCodeString(H2Config_hotkeyIdHelp)).c_str());
+			ini.SetLongValue(config_main_key, "hotkey_align_window", H2Config_hotkeyIdAlignWindow, std::string("# " + GetVKeyCodeString(H2Config_hotkeyIdAlignWindow)).c_str());
+			ini.SetLongValue(config_main_key, "hotkey_window_mode", H2Config_hotkeyIdWindowMode, std::string("# " + GetVKeyCodeString(H2Config_hotkeyIdWindowMode)).c_str());
+			ini.SetLongValue(config_main_key, "hotkey_hide_ingame_chat", H2Config_hotkeyIdToggleHideIngameChat, std::string("# " + GetVKeyCodeString(H2Config_hotkeyIdToggleHideIngameChat)).c_str());
+			ini.SetLongValue(config_main_key, "hotkey_guide", H2Config_hotkeyIdGuide, std::string("# " + GetVKeyCodeString(H2Config_hotkeyIdGuide)).c_str());
+			ini.SetLongValue(config_main_key, "hotkey_console", H2Config_hotkeyIdConsole, std::string("# " + GetVKeyCodeString(H2Config_hotkeyIdConsole)).c_str());
 		}
 
 		ini.SaveFile(fileConfig);
@@ -654,6 +653,7 @@ void ReadH2Config() {
 
 		CSimpleIniA ini;
 		ini.SetUnicode();
+		const char* config_main_key = H2ConfigVersionSection.c_str();
 
 		SI_Error rc = ini.LoadFile(fileConfig);
 		if (rc < 0)
@@ -663,37 +663,38 @@ void ReadH2Config() {
 		else
 		{
 			// global
-			H2Portable = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "h2portable", false);
-			H2Config_base_port = ini.GetLongValue(H2ConfigVersionSection.c_str(), "base_port", H2Config_base_port);
-			H2Config_upnp_enable = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "upnp", true);
-			H2Config_xDelay = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "enable_xdelay", H2Config_xDelay);
 
-			H2Config_debug_log = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "debug_log", H2Config_debug_log);
-			H2Config_debug_log_level = ini.GetLongValue(H2ConfigVersionSection.c_str(), "debug_log_level", H2Config_debug_log_level);
-			H2Config_debug_log_console = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "debug_log_console", H2Config_debug_log_console);
+			H2Portable = ini.GetBoolValue(config_main_key, "h2portable", false);
+			H2Config_base_port = ini.GetLongValue(config_main_key, "base_port", H2Config_base_port);
+			H2Config_upnp_enable = ini.GetBoolValue(config_main_key, "upnp", true);
+			H2Config_xDelay = ini.GetBoolValue(config_main_key, "enable_xdelay", H2Config_xDelay);
 
-			const char* ip_wan = ini.GetValue(H2ConfigVersionSection.c_str(), "wan_ip");
+			H2Config_debug_log = ini.GetBoolValue(config_main_key, "debug_log", H2Config_debug_log);
+			H2Config_debug_log_level = ini.GetLongValue(config_main_key, "debug_log_level", H2Config_debug_log_level);
+			H2Config_debug_log_console = ini.GetBoolValue(config_main_key, "debug_log_console", H2Config_debug_log_console);
+
+			const char* ip_wan = ini.GetValue(config_main_key, "wan_ip");
 			if (ip_wan
-				&& strnlen_s(ip_wan, 15) >= 7
+				&& strnlen_s(ip_wan, IP_MAX_STR_LEN) >= 7
 				&& inet_addr(ip_wan) != INADDR_NONE)
 			{
-				strncpy(H2Config_str_wan, ip_wan, 15);
+				strncpy(H2Config_str_wan, ip_wan, IP_MAX_STR_LEN);
 				H2Config_ip_wan = inet_addr(H2Config_str_wan);
 			}
 
-			const char* ip_lan = ini.GetValue(H2ConfigVersionSection.c_str(), "lan_ip");
+			const char* ip_lan = ini.GetValue(config_main_key, "lan_ip");
 			if (ip_lan
-				&& strnlen_s(ip_lan, 15) >= 7
+				&& strnlen_s(ip_lan, IP_MAX_STR_LEN) >= 7
 				&& inet_addr(ip_lan) != INADDR_NONE)
 			{
-				strncpy(H2Config_str_lan, ip_lan, 15);
+				strncpy(H2Config_str_lan, ip_lan, IP_MAX_STR_LEN);
 				H2Config_ip_lan = inet_addr(H2Config_str_lan);
 			}
 
 			// client only
 			if (!H2IsDediServer)
 			{
-				std::string language_code(ini.GetValue(H2ConfigVersionSection.c_str(), "language_code", "-1x0"));
+				std::string language_code(ini.GetValue(config_main_key, "language_code", "-1x0"));
 				if (!language_code.empty())
 				{
 					size_t delimiter_offset = language_code.find("x");
@@ -707,21 +708,23 @@ void ReadH2Config() {
 					}
 				}
 
-				H2Config_custom_labels_capture_missing = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "language_label_capture", H2Config_custom_labels_capture_missing);
-				H2Config_skip_intro = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "skip_intro", H2Config_skip_intro);
-				H2Config_raw_input = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "raw_mouse_input", H2Config_raw_input);
-				H2Config_discord_enable = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "discord_enable", H2Config_discord_enable);
-				H2Config_fps_limit = ini.GetLongValue(H2ConfigVersionSection.c_str(), "fps_limit", H2Config_fps_limit);
-				H2Config_static_lod_state = ini.GetLongValue(H2ConfigVersionSection.c_str(), "static_lod_state", H2Config_static_lod_state);
+				H2Config_custom_labels_capture_missing = ini.GetBoolValue(config_main_key, "language_label_capture", H2Config_custom_labels_capture_missing);
+				H2Config_skip_intro = ini.GetBoolValue(config_main_key, "skip_intro", H2Config_skip_intro);
+				H2Config_raw_input = ini.GetBoolValue(config_main_key, "raw_mouse_input", H2Config_raw_input);
+				H2Config_discord_enable = ini.GetBoolValue(config_main_key, "discord_enable", H2Config_discord_enable);
+				H2Config_fps_limit = ini.GetLongValue(config_main_key, "fps_limit", H2Config_fps_limit);
+				H2Config_static_lod_state = ini.GetLongValue(config_main_key, "static_lod_state", H2Config_static_lod_state);
 
-				H2Config_field_of_view = ini.GetLongValue(H2ConfigVersionSection.c_str(), "field_of_view", H2Config_field_of_view);
-				H2Config_vehicle_field_of_view = ini.GetLongValue(H2ConfigVersionSection.c_str(), "vehicle_field_of_view", H2Config_vehicle_field_of_view);
-				H2Config_static_first_person = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "static_fp_fov", false);
-				//H2Config_experimental_fps = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "experimental_fpx_fix", H2Config_experimental_fps);
-				switch(std::stoi(ini.GetValue(H2ConfigVersionSection.c_str(), "experimental_rendering", "0")))
+				H2Config_field_of_view = ini.GetLongValue(config_main_key, "field_of_view", H2Config_field_of_view);
+				H2Config_vehicle_field_of_view = ini.GetLongValue(config_main_key, "vehicle_field_of_view", H2Config_vehicle_field_of_view);
+				H2Config_static_first_person = ini.GetBoolValue(config_main_key, "static_fp_fov", false);
+				//H2Config_experimental_fps = ini.GetBoolValue(config_main_key, "experimental_fpx_fix", H2Config_experimental_fps);
+
+				int rendering_type = ini.GetLongValue(config_main_key, "experimental_rendering", 0);
+				switch(rendering_type)
 				{
-					default:
 					case 0:
+					default:
 						H2Config_experimental_fps = _rendering_mode_none;
 						break;
 					case 1:
@@ -732,97 +735,104 @@ void ReadH2Config() {
 						break;
 					case 3:
 						H2Config_experimental_fps = _rendering_mode_original_game_frame_limit;
+						break;
 				}
 				
-				std::string crosshair_offset_str(ini.GetValue(H2ConfigVersionSection.c_str(), "crosshair_offset", "NaN"));
+				std::string crosshair_offset_str(ini.GetValue(config_main_key, "crosshair_offset", "NaN"));
 				if (crosshair_offset_str != "NaN")
 					H2Config_crosshair_offset = std::stof(crosshair_offset_str);
 				else
 					H2Config_crosshair_offset = 0.138f;
 
-				std::string crosshair_scale_str(ini.GetValue(H2ConfigVersionSection.c_str(), "crosshair_scale", "NaN"));
+				std::string crosshair_scale_str(ini.GetValue(config_main_key, "crosshair_scale", "NaN"));
 				if (crosshair_scale_str != "NaN")
 					H2Config_crosshair_scale = std::stof(crosshair_scale_str);
 				else
 					H2Config_crosshair_scale = 1.0f;
-				std::string raw_mouse_scale_str(ini.GetValue(H2ConfigVersionSection.c_str(), "mouse_raw_scale", "25"));
+
+				std::string raw_mouse_scale_str(ini.GetValue(config_main_key, "mouse_raw_scale", "25"));
 				H2Config_raw_mouse_scale = std::stof(raw_mouse_scale_str);
 
-				H2Config_refresh_rate = ini.GetLongValue(H2ConfigVersionSection.c_str(), "refresh_rate", H2Config_refresh_rate);
-				H2Config_mouse_uniform = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "mouse_uniform_sens", H2Config_mouse_uniform);
-				std::string mouse_sens_str(ini.GetValue(H2ConfigVersionSection.c_str(), "mouse_sens", "0"));
+				H2Config_refresh_rate = ini.GetLongValue(config_main_key, "refresh_rate", H2Config_refresh_rate);
+				H2Config_mouse_uniform = ini.GetBoolValue(config_main_key, "mouse_uniform_sens", H2Config_mouse_uniform);
+				std::string mouse_sens_str(ini.GetValue(config_main_key, "mouse_sens", "0"));
 				H2Config_mouse_sens = std::stof(mouse_sens_str);
-				std::string controller_sens_str(ini.GetValue(H2ConfigVersionSection.c_str(), "controller_sens", "0"));
+				std::string controller_sens_str(ini.GetValue(config_main_key, "controller_sens", "0"));
 				H2Config_controller_sens = std::stof(controller_sens_str);
-				H2Config_controller_modern = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "controller_modern", H2Config_controller_modern);
+				H2Config_controller_modern = ini.GetBoolValue(config_main_key, "controller_modern", H2Config_controller_modern);
+				
 				/*
-				 * ini.SetValue(H2ConfigVersionSection.c_str(), "deadzone_type", std::to_string(H2Config_Controller_Deadzone).c_str());
+				 * ini.SetValue(config_main_key, "deadzone_type", std::to_string(H2Config_Controller_Deadzone).c_str());
 
-			ini.SetValue(H2ConfigVersionSection.c_str(), "deadzone_axial_x", std::to_string(H2Config_Deadzone_A_X).c_str());
+				   ini.SetValue(config_main_key, "deadzone_axial_x", std::to_string(H2Config_Deadzone_A_X).c_str());
 
-			ini.SetValue(H2ConfigVersionSection.c_str(), "deadzone_axial_y", std::to_string(H2Config_Deadzone_A_Y).c_str());
+				   ini.SetValue(config_main_key, "deadzone_axial_y", std::to_string(H2Config_Deadzone_A_Y).c_str());
 
-			ini.SetValue(H2ConfigVersionSection.c_str(), "deadzone_radial", std::to_string(H2Config_Deadzone_Radial).c_str());
+				   ini.SetValue(config_main_key, "deadzone_radial", std::to_string(H2Config_Deadzone_Radial).c_str());
 				 */
 
-				switch (std::stoi(ini.GetValue(H2ConfigVersionSection.c_str(), "deadzone_type", "0")))
+				int deadzone_type = ini.GetLongValue(config_main_key, "deadzone_type", 0);
+				switch (deadzone_type)
 				{
-					default:
 					case 0:
-						H2Config_Controller_Deadzone = Axial;
+					default:
+						H2Config_Controller_Deadzone = _controller_input_thumbstick_deadzone_axial;
 						break;
 					case 1:
-						H2Config_Controller_Deadzone = Radial;
+						H2Config_Controller_Deadzone = _controller_input_thumbstick_deadzone_radial;
 						break;
 					case 2:
-						H2Config_Controller_Deadzone = Both;
+						H2Config_Controller_Deadzone = _controller_input_thumbstick_deadzone_both;
 						break;
 				}
-				std::string deadzone_axial_x(ini.GetValue(H2ConfigVersionSection.c_str(), "deadzone_axial_x", "26.518"));
+				std::string deadzone_axial_x(ini.GetValue(config_main_key, "deadzone_axial_x", "26.518"));
 				H2Config_Deadzone_A_X = std::stof(deadzone_axial_x);
-				std::string deadzone_axial_y(ini.GetValue(H2ConfigVersionSection.c_str(), "deadzone_axial_y", "26.518"));
+				std::string deadzone_axial_y(ini.GetValue(config_main_key, "deadzone_axial_y", "26.518"));
 				H2Config_Deadzone_A_Y = std::stof(deadzone_axial_y);
-				std::string deadzone_radial(ini.GetValue(H2ConfigVersionSection.c_str(), "deadzone_radial", "26.518"));
+				std::string deadzone_radial(ini.GetValue(config_main_key, "deadzone_radial", "26.518"));
 				H2Config_Deadzone_Radial = std::stof(deadzone_radial);
 
 
-				H2Config_shader_lod_max = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "shader_lod_max", H2Config_shader_lod_max);
-				H2Config_light_suppressor = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "light_suppressor", H2Config_light_suppressor);
-				H2Config_hiresfix = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "hires_fix", H2Config_hiresfix);
-				H2Config_d3d9ex = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "d3dex", H2Config_d3d9ex);
-				H2Config_disable_ingame_keyboard = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "disable_ingame_keyboard", H2Config_disable_ingame_keyboard);
-				H2Config_hide_ingame_chat = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "hide_ingame_chat", H2Config_hide_ingame_chat);
+				H2Config_shader_lod_max = ini.GetBoolValue(config_main_key, "shader_lod_max", H2Config_shader_lod_max);
+				H2Config_light_suppressor = ini.GetBoolValue(config_main_key, "light_suppressor", H2Config_light_suppressor);
+				H2Config_hiresfix = ini.GetBoolValue(config_main_key, "hires_fix", H2Config_hiresfix);
+				H2Config_d3dex = ini.GetBoolValue(config_main_key, "d3dex", H2Config_d3dex);
+				H2Config_disable_ingame_keyboard = ini.GetBoolValue(config_main_key, "disable_ingame_keyboard", H2Config_disable_ingame_keyboard);
+				H2Config_hide_ingame_chat = ini.GetBoolValue(config_main_key, "hide_ingame_chat", H2Config_hide_ingame_chat);
 			
-				H2Config_hotkeyIdHelp = ini.GetLongValue(H2ConfigVersionSection.c_str(), "hotkey_help", H2Config_hotkeyIdHelp);
-				H2Config_hotkeyIdAlignWindow = ini.GetLongValue(H2ConfigVersionSection.c_str(), "hotkey_align_window", H2Config_hotkeyIdAlignWindow);
-				H2Config_hotkeyIdWindowMode = ini.GetLongValue(H2ConfigVersionSection.c_str(), "hotkey_window_mode", H2Config_hotkeyIdWindowMode);
-				H2Config_hotkeyIdToggleHideIngameChat = ini.GetLongValue(H2ConfigVersionSection.c_str(), "hotkey_hide_ingame_chat", H2Config_hotkeyIdToggleHideIngameChat);
-				H2Config_hotkeyIdGuide = ini.GetLongValue(H2ConfigVersionSection.c_str(), "hotkey_guide", H2Config_hotkeyIdGuide);
-				H2Config_hotkeyIdConsole = ini.GetLongValue(H2ConfigVersionSection.c_str(), "hotkey_console", H2Config_hotkeyIdConsole);
+				H2Config_hotkeyIdHelp = ini.GetLongValue(config_main_key, "hotkey_help", H2Config_hotkeyIdHelp);
+				H2Config_hotkeyIdAlignWindow = ini.GetLongValue(config_main_key, "hotkey_align_window", H2Config_hotkeyIdAlignWindow);
+				H2Config_hotkeyIdWindowMode = ini.GetLongValue(config_main_key, "hotkey_window_mode", H2Config_hotkeyIdWindowMode);
+				H2Config_hotkeyIdToggleHideIngameChat = ini.GetLongValue(config_main_key, "hotkey_hide_ingame_chat", H2Config_hotkeyIdToggleHideIngameChat);
+				H2Config_hotkeyIdGuide = ini.GetLongValue(config_main_key, "hotkey_guide", H2Config_hotkeyIdGuide);
+				H2Config_hotkeyIdConsole = ini.GetLongValue(config_main_key, "hotkey_console", H2Config_hotkeyIdConsole);
 
-				switch(std::stoi(ini.GetValue(H2ConfigVersionSection.c_str(), "override_shadows", "1")))
+				int shadow_override = ini.GetLongValue(config_main_key, "override_shadows", 1);
+				switch (shadow_override)
 				{
 					case 0:
 						H2Config_Override_Shadows = e_override_texture_resolution::tex_low;
-					break;
-					default:
+						break;
 					case 1:
+					default:
 						H2Config_Override_Shadows = e_override_texture_resolution::tex_default;
-					break;
+						break;
 					case 2:
 						H2Config_Override_Shadows = e_override_texture_resolution::tex_high;
-					break;
+						break;
 					case 3:
 						H2Config_Override_Shadows = e_override_texture_resolution::tex_ultra;
-					break;
+						break;
 				}
-				switch(std::stoi(ini.GetValue(H2ConfigVersionSection.c_str(), "override_water", "1")))
+
+				int water_override = ini.GetLongValue(config_main_key, "override_water", 1);
+				switch(water_override)
 				{
 					case 0:
 						H2Config_Override_Water = e_override_texture_resolution::tex_low;
 						break;
-					default:
 					case 1:
+					default:
 						H2Config_Override_Water = e_override_texture_resolution::tex_default;
 						break;
 					case 2:
@@ -832,59 +842,58 @@ void ReadH2Config() {
 						H2Config_Override_Water = e_override_texture_resolution::tex_ultra;
 						break;
 				}
-				H2Config_melee_fix = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "melee_fix", H2Config_melee_fix);
 
-				H2Config_CustomLayout.FromString(std::string(ini.GetValue(H2ConfigVersionSection.c_str(), "controller_layout", "1-2-4-8-16-32-64-128-256-512-4096-8192-16384-32768")));
+				H2Config_CustomLayout.FromString(std::string(ini.GetValue(config_main_key, "controller_layout", "1-2-4-8-16-32-64-128-256-512-4096-8192-16384-32768")));
 				
-				H2Config_no_events = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "no_events", H2Config_no_events);
-				H2Config_spooky_boy = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "skeleton_biped", H2Config_spooky_boy);
+				H2Config_no_events = ini.GetBoolValue(config_main_key, "no_events", H2Config_no_events);
+				H2Config_spooky_boy = ini.GetBoolValue(config_main_key, "skeleton_biped", H2Config_spooky_boy);
 #ifndef NDEBUG
-				H2Config_forced_event = ini.GetLongValue(H2ConfigVersionSection.c_str(), "forced_event", H2Config_forced_event);
+				H2Config_forced_event = ini.GetLongValue(config_main_key, "forced_event", H2Config_forced_event);
 #endif
 			}
 
 			// dedicated server only
 			if (H2IsDediServer)
 			{
-				const char* server_name = ini.GetValue(H2ConfigVersionSection.c_str(), "server_name", H2Config_dedi_server_name);
+				const char* server_name = ini.GetValue(config_main_key, "server_name", H2Config_dedi_server_name);
 				if (server_name) {
 					strncpy(H2Config_dedi_server_name, server_name, XUSER_MAX_NAME_LENGTH);
 				}
 
-				const char* server_playlist = ini.GetValue(H2ConfigVersionSection.c_str(), "server_playlist", H2Config_dedi_server_playlist);
+				const char* server_playlist = ini.GetValue(config_main_key, "server_playlist", H2Config_dedi_server_playlist);
 				if (server_playlist) {
 					strncpy(H2Config_dedi_server_playlist, server_playlist, sizeof(H2Config_dedi_server_playlist));
 				}
 
-				H2Config_additional_pcr_time = ini.GetLongValue(H2ConfigVersionSection.c_str(), "additional_pcr_time", H2Config_additional_pcr_time);
+				H2Config_additional_pcr_time = ini.GetLongValue(config_main_key, "additional_pcr_time", H2Config_additional_pcr_time);
         
-				H2Config_minimum_player_start = ini.GetLongValue(H2ConfigVersionSection.c_str(), "minimum_player_start", H2Config_minimum_player_start);
-				H2Config_vip_lock = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "vip_lock", H2Config_vip_lock);
-				H2Config_even_shuffle_teams = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "shuffle_even_teams", H2Config_even_shuffle_teams);
-				H2Config_koth_random = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "koth_random", H2Config_koth_random);
-				H2Config_anti_cheat_enabled = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "enable_anti_cheat", H2Config_anti_cheat_enabled);
+				H2Config_minimum_player_start = ini.GetLongValue(config_main_key, "minimum_player_start", H2Config_minimum_player_start);
+				H2Config_vip_lock = ini.GetBoolValue(config_main_key, "vip_lock", H2Config_vip_lock);
+				H2Config_even_shuffle_teams = ini.GetBoolValue(config_main_key, "shuffle_even_teams", H2Config_even_shuffle_teams);
+				H2Config_koth_random = ini.GetBoolValue(config_main_key, "koth_random", H2Config_koth_random);
+				H2Config_anti_cheat_enabled = ini.GetBoolValue(config_main_key, "enable_anti_cheat", H2Config_anti_cheat_enabled);
 
-				const char* login_identifier = ini.GetValue(H2ConfigVersionSection.c_str(), "login_identifier", H2Config_login_identifier);
+				const char* login_identifier = ini.GetValue(config_main_key, "login_identifier", H2Config_login_identifier);
 				if (login_identifier) {
 					strncpy(H2Config_login_identifier, login_identifier, sizeof(H2Config_login_identifier));
 				}
 
-				const char* login_password = ini.GetValue(H2ConfigVersionSection.c_str(), "login_password", H2Config_login_password);
+				const char* login_password = ini.GetValue(config_main_key, "login_password", H2Config_login_password);
 				if (login_password) {
 					strncpy(H2Config_login_password, login_password, sizeof(H2Config_login_password));
 				}
 
-				const char* stats_authkey = ini.GetValue(H2ConfigVersionSection.c_str(), "stats_auth_key", H2Config_stats_authkey);
+				const char* stats_authkey = ini.GetValue(config_main_key, "stats_auth_key", H2Config_stats_authkey);
 				if (stats_authkey) {
 					strncpy(H2Config_stats_authkey, stats_authkey, sizeof(H2Config_stats_authkey) - 1); // - 1 for the null character
 				}
 
-				std::string team_bit_mask(ini.GetValue(H2ConfigVersionSection.c_str(), "teams_enabled_bit_flags", H2Config_team_bit_flags_str));
+				std::string team_bit_mask(ini.GetValue(config_main_key, "teams_enabled_bit_flags", H2Config_team_bit_flags_str));
 				if (!team_bit_mask.empty())
 				{
 					strncpy_s(H2Config_team_bit_flags_str, sizeof(H2Config_team_bit_flags_str), team_bit_mask.c_str(), 15);
-					H2Config_team_bit_flags = 0;
 					memset(H2Config_team_flag_array, 0, sizeof(H2Config_team_flag_array));
+					H2Config_team_bit_flags = 0;
 
 					size_t true_bit_value_count = std::count(team_bit_mask.begin(), team_bit_mask.end(), '1');
 					size_t false_bit_value_count = std::count(team_bit_mask.begin(), team_bit_mask.end(), '0');

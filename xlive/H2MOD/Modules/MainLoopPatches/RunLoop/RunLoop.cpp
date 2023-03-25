@@ -435,7 +435,7 @@ void __cdecl game_main_loop()
 		{
 			if (H2Config_controller_modern)
 			{
-				ControllerInput::procces_input();
+				ControllerInput::abstraction_update();
 			}
 			else
 			{

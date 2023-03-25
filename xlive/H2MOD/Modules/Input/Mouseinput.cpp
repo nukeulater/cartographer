@@ -50,7 +50,7 @@ char __cdecl mouse_input(int local_player_index, void *data, int a4, float *a5, 
 
 char* MouseInput::GetMouseState()
 {
-	return Memory::GetAddress<char*>(0x47a570);
+	return Memory::GetAddress<char*>(0x47A570);
 }
 
 void MouseInput::SetSensitivity(float value)

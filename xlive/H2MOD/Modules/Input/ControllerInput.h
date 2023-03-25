@@ -1,86 +1,121 @@
 #pragma once
+
+#include "Blam/Engine/Players/LocalPlayers.h"
+
+#define GAME_MAX_INPUT_DEVICES 20
+
+enum // controller button inputs
+{
+	_controller_input_dpad_up,
+	_controller_input_dpad_down,
+	_controller_input_dpad_left,
+	_controller_input_dpad_right,
+	_controller_input_start,
+	_controller_input_back,
+	_controller_input_left_thumb,
+	_controller_input_right_thumb,
+	_controller_input_left_shoulder,
+	_controller_input_right_shoulder,
+	_controller_input_a,
+	_controller_input_b,
+	_controller_input_x,
+	_controller_input_y,
+	_controller_input_end
+};
+
+enum e_deadzone_types
+{
+	_controller_input_thumbstick_deadzone_axial,
+	_controller_input_thumbstick_deadzone_radial,
+	_controller_input_thumbstick_deadzone_both,
+};
+
+struct s_controller_thumbsticks_points
+{
+	short thumbstickLX;
+	short thumbstickLY;
+	short thumbstickRX;
+	short thumbstickRY;
+};
+
+struct s_controller_input_settings
+{
+	// in case more settings will be applied
+	int settings_version;
+
+	int deadzone_type[ENGINE_MAX_LOCAL_PLAYERS];
+	short deadzone_radial[ENGINE_MAX_LOCAL_PLAYERS];
+	s_controller_thumbsticks_points deadzone_axial[ENGINE_MAX_LOCAL_PLAYERS];
+	WORD button_layout[ENGINE_MAX_LOCAL_PLAYERS][_controller_input_end];
+	float sensitivity[ENGINE_MAX_LOCAL_PLAYERS];
+
+	void GetLayout(WORD* out)
+	{
+		memcpy(out, button_layout, sizeof(button_layout));
+	}
+
+	void FromString(std::string string)
+	{
+		std::string item;
+		std::stringstream ss(string);
+
+		for (int i = 0; i < _controller_input_end; i++)
+		{
+			if (std::getline(ss, item, '-'))
+			{
+				button_layout[i] = std::stoi(item);
+			}
+		}
+	}
+
+	static short DeadzoneFromPercentage(float deadzone)
+	{
+		return (short)(32767.f * (deadzone / 100.f));
+	}
+
+	void SetDefaultSettings()
+	{
+		const short default_radial_deadzone = 0;
+		const float default_sensitivity = 3.0f;
+		const e_deadzone_types default_deadzone_type = _controller_input_thumbstick_deadzone_axial;
+		const s_controller_thumbsticks_points default_deadzones =
+		{
+			XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE,
+			XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE,
+			XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE,
+			XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE,
+		};
+
+		for (int i = 0; i < ENGINE_MAX_LOCAL_PLAYERS; i++)
+		{
+			deadzone_type[i] = default_deadzone_type;
+			deadzone_axial[i] = default_deadzones;
+			deadzone_radial[i] = default_radial_deadzone;
+			sensitivity[i] = default_sensitivity;
+		}
+	}
+};
+
 namespace ControllerInput
 {
-	struct CustomControllerLayout
+	// this is actually an interface
+	// which is inherited by 2 classes, c_xinput_device for controllers
+	// and c_dinput_device, for other peripherals
+	class alignas(4) c_xinput_device
 	{
-		WORD DPAD_UP		= XINPUT_GAMEPAD_DPAD_UP;
-		WORD DPAD_DOWN		= XINPUT_GAMEPAD_DPAD_DOWN;
-		WORD DPAD_LEFT		= XINPUT_GAMEPAD_DPAD_LEFT;
-		WORD DPAD_RIGHT		= XINPUT_GAMEPAD_DPAD_RIGHT;
-		WORD START			= XINPUT_GAMEPAD_START;
-		WORD BACK			= XINPUT_GAMEPAD_BACK;
-		WORD LEFT_THUMB		= XINPUT_GAMEPAD_LEFT_THUMB;
-		WORD RIGHT_THUMB	= XINPUT_GAMEPAD_RIGHT_THUMB;
-		WORD LEFT_SHOULDER	= XINPUT_GAMEPAD_LEFT_SHOULDER;
-		WORD RIGHT_SHOULDER	= XINPUT_GAMEPAD_RIGHT_SHOULDER;
-		WORD A				= XINPUT_GAMEPAD_A;
-		WORD B				= XINPUT_GAMEPAD_B;
-		WORD X				= XINPUT_GAMEPAD_X;
-		WORD Y				= XINPUT_GAMEPAD_Y;
-		void ToArray(WORD* out)
-		{
-			WORD temp[] = { DPAD_UP , DPAD_DOWN , DPAD_LEFT, DPAD_RIGHT, START, BACK, LEFT_THUMB, RIGHT_THUMB, LEFT_SHOULDER, RIGHT_SHOULDER, A, B ,X, Y };
-			memcpy(out, temp, sizeof(temp));
-		}
-		std::string ToString()
-		{
-			std::string temp;
-			temp += std::to_string(DPAD_UP) + "-";
-			temp += std::to_string(DPAD_DOWN) + "-";
-			temp += std::to_string(DPAD_LEFT) + "-";
-			temp += std::to_string(DPAD_RIGHT) + "-";
-			temp += std::to_string(START) + "-";
-			temp += std::to_string(BACK) + "-";
-			temp += std::to_string(LEFT_THUMB) + "-";
-			temp += std::to_string(RIGHT_THUMB) + "-";
-			temp += std::to_string(LEFT_SHOULDER) + "-";
-			temp += std::to_string(RIGHT_SHOULDER) + "-";
-			temp += std::to_string(A) + "-";
-			temp += std::to_string(B) + "-";
-			temp += std::to_string(X) + "-";
-			temp += std::to_string(Y);
-			return temp;
-		}
-		void FromString(std::string string)
-		{
-			std::stringstream ss(string);
-			std::string item;
-			std::vector<WORD> items;
-			while(std::getline(ss, item, '-'))
-			{
-				items.push_back((WORD)std::stol(item));
-			}
-			DPAD_UP = items.at(0);
-			DPAD_DOWN = items.at(1);
-			DPAD_LEFT = items.at(2);
-			DPAD_RIGHT = items.at(3);
-			START = items.at(4);
-			BACK = items.at(5);
-			LEFT_THUMB = items.at(6);
-			RIGHT_THUMB = items.at(7);
-			LEFT_SHOULDER = items.at(8);
-			RIGHT_SHOULDER = items.at(9);
-			A = items.at(10);
-			B = items.at(11);
-			X = items.at(12);
-			Y = items.at(13);
-		}
+	public:
+		void **vtbl;
+
+		DWORD __thiscall get_device_state(XINPUT_STATE* out_state);
 	};
+	static_assert(sizeof(c_xinput_device) == 4, "invalid c_input_device size");
 
-	struct alignas(4) controller_info
-	{
-		void **xinput_device_vtbl;
-		DWORD dwUserIndex;
-		DWORD error_level;
-		XINPUT_STATE xinput_state;
-	};
+	void* __cdecl get_controller_input(__int16 index);
+	void __cdecl abstraction_update();
 
-
-	unsigned char* __cdecl get_controller_input(__int16 index);
-	void __cdecl procces_input();
-	void ToggleModern();
 	void SetSensitiviy(float value);
 	bool HasInput();
-	void SetDeadzones();
 	void Initialize();
+	void SetDeadzones(e_deadzone_types deadzone_type, float deadzoneLX, float deadzoneLY, float deadzoneRX, float deadzoneRY, float deadzoneRadial);
+	void ApplyDefaultSettings();
 }
