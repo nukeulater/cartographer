@@ -341,6 +341,7 @@
     <ClCompile Include="Blam\Engine\math\color_math.cpp" />
     <ClCompile Include="Blam\Engine\tag_files\string_id.cpp" />
     <ClCompile Include="Blam\Engine\Networking\online\online_account_xbox.cpp" />
+    <ClCompile Include="Blam\Engine\bitmaps\bitmap_group.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
