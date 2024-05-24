@@ -140,27 +140,32 @@ void __cdecl rasterizer_dx9_sun_glow_draw(datum tag_index, real_point3d* point, 
         bool in_bounds = rasterizer_dx9_sun_is_in_bounds(&sun_draw_rect);
         if (in_bounds)
         {
-            // clear_alpha
-
             IDirect3DPixelShader9** lens_flare_pixel_shaders = lens_flare_pixel_shaders_get();
 
             rasterizer_dx9_set_shader_code(10);
 
-            real32 x_result = x / 2;
-            real32 y_result = y / 2;
+            real32 x_result = x / 2.f;
+            real32 y_result = y / 2.f;
 
             int16 left = global_window_parameters->camera.viewport_bounds.left;
             int16 bottom = global_window_parameters->camera.viewport_bounds.bottom;
 
             RECT rect;
-            rect.left = (x * sun_draw_rect.x0 * 0.5) + x_result + left;
-            rect.top = bottom - ((y * sun_draw_rect.y1 * 0.5) + y_result);
+            rect.left = (x * sun_draw_rect.x0 * 0.5f) + x_result + left;
+            rect.top = bottom - ((y * sun_draw_rect.y1 * 0.5f) + y_result);
 
-            rect.right = (x * sun_draw_rect.x1 * 0.5) + x_result + left;
-            rect.bottom = bottom - ((y * sun_draw_rect.y0 * 0.5) + y_result);
+            rect.right = (x * sun_draw_rect.x1 * 0.5f) + x_result + left;
+            rect.bottom = bottom - ((y * sun_draw_rect.y0 * 0.5f) + y_result);
             
-            IDirect3DSurface9* global_d3d_surface_render_primary = global_d3d_surface_render_resolved_get();
-            rasterizer_set_render_target_internal_hook_set_viewport(global_d3d_surface_render_primary, global_d3d_surface_render_primary_z_get(), true);
+            // works fairly the same as the motion sensor
+            // it draws the mask on a surface that can have the image altered
+            // in this case the main render target (backbuffer or the intermediary buffer)
+            // then it copies the image from the surface including the mask in the sun's alpha calc surface
+            // to produce the actual image with alpha 
+            *rasterizer_target_back_buffer() = false;
+            rasterizer_dx9_set_target(*rasterizer_dx9_main_render_target_get(), 0, true);
+            *rasterizer_target_back_buffer() = true;
+
             rasterizer_dx9_set_render_state(D3DRS_CULLMODE, D3DBLEND_ZERO);
             rasterizer_dx9_set_render_state(D3DRS_COLORWRITEENABLE, D3DBLEND_INVDESTALPHA);
             rasterizer_dx9_set_render_state(D3DRS_ALPHABLENDENABLE, (D3DBLEND)0);
@@ -200,12 +205,18 @@ void __cdecl rasterizer_dx9_sun_glow_draw(datum tag_index, real_point3d* point, 
             rasterizer_dx9_set_render_state(D3DRS_COLORWRITEENABLE, D3DBLEND_INVBLENDFACTOR);
             rasterizer_dx9_draw_rect(&sun_draw_rect, 1.f, global_yellow_pixel32);
             rasterizer_dx9_set_stencil_mode(0);
-            global_d3d_device->StretchRect(global_d3d_surface_render_primary, &rect, rasterizer_dx9_sun_alpha_surface_get(), NULL, D3DTEXF_LINEAR);
 
-            // copy_to_sun_glow_primary
+            // copy the surface drawn with the mask on it, also by specifying the size to be copied from the src surface
+            // this definitely needs a helper function to pass just the target surfaces from the enum
+            // and posibly the size to be copied with the rects
+            global_d3d_device->StretchRect(global_d3d_surface_render_primary_get(), &rect, rasterizer_dx9_sun_alpha_surface_get(), NULL, D3DTEXF_LINEAR);
 
-            rasterizer_dx9_set_render_state(D3DRS_ZENABLE, (D3DBLEND)0);
-            e_rasterizer_target target = sub_66C2CA(1.f, 1.f, 0.f, 15, 14, -1, -1, 1, 0, 1.f, 1.f);
+            // render the sun on the actual output surface
+            // that is later copied to the back buffer (rasterizer_target should be the resolved or 37th surface)
+            rasterizer_dx9_set_render_state(D3DRS_ZENABLE, (DWORD)0);
+            e_rasterizer_target target = rasterizer_get_sun_render_surface(1.f, 1.f, 0.f, 
+                _rasterizer_target_sun_glow_secondary, _rasterizer_target_sun_glow_primary, 
+                -1, -1, 1, 0, 1.f, 1.f);
             rasterizer_dx9_set_target(rasterizer_target, 0, 0);
             rasterizer_dx9_set_target_as_texture(0, target);
             rasterizer_dx9_set_sampler_state(0, D3DSAMP_ADDRESSU, 3u);
@@ -222,9 +233,9 @@ void __cdecl rasterizer_dx9_sun_glow_draw(datum tag_index, real_point3d* point, 
             rasterizer_dx9_set_render_state(D3DRS_SRCBLEND, D3DBLEND_ONE);
             rasterizer_dx9_set_render_state(D3DRS_DESTBLEND, D3DBLEND_ONE);
             rasterizer_dx9_set_render_state(D3DRS_BLENDOP, D3DBLEND_ZERO);
-            rasterizer_dx9_set_render_state(D3DRS_ALPHATESTENABLE, (D3DBLEND)0);
+            rasterizer_dx9_set_render_state(D3DRS_ALPHATESTENABLE, (DWORD)0);
             rasterizer_dx9_set_render_state(D3DRS_ZFUNC, D3DBLEND_INVDESTALPHA);
-            rasterizer_dx9_set_render_state(D3DRS_DEPTHBIAS, (D3DBLEND)0);
+            rasterizer_dx9_set_render_state(D3DRS_DEPTHBIAS, (DWORD)0);
             global_d3d_device->SetPixelShader(lens_flare_pixel_shaders[4]);
 
             real32 alpha = 1.f - global_window_parameters->fog_result.sky_fog_alpha;
@@ -239,6 +250,8 @@ void __cdecl rasterizer_dx9_sun_glow_draw(datum tag_index, real_point3d* point, 
                 calculation -= 4.f;
                 calculation /= 640.f;   // Resolution
 
+                // FIXME determine the vertex positions
+                // these probably use the entire screen size to compute them
                 sun_alpha_rect.x0 = sun_draw_rect.x0 - calculation;
                 sun_alpha_rect.x1 = sun_draw_rect.x1 + calculation;
                 sun_alpha_rect.y0 = sun_draw_rect.y1 + calculation;

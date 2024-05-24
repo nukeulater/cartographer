@@ -66,9 +66,6 @@ void __cdecl rasterizer_dx9_apply_gamma_and_brightness(e_rasterizer_target raste
         real32* gamma = rasterizer_dx9_gamma_get();
         real32* brightness = rasterizer_dx9_brightness_get();
 
-
-        
-
         if (*brightness == 0.f && *gamma == 1.f)
         {
             IDirect3DSurface9* target_surface = rasterizer_dx9_get_render_target_surface(rasterizer_target, 0);
@@ -140,8 +137,8 @@ void __cdecl rasterizer_dx9_apply_gamma_and_brightness(e_rasterizer_target raste
             {
                 left,
                 top,
-                width + left,
-                height + top
+                left + width,
+                top + height
             };
 
             IDirect3DSurface9* dst_surface = rasterizer_dx9_get_render_target_surface(rasterizer_target_dst, 0);
