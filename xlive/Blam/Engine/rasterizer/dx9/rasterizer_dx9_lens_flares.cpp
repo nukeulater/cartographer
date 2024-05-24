@@ -91,7 +91,7 @@ int32 __cdecl rasterizer_dx9_sun_glow_occlude(datum tag_index, real_point3d* poi
             rasterizer_dx9_set_shader_code(10);
             rasterizer_dx9_set_render_state(D3DRS_ZENABLE, D3DBLEND_ZERO);
             rasterizer_dx9_set_render_state(D3DRS_ZFUNC, D3DBLEND_INVSRCCOLOR);
-            rasterizer_dx9_set_render_state(D3DRS_COLORWRITEENABLE, (D3DBLEND)0);
+            rasterizer_dx9_set_render_state(D3DRS_COLORWRITEENABLE, (DWORD)0);
             rasterizer_dx9_set_stencil_mode(7);
             rasterizer_dx9_draw_rect(&sun_occlusion_rect, 1.0f, global_yellow_pixel32);
         }
@@ -128,34 +128,35 @@ void __cdecl rasterizer_dx9_sun_glow_draw(datum tag_index, real_point3d* point, 
     real_rectangle2d rect;
     if (render_projection_point_to_screen(&position, definition->occlusion_radius, &rect, &bounds))
     {
-        real32 x = rectangle2d_width(&global_window_parameters->camera.viewport_bounds);
-        real32 y = rectangle2d_height(&global_window_parameters->camera.viewport_bounds);
+        real32 viewport_width = rectangle2d_width(&global_window_parameters->camera.viewport_bounds);
+        real32 viewport_height = rectangle2d_height(&global_window_parameters->camera.viewport_bounds);
+        int16 viewport_left = global_window_parameters->camera.viewport_bounds.left;
+        int16 viewport_bottom = global_window_parameters->camera.viewport_bounds.bottom;
 
-        real_rectangle2d sun_draw_rect;
-        sun_draw_rect.x0 = rect.x0 - bounds.lower;    // Leftmost point on the screen
-        sun_draw_rect.x1 = rect.x0 + bounds.lower;    // Rightmost point on the screen
-        sun_draw_rect.y0 = rect.x1 - bounds.upper;    // Topmost point on the screen
-        sun_draw_rect.y1 = rect.x1 + bounds.upper;    // Bottommost point on the screen
 
-        bool in_bounds = rasterizer_dx9_sun_is_in_bounds(&sun_draw_rect);
+        // holds the position of the center of the sun
+        real_rectangle2d sun_screen_position_center;
+        sun_screen_position_center.v[0] = rect.x0 - bounds.lower;    // Leftmost point on the screen
+        sun_screen_position_center.v[1] = rect.x0 + bounds.lower;    // Rightmost point on the screen
+        sun_screen_position_center.v[2] = rect.x1 - bounds.upper;    // Topmost point on the screen
+        sun_screen_position_center.v[3] = rect.x1 + bounds.upper;    // Bottommost point on the screen
+
+        bool in_bounds = rasterizer_dx9_sun_is_in_bounds(&sun_screen_position_center);
         if (in_bounds)
         {
             IDirect3DPixelShader9** lens_flare_pixel_shaders = lens_flare_pixel_shaders_get();
 
             rasterizer_dx9_set_shader_code(10);
 
-            real32 x_result = x / 2.f;
-            real32 y_result = y / 2.f;
-
-            int16 left = global_window_parameters->camera.viewport_bounds.left;
-            int16 bottom = global_window_parameters->camera.viewport_bounds.bottom;
+            real32 x_result = viewport_width / 2.f;
+            real32 y_result = viewport_height / 2.f;
 
             RECT rect;
-            rect.left = (x * sun_draw_rect.x0 * 0.5f) + x_result + left;
-            rect.top = bottom - ((y * sun_draw_rect.y1 * 0.5f) + y_result);
+            rect.left = (viewport_width * sun_screen_position_center.x0 * 0.5f) + x_result + viewport_left;
+            rect.top = viewport_bottom - ((viewport_height * sun_screen_position_center.y1 * 0.5f) + y_result);
 
-            rect.right = (x * sun_draw_rect.x1 * 0.5f) + x_result + left;
-            rect.bottom = bottom - ((y * sun_draw_rect.y0 * 0.5f) + y_result);
+            rect.right = (viewport_width * sun_screen_position_center.x1 * 0.5f) + x_result + viewport_left;
+            rect.bottom = viewport_bottom - ((viewport_height * sun_screen_position_center.y0 * 0.5f) + y_result);
             
             // works fairly the same as the motion sensor
             // it draws the mask on a surface that can have the image altered
@@ -168,20 +169,20 @@ void __cdecl rasterizer_dx9_sun_glow_draw(datum tag_index, real_point3d* point, 
 
             rasterizer_dx9_set_render_state(D3DRS_CULLMODE, D3DBLEND_ZERO);
             rasterizer_dx9_set_render_state(D3DRS_COLORWRITEENABLE, D3DBLEND_INVDESTALPHA);
-            rasterizer_dx9_set_render_state(D3DRS_ALPHABLENDENABLE, (D3DBLEND)0);
-            rasterizer_dx9_set_render_state(D3DRS_ALPHATESTENABLE, (D3DBLEND)0);
-            rasterizer_dx9_set_render_state(D3DRS_ZENABLE, (D3DBLEND)0);
-            rasterizer_dx9_set_render_state(D3DRS_DEPTHBIAS, (D3DBLEND)0);
+            rasterizer_dx9_set_render_state(D3DRS_ALPHABLENDENABLE, (DWORD)0);
+            rasterizer_dx9_set_render_state(D3DRS_ALPHATESTENABLE, (DWORD)0);
+            rasterizer_dx9_set_render_state(D3DRS_ZENABLE, (DWORD)0);
+            rasterizer_dx9_set_render_state(D3DRS_DEPTHBIAS, (DWORD)0);
             global_d3d_device->SetPixelShader(lens_flare_pixel_shaders[1]);
 
-            x_result = 10.f / x;
-            y_result = 10.f / y;
+            x_result = 10.f / viewport_width;
+            y_result = 10.f / viewport_height;
 
             real_rectangle2d sun_alpha_rect;
-            sun_alpha_rect.x0 = sun_draw_rect.x0 - x_result;
-            sun_alpha_rect.x1 = sun_draw_rect.x1 + x_result;
-            sun_alpha_rect.y0 = sun_draw_rect.y0 - y_result;
-            sun_alpha_rect.y1 = sun_draw_rect.y1 + y_result;
+            sun_alpha_rect.x0 = sun_screen_position_center.x0 - x_result;
+            sun_alpha_rect.x1 = sun_screen_position_center.x1 + x_result;
+            sun_alpha_rect.y0 = sun_screen_position_center.y0 - y_result;
+            sun_alpha_rect.y1 = sun_screen_position_center.y1 + y_result;
             // real32 depth_range = 0.06f / 1024.f;
 
             rasterizer_dx9_draw_rect(&sun_alpha_rect, 1.f, { 0 });
@@ -203,7 +204,7 @@ void __cdecl rasterizer_dx9_sun_glow_draw(datum tag_index, real_point3d* point, 
             rasterizer_dx9_set_stencil_mode(8);
             global_d3d_device->SetPixelShader(lens_flare_pixel_shaders[2]);
             rasterizer_dx9_set_render_state(D3DRS_COLORWRITEENABLE, D3DBLEND_INVBLENDFACTOR);
-            rasterizer_dx9_draw_rect(&sun_draw_rect, 1.f, global_yellow_pixel32);
+            rasterizer_dx9_draw_rect(&sun_screen_position_center, 1.f, global_yellow_pixel32);
             rasterizer_dx9_set_stencil_mode(0);
 
             // copy the surface drawn with the mask on it, also by specifying the size to be copied from the src surface
@@ -243,21 +244,24 @@ void __cdecl rasterizer_dx9_sun_glow_draw(datum tag_index, real_point3d* point, 
 
             real32 brightness = alpha * product_magic;
             
-            for (uint32 pass = 0; pass < k_sun_quad_pass_count; pass++)
+            for (int32 pass = 0; pass < k_sun_quad_pass_count; pass++)
             {
-                real32 calculation = pass * (1.f / (real32)k_sun_quad_pass_count);
-                calculation *= 80.f;
-                calculation -= 4.f;
-                calculation /= 640.f;   // Resolution
+                real32 square_half_size = pass / (real32)k_sun_quad_pass_count;
+                square_half_size *= 80.f; // max square size, 16 passes
+                square_half_size -= 4.f; // minor offset
+                square_half_size /= 640.f; // baseline resolution
 
                 // FIXME determine the vertex positions
                 // these probably use the entire screen size to compute them
-                sun_alpha_rect.x0 = sun_draw_rect.x0 - calculation;
-                sun_alpha_rect.x1 = sun_draw_rect.x1 + calculation;
-                sun_alpha_rect.y0 = sun_draw_rect.y1 + calculation;
-                sun_alpha_rect.y1 = sun_draw_rect.y0 - calculation;
 
-                real32 result_div = brightness / (pass + 1);
+                real_rectangle2d sun_quad;
+                // create the required quad from the center point
+                sun_quad.x0 = sun_screen_position_center.v[0] - square_half_size; // go left square_half_size
+                sun_quad.x1 = sun_screen_position_center.v[1] + square_half_size; // go right square_half_size
+                sun_quad.y0 = sun_screen_position_center.v[3] + square_half_size; // go up square_half_size
+                sun_quad.y1 = sun_screen_position_center.v[2] - square_half_size; // go down square_half_size
+
+                real32 result_div = brightness / (real32)(pass + 1);
 
                 real_argb_color real_color;
                 real_color.red = result_div * 0.733333f;
@@ -265,8 +269,9 @@ void __cdecl rasterizer_dx9_sun_glow_draw(datum tag_index, real_point3d* point, 
                 real_color.blue = result_div * 0.5f;
                 real_color.alpha = 1.f;
 
+                // the mask prevents this from becoming a quad
                 pixel32 color = real_argb_color_to_pixel32(&real_color);
-                rasterizer_dx9_draw_rect(&sun_alpha_rect, 0.f, color);
+                rasterizer_dx9_draw_rect(&sun_quad, 0.f, color);
             }
         }
     }

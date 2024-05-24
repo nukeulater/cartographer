@@ -107,6 +107,10 @@ void rasterizer_dx9_render_screen_effects(int32 render_layer_debug_view, bool le
 		}
 	}
 
+	// this is the main output surface
+	// already contains the processed image of the game
+	// and is used for post-processing (e.g. brightness, bloom, sun etc.)
+	// which is later copied in the backbuffer to be displayed on the screen
 	e_rasterizer_target target = _rasterizer_target_render_resolved;
 	scenario* global_scenario = get_global_scenario();
 	if (global_scenario)
