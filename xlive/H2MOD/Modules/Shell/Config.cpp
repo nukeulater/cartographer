@@ -573,8 +573,6 @@ void ReadH2Config() {
 						break;
 				}
 				
-				std::string raw_mouse_scale_str(ini.GetValue(k_h2config_version_section, "mouse_raw_scale", "25"));
-
 				H2Config_shader_lod_max = ini.GetBoolValue(k_h2config_version_section, "shader_lod_max", H2Config_shader_lod_max);
 				H2Config_light_suppressor = ini.GetBoolValue(k_h2config_version_section, "light_suppressor", H2Config_light_suppressor);
 				H2Config_disable_ingame_keyboard = ini.GetBoolValue(k_h2config_version_section, "disable_ingame_keyboard", H2Config_disable_ingame_keyboard);
