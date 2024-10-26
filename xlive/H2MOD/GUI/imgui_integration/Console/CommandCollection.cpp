@@ -15,9 +15,9 @@
 #include "simulation/game_interface/simulation_game_action.h"
 #include "text/unicode.h"
 
+#include "H2MOD.h"
 #include "H2MOD/GUI/imgui_integration/imgui_handler.h"
 #include "H2MOD/Modules/MapManager/MapManager.h"
-#include "H2MOD/Modules/Tweaks/Tweaks.h"
 
 // for XNet connection logging
 #include "tag_files/tag_loader/tag_injection.h"
@@ -557,7 +557,7 @@ int CommandCollection::WarpFixCmd(const std::vector<std::string>& tokens, Consol
 		return 0;
 	}
 
-	H2Tweaks::WarpFix(warpFixVar);
+	H2MOD::player_position_increase_client_position_margin_of_error(warpFixVar);
 	return 0;
 }
 

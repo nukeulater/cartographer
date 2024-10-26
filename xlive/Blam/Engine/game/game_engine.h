@@ -1,4 +1,5 @@
 #pragma once
+#include "saved_games/game_variant.h"
 #include "game/game_allegiance.h"
 #include "game_statborg.h"
 #include "math/color_math.h"
@@ -74,6 +75,72 @@ enum e_multiplayer_event_sound_flags : int16
 };
 
 /* structures */
+
+class c_game_engine
+{
+public:
+	virtual e_game_engine_index get_type() = 0;
+
+	/*
+		Called on scenario load, returns success
+		game engine will be disabled on failure
+	*/
+	virtual bool setup() = 0;
+
+	/* Called on scenario cleanup/exit */
+	virtual void cleanup() = 0;
+	virtual bool unk_function_4() = 0;
+	virtual bool unk_function_5(int arg1) = 0;
+	virtual void unk_function_players_1(datum player_index) = 0;
+	virtual void update_player__maybe__maybe_spawn(int event_type) = 0;
+	virtual void unk_function_8(int arg1) = 0;
+	virtual void unk_function_9(int arg1) = 0;
+	virtual void unk_function_players_2(int arg1, int arg2) = 0;
+	virtual void unk_function_11(int arg1) = 0;
+	virtual void unk_function_12() = 0;
+	virtual void unk_function_13() = 0;
+	virtual void unk_function_14(int arg1) = 0;
+
+	/* Render 3d objects (e.g hologram around hill in KotH) */
+	virtual void render_in_world(int32 user_index) = 0;
+	virtual void unk_function_16(int arg1) = 0;
+	virtual int unk_function_17(int arg1, int arg2) = 0;
+	virtual int unk_function_18(int arg1, int arg2) = 0;
+	virtual void unk_function_19() = 0;
+	virtual float player_speed_multiplier(datum player_index) = 0;
+	virtual int unk_function_21(int arg1) = 0;
+	virtual void unk_function_22(int arg1) = 0;
+	virtual void unk_function_23(int arg1) = 0;
+	virtual void unk_function_24(int arg1, int arg2) = 0;
+	virtual int unk_function_25(int arg1, int arg2) = 0;
+	virtual int unk_function_26(int arg1, int arg2, int arg3) = 0;
+	virtual int unk_function_27() = 0;
+	virtual bool is_team_enemy(e_game_team team_a, e_game_team team_b) = 0;
+	virtual void unk_function_29(int arg1) = 0;
+	virtual void unk_function_30(int arg1, int arg2, int arg3) = 0;
+	virtual void unk_function_31(int arg1, int arg2, char arg3, int arg4) = 0;
+	virtual int unk_function_32(int arg1, int arg2, int arg3) = 0;
+	virtual void unk_function_33(int arg1, int arg2) = 0;
+	virtual int unk_function_34(int arg1, int arg2) = 0;
+	virtual bool unk_function_35(int arg1) = 0;
+	virtual int unk_function_36(int arg1, int arg2) = 0;
+	virtual void unk_function_37(int arg1) = 0;
+	virtual int unk_function_38(int arg1, int arg2) = 0;
+	virtual bool should_garbage_collect(int arg1) = 0;
+	virtual void unk_function_40() = 0;
+	virtual void unk_function_41() = 0;
+	virtual void* unk_function_42(void* arg1) = 0;
+	virtual void* unk_function_43(char a1, size_t* a2, void* a3) = 0;
+	virtual bool unk_function_44(char a1, void* a2) = 0;
+	virtual int unk_function_45(char a1, int a2) = 0;
+	virtual int unk_function_46(char a1, int a2, int a3) = 0;
+	virtual bool unk_function_47(char a1, int a2, int a3) = 0;
+	virtual void* unk_function_48(int a1, int a2, void* a3) = 0;
+	virtual void unk_function_49(int arg1, int arg2, int arg3, int arg4) = 0;
+	virtual bool unk_function_50(__int16 a1, __int16 a2, int a3, int a4) = 0;
+	virtual int unk_function_51(int arg1, int arg2, int arg3, int arg4, int arg5) = 0;
+private:
+};
 
 struct s_game_engine_global_player_info
 {

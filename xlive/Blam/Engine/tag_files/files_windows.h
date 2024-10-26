@@ -91,3 +91,5 @@ bool __cdecl file_set_hidden(s_file_reference* file_reference, bool hidden);
 // file_to_add: file reference for the file we want to add to the zip
 // path_in_zip: the file path (includes the filename) the file will be set as in the zip file
 bool compress_file_to_zip(zipFile zip_file, s_file_reference* file_to_add, const char* path_in_zip);
+
+bool __cdecl file_write_encrypted_hook(s_file_reference* file_ptr, DWORD nNumberOfBytesToWrite, LPVOID lpBuffer);

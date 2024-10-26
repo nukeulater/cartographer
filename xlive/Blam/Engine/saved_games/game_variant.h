@@ -2,14 +2,21 @@
 
 enum e_game_engine_index
 {
-	_game_engine_campaign = 0,
-	_game_engine_ctf = 1,
-	_game_engine_slayer = 2,
-	_game_engine_oddball = 3,
-	_game_engine_koth = 4,
-	_game_engine_juggernaut = 7,
-	_game_engine_territories = 8,
-	_game_engine_assault = 9,
+	_game_engine_invalid = -1,
+
+	_game_engine_campaign,
+	_game_engine_ctf,
+	_game_engine_slayer,
+	_game_engine_oddball,
+	_game_engine_koth,
+	_game_engine_5,
+	_game_engine_6,
+	_game_engine_juggernaut,
+	_game_engine_territories,
+	_game_engine_assault,
+	_game_engine_10,
+
+	k_game_engine_count,
 };
 enum e_game_variant_description_index : char
 {
