@@ -369,3 +369,42 @@ LRESULT WINAPI H2WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 	return result;
 }
+
+void DuplicateDataBlob(DATA_BLOB* pDataIn, DATA_BLOB* pDataOut)
+{
+	pDataOut->cbData = pDataIn->cbData;
+	pDataOut->pbData = static_cast<BYTE*>(LocalAlloc(LMEM_FIXED, pDataIn->cbData));
+	CopyMemory(pDataOut->pbData, pDataIn->pbData, pDataIn->cbData);
+}
+
+BOOL WINAPI CryptProtectDataHook(
+	_In_       DATA_BLOB* pDataIn,
+	_In_opt_   LPCWSTR                   szDataDescr,
+	_In_opt_   DATA_BLOB* pOptionalEntropy,
+	_Reserved_ PVOID                     pvReserved,
+	_In_opt_   CRYPTPROTECT_PROMPTSTRUCT* pPromptStruct,
+	_In_       DWORD                     dwFlags,
+	_Out_      DATA_BLOB* pDataOut
+)
+{
+	DuplicateDataBlob(pDataIn, pDataOut);
+
+	return TRUE;
+}
+
+BOOL WINAPI CryptUnprotectDataHook(
+	_In_       DATA_BLOB* pDataIn,
+	_Out_opt_  LPWSTR* ppszDataDescr,
+	_In_opt_   DATA_BLOB* pOptionalEntropy,
+	_Reserved_ PVOID                     pvReserved,
+	_In_opt_   CRYPTPROTECT_PROMPTSTRUCT* pPromptStruct,
+	_In_       DWORD                     dwFlags,
+	_Out_      DATA_BLOB* pDataOut
+)
+{
+	if (CryptUnprotectData(pDataIn, ppszDataDescr, pOptionalEntropy, pvReserved, pPromptStruct, dwFlags, pDataOut) == FALSE) {
+		DuplicateDataBlob(pDataIn, pDataOut); // if decrypting the data fails just assume it's unencrypted
+	}
+
+	return TRUE;
+}

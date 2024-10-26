@@ -11,10 +11,10 @@
 #include "networking/NetworkMessageTypeCollection.h"
 #include "rasterizer/rasterizer_globals.h"
 
+#include "H2MOD.h"
 #include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
-#include "H2MOD/Modules/Tweaks/Tweaks.h"
 
 #ifndef NDEBUG
 #include "H2MOD/Modules/DirectorHooks/DirectorHooks.h"
@@ -686,7 +686,7 @@ namespace ImGuiHandler {
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 						if (ImGui::Checkbox("##XDelay", &H2Config_xDelay))
 						{
-							H2Tweaks::RefreshTogglexDelay();
+							H2MOD::RefreshTogglexDelay();
 						}
 						ImGui::Columns(1);
 						ImGui::Separator();

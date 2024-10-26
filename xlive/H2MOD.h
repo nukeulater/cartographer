@@ -21,7 +21,9 @@ public:
 	static void Deinitialize();
 	static void ApplyHooks();
 	static void RegisterEvents();
+	static void RefreshTogglexDelay();
 
+	static void player_position_increase_client_position_margin_of_error(bool enable);
 	int get_player_index_from_unit_datum_index(datum unit_datum_index);
 	void set_unit_speed_patch(bool hackit);
 	void disable_score_announcer_sounds(int sound);

@@ -150,3 +150,12 @@ bool compress_file_to_zip(zipFile zip_file, s_file_reference* file_to_add, const
 
 	return result;
 }
+
+bool __cdecl file_write_encrypted_hook(s_file_reference* file_ptr, DWORD nNumberOfBytesToWrite, LPVOID lpBuffer)
+{
+	DWORD file_size = GetFileSize(file_ptr->handle, NULL);
+
+	if (file_size > nNumberOfBytesToWrite) // clear the file as unencrypted data is shorter then encrypted data.
+		file_change_size(file_ptr, 0);
+	return file_write(file_ptr, nNumberOfBytesToWrite, lpBuffer);
+}
