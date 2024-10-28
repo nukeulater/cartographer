@@ -608,7 +608,7 @@ static void overrideCoreH2Labels() {
 	}
 } 
 
-void InitCustomLanguage() {
+void custom_language_initialize() {
 	if (!Memory::IsDedicatedServer()) {
 		setGameLanguage();
 

@@ -37,4 +37,4 @@ void __cdecl ice_cream_flavor_stock(const e_skull_type skull);
 // Gets the activation array for the skulls
 bool* get_ice_cream_activation();
 
-void apply_cheat_hooks();
+void cheats_apply_patches();

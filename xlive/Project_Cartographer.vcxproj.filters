@@ -29,7 +29,6 @@
     <ClCompile Include="H2MOD\Modules\OnScreenDebug\OnscreenDebug.cpp" />
     <ClCompile Include="H2MOD\Modules\MainLoopPatches\RunLoop\RunLoop.cpp" />
     <ClCompile Include="H2MOD\Modules\Shell\Startup\Startup.cpp" />
-    <ClCompile Include="H2MOD\Modules\Tweaks\Tweaks.cpp" />
     <ClCompile Include="H2MOD\Modules\Updater\Updater.cpp" />
     <ClCompile Include="H2MOD\Utils\Utils.cpp" />
     <ClCompile Include="H2MOD\Variants\GunGame\GunGame.cpp" />
@@ -447,6 +446,11 @@
     <ClCompile Include="Blam\Engine\networking\online\online_task_xbox.cpp" />
     <ClCompile Include="Blam\Engine\camera\following_camera.cpp" />
     <ClCompile Include="Blam\Engine\camera\editor_camera.cpp" />
+    <ClCompile Include="Blam\Engine\bitmaps\tiff_file.cpp" />
+    <ClCompile Include="Blam\Engine\rasterizer\dx12\rasterizer_dx12_main.cpp" />
+    <ClCompile Include="Blam\Engine\rasterizer\rasterizer_main.cpp" />
+    <ClCompile Include="Blam\Engine\bitmaps\bitmap_utilities.cpp" />
+    <ClCompile Include="Blam\Engine\bitmaps\targa_file.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
@@ -574,7 +578,6 @@
     <ClInclude Include="H2MOD\Modules\OnScreenDebug\OnscreenDebug.h" />
     <ClInclude Include="H2MOD\Modules\MainLoopPatches\RunLoop\RunLoop.h" />
     <ClInclude Include="H2MOD\Modules\Shell\Startup\Startup.h" />
-    <ClInclude Include="H2MOD\Modules\Tweaks\Tweaks.h" />
     <ClInclude Include="H2MOD\Modules\Updater\Updater.h" />
     <ClInclude Include="H2MOD\Utils\Utils.h" />
     <ClInclude Include="H2MOD\Variants\GunGame\GunGame.h" />
@@ -1166,6 +1169,12 @@
     <ClInclude Include="Blam\Engine\render\render_patchy_fog.h" />
     <ClInclude Include="Blam\Engine\networking\online\online_task_xbox.h" />
     <ClInclude Include="Blam\Engine\camera\editor_camera.h" />
+    <ClInclude Include="Blam\Engine\bitmaps\tiff_file.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\dx12\rasterizer_dx12_main.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\rasterizer_main.h" />
+    <ClInclude Include="Blam\Engine\bitmaps\bitmap_utilities.h" />
+    <ClInclude Include="Blam\Engine\bitmaps\targa_file.h" />
+    <ClInclude Include="Blam\Engine\memory\hashtable.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

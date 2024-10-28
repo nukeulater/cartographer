@@ -87,7 +87,7 @@ bool* get_ice_cream_activation()
 	return skull_enabled;
 }
 
-void apply_cheat_hooks()
+void cheats_apply_patches()
 {
 	DETOUR_ATTACH(p_ice_cream_flavor_available, Memory::GetAddress<ice_cream_flavor_available_t>(0xBD114, 0xAC2A2), ice_cream_flavor_available);
 	DETOUR_ATTACH(p_ice_cream_activation, Memory::GetAddress<ice_cream_activation_t>(0xBD137, 0xAC2C5), ice_cream_flavor_stock);

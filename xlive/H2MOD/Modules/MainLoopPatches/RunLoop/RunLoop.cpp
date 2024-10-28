@@ -1,9 +1,7 @@
 #include "stdafx.h"
 #include "RunLoop.h"
 
-#include "shell/shell_windows.h"
 #include "main/main_game_time.h"
-#include "rasterizer/dx9/rasterizer_dx9_main.h"
 
 #include "H2MOD/GUI/XLiveRendering.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
@@ -77,7 +75,7 @@ void CartographerMainLoop() {
 	*/
 }
 
-void __cdecl main_game_time_initialize_defaults_hook()
+void __cdecl main_game_time_initialize_hook()
 {
 	// windows 10 version 2004 and above added behaviour changes to how windows timer resolution works, and we have to explicitly set the time resolution
 	// and since they were added, when playing on a laptop on battery it migth add heavy stuttering when using a frame limiter based on Sleep function (or std::this_thread::sleep_for) implementation
@@ -90,7 +88,7 @@ void __cdecl main_game_time_initialize_defaults_hook()
 
 	timeBeginPeriod(TIMER_RESOLUTION_MS);
 
-	INVOKE(0x2869F, 0x24841, main_game_time_initialize_defaults_hook);
+	INVOKE(0x2869F, 0x24841, main_game_time_initialize_hook);
 }
 
 void __cdecl game_modules_dispose_hook() {
@@ -99,18 +97,8 @@ void __cdecl game_modules_dispose_hook() {
 
 	DeinitH2Startup();
 
-	// reset time resolution to system default on game exit (initialization happens in main_game_time_initialize_defaults_hook())
+	// reset time resolution to system default on game exit (initialization happens in main_game_time_initialize_hook())
 	timeEndPeriod(TIMER_RESOLUTION_MS);
-}
-
-// rasterizer_present hook
-// used to limit framerate using our implementation
-void __cdecl rasterizer_present_hook(bitmap_data* bitmap) {
-	//typedef void(__cdecl* rasterizer_present_t)(int);
-	//auto p_rasterizer_present = Memory::GetAddress<rasterizer_present_t>(0x26271A);
-
-	rasterizer_dx9_present(bitmap);
-	shell_windows_throttle_framerate(H2Config_fps_limit);
 }
 
 typedef void(_cdecl* main_loop_body_t)();
@@ -128,7 +116,7 @@ void __cdecl main_loop_body() {
 	EventHandler::GameLoopEventExecute(EventExecutionType::execute_after);
 }
 
-void InitRunLoop() {
+void main_loop_apply_patches() {
 	LOG_INFO_GAME("{} - initializing", __FUNCTION__);
 
 	addDebugText("Pre RunLoop hooking.");
@@ -146,10 +134,6 @@ void InitRunLoop() {
 		// override
 		g_experimental_rendering_mode = _rendering_mode_original_game_frame_limit;
 
-		// present hooks for the frame limiter
-		PatchCall(Memory::GetAddress(0x19073C), rasterizer_present_hook);
-		PatchCall(Memory::GetAddress(0x19074C), rasterizer_present_hook);
-
 		switch (g_experimental_rendering_mode)
 		{
 		case _rendering_mode_original_game_frame_limit:
@@ -163,7 +147,7 @@ void InitRunLoop() {
 		} // switch (g_experimental_rendering_mode)
 	}
 
-	PatchCall(Memory::GetAddress(0x39E3D, 0xBA40), main_game_time_initialize_defaults_hook);
+	PatchCall(Memory::GetAddress(0x39E3D, 0xBA40), main_game_time_initialize_hook);
 	PatchCall(Memory::GetAddress(0x39E7C, 0xC6F7), game_modules_dispose_hook);
 
 	addDebugText("Post RunLoop Hooking.");

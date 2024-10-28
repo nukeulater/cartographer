@@ -31,3 +31,25 @@ bool __cdecl game_is_minimized(void);
 bool __cdecl gfwl_gamestore_initialize(void);
 
 int32* fatal_error_id_get(void);
+
+void DuplicateDataBlob(DATA_BLOB* pDataIn, DATA_BLOB* pDataOut);
+
+BOOL WINAPI CryptProtectDataHook(
+	_In_       DATA_BLOB* pDataIn,
+	_In_opt_   LPCWSTR                   szDataDescr,
+	_In_opt_   DATA_BLOB* pOptionalEntropy,
+	_Reserved_ PVOID                     pvReserved,
+	_In_opt_   CRYPTPROTECT_PROMPTSTRUCT* pPromptStruct,
+	_In_       DWORD                     dwFlags,
+	_Out_      DATA_BLOB* pDataOut
+);
+
+BOOL WINAPI CryptUnprotectDataHook(
+	_In_       DATA_BLOB* pDataIn,
+	_Out_opt_  LPWSTR* ppszDataDescr,
+	_In_opt_   DATA_BLOB* pOptionalEntropy,
+	_Reserved_ PVOID                     pvReserved,
+	_In_opt_   CRYPTPROTECT_PROMPTSTRUCT* pPromptStruct,
+	_In_       DWORD                     dwFlags,
+	_Out_      DATA_BLOB* pDataOut
+);

@@ -17,7 +17,8 @@ enum e_shared_resource_database_type : int32
 	_shared_resource_database_type_main_menu = 0,
 	_shared_resource_database_type_multi_player = 1,
 	_shared_resource_database_type_single_player = 2,
-	_shared_resource_database_type_none = -1
+	k_shared_resource_database_type_count,
+	_shared_resource_database_type_none = NONE
 };
 
 struct cache_file_tag_instance
@@ -58,7 +59,7 @@ struct s_cache_header
 	int32 tag_offset_mask;
 	int32 shared_tag_dependency_offset;
 	int32 shared_tag_dependency_count;
-	int8 some_path[256];
+	char path[256];
 	char version_string[32];
 	int16 type;	// e_scenario_type
 	int16 pad;
@@ -66,7 +67,7 @@ struct s_cache_header
 	bool crc_valid;
 	int8 pad_1[3];
 	bool field_158;
-	bool tracked__maybe;
+	bool tracked;
 	bool field_15A;
 	bool field_15B;
 	int32 field_15C;
@@ -78,12 +79,11 @@ struct s_cache_header
 	int32 string_table_size;
 	int32 string_idx_offset;
 	int32 string_table_offset;
-	int8 uses_shared_map[3];
+	bool uses_shared_map[k_shared_resource_database_type_count];
 	int8 pad_2;
-	FILETIME time;
-	FILETIME main_menu_time;
-	FILETIME shared_time;
-	FILETIME campaign_time;
+
+	FILETIME creation_time;
+	FILETIME shared_creation_time[k_shared_resource_database_type_count];
 	char name[32];
 	e_language language;
 	char scenario_path[256];
@@ -95,10 +95,12 @@ struct s_cache_header
 	int32 language_pack_offset;
 	int32 language_pack_size;
 	datum secondary_ugh_tag_index;
+
 	int32 geometry_data_offset;
 	int32 geometry_data_size;
-	int32 checksum;
-	int32 mopp_code_checksum;
+	
+	uint32 checksum;
+	uint32 mopp_checksum;
 	int8 field_2F8[1284];
 	int32 footer_signature;
 };
@@ -163,7 +165,7 @@ uint32 __cdecl cache_file_align_read_size_to_cache_page(uint32 size);
 
 bool __cdecl cache_file_blocking_read(uint32 a1, uint32 cache_offset, uint32 read_size, void* out_buffer);
 
-bool __cdecl scenario_tags_load(const char* scenario_path);
+bool __cdecl scenario_tags_load_internal(const char* scenario_path);
 
 datum tag_loaded(uint32 group_tag, const char* name);
 

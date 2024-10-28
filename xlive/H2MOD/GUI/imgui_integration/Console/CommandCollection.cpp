@@ -8,15 +8,16 @@
 #include "game/game.h"
 #include "main/main_game.h"
 #include "main/main_game_time.h"
+#include "main/main_screenshot.h"
 #include "networking/Session/NetworkSession.h"
 #include "networking/NetworkMessageTypeCollection.h"
 #include "objects/objects.h"
 #include "simulation/game_interface/simulation_game_action.h"
 #include "text/unicode.h"
 
+#include "H2MOD.h"
 #include "H2MOD/GUI/imgui_integration/imgui_handler.h"
 #include "H2MOD/Modules/MapManager/MapManager.h"
-#include "H2MOD/Modules/Tweaks/Tweaks.h"
 
 // for XNet connection logging
 #include "tag_files/tag_loader/tag_injection.h"
@@ -86,6 +87,7 @@ void CommandCollection::InitializeCommands()
 	InsertCommand(new ConsoleCommand("connect", "lets you directly connect to a session with an invite code", 1, 1, CommandCollection::connect));
 	InsertCommand(new ConsoleCommand("sv_change_player_team", "changes the player team to the specivied team", 2, 2, CommandCollection::change_player_team));
 	InsertCommand(new ConsoleCommand("quit", "quits the game to desktop", 0, 0, CommandCollection::quit));
+	InsertCommand(new ConsoleCommand("screenshot_cubemap", "takes a cubemap screenshot and saves as <name>.tif", 1, 1, CommandCollection::_screenshot_cubemap));
 
 	atexit([]() -> void {
 		for (auto command : commandTable)
@@ -555,7 +557,7 @@ int CommandCollection::WarpFixCmd(const std::vector<std::string>& tokens, Consol
 		return 0;
 	}
 
-	H2Tweaks::WarpFix(warpFixVar);
+	H2MOD::player_position_increase_client_position_margin_of_error(warpFixVar);
 	return 0;
 }
 
@@ -931,5 +933,12 @@ int CommandCollection::change_player_team(const std::vector<std::string>& tokens
 int CommandCollection::quit(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
 	main_quit();
+	return 0;
+}
+
+int CommandCollection::_screenshot_cubemap(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
+{
+	ImGuiHandler::ToggleWindow("console");	// Close the console window so it doesn't appear in the cubemap screenshot
+	screenshot_cubemap(tokens[1].c_str());
 	return 0;
 }

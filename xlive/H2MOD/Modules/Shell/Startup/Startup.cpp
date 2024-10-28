@@ -12,7 +12,6 @@
 #include "H2MOD/Modules/Accounts/AccountLogin.h"
 #include "H2MOD/Modules/Accounts/Accounts.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
-#include "H2MOD/Modules/Tweaks/Tweaks.h"
 #include "H2MOD/Utils/Utils.h"
 
 #include "Util/filesys.h"
@@ -356,16 +355,6 @@ void InitH2Startup() {
 	if (!configureXinput())
 		exit(EXIT_FAILURE);
 
-	//apply any network hooks
-	H2Tweaks::ApplyPatches();
-
-	shell_apply_patches();
-	shell_windows_apply_patches();
-
-	extern void InitCustomLanguage();
-	InitCustomLanguage();
-	extern void InitRunLoop();
-	InitRunLoop();
 	H2MOD::Initialize();
 
 	addDebugText("ProcessStartup finished.");
@@ -394,7 +383,6 @@ void DeinitH2Startup() {
 	DeinitRunLoop();
 	extern void DeinitCustomLanguage();
 	DeinitCustomLanguage();
-	H2Tweaks::DisposePatches();
 	DeinitH2Accounts();
 	DeinitH2Config();
 	curl_global_cleanup();
