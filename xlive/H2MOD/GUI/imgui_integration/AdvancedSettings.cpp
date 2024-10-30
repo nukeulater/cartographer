@@ -11,10 +11,10 @@
 #include "networking/NetworkMessageTypeCollection.h"
 #include "rasterizer/rasterizer_globals.h"
 
+#include "H2MOD.h"
 #include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
-#include "H2MOD/Modules/Tweaks/Tweaks.h"
 
 #ifndef NDEBUG
 #include "H2MOD/Modules/DirectorHooks/DirectorHooks.h"
@@ -158,36 +158,33 @@ namespace ImGuiHandler {
 					}
 					ImGui::PopItemWidth();
 
-					if (current_controller_index == _controller_index_0)
+
+					//Vehicle FOV
+					ImGui::Text(advanced_settings_get_string(_advanced_string_vehicle_field_of_view));
+					ImGui::PushItemWidth(WidthPercentage(80));
+
+					val = current_cartographer_profile->vehicle_field_of_view;
+					ImGui::SliderInt("##VehicleFOV1", &val, 45, 110, ""); ImGui::SameLine();
+					if (ImGui::IsItemEdited())
 					{
-						//Vehicle FOV
-						ImGui::Text(advanced_settings_get_string(_advanced_string_vehicle_field_of_view));
-						ImGui::PushItemWidth(WidthPercentage(80));
-
-						val = current_cartographer_profile->vehicle_field_of_view;
-						ImGui::SliderInt("##VehicleFOV1", &val, 45, 110, ""); ImGui::SameLine();
-						if (ImGui::IsItemEdited())
-						{
-							current_cartographer_profile->vehicle_field_of_view = PIN(val, 45, 110);
-							observer_set_suggested_field_of_view(current_cartographer_profile->vehicle_field_of_view);
-						}
-
-						ImGui::PushItemWidth(WidthPercentage(10));
-
-						val = current_cartographer_profile->vehicle_field_of_view;
-						ImGui::InputInt("##VehicleFOV2", &val, 0, 110, ImGuiInputTextFlags_::ImGuiInputTextFlags_AutoSelectAll); ImGui::SameLine();
-						if (ImGui::IsItemEdited()) {
-							current_cartographer_profile->vehicle_field_of_view = PIN(val, 45, 110);
-							observer_set_suggested_field_of_view(current_cartographer_profile->vehicle_field_of_view);
-						}
-						ImGui::PushItemWidth(WidthPercentage(10));
-						if (ImGui::Button(advanced_settings_get_string(_advanced_string_reset, "VehicleFOV3"), b2_size))
-						{
-							current_cartographer_profile->vehicle_field_of_view = 78;
-							observer_set_suggested_field_of_view(current_cartographer_profile->vehicle_field_of_view);
-						}
-						ImGui::PopItemWidth();
+						current_cartographer_profile->vehicle_field_of_view = PIN(val, 45, 110);
 					}
+
+					ImGui::PushItemWidth(WidthPercentage(10));
+
+					val = current_cartographer_profile->vehicle_field_of_view;
+					ImGui::InputInt("##VehicleFOV2", &val, 0, 110, ImGuiInputTextFlags_::ImGuiInputTextFlags_AutoSelectAll); ImGui::SameLine();
+					if (ImGui::IsItemEdited()) {
+						current_cartographer_profile->vehicle_field_of_view = PIN(val, 45, 110);
+					}
+					ImGui::PushItemWidth(WidthPercentage(10));
+					if (ImGui::Button(advanced_settings_get_string(_advanced_string_reset, "VehicleFOV3"), b2_size))
+					{
+						current_cartographer_profile->vehicle_field_of_view = 78;
+					}
+					ImGui::PopItemWidth();
+
+
 					//Crosshair Offset
 					ImGui::Text(advanced_settings_get_string(_advanced_string_crosshair_offset));
 					ImGui::PushItemWidth(WidthPercentage(80));
@@ -686,7 +683,7 @@ namespace ImGuiHandler {
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 						if (ImGui::Checkbox("##XDelay", &H2Config_xDelay))
 						{
-							H2Tweaks::RefreshTogglexDelay();
+							H2MOD::RefreshTogglexDelay();
 						}
 						ImGui::Columns(1);
 						ImGui::Separator();

@@ -315,6 +315,9 @@
     <ClCompile Include="Blam\Engine\bink\wmv_playback.cpp" />
     <ClCompile Include="Blam\Engine\bitmaps\bitmaps.cpp" />
     <ClCompile Include="Blam\Engine\bitmaps\bitmap_group.cpp" />
+    <ClCompile Include="Blam\Engine\bitmaps\bitmap_utilities.cpp" />
+    <ClCompile Include="Blam\Engine\bitmaps\targa_file.cpp" />
+    <ClCompile Include="Blam\Engine\bitmaps\tiff_file.cpp" />
     <ClCompile Include="Blam\Engine\cache\cache_files.cpp" />
     <ClCompile Include="Blam\Engine\cache\cache_file_verification.cpp" />
     <ClCompile Include="Blam\Engine\cache\pc_geometry_cache.cpp" />
@@ -323,7 +326,9 @@
     <ClCompile Include="Blam\Engine\camera\camera.cpp" />
     <ClCompile Include="Blam\Engine\camera\dead_camera.cpp" />
     <ClCompile Include="Blam\Engine\camera\director.cpp" />
+    <ClCompile Include="Blam\Engine\camera\editor_camera.cpp" />
     <ClCompile Include="Blam\Engine\camera\first_person_camera.cpp" />
+    <ClCompile Include="Blam\Engine\camera\following_camera.cpp" />
     <ClCompile Include="Blam\Engine\camera\observer.cpp" />
     <ClCompile Include="Blam\Engine\cartographer\tag_fixes\tag_fixes.cpp" />
     <ClCompile Include="Blam\Engine\cartographer\twizzler\twizzler.cpp" />
@@ -563,6 +568,9 @@
     <ClInclude Include="Blam\Engine\bink\wmv_playback.h" />
     <ClInclude Include="Blam\Engine\bitmaps\bitmaps.h" />
     <ClInclude Include="Blam\Engine\bitmaps\bitmap_group.h" />
+    <ClInclude Include="Blam\Engine\bitmaps\bitmap_utilities.h" />
+    <ClInclude Include="Blam\Engine\bitmaps\targa_file.h" />
+    <ClInclude Include="Blam\Engine\bitmaps\tiff_file.h" />
     <ClInclude Include="Blam\Engine\cache\cache_file_verification.h" />
     <ClInclude Include="Blam\Engine\cache\pc_geometry_cache.h" />
     <ClInclude Include="Blam\Engine\cache\pc_texture_cache.h" />
@@ -571,6 +579,7 @@
     <ClInclude Include="Blam\Engine\camera\camera_track_definition.h" />
     <ClInclude Include="Blam\Engine\camera\dead_camera.h" />
     <ClInclude Include="Blam\Engine\camera\director.h" />
+    <ClInclude Include="Blam\Engine\camera\editor_camera.h" />
     <ClInclude Include="Blam\Engine\camera\first_person_camera.h" />
     <ClInclude Include="Blam\Engine\camera\following_camera.h" />
     <ClInclude Include="Blam\Engine\camera\observer.h" />
@@ -771,6 +780,7 @@
     <ClCompile Include="Blam\Engine\rasterizer\rasterizer_lens_flares.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\rasterizer_lights.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\rasterizer_loading.cpp" />
+    <ClCompile Include="Blam\Engine\rasterizer\rasterizer_main.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\rasterizer_memory.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\rasterizer_occlusion.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\rasterizer_profile.cpp" />
@@ -936,7 +946,6 @@
     <ClCompile Include="H2MOD\Modules\OnScreenDebug\OnscreenDebug.cpp" />
     <ClCompile Include="H2MOD\Modules\MainLoopPatches\RunLoop\RunLoop.cpp" />
     <ClCompile Include="H2MOD\Modules\Shell\Startup\Startup.cpp" />
-    <ClCompile Include="H2MOD\Modules\Tweaks\Tweaks.cpp" />
     <ClCompile Include="H2MOD\Modules\Updater\Updater.cpp" />
     <ClCompile Include="H2MOD\Utils\Utils.cpp" />
     <ClCompile Include="H2MOD\Variants\GunGame\GunGame.cpp" />
@@ -1150,6 +1159,7 @@
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_water.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_weather.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_widgets.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\dx9\shaders\compiled\bloom_simple.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\shaders\compiled\fog_atmospheric_apply.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\shaders\compiled\motion_sensor_sweep.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\shaders\compiled\sun_glow_convolve.h" />
@@ -1164,6 +1174,7 @@
     <ClInclude Include="Blam\Engine\rasterizer\rasterizer_lens_flares.h" />
     <ClInclude Include="Blam\Engine\rasterizer\rasterizer_lights.h" />
     <ClInclude Include="Blam\Engine\rasterizer\rasterizer_loading.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\rasterizer_main.h" />
     <ClInclude Include="Blam\Engine\rasterizer\rasterizer_memory.h" />
     <ClInclude Include="Blam\Engine\rasterizer\rasterizer_occlusion.h" />
     <ClInclude Include="Blam\Engine\rasterizer\rasterizer_profile.h" />
@@ -1392,7 +1403,6 @@
     <ClInclude Include="H2MOD\Modules\OnScreenDebug\OnscreenDebug.h" />
     <ClInclude Include="H2MOD\Modules\MainLoopPatches\RunLoop\RunLoop.h" />
     <ClInclude Include="H2MOD\Modules\Shell\Startup\Startup.h" />
-    <ClInclude Include="H2MOD\Modules\Tweaks\Tweaks.h" />
     <ClInclude Include="H2MOD\Modules\Updater\Updater.h" />
     <ClInclude Include="H2MOD\Utils\Utils.h" />
     <ClInclude Include="H2MOD\Variants\GunGame\GunGame.h" />

@@ -31,9 +31,9 @@ void* tag_get_safe(tag_group group, datum tag_index);
 void cache_files_apply_patches(void)
 {
 	// Default Maps
-	PatchCall(Memory::GetAddress(0x3166B, 0x2551B), scenario_tags_load);
+	PatchCall(Memory::GetAddress(0x3166B, 0x2551B), scenario_tags_load_internal);
 	// Custom Maps
-	PatchCall(Memory::GetAddress(0x315ED, 0x2549D), scenario_tags_load);
+	PatchCall(Memory::GetAddress(0x315ED, 0x2549D), scenario_tags_load_internal);
 
 	DETOUR_ATTACH(p_tag_get_safe, Memory::GetAddress<t_tag_get_safe>(0x316C3, 0x25573), tag_get_safe);
 	return;
@@ -114,6 +114,7 @@ void scenario_tags_load_internal_panic()
 	}
 
 	cache_file_close();
+	return;
 }
 
 
@@ -209,7 +210,7 @@ bool scenario_tags_load_debug(void)
 	return true;
 }
 
-bool __cdecl scenario_tags_load(const char* scenario_path)
+bool __cdecl scenario_tags_load_internal(const char* scenario_path)
 {
 	s_cache_header* cache_header = cache_files_get_header();
 
@@ -217,7 +218,7 @@ bool __cdecl scenario_tags_load(const char* scenario_path)
 
 	const uint32 aligned_tag_size_read = cache_header->tag_size + cache_header->tag_offset_mask;
 
-	if(!cache_header_verify(cache_header) || strlen(cache_header->version_string) > 32)
+	if(!cache_header_verify(cache_header)|| csstrnlen(cache_header->version_string, NUMBEROF(cache_header->version_string)) > 32)
 	{
 		scenario_tags_load_internal_panic();
 		return false;
@@ -248,7 +249,7 @@ bool __cdecl scenario_tags_load(const char* scenario_path)
 	{
 		game_preferences_flag_dirty();
 		scenario_tags_load_internal_panic();
-		DISPLAY_ASSERT("scenario_tags_load: failed to load tag header from cache");
+		DISPLAY_ASSERT("scenario_tags_load_internal: failed to load tag header from cache");
 		return false;
 	}
 
@@ -257,7 +258,7 @@ bool __cdecl scenario_tags_load(const char* scenario_path)
 	{
 		game_preferences_flag_dirty();
 		scenario_tags_load_internal_panic();
-		DISPLAY_ASSERT("scenario_tags_load: failed to load tag data from cache");
+		DISPLAY_ASSERT("scenario_tags_load_internal: failed to load tag data from cache");
 		return false;
 	}
 

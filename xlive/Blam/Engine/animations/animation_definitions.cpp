@@ -113,7 +113,7 @@ int16 c_model_animation::find_first_key_of_type(const e_frame_event_type event_t
 	return result;
 }
 
-int16 c_model_animation::find_first_sound_event(s_sound_event* sound_event) const
+int16 c_model_animation::find_first_sound_event(int32* sound) const
 {
 	int16 frame = 0;
 	if (this->sound_events.count > 0)
@@ -122,9 +122,9 @@ int16 c_model_animation::find_first_sound_event(s_sound_event* sound_event) cons
 		frame = event->frame;
 		
 		// Populate sound event pointer if not null
-		if (sound_event)
+		if (sound)
 		{
-			sound_event = event;
+			*sound = event->sound;
 		}
 	}
 
@@ -252,9 +252,9 @@ size_t c_model_animation::get_sound_events_size(void) const
 
 int16 c_model_animation::get_sound_reference_index(void) const
 {
-	s_sound_event* sound_event = NULL;
-	this->find_first_sound_event(sound_event);
-	return (sound_event ? sound_event->sound : NONE);
+	int32 sound = NONE;
+	this->find_first_sound_event(&sound);
+	return sound;
 }
 
 string_id c_model_animation::get_string_id(void) const

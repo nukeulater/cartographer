@@ -9,7 +9,8 @@
 #include "game/game_options.h"
 #include "rasterizer/dx9/rasterizer_dx9_main.h"
 
-// constants
+/* constants */
+
 #define k_crash_message_header_break L"=============================================\n"
 const wchar_t* k_report_text_file_names[k_report_text_file_type_count] = { L"exception_info.txt", L"cpu_info.txt", L"game_options.txt", L"game_globals.txt", L"rasterizer.txt"};
 
@@ -17,31 +18,33 @@ const wchar_t* k_report_text_file_names[k_report_text_file_type_count] = { L"exc
 
 static c_static_wchar_string<MAX_PATH> g_report_text_file_paths[k_report_text_file_type_count];
 
-// forward declarations
+/* prototypes */
 
 // Create and populate new cpu_info.txt file in the report path
-void setup_cpu_info_text(const wchar_t* reports_path, const MINIDUMP_EXCEPTION_INFORMATION* minidump_info);
+static void setup_cpu_info_text(const wchar_t* reports_path, const MINIDUMP_EXCEPTION_INFORMATION* minidump_info);
 
 // Create and populate new exception_info.txt file in the report path
-void setup_exception_text(const wchar_t* reports_path, const MINIDUMP_EXCEPTION_INFORMATION* minidump_info);
+static void setup_exception_text(const wchar_t* reports_path, const MINIDUMP_EXCEPTION_INFORMATION* minidump_info);
 
 // Create and populate new game_options.txt file in the report path
-void setup_game_options_text(const wchar_t* reports_path);
+static void setup_game_options_text(const wchar_t* reports_path);
 
 // Create and populate new game_globals.txt file in the report path
-void setup_game_global_text(const wchar_t* reports_path);
+static void setup_game_global_text(const wchar_t* reports_path);
 
 // Create and populate new rasterizer.txt file in the report path
-void setup_rasterizer_text(const wchar_t* reports_path);
+static void setup_rasterizer_text(const wchar_t* reports_path);
 
 // Inserts a value into a file as a string represented in hex
-void print_hex_value_to_file(FILE* file, uint32 value);
+static void print_hex_value_to_file(FILE* file, uint32 value);
 
 // Inserts a bool into a file as a string that's either "true" or "false"
-void print_bool_to_file(FILE* file, bool value);
+static void print_bool_to_file(FILE* file, bool value);
 
 // Verify the pointers in a minidump file
-bool minidump_info_verify_pointers(FILE* file, const MINIDUMP_EXCEPTION_INFORMATION* minidump_info);
+static bool minidump_info_verify_pointers(FILE* file, const MINIDUMP_EXCEPTION_INFORMATION* minidump_info);
+
+/* public code */
 
 const wchar_t* get_crash_info_text_file_path(e_report_file_type type)
 {
@@ -57,7 +60,9 @@ void crash_info_text_files_create(const wchar_t* reports_path, const MINIDUMP_EX
     setup_rasterizer_text(reports_path);
 }
 
-void setup_cpu_info_text(const wchar_t* reports_path, const MINIDUMP_EXCEPTION_INFORMATION* minidump_info)
+/* private code */
+
+static void setup_cpu_info_text(const wchar_t* reports_path, const MINIDUMP_EXCEPTION_INFORMATION* minidump_info)
 {
     c_static_wchar_string260* report_info_path_cpu = &g_report_text_file_paths[_report_file_type_cpu];
     report_info_path_cpu->set(reports_path);
@@ -110,7 +115,7 @@ void setup_cpu_info_text(const wchar_t* reports_path, const MINIDUMP_EXCEPTION_I
     return;
 }
 
-void setup_module_text(FILE* file, const MINIDUMP_EXCEPTION_INFORMATION* minidump_info)
+static void setup_module_text(FILE* file, const MINIDUMP_EXCEPTION_INFORMATION* minidump_info)
 {
     // Get module info
     DWORD process_id = GetCurrentProcessId();
@@ -196,7 +201,7 @@ void setup_exception_text(const wchar_t* reports_path, const MINIDUMP_EXCEPTION_
     return;
 }
 
-void setup_game_options_text(const wchar_t* reports_path)
+static void setup_game_options_text(const wchar_t* reports_path)
 {
     c_static_wchar_string260* report_info_path_game_options = &g_report_text_file_paths[_report_file_type_game_options];
     report_info_path_game_options->set(reports_path);
@@ -205,11 +210,9 @@ void setup_game_options_text(const wchar_t* reports_path)
 
     FILE* file;
     errno_t error = _wfopen_s(&file, report_info_path_game_options->get_string(), L"w+");
-    if (!error && file != NULL)
+    const s_game_options* game_options = game_options_get();
+    if (!error && file != NULL && game_options != NULL)
     {
-        s_game_options* game_options = game_options_get();
-
-
         fwprintf(file, L"GAME OPTIONS\n");
         fwprintf(file, L"%ls", k_crash_message_header_break);
 
@@ -343,7 +346,7 @@ void setup_game_options_text(const wchar_t* reports_path)
     return;
 }
 
-void setup_game_global_text(const wchar_t* reports_path)
+static void setup_game_global_text(const wchar_t* reports_path)
 {
     c_static_wchar_string260* report_info_path_game_globals = &g_report_text_file_paths[_report_file_type_game_globals];
     report_info_path_game_globals->set(reports_path);
@@ -352,9 +355,9 @@ void setup_game_global_text(const wchar_t* reports_path)
 
     FILE* file;
     errno_t error = _wfopen_s(&file, report_info_path_game_globals->get_string(), L"w+");
-    if (!error && file != NULL)
+    const s_main_game_globals* game_globals = get_main_game_globals();
+    if (!error && file != NULL && game_globals != NULL)
     {
-        s_main_game_globals* game_globals = get_main_game_globals();
 
         fwprintf(file, L"GAME GLOBALS\n");
         fwprintf(file, L"%ls", k_crash_message_header_break);
@@ -387,13 +390,13 @@ void setup_game_global_text(const wchar_t* reports_path)
         fwprintf(file, L"Game Ragdoll Count: %d\n", game_globals->game_ragdoll_count);
 
         fwprintf(file, L"Cluster PVS: ");
-        print_array_to_file(file, game_globals->cluster_pvs, sizeof(game_globals->cluster_pvs));
+        print_array_to_file(file, game_globals->cluster_pvs.cluster_bitvector, NUMBEROF(game_globals->cluster_pvs.cluster_bitvector));
 
         fwprintf(file, L"Cluster PVS Local: ");
-        print_array_to_file(file, game_globals->cluster_pvs_local, sizeof(game_globals->cluster_pvs_local));
+        print_array_to_file(file, game_globals->cluster_pvs_local.cluster_bitvector, NUMBEROF(game_globals->cluster_pvs_local.cluster_bitvector));
 
         fwprintf(file, L"Cluster Activation: ");
-        print_array_to_file(file, game_globals->cluster_activation, NUMBEROF(game_globals->cluster_activation));
+        print_array_to_file(file, game_globals->cluster_activation.cluster_bitvector, NUMBEROF(game_globals->cluster_activation.cluster_bitvector));
 
         fwprintf(file, L"Enable Scripted Camera PVS: ");
         print_bool_to_file(file, game_globals->enable_scripted_camera_pvs);
@@ -408,7 +411,7 @@ void setup_game_global_text(const wchar_t* reports_path)
     return;
 }
 
-void setup_rasterizer_text(const wchar_t* reports_path)
+static void setup_rasterizer_text(const wchar_t* reports_path)
 {
     c_static_wchar_string260* report_info_path_game_globals = &g_report_text_file_paths[_report_file_type_rasterizer];
     report_info_path_game_globals->set(reports_path);
@@ -417,10 +420,9 @@ void setup_rasterizer_text(const wchar_t* reports_path)
 
     FILE* file;
     errno_t error = _wfopen_s(&file, report_info_path_game_globals->get_string(), L"w+");
-    if (!error && file != NULL)
+    const s_main_game_globals* game_globals = get_main_game_globals();
+    if (!error && file != NULL && game_globals != NULL)
     {
-        s_main_game_globals* game_globals = get_main_game_globals();
-
         fwprintf(file, L"RASTERIZER\n");
         fwprintf(file, L"%ls", k_crash_message_header_break);
 
@@ -434,7 +436,7 @@ void setup_rasterizer_text(const wchar_t* reports_path)
 }
 
 // Print value parameter to file in hexadecimal format
-void print_hex_value_to_file(FILE* file, uint32 value)
+static void print_hex_value_to_file(FILE* file, uint32 value)
 {
     const size_t length = sizeof(value) * 2;
     wchar_t hex_string[length + 1];
@@ -450,14 +452,14 @@ void print_hex_value_to_file(FILE* file, uint32 value)
 }
 
 // Print value parameter to file as True or False
-void print_bool_to_file(FILE* file, bool value)
+static void print_bool_to_file(FILE* file, bool value)
 {
     fwprintf(file, L"%ls\n", (value ? L"True" : L"False"));
     return;
 }
 
 // Verify pointers are not null in minidump_info struct
-bool minidump_info_verify_pointers(FILE* file, const MINIDUMP_EXCEPTION_INFORMATION* minidump_info)
+static bool minidump_info_verify_pointers(FILE* file, const MINIDUMP_EXCEPTION_INFORMATION* minidump_info)
 {
     bool print_data = true;
     if (minidump_info->ExceptionPointers == nullptr)

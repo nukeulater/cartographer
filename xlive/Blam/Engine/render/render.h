@@ -147,6 +147,13 @@ bool __cdecl structure_get_cluster_and_leaf_from_render_point(real_point3d* poin
 
 e_screen_split_type get_screen_split_type(uint32 render_user_index);
 
+void __cdecl render_frame(
+	uint32 frame_render_type,
+	int32 window_count,
+	int32 player_count,
+	int32 screen_split_type,
+	window_bound* window);
+
 // Render window
 void __cdecl render_window(window_bound* window, bool is_texture_camera);
 

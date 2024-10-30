@@ -1,6 +1,6 @@
 #pragma once
 
-void InitCustomLanguage();
+void custom_language_initialize();
 void DeinitCustomLanguage();
 void setCustomLanguage(int);
 void setCustomLanguage(int, int);
