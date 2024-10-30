@@ -93,6 +93,7 @@
 #include "H2MOD/Variants/VariantSystem.h"
 #include "H2MOD/Variants/H2X/H2X.h"
 #include "interface/new_hud_draw.h"
+#include "interface/user_interface_utilities.h"
 #include "saved_games/cartographer_player_profile.h"
 
 std::unique_ptr<H2MOD> h2mod(std::make_unique<H2MOD>());
@@ -916,8 +917,8 @@ void H2MOD::ApplyHooks() {
 		input_abstraction_patches_apply();
 		render_apply_patches();
 		apply_interface_hooks();
-
 		new_hud_draw_apply_patches();
+		user_interface_utilities_apply_patches();
 	}
 	else {
 		LOG_INFO_GAME("{} - applying dedicated server hooks", __FUNCTION__);

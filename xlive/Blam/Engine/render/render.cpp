@@ -75,6 +75,8 @@ t_render_ingame_user_interface_hud_indicators_element_hook p_render_ingame_user_
 e_controller_index g_render_current_controller_index = _controller_index_0;
 uint32 g_render_current_user_index = 0;
 
+window_bound g_user_window_bounds[k_number_of_controllers];
+
 /* prototypes */
 
 int32* get_global_window_out_cluster_index(int32 index);
@@ -133,12 +135,19 @@ void __cdecl render_camera(
 
 void render_apply_patches(void)
 {
+    memset(g_user_window_bounds, 0, sizeof(window_bound) * k_number_of_controllers);
+
     PatchCall(Memory::GetAddress(0x19224A), render_window);
     PatchCall(Memory::GetAddress(0x19DA7C), render_window);
 
     DETOUR_ATTACH(p_draw_ingame_user_interface_hud_element, Memory::GetAddress<t_render_ingame_user_interface_hud_element>(0x221E3B), render_ingame_user_interface_hud_element_hook);
     DETOUR_ATTACH(p_render_ingame_user_interface_hud_indicators_element, Memory::GetAddress<t_render_ingame_user_interface_hud_indicators_element_hook>(0x221C77), render_ingame_user_interface_hud_indicators_element_hook);
     return;
+}
+
+window_bound* get_user_window_bounds(uint32 user_index)
+{
+    return &g_user_window_bounds[user_index];
 }
 
 int32 get_global_render_window_count()
@@ -318,6 +327,8 @@ void __cdecl render_window(window_bound* window, bool is_texture_camera)
     {
         g_render_current_controller_index = controller_index;
         g_render_current_user_index = window->user_index;
+
+        memcpy(&g_user_window_bounds[window->user_index], window, sizeof(window_bound));
 
         render_view(
             &frustum_bounds,
