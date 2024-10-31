@@ -99,6 +99,8 @@ bool __cdecl render_ingame_user_interface_hud_element_hook(
 
 void render_apply_patches(void);
 
+window_bound* get_user_window_bounds(uint32 user_index);
+
 int32 get_global_render_window_count();
 
 bool get_global_render_split_horizontally();
