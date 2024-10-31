@@ -75,7 +75,7 @@ t_render_ingame_user_interface_hud_indicators_element_hook p_render_ingame_user_
 e_controller_index g_render_current_controller_index = _controller_index_0;
 uint32 g_render_current_user_index = 0;
 
-window_bound g_user_window_bounds[k_number_of_controllers];
+window_bound g_user_window_bounds[k_number_of_controllers]{};
 
 /* prototypes */
 
@@ -135,8 +135,6 @@ void __cdecl render_camera(
 
 void render_apply_patches(void)
 {
-    memset(g_user_window_bounds, 0, sizeof(window_bound) * k_number_of_controllers);
-
     PatchCall(Memory::GetAddress(0x19224A), render_window);
     PatchCall(Memory::GetAddress(0x19DA7C), render_window);
 
