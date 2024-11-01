@@ -15,7 +15,7 @@
 
 /* prototypes */
 
-e_split_type get_splitscreen_split_type(void);
+e_screen_split_type get_splitscreen_split_type(void);
 void set_display_type(e_display_type display_type);
 void render_splitscreen_line(void);
 
@@ -93,9 +93,9 @@ void __cdecl interface_draw_bitmap(
 
 /* private code */
 
-e_split_type get_splitscreen_split_type(void)
+e_screen_split_type get_splitscreen_split_type(void)
 {
-	return *Memory::GetAddress<e_split_type*>(0x4E6970);
+	return *Memory::GetAddress<e_screen_split_type*>(0x4E6970);
 }
 
 void set_display_type(e_display_type display_type)
@@ -122,7 +122,7 @@ void render_splitscreen_line(void)
 	color.color = k_splitscreen_line_colour;
 	if (player_window_count > 1)
 	{
-		if (get_splitscreen_split_type() == _split_type_vertical)
+		if (get_splitscreen_split_type() == _screen_split_type_half)
 		{
 			line.top = (resolution_y / 2) - line_size;
 			line.left = 0;

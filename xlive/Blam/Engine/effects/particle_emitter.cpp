@@ -17,7 +17,7 @@ void c_particle_emitter::adjust_matrix_and_vector_to_effect_camera(bool use_effe
 {
 	if (use_effect_camera)
 	{
-		s_camera* effect_camera = get_effect_camera();
+		render_camera* effect_camera = get_effect_camera();
 		real_matrix3x3 effect_camera_matrix;
 
 		*out_matrix = this->m_matrix;

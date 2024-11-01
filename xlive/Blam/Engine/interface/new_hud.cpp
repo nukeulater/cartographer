@@ -133,7 +133,7 @@ bool __cdecl render_ingame_chat_check(void)
 real_point2d* __cdecl ui_get_hud_element_position_hook(e_hud_anchor anchor, real_point2d* point)
 {
 	real32 safe_area = *Memory::GetAddress<real32*>(0x9770F0);
-	s_camera* global_camera = get_global_camera();
+	render_camera* global_camera = get_global_camera();
 
 	real32 scale_factor = *get_secondary_hud_scale();
 

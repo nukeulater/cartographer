@@ -4,9 +4,9 @@
 #include "interface.h"
 
 #include "bitmaps/bitmap_group.h"
+#include "camera/camera.h"
 #include "cache/pc_texture_cache.h"
 #include "game/players.h"
-#include "render/render_cameras.h"
 #include "units/units.h"
 
 void hud_render_player_indicator(datum player_index)
@@ -22,7 +22,7 @@ void hud_render_player_indicator(datum player_index)
     render_projection* global_projection = global_projection_get();
     matrix4x3_transform_point(&global_projection->world_to_view, &head_position, &world_position);
 
-    const s_camera* global_camera = get_global_camera();
+    const render_camera* global_camera = get_global_camera();
     real_point2d screen_point;
     if (render_camera_world_to_screen(global_camera, global_projection, NULL, &world_position, &screen_point))
     {

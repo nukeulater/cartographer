@@ -25,12 +25,6 @@ enum e_interface_tag : uint8
     NUMBER_OF_INTERFACE_TAGS
 };
 
-enum e_split_type : int32
-{
-	_split_type_horizontal = 0,
-	_split_type_vertical = 1
-};
-
 /* public code */
 
 void apply_interface_hooks(void);

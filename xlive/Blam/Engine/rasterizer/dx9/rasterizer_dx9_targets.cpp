@@ -166,7 +166,7 @@ bool __cdecl rasterizer_dx9_set_render_target_internal(IDirect3DSurface9* target
 
 void __cdecl rasterizer_set_render_target_internal_hook_set_viewport(IDirect3DSurface9* target, IDirect3DSurface9* z_stencil, bool a3)
 {
-	const s_camera* global_camera = get_global_camera();
+	const render_camera* global_camera = get_global_camera();
 
     // NOTE: *ONLY* use this function for entire screen surfaces (e.g the backbuffer, a render target)
 

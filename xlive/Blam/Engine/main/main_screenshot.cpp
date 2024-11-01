@@ -52,9 +52,9 @@ static void screenshot_cubemap_retrieve_rotation_info(
 	int32 width);
 
 /* dumps camera info to a text file */
-static void __cdecl dump_camera_to_file(const char* camera_name, const s_camera* camera);
+static void __cdecl dump_camera_to_file(const char* camera_name, const render_camera* camera);
 
-static void __cdecl screenshot_cubemap_set_camera_rotation(int32 face_index, int32 resolution, const real_point3d* location, s_camera* camera);
+static void __cdecl screenshot_cubemap_set_camera_rotation(int32 face_index, int32 resolution, const real_point3d* location, render_camera* camera);
 
 static void screenshot_calculate_bloom(bitmap_data* bitmap, int32 horizontal_tile, int32 vertical_tile);
 
@@ -649,13 +649,13 @@ static void screenshot_cubemap_retrieve_rotation_info(
 	return;
 }
 
-static void __cdecl dump_camera_to_file(const char* camera_name, const s_camera* camera)
+static void __cdecl dump_camera_to_file(const char* camera_name, const render_camera* camera)
 {
 	INVOKE(0x2735CA, 0x0, dump_camera_to_file, camera_name, camera);
 	return;
 }
 
-static void __cdecl screenshot_cubemap_set_camera_rotation(int32 face_index, int32 resolution, const real_point3d* location, s_camera* camera)
+static void __cdecl screenshot_cubemap_set_camera_rotation(int32 face_index, int32 resolution, const real_point3d* location, render_camera* camera)
 {
 	INVOKE(0x2788CB, 0x0, screenshot_cubemap_set_camera_rotation, face_index, resolution, location, camera);
 	return;
