@@ -212,3 +212,8 @@ void observer_set_suggested_field_of_view(float fov)
 	}
 	*Memory::GetAddress<float*>(0x413780, 0x3B5300) = final_fov_rad;
 }
+
+s_observer_result* __cdecl observer_get_camera(int32 user_index)
+{
+	return INVOKE(0x81EBA, 0x0, observer_get_camera, user_index);
+}

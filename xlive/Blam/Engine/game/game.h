@@ -80,6 +80,7 @@ bool game_is_multiplayer(void);
 bool game_is_ui_shell(void);
 void __cdecl game_shell_set_in_progress();
 bool game_in_progress(void);
+bool game_is_active(void);
 bool game_is_predicted(void);
 bool game_is_distributed(void);
 bool game_is_server(void);

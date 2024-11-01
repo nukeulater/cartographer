@@ -34,3 +34,10 @@ void rasterizer_get_frame_bounds(rectangle2d* frame_bounds)
 	*frame_bounds = rasterizer_globals_get()->frame_bounds;
 	return;
 }
+
+void rasterizer_get_screen_and_frame_bounds(rectangle2d* screen_bounds, rectangle2d* frame_bounds)
+{
+	rasterizer_get_screen_bounds(screen_bounds);
+	rasterizer_get_frame_bounds(frame_bounds);
+	return;
+}

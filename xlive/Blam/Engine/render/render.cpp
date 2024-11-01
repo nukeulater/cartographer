@@ -277,10 +277,10 @@ void __cdecl render_frame(
     uint32 frame_render_type,
     int32 window_count,
     int32 player_count,
-    int32 screen_split_type,
+    int32 display_split_type,
     window_bound* window)
 {
-    INVOKE(0x192140, 0x0, render_frame, frame_render_type, window_count, player_count, screen_split_type, window);
+    INVOKE(0x192140, 0x0, render_frame, frame_render_type, window_count, player_count, display_split_type, window);
     return;
 }
 

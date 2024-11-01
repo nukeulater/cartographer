@@ -16,7 +16,7 @@ struct s_observer_result
 {
 	real_point3d position;
 	s_location location;
-	real_vector3d field_14;
+	real_vector3d velocity;
 	real_vector3d forward;
 	real_vector3d up;
 	real32 horizontal_field_of_view;
@@ -103,5 +103,7 @@ float observer_suggested_field_of_view();
 
 // Sets the FOV value for the observer camera
 void observer_set_suggested_field_of_view(float fov);
+
+s_observer_result* __cdecl observer_get_camera(int32 user_index);
 
 void observer_apply_patches(void);

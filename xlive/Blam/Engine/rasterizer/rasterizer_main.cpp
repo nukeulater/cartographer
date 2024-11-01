@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "rasterizer_main.h"
 
+#include "game/game.h"
 #include "rasterizer/dx9/rasterizer_dx9_main.h"
 #include "shell/shell_windows.h"
 
@@ -30,6 +31,12 @@ void rasterizer_present_frame_screenshot_wrapper(bitmap_data* bitmap)
 {
 	rasterizer_dx9_present(bitmap, true);
 	return;
+}
+
+e_display_type rasterizer_get_display_type(void)
+{
+	const bool ui_shell = game_is_active() && game_is_ui_shell();
+	return ui_shell ? _display_type_4_by_3 : rasterizer_globals_get()->display_parameters.display_type;
 }
 
 /* private code */

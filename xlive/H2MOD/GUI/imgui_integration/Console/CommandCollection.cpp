@@ -8,6 +8,7 @@
 #include "game/game.h"
 #include "main/main_game.h"
 #include "main/main_game_time.h"
+#include "main/main_render.h"
 #include "main/main_screenshot.h"
 #include "networking/Session/NetworkSession.h"
 #include "networking/NetworkMessageTypeCollection.h"
@@ -44,6 +45,9 @@ extern real32 g_rumble_factor;
 ComVarFromPtr(rumble_var_cmd, real32, &g_rumble_factor,
 	"var_rumble_scale", "change controller vibration strength (0.0 to 1.0), 1 parameter(s): <float>", 1, 1, CommandCollection::RumbleScaleCmd);
 
+ComVarFromPtr(debug_render_horizontal_splitscreen, bool, &g_debug_render_horizontal_splitscreen,
+	"debug_render_horizontal_splitscreen", "force horizontal spliscreen split", 1, 1, CommandCollection::BoolVarHandlerCmd);
+
 // don't forget to add '_cmd' after the name, 
 // if you add a variable command created using `DECL_ComVarCommandPtr` macro
 std::vector<ConsoleCommand*> CommandCollection::commandTable;
@@ -58,6 +62,7 @@ void CommandCollection::InitializeCommands()
 	InsertCommand(new ConsoleCommand(og_frame_limiter_var_cmd));
 	InsertCommand(new ConsoleCommand(display_xyz_var_cmd));
 	InsertCommand(new ConsoleCommand(rumble_var_cmd));
+	InsertCommand(new ConsoleCommand(debug_render_horizontal_splitscreen));
 	InsertCommand(new ConsoleCommand("help", "outputs all commands, 0 - 1 parameter(s): <string>(optional): command name", 0, 1, CommandCollection::HelpCmd));
 	InsertCommand(new ConsoleCommand("log_peers", "logs all peers to console, 0 parameter(s)", 0, 0, CommandCollection::LogPeersCmd));
 	InsertCommand(new ConsoleCommand("log_players", "logs all players to console, 0 parameter(s)", 0, 0, CommandCollection::LogPlayersCmd));

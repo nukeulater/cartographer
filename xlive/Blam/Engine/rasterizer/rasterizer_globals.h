@@ -16,8 +16,8 @@ enum e_rasterizer_window_mode : uint32
 
 enum e_display_type : uint8
 {
-	_display_type_widescreen = 0,
-	_display_type_4_by_3 = 1
+	_display_type_4_by_3 = 0,
+	_display_type_widescreen = 1,
 };
 
 /* structures */
@@ -132,3 +132,5 @@ uint32 rasterizer_get_height(void);
 void rasterizer_get_screen_bounds(rectangle2d* screen_bounds);
 
 void rasterizer_get_frame_bounds(rectangle2d* frame_bounds);
+
+void rasterizer_get_screen_and_frame_bounds(rectangle2d* screen_bounds, rectangle2d* frame_bounds);

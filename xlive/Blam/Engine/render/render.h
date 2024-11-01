@@ -4,13 +4,19 @@
 #include "render_layers.h"
 #include "render_visibility_collection.h"
 
-#include "camera/camera.h"
 #include "effects/player_effects.h"
 #include "scenario/scenario_fog.h"
 
 /* enums */
 
-enum e_screen_split_type : uint32
+enum e_display_split_type : uint32
+{
+	_display_split_type_none = 0,
+	_display_split_type_horizontal = 1,
+	_display_split_type_vertical = 2
+};
+
+enum e_screen_split_type : uint8
 {
 	_screen_split_type_full = 0,
 	_screen_split_type_half = 1,
@@ -151,7 +157,7 @@ void __cdecl render_frame(
 	uint32 frame_render_type,
 	int32 window_count,
 	int32 player_count,
-	int32 screen_split_type,
+	int32 display_split_type,
 	window_bound* window);
 
 // Render window
