@@ -125,8 +125,8 @@ struct {
 e_cartographer_account_manager_screen_type g_open_cartographer_account_manager_context = _cartographer_account_manager_screen_type_none;
 
 int g_account_manager_master_login_code;
-HANDLE g_account_manager_login_thread_handle = INVALID_HANDLE_VALUE;
-HANDLE g_account_manager_thread_handle = 0;
+HANDLE g_account_manager_login_thread_handle = NULL;
+HANDLE g_account_manager_thread_handle = NULL;
 
 
 static void get_cartographer_account_manager_label(e_cartographer_account_manager_screen_type screen_type, int32 label_id, wchar_t** out_label)
@@ -409,7 +409,7 @@ void c_cartographer_account_manager_edit_list::handle_item_pressed_event_for_add
 	}
 	else if (button_id == _item_cartographer_account_add_login) // login button id
 	{
-		if (g_account_manager_login_thread_handle == INVALID_HANDLE_VALUE) {
+		if (g_account_manager_login_thread_handle == NULL) {
 
 			c_cartographer_account_manager_menu::accountingGoBackToList = false;
 			c_cartographer_account_manager_menu::UpdateAccountingActiveHandle(true);
@@ -462,7 +462,7 @@ void c_cartographer_account_manager_edit_list::handle_item_pressed_event_for_lis
 			c_cartographer_account_manager_menu::load_for_account_list_context();
 			user_interface_back_out_from_channel(parent_screen_ui_channel, parent_render_window);
 		}
-		else if (g_account_manager_login_thread_handle == INVALID_HANDLE_VALUE)
+		else if (g_account_manager_login_thread_handle == NULL)
 		{
 			c_cartographer_account_manager_menu::accountingGoBackToList = false;
 			c_cartographer_account_manager_menu::UpdateAccountingActiveHandle(true);
@@ -513,7 +513,7 @@ void c_cartographer_account_manager_edit_list::handle_item_pressed_event_for_cre
 	}
 	else if (button_id == _item_cartographer_account_create_process)
 	{
-		if (!g_account_manager_thread_handle)
+		if (g_account_manager_thread_handle == NULL)
 		{
 			c_cartographer_account_manager_menu::accountingGoBackToList = false;
 			c_cartographer_account_manager_menu::UpdateAccountingActiveHandle(true);
@@ -730,8 +730,8 @@ void xbox_live_task_progress_callback(c_screen_xbox_live_task_progress_dialog* d
 {
 	dialog->set_display_text_raw(L"Signing into Project Cartographer, please wait...");
 
-	// if the g_account_manager_login_thread_handle handle is INVALID_HANDLE_VALUE, it means that the login thread has ended
-	if (g_account_manager_login_thread_handle == INVALID_HANDLE_VALUE)
+	// if the g_account_manager_login_thread_handle handle is NULL, it means that the login thread has ended
+	if (g_account_manager_login_thread_handle == NULL)
 	{
 		dialog->close_task();
 
@@ -842,7 +842,7 @@ DWORD WINAPI thread_account_login_proc_cb(LPVOID lParam)
 
 	c_cartographer_account_manager_menu::UpdateAccountingActiveHandle(false);
 
-	g_account_manager_login_thread_handle = INVALID_HANDLE_VALUE;
+	g_account_manager_login_thread_handle = NULL;
 	return 0;
 }
 
@@ -863,7 +863,7 @@ static DWORD WINAPI thread_account_create_proc_cb(LPVOID lParam)
 
 	c_cartographer_account_manager_menu::UpdateAccountingActiveHandle(false);
 
-	g_account_manager_thread_handle = 0;
+	g_account_manager_thread_handle = NULL;
 	return 0;
 }
 
