@@ -12,6 +12,8 @@
 #include "render/weather_definitions.h"
 #include "units/biped_definitions.h"
 #include "units/vehicle_definitions.h"
+
+#include "H2MOD/Modules/Shell/H2MODShell.h"
 #include "Util/filesys.h"
 
 /* constants */
@@ -96,10 +98,20 @@ bool c_tag_injecting_manager::find_map(const wchar_t* map_name, c_static_wchar_s
 			}
 			return true;
 		}
+		// Exit and create a popup if a map is missing
 		else
 		{
-			// if map is found in neither location then return the function early
-			LOG_ERROR_GAME(L"[c_tag_injecting_manager::set_active_map] could not locate {}.map in any valid content location", map_name);
+			const wchar_t* format = L"[c_tag_injecting_manager::set_active_map] could not locate %s.map in any valid content location";
+			wchar_t output_wide[NUMBEROF(format) + MAX_PATH];
+			
+			usnzprintf(output_wide, NUMBEROF(output_wide), format, map_name);
+
+			char output[(NUMBEROF(format) + MAX_PATH) * 2];
+			wchar_string_to_utf8_string(output_wide, output, NUMBEROF(output));
+
+			LOG_ERROR_GAME(output_wide);
+			_Shell::OpenMessageBox(NULL, MB_ICONERROR, "Missing Map File", output);
+			exit(EXIT_FAILURE);
 			return false;
 		}
 	}
@@ -498,9 +510,20 @@ bool c_tag_injecting_manager::initialize_agent(tag_group group)
 	plugin_path.append(wide_tag_class);
 	plugin_path.append(L".xml");
 
+	// Exit and create a popup if a plugin is missing
 	if (!PathFileExists(plugin_path.get_string()))
 	{
-		LOG_ERROR_GAME(L"[c_tag_injecting_manager::initialize_agent] Plugin file could not be located {}", plugin_path.get_string());
+		const wchar_t* format = L"[c_tag_injecting_manager::initialize_agent] Plugin file could not be located %s";
+		wchar_t output_wide[NUMBEROF(format) + MAX_PATH];
+
+		usnzprintf(output_wide, NUMBEROF(output_wide), format, plugin_path.get_string());
+
+		char output[(NUMBEROF(format) + MAX_PATH) * 2];
+		wchar_string_to_utf8_string(output_wide, output, NUMBEROF(output));
+
+		LOG_ERROR_GAME(output_wide);
+		_Shell::OpenMessageBox(NULL, MB_ICONERROR, "Missing Plugin File", output);
+		exit(EXIT_FAILURE);
 		return false;
 	}
 	this->m_agents[tag_group_index].init(group, plugin_path.get_string());
