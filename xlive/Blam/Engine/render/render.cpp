@@ -102,9 +102,9 @@ bool __cdecl render_ingame_user_interface_hud_indicators_element_hook(
 
 void render_view(
     real_rectangle2d* frustum_bounds,
-    s_camera* rasterizer_camera,
+    render_camera* rasterizer_camera,
     int32 window_bound_index,
-    s_camera* render_camera,
+    render_camera* render_camera,
     bool is_texture_camera,
     int32 cluster_index,
     int32 leaf_index,
@@ -123,7 +123,7 @@ void render_view(
 
 void __cdecl render_scene_bitflags_set(void);
 void render_scene_wrapper(bool is_texture_camera);
-void __cdecl render_camera(
+void __cdecl render_camera_scene(
     int32 render_layer_debug_view,
     bool render_transparent_geo,
     bool lens_flare_occlusion_test,
@@ -277,10 +277,10 @@ void __cdecl render_frame(
     uint32 frame_render_type,
     int32 window_count,
     int32 player_count,
-    int32 screen_split_type,
+    int32 display_split_type,
     window_bound* window)
 {
-    INVOKE(0x192140, 0x0, render_frame, frame_render_type, window_count, player_count, screen_split_type, window);
+    INVOKE(0x192140, 0x0, render_frame, frame_render_type, window_count, player_count, display_split_type, window);
     return;
 }
 
@@ -582,7 +582,7 @@ render_postprocess:
                         list_type->m_field_C = 0;
                         list_type->m_render_layer_flags.clear();
                         rasterizer_transparent_geometry_reset_counts();
-                        render_camera(
+                        render_camera_scene(
                             render_layer_debug_view,
                             render_transparent_geo,
                             lens_flare_occlusion_test,
@@ -739,6 +739,11 @@ render_scene_end:
     return;
 }
 
+void __cdecl render_nonplayer_frame(window_bound* window_bounds)
+{
+    INVOKE(0x191FF9, 0x0, render_nonplayer_frame, window_bounds);
+    return;
+}
 
 /* private code */
 
@@ -810,7 +815,7 @@ void rasterizer_setup_2d_vertex_shader_user_interface_constants()
 	real_vector4d vc[5];
 	int16 width, height;
 
-	s_camera* global_camera = get_global_camera();
+	render_camera* global_camera = get_global_camera();
 
 	rectangle2d screen_bounds = global_camera->viewport_bounds;
 	width = rectangle2d_width(&screen_bounds);
@@ -877,9 +882,9 @@ bool __cdecl render_ingame_user_interface_hud_indicators_element_hook(int32* a1,
 
 void render_view(
     real_rectangle2d* frustum_bounds,
-    s_camera* rasterizer_camera,
+    render_camera* rasterizer_camera,
     int32 window_bound_index,
-    s_camera* render_camera,
+    render_camera* render_camera,
     bool is_texture_camera,
     int32 cluster_index,
     int32 leaf_index,
@@ -897,7 +902,7 @@ void render_view(
     s_screen_flash* screen_flash) 
 {
     ASSERT(render_camera);
-    s_camera* camera = (rasterizer_camera ? rasterizer_camera : render_camera);
+    struct render_camera* camera = (rasterizer_camera ? rasterizer_camera : render_camera);
 
     ++*global_view_frame_num_get();
 
@@ -914,7 +919,7 @@ void render_view(
     *global_fog_result_get() = *fog;
     *global_byte_4E6938_get() = false;
 
-    s_camera* global_camera = get_global_camera();
+    struct render_camera* global_camera = get_global_camera();
     *global_camera = *render_camera;
 
     render_camera_build_projection(global_camera, frustum_bounds, global_projection_get());
@@ -1044,7 +1049,7 @@ void render_scene_wrapper(bool is_texture_camera)
     return;
 }
 
-void __cdecl render_camera(
+void __cdecl render_camera_scene(
     int32 render_layer_debug_view,
     bool render_transparent_geo,
     bool lens_flare_occlusion_test,
@@ -1052,7 +1057,7 @@ void __cdecl render_camera(
     int32 hologram_flag,
     int32 effect_flag)
 {
-    INVOKE(0x1912B3, 0x0, render_camera,
+    INVOKE(0x1912B3, 0x0, render_camera_scene,
         render_layer_debug_view,
         render_transparent_geo,
         lens_flare_occlusion_test,

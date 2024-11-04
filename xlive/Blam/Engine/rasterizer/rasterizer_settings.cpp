@@ -188,7 +188,7 @@ void rasterizer_settings_set_default_settings(void)
 	rasterizer_globals->display_parameters.backbuffer_format = D3DFMT_A8R8G8B8;
 	rasterizer_globals->display_parameters.depthstencil_format = D3DFMT_D24S8;
 	rasterizer_globals->display_parameters.window_mode = _rasterizer_window_mode_funky_fullscreen;
-	rasterizer_globals->display_parameters.display_type = _display_type_widescreen;
+	rasterizer_globals->display_parameters.display_type = _display_type_4_by_3;
 	rasterizer_globals->sun_width_scale = 1.f;
 	rasterizer_globals->frame_bounds = rasterizer_globals->screen_bounds;
 	rasterizer_globals->fullscreen_parameters.gamma = 1.f;

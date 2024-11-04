@@ -8,7 +8,7 @@
 
 /* prototypes */
 
-void __cdecl render_camera_build_projection_static(s_camera* camera, real_rectangle2d* frustum_bounds, render_projection* out_projection);
+void __cdecl render_camera_build_projection_static(render_camera* camera, real_rectangle2d* frustum_bounds, render_projection* out_projection);
 
 /* public code */
 
@@ -23,7 +23,7 @@ render_projection* global_projection_get(void)
 	return Memory::GetAddress<render_projection*>(0x4E673C);
 }
 
-void __cdecl render_camera_build_projection(s_camera* camera,
+void __cdecl render_camera_build_projection(render_camera* camera,
 	real_rectangle2d* frustum_bounds,
 	render_projection* projection)
 {
@@ -31,7 +31,7 @@ void __cdecl render_camera_build_projection(s_camera* camera,
 	return;
 }
 
-void __cdecl render_camera_build_projection_static(s_camera* camera, real_rectangle2d* frustum_bounds, render_projection* out_projection)
+void __cdecl render_camera_build_projection_static(render_camera* camera, real_rectangle2d* frustum_bounds, render_projection* out_projection)
 {
 	real32 old_camera_field_of_view = camera->vertical_field_of_view;
 	s_saved_game_cartographer_player_profile* profile_settings = cartographer_player_profile_get_by_user_index(global_render_current_user_index());
@@ -49,7 +49,7 @@ void __cdecl render_camera_build_projection_static(s_camera* camera, real_rectan
 	return;
 }
 
-void __cdecl render_camera_build_viewport_frustum_bounds(const s_camera* camera, real_rectangle2d* frustum_bounds)
+void __cdecl render_camera_build_viewport_frustum_bounds(const render_camera* camera, real_rectangle2d* frustum_bounds)
 {
 	INVOKE(0x194FBD, 0x180EB6, render_camera_build_viewport_frustum_bounds, camera, frustum_bounds);
 	return;
@@ -116,7 +116,7 @@ bool render_projection_point_to_screen(
 }
 
 bool render_camera_world_to_screen(
-	const s_camera* camera,
+	const render_camera* camera,
 	const render_projection* projection,
 	const rectangle2d* viewport_bounds,
 	const real_point3d* view_point,

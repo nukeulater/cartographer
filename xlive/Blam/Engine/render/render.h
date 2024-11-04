@@ -4,13 +4,19 @@
 #include "render_layers.h"
 #include "render_visibility_collection.h"
 
-#include "camera/camera.h"
 #include "effects/player_effects.h"
 #include "scenario/scenario_fog.h"
 
 /* enums */
 
-enum e_screen_split_type : int8
+enum e_display_split_type : uint32
+{
+	_display_split_type_none = 0,
+	_display_split_type_horizontal = 1,
+	_display_split_type_vertical = 2
+};
+
+enum e_screen_split_type : uint8
 {
 	_screen_split_type_full = 0,
 	_screen_split_type_half = 1,
@@ -37,7 +43,7 @@ struct s_frame
 	int16 alpha;
 	int16 pad;
 	real_rgb_color color;
-	s_camera camera;
+	render_camera camera;
 	render_projection projection;
 	s_scenario_fog_result fog_result;
 	bool render_fog;
@@ -65,8 +71,8 @@ struct window_bound
 	int32 single_view;
 	int32 window_bound_index;
 	int32 user_index;
-	s_camera render_camera;
-	s_camera rasterizer_camera;
+	struct render_camera render_camera;
+	struct render_camera rasterizer_camera;
 	s_bloom_window_data bloom_data;
 };
 ASSERT_STRUCT_SIZE(window_bound, 280);
@@ -151,7 +157,7 @@ void __cdecl render_frame(
 	uint32 frame_render_type,
 	int32 window_count,
 	int32 player_count,
-	int32 screen_split_type,
+	int32 display_split_type,
 	window_bound* window);
 
 // Render window
@@ -165,3 +171,5 @@ void __cdecl render_scene(
 	int32 hologram_flag,
 	int32 effect_flag,
 	real32 depth_range);
+
+void __cdecl render_nonplayer_frame(window_bound* window_bounds);

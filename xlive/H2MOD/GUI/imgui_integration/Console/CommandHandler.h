@@ -102,7 +102,7 @@ public:
 protected:
 
     CommandFlags m_flags;
-    char m_name[32];
+    char m_name[64];
     char m_command_description[256];
     size_t m_min_parameter_count;
     size_t m_max_parameter_count;

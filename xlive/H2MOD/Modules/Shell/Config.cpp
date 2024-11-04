@@ -68,6 +68,7 @@ char H2Config_stats_authkey[32 + 1] = { "" };
 bool H2Config_vip_lock = false;
 bool H2Config_even_shuffle_teams = false;
 bool H2Config_koth_random = true;
+bool H2Config_intel_sky_hack = false;
 H2Config_Experimental_Rendering_Mode H2Config_experimental_fps = _rendering_mode_none;
 
 // ### TODO FIXME remove CSimpleIniA garbage
@@ -383,6 +384,7 @@ void SaveH2Config() {
 			ini.SetBoolValue(k_h2config_version_section, "force_off_sm3", H2Config_force_off_sm3);
 			ini.SetBoolValue(k_h2config_version_section, "use_d3d9on12", g_rasterizer_dx9on12_enabled);
 			ini.SetBoolValue(k_h2config_version_section, "disable_amd_or_ati_patches", g_rasterizer_dx9_driver_globals.disable_amd_or_ati_patches);
+			ini.SetBoolValue(k_h2config_version_section, "intel_sky_hack", H2Config_intel_sky_hack);
 		}
 
 		ini.SetBoolValue(k_h2config_version_section, "enable_xdelay", H2Config_xDelay);
@@ -629,7 +631,7 @@ void ReadH2Config() {
 					k_h2config_version_section,
 					"disable_amd_or_ati_patches",
 					g_rasterizer_dx9_driver_globals.disable_amd_or_ati_patches);
-
+				*Memory::GetAddress<bool*>(0x41F6A9) = !ini.GetBoolValue(k_h2config_version_section, "intel_sky_hack", H2Config_intel_sky_hack);
 			}
 
 			// dedicated server only

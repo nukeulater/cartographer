@@ -133,7 +133,7 @@ void motion_sensor_update_with_delta(real32 delta)
 
 void motion_sensor_render_update(real_point2d* position, real32 pulse)
 {
-	s_camera* global_camera = get_global_camera();
+	render_camera* global_camera = get_global_camera();
 
 	position->x -= global_camera->viewport_bounds.left;
 	position->x -= global_camera->window_bounds.left;

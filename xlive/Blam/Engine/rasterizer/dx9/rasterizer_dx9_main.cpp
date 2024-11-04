@@ -693,7 +693,7 @@ bool __cdecl rasterizer_dx9_device_initialize(s_rasterizer_parameters* parameter
 
 void __cdecl rasterizer_dx9_initialize_camera_projection(
     bool is_texture_camera,
-    const s_camera* camera,
+    const render_camera* camera,
     const render_projection* projection,
     e_rasterizer_target rasterizer_target)
 {

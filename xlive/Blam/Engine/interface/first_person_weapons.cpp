@@ -620,7 +620,7 @@ int32 __cdecl first_person_weapon_build_models(int32 user_index, datum unit_inde
                         }
                     }
                     real_matrix4x3 camera_matrix;
-                    s_camera* global_camera = get_global_camera();
+                    render_camera* global_camera = get_global_camera();
                     matrix4x3_from_point_and_vectors(&camera_matrix, &global_camera->point, &global_camera->forward, &global_camera->up);
                     if (TEST_BIT(first_person_data->flags, 2))
                     {
