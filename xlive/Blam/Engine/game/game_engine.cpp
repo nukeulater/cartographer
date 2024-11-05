@@ -15,7 +15,7 @@ c_game_engine** get_game_mode_engines()
 
 c_game_engine* get_slayer_engine()
 {
-	return get_game_mode_engines()[_game_engine_slayer];
+	return get_game_mode_engines()[_game_engine_type_slayer];
 }
 
 bool __cdecl game_engine_get_change_colors(s_player_profile* player_profile, e_game_team team_index, real_rgb_color* change_colors)

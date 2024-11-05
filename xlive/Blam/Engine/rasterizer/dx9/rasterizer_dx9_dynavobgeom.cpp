@@ -148,7 +148,7 @@ void rasterizer_dx9_dynamic_screen_geometry_draw(const s_dynamic_geometry_parame
 			rasterizer_dx9_set_sampler_state(sampler, D3DSAMP_MAXMIPLEVEL, 0);
 		}
 
-		rasterizer_dx9_set_vertex_shader_permutation(14);
+		rasterizer_dx9_set_vertex_shader_permutation(_global_vertex_shader_screen2_old);
 		rasterizer_dx9_submit_vertex_declaration(35);
 		rasterizer_dx9_submit_resolve();
 
@@ -201,7 +201,7 @@ void rasterizer_dx9_dynamic_screen_geometry_draw(const s_dynamic_geometry_parame
 		if (draw_geometry)
 		{
 			rasterizer_dx9_set_render_state(D3DRS_CULLMODE, D3DBLEND_SRCCOLOR);
-			rasterizer_dx9_set_vertex_shader_permutation(14);
+			rasterizer_dx9_set_vertex_shader_permutation(_global_vertex_shader_screen2_old);
 			rasterizer_dx9_submit_vertex_declaration(35);
 			rasterizer_dx9_submit_resolve();
 			rasterizer_dx9_draw_primitive_dynamic_geometry(0, 0, D3DPT_LINESTRIP, 35, sizeof(s_dynamic_vertex_data), 4, rasterizer_dx9_primitive_builder, 0, 0, vertex_data);

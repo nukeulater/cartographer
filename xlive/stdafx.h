@@ -65,7 +65,6 @@ static_assert(EXECUTABLE_TYPE <= 7 && EXECUTABLE_TYPE >= 0, "EXECUTABLE_TYPE VAL
 #include <unordered_set>
 #include <map>
 #include <mutex>
-#include <queue>
 #include <string>
 #include <vector>
 #include <random>

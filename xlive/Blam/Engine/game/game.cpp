@@ -285,7 +285,7 @@ void game_info_initialize_for_new_map(s_game_options* options)
 
     if (game_is_multiplayer() || game_globals->options.game_variant.variant_game_engine_index)
     {
-        game_engine_variant_cleanup(&game_globals->options.game_variant.variant_flag);
+        game_engine_variant_cleanup(&game_globals->options.game_variant.flags);
     }
     random_math_set_seed(game_globals->options.random_seed);
     game_globals->game_is_lost = false;

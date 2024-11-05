@@ -198,7 +198,7 @@ wchar_t* NetworkSession::GetGameVariantName()
 
 bool NetworkSession::IsVariantTeamPlay()
 {
-	return GetActiveNetworkSession()->parameters[0].game_variant.is_team_play();
+	return TEST_BIT(GetActiveNetworkSession()->parameters[0].game_variant.flags, _game_engine_teams_bit);
 }
 
 void NetworkSession::LeaveSession()

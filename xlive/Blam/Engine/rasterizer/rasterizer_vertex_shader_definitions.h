@@ -4,6 +4,43 @@
 
 /* enums */
 
+enum e_global_vertex_shader : int32
+{
+	_global_vertex_shader_bloom = 0,
+	_global_vertex_shader_convolution,
+	_global_vertex_shader_debug,
+	_global_vertex_shader_decal,
+	_global_vertex_shader_effect,
+	_global_vertex_shader_effect_billboarded,
+	_global_vertex_shader_effect_parallel,
+	_global_vertex_shader_effect_parallel_pushed,
+	_global_vertex_shader_effect_perpendicular,
+	_global_vertex_shader_filter_copy,
+	_global_vertex_shader_lens_flare,
+	_global_vertex_shader_lens_flare_horrible_legacy,
+	_global_vertex_shader_screen,
+	_global_vertex_shader_screen_old,
+	_global_vertex_shader_screen2_old,
+	_global_vertex_shader_stencil_debug_view,
+	_global_vertex_shader_screen_xform_4,
+	_global_vertex_shader_stencil_shadow_cap_proj,
+	_global_vertex_shader_stencil_shadow_stitch_no_proj,
+	_global_vertex_shader_stencil_shadow_stitch_proj,
+	_global_vertex_shader_screen_hud,
+	_global_vertex_shader_weather_plate,
+	_global_vertex_shader_weather_particle,
+	_global_vertex_shader_decal_hardcoded,
+	_global_vertex_shader_screen_0_stage,
+	_global_vertex_shader_screen_1_stage,
+	_global_vertex_shader_screen_2_stage,
+	_global_vertex_shader_screen_3_stage,
+	_global_vertex_shader_screen_4_stage,
+	_global_vertex_shader_screen_5_stage,
+	_global_vertex_shader_screen_6_stage,
+	_global_vertex_shader_screen_7_stage,
+	k_global_vertex_shader_count
+};
+
 enum e_vertex_shader_platform : int16
 {
 	_vertex_shader_platform_pc,

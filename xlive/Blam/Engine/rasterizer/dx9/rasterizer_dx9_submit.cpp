@@ -9,13 +9,13 @@ void __cdecl rasterizer_dx9_gpu_frontend_initialize(void)
 	return;
 }
 
-void __cdecl rasterizer_dx9_set_vertex_shader_permutation(int32 shader_index)
+void __cdecl rasterizer_dx9_set_vertex_shader_permutation(e_global_vertex_shader shader_index)
 {
 	INVOKE_TYPE(0x26F3CE, 0x0, void(__cdecl*)(int32), shader_index);
 	return;
 }
 
-void __cdecl rasterizer_dx9_set_vertex_shader_permutation(int32 shader_index, int32 a2, int32 max_nodes_per_vertex)
+void __cdecl rasterizer_dx9_set_vertex_shader_permutation(e_global_vertex_shader shader_index, int32 a2, int32 max_nodes_per_vertex)
 {
 	INVOKE_TYPE(0x26F364, 0x0, void(__cdecl*)(int32, int32, int32), shader_index, a2, max_nodes_per_vertex);
 	return;

@@ -13,6 +13,7 @@
 
 #include "H2MOD/Modules/Accounts/AccountLogin.h"
 #include "H2MOD/Modules/Achievements/Achievements.h"
+#include "H2MOD/GUI/XLiveRendering.h"
 
 #include "version_git.h"
 
@@ -49,8 +50,6 @@ void render_cartographer_ingame_ui(void)
 	// these are global variables defined in legacy files where
 	// various d3dx9 rendering functions originally were.
 
-	// defined in XLiveRendering.cpp
-	extern char* buildText;
 	// defined in Modules\Updater\Updater.cpp
 	extern char* autoUpdateText;
 	extern long long sizeOfDownload;
@@ -66,7 +65,7 @@ void render_cartographer_ingame_ui(void)
 #endif
 
 	rasterizer_dx9_perf_event_begin("render cartographer ingame ui", NULL);
-	render_cartographer_status_bar(buildText);
+	render_cartographer_status_bar(g_cartographer_build_text);
 	render_cartographer_update_message(autoUpdateText, sizeOfDownload, sizeOfDownloaded);
 	if (!AchievementMap.empty())
 	{

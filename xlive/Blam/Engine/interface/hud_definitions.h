@@ -201,4 +201,4 @@ struct hud_globals_definition
 ASSERT_STRUCT_SIZE(hud_globals_definition, 1160);
 
 // gets the current loaded hud globals tag
-hud_globals_definition* get_hud_globals();
+hud_globals_definition* get_hud_globals(void);
