@@ -174,12 +174,12 @@ public:
 		return;
 	}
 
-	const int32* get_bits_direct(void) const
+	const uint32* get_bits_direct(void) const
 	{
 		return m_flags;
 	}
 
-	int32* get_writeable_bits_direct(void)
+	uint32* get_writeable_bits_direct(void)
 	{
 		return m_flags;
 	}
