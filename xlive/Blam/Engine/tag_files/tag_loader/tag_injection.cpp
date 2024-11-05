@@ -2,7 +2,6 @@
 #include "tag_injection.h"
 
 #include "tag_injection_manager.h"
-#include "scenario/scenario_definitions.h"
 
 c_tag_injecting_manager g_manager;
 

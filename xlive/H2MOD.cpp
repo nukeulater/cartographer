@@ -1176,14 +1176,8 @@ void H2MOD::Initialize()
 
 	h2mod_apply_tweaks();
 
-	// Apply patches for the hud that need to be applied before WinMain is called
-	hud_apply_pre_winmain_patches();
-
 	// Apply patches
 	game_apply_pre_winmain_patches();
-
-	// adds support for more monitor resolutions
-	rasterizer_settings_apply_hooks();
 
 	shell_apply_patches();
 	shell_windows_apply_patches();
@@ -1193,6 +1187,12 @@ void H2MOD::Initialize()
 
 	if (!Memory::IsDedicatedServer())
 	{
+		// Apply patches for the hud that need to be applied before WinMain is called
+		hud_apply_pre_winmain_patches();
+
+		// adds support for more monitor resolutions
+		rasterizer_settings_apply_hooks();
+
 		KeyboardInput::Initialize();
 		
 		RenderHooks::Initialize();
