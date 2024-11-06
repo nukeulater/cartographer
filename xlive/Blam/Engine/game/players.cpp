@@ -14,7 +14,7 @@
 
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
-
+#include "units/bipeds.h"
 
 
 /*
@@ -437,6 +437,93 @@ void __cdecl players_update_activation(void)
         }
     }
     return;
+}
+
+void player_build_nearby_objects_interaction_context(uint32 player_index, s_player_interaction_context* interaction_context)
+{
+    s_player* player = s_player::get(player_index);
+
+    ASSERT(interaction_context);
+
+    interaction_context->target_datum = 0;
+    interaction_context->field_4 = NONE;
+    interaction_context->field_8 = NONE;
+
+    datum unit_index = player->unit_index;
+
+    if(unit_index != NONE)
+    {
+        biped_datum* player_unit = (biped_datum*)object_get_fast_unsafe(unit_index);
+
+        if(player_unit->unit.object.parent_object_index == NONE)
+        {
+            // todo: what are these combined they are supposed to be e_object_type i think
+            // but the function is doing weird stuff
+            const int32 search_types[2]
+            {
+                 4, -5
+            };
+            const real32 search_radii[2]
+            {
+                player_unit->unit.object.radius + 0.4f,
+                player_unit->unit.object.radius + 3.4f
+            };
+
+            for(int32 search_index = 0; search_index < 2; search_index++)
+            {
+                const int32 search_type = search_types[search_index];
+                const real32 search_radius = search_radii[search_index];
+
+                datum nearby_objects[64]{};
+
+                uint32 number_of_objects = object_search_for_objects_in_radius(
+                    0,
+                    (e_object_type)(search_type & 0xFFFFEBCF),
+                    &player_unit->unit.object.location,
+                    &player_unit->unit.object.center,
+                    search_radius,
+                    nearby_objects,
+                    64);
+
+                for(uint32 i = 0; i < number_of_objects; i++)
+                {
+                    const datum object_index = nearby_objects[i];
+
+                    object_datum* object = (object_datum*)object_get_fast_unsafe(object_index);
+
+                    if (((1 << object->object_identifier.get_type()) & 
+                        (_object_type_creature | _object_type_sound_scenery | _object_type_projectile | _object_type_garbage)) == 0)
+                    {
+                        real32 delta_x = object->center.x - player_unit->unit.object.center.x;
+                        real32 delta_y = object->center.y - player_unit->unit.object.center.y;
+                        real32 delta_z = object->center.z - player_unit->unit.object.center.z;
+                        real32 distance_squared = delta_x * delta_x + delta_y * delta_y + delta_z * delta_z;
+                        real32 combined_radius = object->radius + search_radius;
+
+                        if(distance_squared > combined_radius * combined_radius)
+                        {
+                            continue;
+                        }
+
+                        switch(object->object_identifier.get_type())
+                        {
+                        case _object_type_biped:
+                            break;
+                        //todo: if case vehicle or weapon grab the user_index from player_user_map and (add) check a global variable if pickups are allowed
+                        case _object_type_vehicle:
+                            break;
+                        case _object_type_weapon:
+                            break;
+                        case _object_type_control:
+                            break;
+                        default:
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 int16 local_player_count(void)
