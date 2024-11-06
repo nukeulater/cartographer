@@ -1,4 +1,5 @@
 #pragma once
+#include "new_hud_definitions.h"
 
 struct s_draw_hud_widget_input_results
 {
@@ -22,3 +23,5 @@ void hud_player_indicators_draw_reset(void);
 void __cdecl draw_hud_layer(void);
 
 void new_hud_draw_apply_patches(void);
+
+void hud_widget_anchor_calculate_point(e_hud_anchor anchor, real_point2d* out_point);

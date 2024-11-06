@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "motion_sensor.h"
 
+#include "hud.h"
+#include "new_hud_draw.h"
 #include "game/game_time.h"
 #include "game/players.h"
 #include "rasterizer/dx9/rasterizer_dx9_main.h"
@@ -131,6 +133,33 @@ void motion_sensor_update_with_delta(real32 delta)
 //	INVOKE(0x22C86F, 0x0, motion_sensor_render_update, local_player_index, a2, offset_point);
 //}
 
+
+void motion_sensor_set_size(real32 size)
+{
+	WriteValue<float>(Memory::GetAddress(0x3E6A9C), size * k_radar_size_multiplier);
+}
+
+void __cdecl motion_sensor_draw_screen(int32 local_render_user_index, int32 unused, point2d* location)
+{
+	if (local_render_user_index != NONE)
+	{
+		switch (get_screen_split_type(local_render_user_index))
+		{
+		case _screen_split_type_half:
+		case _screen_split_type_quarter:
+			motion_sensor_set_size(128.f);
+			location->x -= 3;
+			location->y += 3;
+			break;
+		default:
+			motion_sensor_set_size(166.f);
+			break;
+		}
+
+		INVOKE(0x22C86F, 0, motion_sensor_draw_screen, local_render_user_index, unused, location);
+	}
+}
+
 void motion_sensor_render_update(real_point2d* position, real32 pulse)
 {
 	render_camera* global_camera = get_global_camera();
@@ -146,9 +175,11 @@ void motion_sensor_render_update(real_point2d* position, real32 pulse)
 	INVOKE(0x284810, 0x0, motion_sensor_render_update, position, pulse);
 }
 
+
+
 void motion_sensor_apply_patches()
 {
-	motion_sensor_fix_size();
+	PatchCall(Memory::GetAddress(0x2266F9), motion_sensor_draw_screen);
 
 	// Remove hud motion sensor update from game tick
 	NopFill(Memory::GetAddress(0x220c8f), 5);
@@ -160,8 +191,3 @@ void motion_sensor_apply_patches()
 	//NopFill(Memory::GetAddress(0x22C38D), 2);
 }
 
-void motion_sensor_fix_size()
-{
-	float og_res = *Memory::GetAddress<float*>(0x3E6A9C);
-	WriteValue<float>(Memory::GetAddress(0x3E6A9C), og_res * k_radar_size_multiplier);
-}
