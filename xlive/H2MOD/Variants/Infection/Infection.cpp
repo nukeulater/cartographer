@@ -289,8 +289,8 @@ void Infection::removeUnwantedItems()
 	{
 		const char* tag_name = tag_get_name(iterator.current_tag_index);
 		if (strstr(tag_name, "multiplayer\\powerups") ||
-			strncmp(tag_name, "multiplayer\\single_weapons\\frag_grenades", 256) ||
-			strncmp(tag_name, "multiplayer\\single_weapons\\plasma_grenades", 256))
+			strncmp(tag_name, "multiplayer\\single_weapons\\frag_grenades", 256) == 0 ||
+			strncmp(tag_name, "multiplayer\\single_weapons\\plasma_grenades", 256) == 0)
 		{
 			s_item_collection_group_definition* itmc = (s_item_collection_group_definition*)tag_get_fast(iterator.current_tag_index);
 
@@ -357,6 +357,8 @@ void Infection::Dispose()
 	if (!game_is_predicted()) {
 		h2mod->set_unit_speed_patch(false);
 	}
+
+	return;
 }
 
 CustomVariantId Infection::GetVariantId()
@@ -510,13 +512,13 @@ void Infection::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 				}
 				if(team == k_humans_team)
 				{
-					player_user_weapon_interaction_set(player->user_index, false);
+					player_user_weapon_interaction_set(player->user_index, true);
 					hud_player_indicators_draw_enabled_set(player->user_index, false);
 				}
 				else if (team == k_zombie_team)
 				{
 					s_player::set_unit_character_type(playerIdx, _character_type_flood);
-					player_user_weapon_interaction_set(player->user_index, true);
+					player_user_weapon_interaction_set(player->user_index, false);
 					hud_player_indicators_draw_enabled_set(player->user_index, true);
 				}
 			}

@@ -17,6 +17,12 @@
 #include "units/bipeds.h"
 
 
+/* globals */
+
+// k_number_of_users, we have 4 bits left to spare in this value
+uint8 g_user_weapon_interactions_mask = UINT8_MAX;
+
+
 /*
 	- NOTES:
     - This gets the player data from the game state, thus it is available only during a match or gameplay (game life cycle is in_game or after map has been loaded)
@@ -439,12 +445,12 @@ void __cdecl players_update_activation(void)
     return;
 }
 
-void __cdecl player_build_biped_interaction(datum biped_datum, datum player_datum, s_player_interaction_context* interaction_context)
+void __cdecl player_examine_nearby_biped(datum biped_datum, datum player_datum, s_player_interaction_context* out_action_context)
 {
     void* player_build_biped_interaction_usercall = Memory::GetAddress<void*>(0x53E43);
     __asm
     {
-        push interaction_context
+        push out_action_context
         push player_datum
         mov ebx, biped_datum
 
@@ -454,12 +460,12 @@ void __cdecl player_build_biped_interaction(datum biped_datum, datum player_datu
     }
 }
 
-void __cdecl player_build_vehicle_interaction(datum vehicle_datum, datum player_datum, s_player_interaction_context* interaction_context)
+void __cdecl player_examine_nearby_vehicle(datum vehicle_datum, datum player_datum, s_player_interaction_context* out_action_context)
 {
     void* player_build_biped_interaction_usercall = Memory::GetAddress<void*>(0x53CC7);
     __asm
     {
-        push interaction_context
+        push out_action_context
         push player_datum
         mov eax, vehicle_datum
 
@@ -469,40 +475,35 @@ void __cdecl player_build_vehicle_interaction(datum vehicle_datum, datum player_
     }
 }
 
-// k_number_of_users, we have 4 bits left to spare in this value
-uint8 g_user_weapon_interactions_mask;
-
 void player_user_weapon_interaction_set(int32 user_index, bool enabled)
 {
+    ASSERT(VALID_INDEX(user_index, k_number_of_users));
+
     SET_FLAG(g_user_weapon_interactions_mask, user_index, enabled);
+    return;
 }
 
-void player_user_weapon_interaction_reset()
+void player_user_weapon_interaction_reset(void)
 {
-    g_user_weapon_interactions_mask = 0xFF;	// Set all bits to 1
+    // Set all bits to 1
+    g_user_weapon_interactions_mask = UINT8_MAX;
+    return;
 }
 
-void player_build_weapon_interaction(datum weapon_datum, datum player_datum, s_player_interaction_context* interaction_context)
+void player_examine_nearby_weapon(datum weapon_datum, datum player_datum, s_player_interaction_context* out_action_context)
 {
-    const s_players_globals* player_globals = get_players_globals();
+    const s_player* player = (const s_player*)datum_get(s_player::get_data(), player_datum);
 
-    for (long index : player_globals->player_user_mapping)
-    {
-	    if(index == player_datum)
-	    {
-            if (!TEST_BIT(g_user_weapon_interactions_mask, index))
-            {
-                return;
-            }
-	    }
-    }
+    if (player->user_index != NONE)
+        if (!TEST_BIT(g_user_weapon_interactions_mask, player->user_index))
+            return;
 
     void* player_build_biped_interaction_usercall = Memory::GetAddress<void*>(0x53F17);
     __asm
     {
         push weapon_datum
         push player_datum
-        mov eax, interaction_context
+        mov eax, out_action_context
 
         call player_build_biped_interaction_usercall
 
@@ -510,12 +511,12 @@ void player_build_weapon_interaction(datum weapon_datum, datum player_datum, s_p
     }
 }
 
-void __cdecl player_build_control_interaction(datum control_datum, datum player_datum, s_player_interaction_context* interaction_context)
+void __cdecl player_examine_nearby_control(datum control_datum, datum player_datum, s_player_interaction_context* out_action_context)
 {
     void* player_build_biped_interaction_usercall = Memory::GetAddress<void*>(0x53E43);
     __asm
     {
-        push interaction_context
+        push out_action_context
         push player_datum
         mov ebx, control_datum
 
@@ -525,104 +526,111 @@ void __cdecl player_build_control_interaction(datum control_datum, datum player_
     }
 }
 
-
-
-
-void player_build_nearby_objects_interaction_context(datum player_datum, s_player_interaction_context* interaction_context)
+void __cdecl player_find_action_context(datum player_datum, s_player_interaction_context* out_action_context)
 {
-    s_player* player = s_player::get(player_datum);
+    const s_player* player = (const s_player*)datum_get(s_player::get_data(), player_datum);
 
-    ASSERT(interaction_context);
+    ASSERT(out_action_context);
 
-    interaction_context->target_datum = 0;
-    interaction_context->field_4 = NONE;
-    interaction_context->field_8 = NONE;
+    out_action_context->target_datum = 0;
+    out_action_context->field_4 = NONE;
+    out_action_context->field_8 = NONE;
 
     datum unit_index = player->unit_index;
 
-    if(unit_index != NONE)
+    if (unit_index != NONE)
     {
         biped_datum* player_unit = (biped_datum*)object_get_fast_unsafe(unit_index);
 
-        if(player_unit->unit.object.parent_object_index == NONE)
+        if (player_unit->unit.object.parent_object_index == NONE)
         {
-            // todo: what are these combined they are supposed to be e_object_type i think
-            // but the function is doing weird stuff
-            const int32 search_types[2]
+            // Search 1 includes weapons
+            // Search 2 excludes weapons
+            const uint32 search_types[2]
             {
-                 4, -5
+                 FLAG(_object_type_weapon),
+                 ~FLAG(_object_type_weapon),
             };
-            const real32 search_radii[2]
+            // We have a shorter search radius for weapons than other objects
+            const real32 search_radius_types[2]
             {
                 player_unit->unit.object.radius + 0.4f,
                 player_unit->unit.object.radius + 3.4f
             };
 
-            for(int32 search_index = 0; search_index < 2; search_index++)
+            // Perform the two searches
+            for (uint8 search_num = 0; search_num < 2; ++search_num)
             {
-                const int32 search_type = search_types[search_index];
-                const real32 search_radius = search_radii[search_index];
+                const uint32 search_type = search_types[search_num];
+                const real32 search_radius = search_radius_types[search_num];
 
-                datum nearby_objects[64]{};
+                const uint32 objects_to_ignore = FLAG(_object_type_garbage) | FLAG(_object_type_projectile) | FLAG(_object_type_sound_scenery) | FLAG(_object_type_creature);
 
-                uint32 number_of_objects = object_search_for_objects_in_radius(
+                datum nearby_objects[64];
+
+                const int16 number_of_objects = object_search_for_objects_in_radius(
                     0,
-                    (e_object_type)(search_type & 0xFFFFEBCF),
+                    (search_type & ~objects_to_ignore),
                     &player_unit->unit.object.location,
                     &player_unit->unit.object.center,
                     search_radius,
                     nearby_objects,
-                    64);
+                    NUMBEROF(nearby_objects));
 
-                for(uint32 i = 0; i < number_of_objects; i++)
+                // This is used later on in this function for the default condition in the examine switch case
+                int16 nearby_object_num = number_of_objects;
+
+                for (int16 object_num = 0; object_num < number_of_objects; object_num++)
                 {
-                    const datum object_index = nearby_objects[i];
-
-                    const object_datum* object = (object_datum*)object_get_fast_unsafe(object_index);
-
-                    if (
-                        !TEST_BIT(
-                            (FLAG(_object_type_creature) | FLAG(_object_type_sound_scenery) | FLAG(_object_type_projectile) | FLAG(_object_type_garbage)),
-                            object->object_identifier.get_type()
-                        ))
+                    const datum nearby_object_index = nearby_objects[object_num];
+                    const object_datum* object = (object_datum*)object_get_fast_unsafe(nearby_object_index);
+                    const e_object_type type = object->object_identifier.get_type();
+                    
+                    // If our object is not one of the objects we want to ignore
+                    if (!TEST_BIT(objects_to_ignore, type))
                     {
-
                         real_vector3d delta;
                         vector_from_points3d(&player_unit->unit.object.center, &object->center, &delta);
                         const real32 magnitude = magnitude_squared3d(&delta);
                         const real32 combined_radius = object->radius + search_radius;
 
-                        if(magnitude > combined_radius * combined_radius)
-                        {
-                            continue;
-                        }
+                        const uint32 object_types_to_skip_radius_check = FLAG(_object_type_weapon) | FLAG(_object_type_machine) | FLAG(_object_type_control);
 
-                        switch(object->object_identifier.get_type())
+                        // If the object is not of the following types then we have to run the following check:
+                        // Compare the magnitude of the vector between the player and object and make sure we aren't going outside the combined radius squared
+                        if (!TEST_BIT(object_types_to_skip_radius_check, type) || magnitude < combined_radius * combined_radius)
                         {
-                        case _object_type_biped:
-                            player_build_biped_interaction(object_index, player_datum, interaction_context);
-                            break;
-                        //todo: if case vehicle or weapon grab the user_index from player_user_map and (add) check a global variable if pickups are allowed
-                        case _object_type_vehicle:
-                            player_build_vehicle_interaction(object_index, player_datum, interaction_context);
-                            break;
-                        case _object_type_weapon:
-                            player_build_weapon_interaction(object_index, player_datum, interaction_context);
-                            break;
-                        case _object_type_control:
-                            player_build_control_interaction(object_index, player_datum, interaction_context);
-                            break;
-                        default:
-                        {
-                            datum t_datum = object->current_weapon_datum;
-                            while (t_datum != NONE && i < 64)
+                            switch (type)
                             {
-                                object_datum* t_object = (object_datum*)object_get_fast_unsafe(t_datum);
-                                nearby_objects[i++] = t_datum;
-                                t_datum = t_object->next_index;
+                            case _object_type_biped:
+                                player_examine_nearby_biped(nearby_object_index, player_datum, out_action_context);
+                                break;
+                            case _object_type_vehicle:
+                                player_examine_nearby_vehicle(nearby_object_index, player_datum, out_action_context);
+                                break;
+                            case _object_type_weapon:
+                                player_examine_nearby_weapon(nearby_object_index, player_datum, out_action_context);
+                                break;
+                            case _object_type_control:
+                                player_examine_nearby_control(nearby_object_index, player_datum, out_action_context);
+                                break;
+                            default:
+                            {
+
+                                for (datum current_weapon_datum = object->current_weapon_datum; current_weapon_datum != NONE; ++nearby_object_num)
+                                {
+                                    if (nearby_object_num > NUMBEROF(nearby_objects))
+                                    {
+                                        break;
+                                    }
+
+                                    object_datum* t_object = object_get_fast_unsafe(current_weapon_datum);
+                                    nearby_objects[nearby_object_num] = current_weapon_datum;
+                                    current_weapon_datum = t_object->next_index;
+                                }
+                                break;
                             }
-                        }
-                            break;
+                            }
                         }
                     }
                 }
@@ -639,8 +647,6 @@ int16 local_player_count(void)
 
 void players_apply_patches(void)
 {
-    player_user_weapon_interaction_reset();
-
     // Change the validation for player_appearance_valid to use the updated k_player_character_type_count constant
     WriteValue<BYTE>(Memory::GetAddress(0x54fb2, 0x5D4AA) + 1, k_player_character_type_count);
 
@@ -650,7 +656,7 @@ void players_apply_patches(void)
     // Replace update activation to insert events into the simulation queue
     PatchCall(Memory::GetAddress(0x58182, 0x6067A), players_update_activation);
 
-    PatchCall(Memory::GetAddress(0x936F2), player_build_nearby_objects_interaction_context);
+    PatchCall(Memory::GetAddress(0x936F2, 0x4B9F2), player_find_action_context);
     return;
 }
 
