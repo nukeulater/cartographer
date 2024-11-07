@@ -251,7 +251,7 @@ void c_screen_4way_signin::update(void)
 				insert_controller_text->set_visible(false);
 			}
 		}
-	
+
 		this->set_child_visible(_widget_type_text, TEXT_BLOCK_INDEX_TO_WIDGET_INDEX(item->text_gamertag_text), show_gamertag_text);
 		this->set_child_visible(_widget_type_text, TEXT_BLOCK_INDEX_TO_WIDGET_INDEX(item->text_gamertag_heading), show_gamertag_text);
 		this->set_child_visible(_widget_type_text, TEXT_BLOCK_INDEX_TO_WIDGET_INDEX(item->text_profile_name_heading), controller_has_joined);
@@ -310,7 +310,7 @@ void c_screen_4way_signin::update(void)
 		}
 	}
 	g_show_split_inputs_option = false;
-	if (IN_RANGE(input_get_connected_gamepads_count(), 0, k_number_of_controllers)
+	if (IN_RANGE(input_get_connected_gamepads_count(), 1, k_number_of_controllers - 1)
 		&& user_interface_controller_is_player_profile_valid(k_windows_device_controller_index))
 	{
 		g_show_split_inputs_option = true;
@@ -594,10 +594,28 @@ bool c_screen_4way_signin::handle_automation_event(s_event_record* event)
 bool c_screen_4way_signin::handle_split_input_event(s_event_record* event)
 {
 	if (event->component == _user_interface_controller_component_button_x
-		&& !input_windows_processing_device_change())
+		&& !input_windows_processing_device_change()
+		&& g_show_split_inputs_option)
 	{
+
+		// signout all profiles other than k_windows_device_controller_index the moment u unsplit inputs
+		// note : we assume here that k_windows_device_controller_index is always signed in before we signout other controllers
+		if (input_windows_has_split_device_active())
+		{
+			for (e_controller_index controller = first_controller();
+				controller != k_no_controller;
+				controller = next_controller(controller))
+			{
+				if (controller != k_windows_device_controller_index
+					&& user_interface_controller_is_player_profile_valid(controller))
+				{
+					// todo : fix the removed controller process, its annoying the way it is now
+					user_interface_controller_sign_out(controller);
+				}
+			}
+		}
+
 		input_windows_notify_change_device_mapping();
-		g_show_split_inputs_option = false;
 		return true;
 	}
 	return false;

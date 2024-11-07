@@ -2,6 +2,7 @@
 #include "screen_main_menu.h"
 #include "screen_4way_signin.h"
 #include "screen_settings.h"
+#include "screen_campaign_options_dialog.h"
 #include "game/preferences.h"
 #include "interface/user_interface_memory.h"
 #include "interface/user_interface_controller.h"
@@ -53,6 +54,7 @@ enum e_main_menu_list_skin_texts
 
 /* forward declarations*/
 
+bool __cdecl screen_show_campaign_options_without_achievement(e_controller_index controller_index);
 bool __cdecl screen_show_screen_4way_signin_splitscreen_offline(e_controller_index controller_index);
 bool __cdecl screen_show_screen_4way_signin_system_link_offline(e_controller_index controller_index);
 bool __cdecl screen_show_screen_4way_signin_xbox_live_callback();
@@ -196,7 +198,44 @@ void c_main_menu_list::handle_item_pressed_event(s_event_record** pevent, datum*
 
 void c_main_menu_list::handle_item_campaign(s_event_record** pevent)
 {
-	INVOKE_TYPE(0xB198, 0x0, void(__thiscall*)(c_main_menu_list*, s_event_record**), this, pevent);
+	//INVOKE_TYPE(0xB198, 0x0, void(__thiscall*)(c_main_menu_list*, s_event_record**), this, pevent);
+
+	if (user_interface_globals_is_beta_build())
+	{
+		screen_error_ok_dialog_show(
+			_user_interface_channel_type_game_error,
+			_ui_error_beta_feature_disabled,
+			_window_4,
+			FLAG((*pevent)->controller),
+			nullptr,
+			nullptr);
+	}
+	else if (online_connected_to_xbox_live())
+	{
+		s_screen_parameters params;
+		params.m_flags = 0;
+		params.m_window_index = _window_4;
+		params.m_context = 0;
+		params.user_flags = FLAG((*pevent)->controller);
+		params.m_channel_type = _user_interface_channel_type_gameshell_screen;
+		params.m_screen_state.field_0 = 0xFFFFFFFF;
+		params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
+		params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
+		params.m_load_function = &c_screen_campaign_options::load;
+
+		params.m_load_function(&params);
+
+		
+	}
+	else
+	{
+		user_interface_error_display_ok_cancel_dialog_with_ok_callback(
+			_user_interface_channel_type_dialog,
+			_window_4,
+			FLAG((*pevent)->controller),
+			screen_show_campaign_options_without_achievement,
+			_ui_error_confirm_campaign_without_achievements);
+	}
 }
 
 void c_main_menu_list::handle_item_xbox_live(s_event_record** pevent)
@@ -337,6 +376,26 @@ void c_main_menu_list::handle_item_quit(s_event_record** pevent)
 	return INVOKE_TYPE(0xA307, 0x0, void(__thiscall*)(c_main_menu_list*, s_event_record**), this, pevent);
 }
 
+bool __cdecl screen_show_campaign_options_without_achievement(e_controller_index controller_index)
+{
+	//return INVOKE(0x213673, 0x0, screen_show_campaign_options_without_achievement, controller_index);
+
+	s_screen_parameters params;
+	params.m_flags = 0;
+	params.m_window_index = _window_4;
+	params.m_context = 0;
+	params.user_flags = user_interface_controller_get_signed_in_controllers_mask(); //replacing 0xFF with active_controllers so that controller-removed-handler stops panicking here
+	params.m_channel_type = _user_interface_channel_type_dialog;
+	params.m_screen_state.field_0 = 0xFFFFFFFF;
+	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
+	params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
+	params.m_load_function = &c_screen_campaign_options::load;
+
+	params.m_load_function(&params);
+
+	return true;
+}
+
 bool __cdecl screen_show_screen_4way_signin_splitscreen_offline(e_controller_index controller_index)
 {
 	online_account_transition_to_offline();
@@ -427,7 +486,7 @@ bool __cdecl screen_show_screen_4way_signin_xbox_live_callback()
 	params.m_flags = 0;
 	params.m_window_index = _window_4;
 	params.m_context = 0;
-	params.user_flags = NONE;// allow all
+	params.user_flags = user_interface_controller_get_signed_in_controllers_mask();
 	params.m_channel_type = _user_interface_channel_type_gameshell_screen;
 	params.m_screen_state.field_0 = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;

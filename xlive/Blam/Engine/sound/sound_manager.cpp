@@ -11,3 +11,8 @@ void sound_idle()
 {
 	INVOKE(0x2D9B2, 0, sound_idle);
 }
+
+void __cdecl sound_pause(bool a1)
+{
+	INVOKE(0x2B579, 0x0, sound_pause, a1);
+}

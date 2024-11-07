@@ -6,6 +6,7 @@
 #define k_number_of_windows_input_virtual_codes 256
 #define k_number_of_windows_mouse_buttons 8
 #define k_number_of_buffered_keys 64
+#define k_number_of_memory_units 9
 
 
 // controller_index which the mouse/keyboard combo will use
@@ -158,6 +159,7 @@ ASSERT_STRUCT_SIZE(s_input_globals, 0x7D8);
 /* global externs */
 extern s_input_globals* input_globals;
 extern XINPUT_VIBRATION g_vibration_state[k_number_of_controllers];
+extern bool* g_input_windows_request_terminate;
 
 /* public code */
 
@@ -188,4 +190,7 @@ bool* input_suppress_global_get(void);
 
 void __cdecl input_set_gamepad_rumbler_state(int16 gamepad_index, uint16 left, uint16 right);
 
-bool __cdecl input_windows_drive_letter_test(int32 drive, bool* out_result);
+
+uint8 __cdecl input_windows_key_frames_down(int16 key);
+uint16 __cdecl input_windows_key_msec_down(int16 key);
+bool __cdecl input_windows_drive_letter_test(int32 memory_unit, int8* drive_letter);

@@ -2,6 +2,7 @@
 
 #include "user_interface_globals.h"
 #include "interface/user_interface.h"
+#include "scenario/scenario_definitions.h"
 
 
 bool __cdecl user_interface_globals_is_beta_build()
@@ -22,6 +23,11 @@ uint32 user_interface_globals_get_edit_player_profile_index()
 s_saved_game_player_profile* user_interface_globals_get_edit_player_profile()
 {
 	return INVOKE(0x209B9D, 0, user_interface_globals_get_edit_player_profile);
+}
+
+e_scenario_type __cdecl user_interface_globals_get_map_type()
+{
+	return INVOKE(0x20B8BB, 0x0, user_interface_globals_get_map_type);
 }
 
 void __cdecl user_interface_globals_set_game_difficulty_real(int32 difficulty)
