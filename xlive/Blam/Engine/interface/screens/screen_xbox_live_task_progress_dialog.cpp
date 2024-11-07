@@ -134,7 +134,7 @@ void c_screen_xbox_live_task_progress_dialog::set_display_text(string_id display
 		text->set_text_from_string_id(display);
 }
 
-void c_screen_xbox_live_task_progress_dialog::set_display_text_raw(wchar_t* raw_text)
+void c_screen_xbox_live_task_progress_dialog::set_display_text_raw(const wchar_t* raw_text)
 {
 	c_text_widget* text = try_find_text_widget(K_SUB_HEADER_TEXT_BLOCK_INDEX);
 	if (text)

@@ -370,11 +370,17 @@ ASSERT_STRUCT_SIZE(s_screen_parameters, 0x20);
 
 void render_menu_user_interface_to_usercall(int32 window_index, int32 controller_index, int32 player_count, rectangle2d* rect2d);
 
-void __cdecl screen_error_ok_dialog_show(int32 a1, e_ui_error_types ui_error_index, int32 a3, int16 a4, void* a5, void* a6);
+const bool __cdecl user_interface_automation_is_active();
+uint32 __cdecl user_interface_milliseconds();
+bool __cdecl user_interface_error_display_allowed();
+bool __cdecl user_interface_has_responding_controller(int32 user_index);
+void __cdecl screen_error_ok_dialog_show(e_user_interface_channel_type channel_type, e_ui_error_types ui_error_index, e_user_interface_render_window window_index, uint16 user_flags, void* ok_callback, void* fallback);
 bool __cdecl user_interface_channel_is_busy(e_user_interface_channel_type channel_type);
+bool __cdecl user_interface_back_out_from_channel_by_id(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, e_user_interface_screen_id id);
+bool __cdecl user_interface_in_screen(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, e_user_interface_screen_id screen_id);
+bool __cdecl user_interface_error_screen_is_active(e_user_interface_channel_type channel_index, e_user_interface_render_window window_index, e_ui_error_types error_code);
+
 void __cdecl user_interface_error_display_ok_cancel_dialog_with_ok_callback(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, uint16 user_flags, void* ok_callback_handle, e_ui_error_types error_type);
 void __cdecl user_interface_back_out_from_channel(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index);
-bool __cdecl user_interface_back_out_from_channel_by_id(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, e_user_interface_screen_id id);
 void __cdecl user_interface_enter_game_shell(int32 context);
-bool __cdecl user_interface_in_screen(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, e_user_interface_screen_id screen_id);
 

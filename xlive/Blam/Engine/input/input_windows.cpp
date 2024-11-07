@@ -16,6 +16,7 @@ bool g_should_offset_gamepad_indices = false;
 bool g_notified_to_change_mapping = false;
 uint32 input_device_change_delay_timer = NULL;
 s_input_globals* input_globals;
+bool* g_input_windows_request_terminate;
 
 XINPUT_VIBRATION g_vibration_state[k_number_of_controllers]{};
 real32 g_rumble_factor = 1.0f;
@@ -97,9 +98,8 @@ void __cdecl input_update_gamepads(uint32 duration_ms)
 		}
 	}
 
-	// we want device changes to happen smoothly, not abrupt
-	input_device_change_delay_timer += duration_ms;
-	if (g_notified_to_change_mapping && input_device_change_delay_timer > 2500)
+	// we want device changes to happen smoothly, not abruptly
+	if (g_notified_to_change_mapping && input_device_change_delay_timer > k_maximum_delay_for_split_inputs)
 	{
 		if (g_should_offset_gamepad_indices)
 		{
@@ -261,9 +261,20 @@ void __cdecl input_set_gamepad_rumbler_state(int16 gamepad_index, uint16 left, u
 	return;
 }
 
-bool __cdecl input_windows_drive_letter_test(int32 drive, bool* out_result)
+uint8 __cdecl input_windows_key_frames_down(int16 key)
 {
-	return INVOKE(0x2E463, 0, input_windows_drive_letter_test, drive, out_result);
+	return INVOKE(0x2EF86, 0x0, input_windows_key_frames_down, key);
+}
+
+uint16 __cdecl input_windows_key_msec_down(int16 key)
+{
+	return INVOKE(0x2F030, 0x0, input_windows_key_msec_down, key);
+}
+
+bool __cdecl input_windows_drive_letter_test(int32 memory_unit, int8* drive_letter)
+{
+	ASSERT(memory_unit < k_number_of_memory_units);
+	return INVOKE(0x2E463, 0, input_windows_drive_letter_test, memory_unit, drive_letter);
 }
 
 bool input_windows_processing_device_change()
@@ -378,6 +389,7 @@ void input_stop_removed_controller_handler_from_panicking()
 void input_windows_apply_patches(void)
 {
 	input_globals = Memory::GetAddress<s_input_globals*>(0x479F50);
+	g_input_windows_request_terminate = Memory::GetAddress<bool*>(0x971291);
 
 	PatchCall(Memory::GetAddress(0x9020F), input_set_gamepad_rumbler_state);    // Replace call in rumble_clear_all_now
 

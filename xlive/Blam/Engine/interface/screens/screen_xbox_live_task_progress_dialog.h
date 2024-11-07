@@ -28,7 +28,7 @@ public:
 	uint8* get_data();
 	void set_header_text(string_id header);
 	void set_display_text(string_id display);
-	void set_display_text_raw(wchar_t* raw_text);
+	void set_display_text_raw(const wchar_t* raw_text);
 	void close_task();
 
 	static void add_task(proc_task_cb_t callback);

@@ -129,10 +129,10 @@ ASSERT_STRUCT_SIZE(s_event_record, 16);
 
 enum e_controller_state_flags
 {
-	_controller_state_bit0,
-	_controller_state_bit1,
-	_controller_state_bit2,
-	_controller_state_has_signed_in_bit = 3,
+	_controller_state_is_attached_bit,
+	_controller_state_bit1,//drive_test1
+	_controller_state_bit2,//drive_test2
+	_controller_state_has_valid_profile_bit = 3,
 	_controller_state_has_xbox_live_bit = 4,
 	_controller_state_save_in_progress_bit = 5,
 	_controller_state_bit6,

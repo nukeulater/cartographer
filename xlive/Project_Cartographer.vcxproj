@@ -373,6 +373,7 @@
     <ClCompile Include="Blam\Engine\hs\hs.cpp" />
     <ClCompile Include="Blam\Engine\input\controllers.cpp" />
     <ClCompile Include="Blam\Engine\input\input_abstraction.cpp" />
+    <ClCompile Include="Blam\Engine\input\input_process.cpp" />
     <ClCompile Include="Blam\Engine\input\input_windows.cpp" />
     <ClCompile Include="Blam\Engine\input\input_xinput.cpp" />
     <ClCompile Include="Blam\Engine\interface\hud_draw.cpp" />
@@ -383,6 +384,7 @@
     <ClCompile Include="Blam\Engine\interface\screens\screen_about_dialog.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_audio_settings.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_bungie_news.cpp" />
+    <ClCompile Include="Blam\Engine\interface\screens\screen_campaign_options_dialog.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_main_menu.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_multiplayer_pregame_lobby.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_network_adapter.cpp" />
@@ -648,6 +650,7 @@
     <ClInclude Include="Blam\Engine\hs\hs_unit_seats.h" />
     <ClInclude Include="Blam\Engine\input\controllers.h" />
     <ClInclude Include="Blam\Engine\input\input_abstraction.h" />
+    <ClInclude Include="Blam\Engine\input\input_process.h" />
     <ClInclude Include="Blam\Engine\input\input_windows.h" />
     <ClInclude Include="Blam\Engine\input\input_xinput.h" />
     <ClInclude Include="Blam\Engine\interface\first_person_weapons.h" />
@@ -665,6 +668,7 @@
     <ClInclude Include="Blam\Engine\interface\screens\screen_about_dialog.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_audio_settings.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_bungie_news.h" />
+    <ClInclude Include="Blam\Engine\interface\screens\screen_campaign_options_dialog.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_esrb_warning.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_main_menu.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_multiplayer_pregame_lobby.h" />

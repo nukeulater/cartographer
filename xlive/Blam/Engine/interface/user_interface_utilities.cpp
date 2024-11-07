@@ -11,6 +11,16 @@ datum __cdecl user_interface_get_widget_tag_index_from_screen_id(e_user_interfac
 	return INVOKE(0x20C701, 0x0, user_interface_get_widget_tag_index_from_screen_id, screen_id);
 }
 
+bool __cdecl user_interface_exit_to_dash()
+{
+	return INVOKE(0x212F7F, 0x0, user_interface_exit_to_dash);
+}
+
+bool __cdecl user_interface_save_map_and_exit()
+{
+	return INVOKE(0x212F68, 0x0, user_interface_save_map_and_exit);
+}
+
 void user_interface_transition_to_offline()
 {
 	for (e_controller_index controller = first_controller();

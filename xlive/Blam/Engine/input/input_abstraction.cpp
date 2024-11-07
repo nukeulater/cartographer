@@ -70,11 +70,6 @@ e_button_functions __cdecl input_abstraction_get_secondary_fire_button(datum uni
 }
 
 
-bool __cdecl input_abstraction_get_key_state(int16 key)
-{
-	return INVOKE(0x2EF86, 0x0, input_abstraction_get_key_state, key);
-}
-
 uint32 s_input_abstraction_globals_sub_45E501(e_button_functions button, void* a3)
 {
 	return INVOKE_TYPE(0x5E501, 0x0, uint32(__thiscall*)(s_input_abstraction_globals*, e_button_functions, void*), input_abstraction_globals, button, a3);
@@ -83,6 +78,11 @@ uint32 s_input_abstraction_globals_sub_45E501(e_button_functions button, void* a
 bool input_abstraction_preferences_new(s_gamepad_input_preferences* preferences, int16 a2, bool a3, bool a4)
 {
 	return INVOKE(0x5EE72, 0, input_abstraction_preferences_new, preferences, a2, a3, a4);
+}
+
+int32 __cdecl input_abstraction_get_last_used_device(e_controller_index controller)
+{
+	return INVOKE(0x5E30E, 0x0, input_abstraction_get_last_used_device, controller);
 }
 
 uint32 input_abstraction_get_stick_type_for_function(e_button_functions function)
