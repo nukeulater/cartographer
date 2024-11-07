@@ -1,9 +1,10 @@
 ﻿#include "stdafx.h"
 #include "input_process.h"
+
 #include "input_windows.h"
+
 #include "interface/screens/screen_xbox_live_task_progress_dialog.h"
 #include "main/game_preferences.h"
-
 
 
 /* constants */
@@ -34,15 +35,14 @@ const wchar_t* g_input_split_restore_string[k_language_count]
 	L"Restaurando entradas, aguarde..."
 };
 
+/* public code */
 
 void input_split_task_progress_callback(c_screen_xbox_live_task_progress_dialog* dialog)
 {
-	e_language language = get_current_language();
+	const e_language language = get_current_language();
+	const wchar_t* display_text = input_windows_has_split_device_active() ? g_input_split_initiate_string[language] : g_input_split_restore_string[language];
 
-	if (input_windows_has_split_device_active())
-		dialog->set_display_text_raw((wchar_t*)g_input_split_initiate_string[language]);
-	else
-		dialog->set_display_text_raw((wchar_t*)g_input_split_restore_string[language]);
+	dialog->set_display_text_raw(display_text);
 
 	//	update the delay_timer in progress screen update
 	input_device_change_delay_timer++;
@@ -51,4 +51,5 @@ void input_split_task_progress_callback(c_screen_xbox_live_task_progress_dialog*
 	{
 		dialog->close_task();
 	}
+	return;
 }
