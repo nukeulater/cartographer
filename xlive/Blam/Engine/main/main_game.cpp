@@ -70,7 +70,7 @@ void main_game_launch_set_multiplayer_splitscreen_count(int32 player_count)
     {
         g_main_game_launch_options.game_mode = _game_mode_multiplayer;
         g_main_game_launch_user_count = player_count;
-        if (g_main_game_launch_options.game_variant.variant_game_engine_index == _game_engine_campaign)
+        if (g_main_game_launch_options.game_variant.variant_game_engine_index == _game_engine_type_none)
         {
             game_variant_build_default(&g_main_game_launch_options.game_variant, _game_variant_description_slayer);
             g_main_game_launch_options.game_variant.round_time_limit = 0;

@@ -484,25 +484,25 @@ void c_screen_squad_settings::update()
 		{
 			switch (game_variant->variant_game_engine_index)
 			{
-			case _game_engine_ctf:
+			case _game_engine_type_ctf:
 				option_bitmap->set_local_bitmap(_squad_settings_dialog_local_bitmap_mp_games, _mp_game_type_ctf);
 				break;
-			case _game_engine_slayer:
+			case _game_engine_type_slayer:
 				option_bitmap->set_local_bitmap(_squad_settings_dialog_local_bitmap_mp_games, _mp_game_type_slayer);
 				break;
-			case _game_engine_oddball:
+			case _game_engine_type_oddball:
 				option_bitmap->set_local_bitmap(_squad_settings_dialog_local_bitmap_mp_games, _mp_game_type_oddball);
 				break;
-			case _game_engine_koth:
+			case _game_engine_type_koth:
 				option_bitmap->set_local_bitmap(_squad_settings_dialog_local_bitmap_mp_games, _mp_game_type_koth);
 				break;
-			case _game_engine_juggernaut:
+			case _game_engine_type_juggernaut:
 				option_bitmap->set_local_bitmap(_squad_settings_dialog_local_bitmap_mp_games, _mp_game_type_juggernaut);
 				break;
-			case _game_engine_territories:
+			case _game_engine_type_territories:
 				option_bitmap->set_local_bitmap(_squad_settings_dialog_local_bitmap_mp_games, _mp_game_type_territories);
 				break;
-			case _game_engine_assault:
+			case _game_engine_type_assault:
 				option_bitmap->set_local_bitmap(_squad_settings_dialog_local_bitmap_mp_games, _mp_game_type_assualt);
 				break;
 			}

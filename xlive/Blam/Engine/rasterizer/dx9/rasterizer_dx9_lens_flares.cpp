@@ -94,7 +94,7 @@ e_rasterizer_target rasterizer_dx9_sun_glow_draw(datum tag_index, real_point3d* 
 
             IDirect3DPixelShader9** lens_flare_pixel_shaders = lens_flare_pixel_shaders_get();
 
-            rasterizer_dx9_set_vertex_shader_permutation(10);
+            rasterizer_dx9_set_vertex_shader_permutation(_global_vertex_shader_lens_flare);
 
             real32 viewport_middle_x = (real32)(viewport_width / 2);
             real32 viewport_middle_y = (real32)(viewport_height / 2);
@@ -296,7 +296,7 @@ e_rasterizer_target rasterizer_dx9_sun_glow_occlude(datum tag_index, real_point3
             //real32 depth_range = global_window_parameters->camera.z_near / global_window_parameters->camera.z_far;
 
             rasterizer_dx9_set_target(rasterizer_target, 0, true);
-            rasterizer_dx9_set_vertex_shader_permutation(10);
+            rasterizer_dx9_set_vertex_shader_permutation(_global_vertex_shader_lens_flare);
             rasterizer_dx9_set_render_state(D3DRS_ZENABLE, D3DZB_TRUE);
             rasterizer_dx9_set_render_state(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
             rasterizer_dx9_set_render_state(D3DRS_COLORWRITEENABLE, 0);
@@ -396,7 +396,7 @@ e_rasterizer_target rasterizer_dx9_convolve_surfaces_original(e_rasterizer_targe
         rasterizer_dx9_set_render_state(D3DRS_ALPHATESTENABLE, 0);
         rasterizer_dx9_set_render_state(D3DRS_ZENABLE, D3DZB_FALSE);
         rasterizer_dx9_set_render_state(D3DRS_DEPTHBIAS, 0);
-        rasterizer_dx9_set_vertex_shader_permutation(1);
+        rasterizer_dx9_set_vertex_shader_permutation(_global_vertex_shader_convolution);
         rasterizer_dx9_submit_resolve();
 
         const real32 width_ratio = 1.f / (real32)dx9_globals->global_d3d_sun_width;

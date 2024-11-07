@@ -49,6 +49,8 @@ namespace XLiveRendering
 extern HWND H2hWnd;
 extern LPDIRECT3DDEVICE9 g_pD3DDevice9;
 
+extern char g_cartographer_build_text[256];
+
 HRESULT WINAPI XLiveInitialize(XLIVE_INITIALIZE_INFO* pXii);
 
 int WINAPI XLiveOnResetDevice(D3DPRESENT_PARAMETERS* pD3DPP);

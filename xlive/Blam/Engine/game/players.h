@@ -101,7 +101,7 @@ ASSERT_STRUCT_SIZE(s_clan_identifiers, 12);
 
 struct s_player_properties
 {
-	wchar_t player_name[16];
+	wchar_t player_name[XUSER_NAME_SIZE];
 	int32 spawn_protection_time;
 	int8 gap_24[28];
 
@@ -241,8 +241,8 @@ struct s_players_globals
 	bool disable_movement;
 	int16 local_player_count;
 	int16 player_controller_count;
-	datum player_user_mapping[4];
-	datum player_controller_mapping[4];
+	datum player_user_mapping[k_number_of_users];
+	datum player_controller_mapping[k_number_of_users];
 	int32 machine_valid_mask;
 	s_machine_identifier machine_identifier[17];
 	bool local_machine_exists;

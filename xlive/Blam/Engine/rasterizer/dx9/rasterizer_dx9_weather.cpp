@@ -13,7 +13,7 @@
 
 /* structures */
 
-struct s_dx9_weather_particle_primitive
+struct s_dx9_weather_triangle_list_vertex
 {
 	real_point3d position;
 	real32 scale;
@@ -23,7 +23,7 @@ struct s_dx9_weather_particle_primitive
 /* globals */
 
 // Multiply max count by 3 since there can be 3 primitives in a rain particle
-s_dx9_weather_particle_primitive g_weather_particle_primitives[MAX_PARTICLES_LITE * 3] = {};
+s_dx9_weather_triangle_list_vertex g_weather_particle_primitives[MAX_PARTICLES_LITE * 3] = {};
 
 /* prototypes */
 
@@ -190,7 +190,7 @@ bool rasterizer_dx9_draw_weather_particles(c_particle_system_lite* system)
 		const s_frame* global_window_parameters = global_window_parameters_get();
 
 		rasterizer_dx9_reset_depth_buffer();
-		rasterizer_dx9_set_vertex_shader_permutation(22, 0, 0);
+		rasterizer_dx9_set_vertex_shader_permutation(_global_vertex_shader_weather_particle, 0, 0);
 		rasterizer_dx9_initialize_camera_projection(false, &global_window_parameters->camera, &global_window_parameters->projection, *rasterizer_dx9_main_render_target_get());
 
 		real_vector2d rain_vector;
@@ -230,10 +230,10 @@ bool rasterizer_dx9_draw_weather_particles(c_particle_system_lite* system)
 
 		const int16 player_count = PIN(local_player_count(), 1, k_number_of_users);
 		const uint32 count_per_user = data->render_data.count / player_count;
-		const uint32 size = count_per_user * sizeof(s_dx9_weather_particle_primitive) * (2 * is_rain + 1);
+		const uint32 size = count_per_user * sizeof(s_dx9_weather_triangle_list_vertex) * (2 * is_rain + 1);
 		
 		uint32 used_vertices = 0;
-		s_dx9_weather_particle_primitive* current_primitive = g_weather_particle_primitives;
+		s_dx9_weather_triangle_list_vertex* current_primitive = g_weather_particle_primitives;
 		
 		for (uint32 i = 0; i < count_per_user; ++i)
 		{
@@ -283,12 +283,12 @@ bool rasterizer_dx9_draw_weather_particles(c_particle_system_lite* system)
 		if (is_rain)
 		{
 			rasterizer_dx9_device_get_interface()->SetPixelShader(g_d3d9_weather_shaders[_dx9_weather_shader_particle_rain]);
-			rasterizer_dx9_draw_primitive_up(D3DPT_TRIANGLELIST, used_vertices / 3, g_weather_particle_primitives, sizeof(s_dx9_weather_particle_primitive));
+			rasterizer_dx9_draw_primitive_up(D3DPT_TRIANGLELIST, used_vertices / 3, g_weather_particle_primitives, sizeof(s_dx9_weather_triangle_list_vertex));
 		}
 		else
 		{
 			rasterizer_dx9_device_get_interface()->SetPixelShader(g_d3d9_weather_shaders[_dx9_weather_shader_particle_generic]);
-			rasterizer_dx9_draw_primitive_up(D3DPT_POINTLIST, used_vertices, g_weather_particle_primitives, sizeof(s_dx9_weather_particle_primitive));
+			rasterizer_dx9_draw_primitive_up(D3DPT_POINTLIST, used_vertices, g_weather_particle_primitives, sizeof(s_dx9_weather_triangle_list_vertex));
 		}
 
 		rasterizer_dx9_set_render_state(D3DRS_POINTSPRITEENABLE, FALSE);

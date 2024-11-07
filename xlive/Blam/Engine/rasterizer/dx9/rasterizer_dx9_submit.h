@@ -1,6 +1,7 @@
 #pragma once
 #include "math/color_math.h"
 #include "memory/hashtable.h"
+#include "rasterizer/rasterizer_vertex_shader_definitions.h"
 
 /* structures */
 
@@ -46,9 +47,9 @@ struct c_gpu_frontend
 
 void __cdecl rasterizer_dx9_gpu_frontend_initialize(void);
 
-void __cdecl rasterizer_dx9_set_vertex_shader_permutation(int32 shader_index);
+void __cdecl rasterizer_dx9_set_vertex_shader_permutation(e_global_vertex_shader shader_index);
 
-void __cdecl rasterizer_dx9_set_vertex_shader_permutation(int32 shader_index, int32 a2, int32 max_nodes_per_vertex);
+void __cdecl rasterizer_dx9_set_vertex_shader_permutation(e_global_vertex_shader shader_index, int32 a2, int32 max_nodes_per_vertex);
 
 void __cdecl rasterizer_dx9_draw_rect(real_rectangle2d* quad, real32 depth, pixel32 color);
 

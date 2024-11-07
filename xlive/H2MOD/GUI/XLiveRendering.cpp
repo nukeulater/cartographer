@@ -22,7 +22,7 @@ D3DPRESENT_PARAMETERS g_d3dPresentParameters;
 
 IDirect3DTexture9* Primitive = NULL;
 
-char* buildText = nullptr;
+char g_cartographer_build_text[256] = {};
 
 const char CompileDate[] = __DATE__;
 const char CompileTime[] = __TIME__;
@@ -56,8 +56,7 @@ int WINAPI XLiveInitializeEx(XLIVE_INITIALIZE_INFO* pXii, DWORD dwVersion)
 	if (pXii->pD3D) {
 		XLiveRendering::InitializeD3D9((LPDIRECT3DDEVICE9)pXii->pD3D, (D3DPRESENT_PARAMETERS*)pXii->pD3DPP);
 
-		buildText = new char[256];
-		snprintf(buildText, 256, "Project Cartographer (v%s) - Build Time: %s %s", DLL_VERSION_STR, CompileDate, CompileTime);
+		snprintf(g_cartographer_build_text, NUMBEROF(g_cartographer_build_text), "Project Cartographer (v%s) - Build Time: %s %s", DLL_VERSION_STR, CompileDate, CompileTime);
 	}
 
 	UpdateMasterStatus(-1, "Status: Initializing");

@@ -1,8 +1,8 @@
 #pragma once
-#include "saved_games/game_variant.h"
 #include "game/game_allegiance.h"
 #include "game_statborg.h"
 #include "math/color_math.h"
+#include "saved_games/game_variant.h"
 #include "tag_files/string_id.h"
 #include "tag_files/tag_block.h"
 #include "tag_files/tag_reference.h"
@@ -79,7 +79,7 @@ enum e_multiplayer_event_sound_flags : int16
 class c_game_engine
 {
 public:
-	virtual e_game_engine_index get_type() = 0;
+	virtual e_game_engine_type get_type() = 0;
 
 	/*
 		Called on scenario load, returns success

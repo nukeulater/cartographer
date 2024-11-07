@@ -10,12 +10,15 @@
 
 /* globals */
 
-window_bound g_window_bounds[6];
+// TODO: figure out why having this global instead of window_bound_get breaks bloom
+//window_bound g_window_bounds[6];
 
 bool g_debug_render_horizontal_splitscreen = false;
 bool g_debug_force_all_player_views_to_default = false;
 
 /*  prototypes */
+
+static window_bound* window_bound_get(void);
 
 static void main_render_hook(void);
 
@@ -72,9 +75,11 @@ void __cdecl main_render(void)
 		display_split_type = use_horizontal_split ? _display_split_type_horizontal : _display_split_type_vertical;
 	}
 
+	window_bound* g_window_bounds = window_bound_get();
+
 	int32 user_index = NONE;
 	window_bound* player_windows = &g_window_bounds[1];
-	for (uint32 window_num = 0; window_num < window_count; ++window_num)
+	for (uint32 window_num = 0; window_num < player_window_count; ++window_num)
 	{
 		s_observer_result* observer_result = NULL;
 		if (g_debug_force_all_player_views_to_default)
@@ -129,6 +134,8 @@ void __cdecl main_render(void)
 
 void __cdecl main_render_previous_backbuffer(int32 a1, int32 a2)
 {
+	window_bound* g_window_bounds = window_bound_get();
+
 	g_window_bounds[0].single_view = 1;
 	g_window_bounds[0].window_bound_index = NONE;
 	g_window_bounds[0].user_index = NONE;
@@ -176,6 +183,11 @@ void __cdecl set_window_camera_values(render_camera* camera, s_observer_result* 
 }
 
 /* private code */
+
+static window_bound* window_bound_get(void)
+{
+	return Memory::GetAddress<window_bound*>(0xA4B738);
+}
 
 static void main_render_hook(void)
 {
