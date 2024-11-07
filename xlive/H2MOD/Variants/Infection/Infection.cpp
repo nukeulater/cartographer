@@ -188,7 +188,7 @@ bool Infection::shouldEndGame()
 
 void Infection::resetWeaponInteractionAndEmblems() {
 	LOG_TRACE_GAME("[h2mod-infection] Resetting weapons interactions and emblem visibility");
-	h2mod->disable_weapon_pickup(true);
+	player_user_weapon_interaction_reset();
 	hud_player_indicators_draw_reset();
 }
 
@@ -510,13 +510,13 @@ void Infection::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 				}
 				if(team == k_humans_team)
 				{
-					h2mod->disable_weapon_pickup(true);
+					player_user_weapon_interaction_set(player->user_index, false);
 					hud_player_indicators_draw_enabled_set(player->user_index, false);
 				}
 				else if (team == k_zombie_team)
 				{
 					s_player::set_unit_character_type(playerIdx, _character_type_flood);
-					h2mod->disable_weapon_pickup(false);
+					player_user_weapon_interaction_set(player->user_index, true);
 					hud_player_indicators_draw_enabled_set(player->user_index, true);
 				}
 			}

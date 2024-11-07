@@ -281,6 +281,10 @@ uint32 player_appearance_required_bits(void);
 // Validate player configuration
 void __cdecl player_validate_configuration(datum player_index, s_player_properties* configuration_data);
 
+void player_user_weapon_interaction_set(int32 user_index, bool enabled);
+
+void player_user_weapon_interaction_reset();
+
 int16 local_player_count(void);
 
 void players_apply_patches(void);

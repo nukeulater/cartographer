@@ -338,31 +338,6 @@ void __cdecl OnObjectDamage(datum unit_datum_index, int a2, bool a3, bool a4)
 	EventHandler::ObjectDamageEventExecute(EventExecutionType::execute_after, unit_datum_index, *(datum*)(a2));
 }
 
-// Client Sided Patch
-// TODO: refactor this and rewrite the player_examine_nearby_weapons function
-// to check if the player_index is a local user and do a comparison to a flags check if they are able to pickup weapons
-void H2MOD::disable_weapon_pickup(bool enable)
-{
-	static BYTE oldBytes[5];
-	static BYTE oldBytesRead = false;
-	DWORD address = Memory::GetAddress(0x55EFA);
-
-	if (oldBytesRead == false)
-	{
-		ReadBytesProtected(address, oldBytes, sizeof(oldBytes));
-		oldBytesRead = true;
-	}
-
-	if (enable)
-	{
-		WriteBytes(address, oldBytes, sizeof(oldBytes));
-	}
-	else
-	{
-		NopFill(address, sizeof(oldBytes));
-	}
-}
-
 int OnAutoPickUpHandler(datum player_datum, datum object_datum)
 {
 	auto p_auto_handle = Memory::GetAddress<int(_cdecl*)(datum, datum)>(0x57AA5, 0x5FF9D);
