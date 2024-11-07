@@ -5,8 +5,14 @@
 #include "game/game.h"
 #include "game/game_time.h"
 #include "networking/logic/life_cycle_manager.h"
-#include "H2MOD/Modules/Input/ControllerInput.h"
 #include "saved_games/cartographer_player_profile.h"
+#include "H2MOD/Modules/Input/ControllerInput.h"
+
+
+#ifdef PC1
+#include "render/render.h"
+#endif
+
 
 /* globals */
 typedef DWORD(WINAPI* XInputGetStateEx_t)(DWORD dwUserIndex, XINPUT_STATE* pState);
