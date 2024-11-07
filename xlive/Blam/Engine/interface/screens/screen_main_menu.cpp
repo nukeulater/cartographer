@@ -218,9 +218,9 @@ void c_main_menu_list::handle_item_campaign(s_event_record** pevent)
 		params.m_context = 0;
 		params.user_flags = FLAG((*pevent)->controller);
 		params.m_channel_type = _user_interface_channel_type_gameshell_screen;
-		params.m_screen_state.field_0 = 0xFFFFFFFF;
-		params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
-		params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
+		params.m_screen_state.field_0 = NONE;
+		params.m_screen_state.m_last_focused_item_order = NONE;
+		params.m_screen_state.m_last_focused_item_index = NONE;
 		params.m_load_function = &c_screen_campaign_options::load;
 
 		params.m_load_function(&params);
@@ -265,9 +265,9 @@ void c_main_menu_list::handle_item_xbox_live(s_event_record** pevent)
 		params.m_context = 0;
 		params.user_flags = FLAG((*pevent)->controller);
 		params.m_channel_type = _user_interface_channel_type_gameshell_screen;
-		params.m_screen_state.field_0 = 0xFFFFFFFF;
-		params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
-		params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
+		params.m_screen_state.field_0 = NONE;
+		params.m_screen_state.m_last_focused_item_order = NONE;
+		params.m_screen_state.m_last_focused_item_index = NONE;
 		//params.m_load_function = &c_screen_bungie_news::load; // replacing with 4way_screen
 		params.m_load_function = &c_screen_4way_signin::load_for_xbox_live;
 
@@ -358,9 +358,9 @@ void c_main_menu_list::handle_item_settings(s_event_record** pevent)
 	params.m_context = NULL;
 	params.user_flags = FLAG((*pevent)->controller);
 	params.m_channel_type = _user_interface_channel_type_gameshell_screen;
-	params.m_screen_state.field_0 = 0xFFFFFFFF;
-	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
-	params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
+	params.m_screen_state.field_0 = NONE;
+	params.m_screen_state.m_last_focused_item_order = NONE;
+	params.m_screen_state.m_last_focused_item_index = NONE;
 	params.m_load_function = &c_screen_settings::load;
 
 	params.m_load_function(&params);
@@ -386,9 +386,9 @@ bool __cdecl screen_show_campaign_options_without_achievement(e_controller_index
 	params.m_context = 0;
 	params.user_flags = user_interface_controller_get_signed_in_controllers_mask(); //replacing 0xFF with active_controllers so that controller-removed-handler stops panicking here
 	params.m_channel_type = _user_interface_channel_type_dialog;
-	params.m_screen_state.field_0 = 0xFFFFFFFF;
-	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
-	params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
+	params.m_screen_state.field_0 = NONE;
+	params.m_screen_state.m_last_focused_item_order = NONE;
+	params.m_screen_state.m_last_focused_item_index = NONE;
 	params.m_load_function = &c_screen_campaign_options::load;
 
 	params.m_load_function(&params);
@@ -413,9 +413,9 @@ bool __cdecl screen_show_screen_4way_signin_splitscreen_offline(e_controller_ind
 		params.m_context = 0;
 		params.user_flags = user_interface_controller_get_signed_in_controllers_mask();
 		params.m_channel_type = _user_interface_channel_type_gameshell_screen;
-		params.m_screen_state.field_0 = 0xFFFFFFFF;
-		params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
-		params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
+		params.m_screen_state.field_0 = NONE;
+		params.m_screen_state.m_last_focused_item_order = NONE;
+		params.m_screen_state.m_last_focused_item_index = NONE;
 		params.m_load_function = &c_screen_4way_signin::load_for_splitscreen;
 
 		params.m_load_function(&params);
@@ -443,9 +443,9 @@ bool __cdecl screen_show_screen_4way_signin_system_link_offline(e_controller_ind
 			params.m_context = 0;
 			params.user_flags = user_interface_controller_get_signed_in_controllers_mask();
 			params.m_channel_type = _user_interface_channel_type_gameshell_screen;
-			params.m_screen_state.field_0 = 0xFFFFFFFF;
-			params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
-			params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
+			params.m_screen_state.field_0 = NONE;
+			params.m_screen_state.m_last_focused_item_order = NONE;
+			params.m_screen_state.m_last_focused_item_index = NONE;
 			params.m_load_function = &c_screen_4way_signin::load_for_system_link;
 
 			params.m_load_function(&params);
@@ -488,9 +488,9 @@ bool __cdecl screen_show_screen_4way_signin_xbox_live_callback()
 	params.m_context = 0;
 	params.user_flags = user_interface_controller_get_signed_in_controllers_mask();
 	params.m_channel_type = _user_interface_channel_type_gameshell_screen;
-	params.m_screen_state.field_0 = 0xFFFFFFFF;
-	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
-	params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
+	params.m_screen_state.field_0 = NONE;
+	params.m_screen_state.m_last_focused_item_order = NONE;
+	params.m_screen_state.m_last_focused_item_index = NONE;
 	params.m_load_function = &c_screen_4way_signin::load_for_xbox_live;
 
 	params.m_load_function(&params);

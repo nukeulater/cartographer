@@ -1,7 +1,7 @@
 #pragma once
 #include "user_interface.h"
 
-enum e_scenario_type : short;
+enum e_scenario_type : int16;
 
 bool __cdecl user_interface_globals_is_beta_build();
 int32 __cdecl user_interface_globals_get_game_difficulty();
