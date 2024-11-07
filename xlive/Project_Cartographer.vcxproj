@@ -373,6 +373,7 @@
     <ClCompile Include="Blam\Engine\hs\hs.cpp" />
     <ClCompile Include="Blam\Engine\input\controllers.cpp" />
     <ClCompile Include="Blam\Engine\input\input_abstraction.cpp" />
+    <ClCompile Include="Blam\Engine\input\input_process.cpp" />
     <ClCompile Include="Blam\Engine\input\input_windows.cpp" />
     <ClCompile Include="Blam\Engine\input\input_xinput.cpp" />
     <ClCompile Include="Blam\Engine\interface\hud_draw.cpp" />
@@ -649,6 +650,7 @@
     <ClInclude Include="Blam\Engine\hs\hs_unit_seats.h" />
     <ClInclude Include="Blam\Engine\input\controllers.h" />
     <ClInclude Include="Blam\Engine\input\input_abstraction.h" />
+    <ClInclude Include="Blam\Engine\input\input_process.h" />
     <ClInclude Include="Blam\Engine\input\input_windows.h" />
     <ClInclude Include="Blam\Engine\input\input_xinput.h" />
     <ClInclude Include="Blam\Engine\interface\first_person_weapons.h" />

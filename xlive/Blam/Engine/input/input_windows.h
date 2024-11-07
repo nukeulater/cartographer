@@ -7,6 +7,7 @@
 #define k_number_of_windows_mouse_buttons 8
 #define k_number_of_buffered_keys 64
 #define k_number_of_memory_units 9
+#define k_maximum_delay_for_split_inputs 250
 
 
 // controller_index which the mouse/keyboard combo will use
@@ -160,6 +161,7 @@ ASSERT_STRUCT_SIZE(s_input_globals, 0x7D8);
 extern s_input_globals* input_globals;
 extern XINPUT_VIBRATION g_vibration_state[k_number_of_controllers];
 extern bool* g_input_windows_request_terminate;
+extern uint32 input_device_change_delay_timer;
 
 /* public code */
 

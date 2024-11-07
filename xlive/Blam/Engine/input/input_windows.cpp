@@ -98,9 +98,8 @@ void __cdecl input_update_gamepads(uint32 duration_ms)
 		}
 	}
 
-	// we want device changes to happen smoothly, not abrupt
-	input_device_change_delay_timer += duration_ms;
-	if (g_notified_to_change_mapping && input_device_change_delay_timer > 2500)
+	// we want device changes to happen smoothly, not abruptly
+	if (g_notified_to_change_mapping && input_device_change_delay_timer > k_maximum_delay_for_split_inputs)
 	{
 		if (g_should_offset_gamepad_indices)
 		{

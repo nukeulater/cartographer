@@ -4,6 +4,8 @@
 #include "screen_network_squad_browser.h"
 #include "screen_bungie_news.h"
 #include "screen_press_start_introduction.h"
+#include "screen_xbox_live_task_progress_dialog.h"
+#include "input/input_process.h"
 #include "interface/user_interface.h"
 #include "interface/user_interface_bitmap_block.h"
 #include "interface/user_interface_controller.h"
@@ -597,21 +599,21 @@ bool c_screen_4way_signin::handle_split_input_event(s_event_record* event)
 		&& !input_windows_processing_device_change()
 		&& g_show_split_inputs_option)
 	{
+		// add a basic progress menu to stop 4way from taking excessive input
+		c_screen_xbox_live_task_progress_dialog::add_task(input_split_task_progress_callback);
 
-		// signout all profiles other than k_windows_device_controller_index the moment u unsplit inputs
+		// signout all profiles other than k_windows_device_controller_index the moment split/unsplit transition occurs
 		// note : we assume here that k_windows_device_controller_index is always signed in before we signout other controllers
-		if (input_windows_has_split_device_active())
+
+		for (e_controller_index controller = first_controller();
+			controller != k_no_controller;
+			controller = next_controller(controller))
 		{
-			for (e_controller_index controller = first_controller();
-				controller != k_no_controller;
-				controller = next_controller(controller))
+			if (controller != k_windows_device_controller_index
+				&& user_interface_controller_is_player_profile_valid(controller))
 			{
-				if (controller != k_windows_device_controller_index
-					&& user_interface_controller_is_player_profile_valid(controller))
-				{
-					// todo : fix the removed controller process, its annoying the way it is now
-					user_interface_controller_sign_out(controller);
-				}
+				// todo : fix the removed controller process, its annoying the way it is now
+				user_interface_controller_sign_out(controller);
 			}
 		}
 
