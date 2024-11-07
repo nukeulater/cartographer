@@ -269,4 +269,6 @@ void __cdecl objects_purge_deleted_objects(void);
 
 void __cdecl object_get_velocities(datum object_index, real_vector3d* translational_velocity, real_vector3d* angular_velocity);
 
+uint32 __cdecl object_search_for_objects_in_radius(int32 search_flags, uint32 object_type_flags, s_location* location, real_point3d* center, real32 radius, datum* out_object_indices, uint32 object_count);
+
 void objects_apply_patches(void);

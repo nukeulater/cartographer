@@ -984,6 +984,12 @@ void object_get_velocities(datum object_index, real_vector3d* translational_velo
 	INVOKE(0x132BDE, 0, object_get_velocities, object_index, translational_velocity, angular_velocity);
 }
 
+uint32 __cdecl object_search_for_objects_in_radius(int32 search_flags, uint32 object_type_flags, s_location *location,
+	real_point3d* center, real32 radius, datum* out_object_indices, uint32 object_count)
+{
+	return INVOKE(0x1331BA, 0x12208A, object_search_for_objects_in_radius, search_flags, object_type_flags, location, center, radius, out_object_indices, object_count);
+}
+
 void __cdecl objects_post_update()
 {
 	object_globals_get()->objects_updating = true;

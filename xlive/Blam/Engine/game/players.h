@@ -281,6 +281,12 @@ uint32 player_appearance_required_bits(void);
 // Validate player configuration
 void __cdecl player_validate_configuration(datum player_index, s_player_properties* configuration_data);
 
+// Sets whether or not the passed user can interact with weapons
+void player_user_weapon_interaction_set(int32 user_index, bool enabled);
+
+// Enables weapon interaction for all users
+void player_user_weapon_interaction_reset(void);
+
 int16 local_player_count(void);
 
 void players_apply_patches(void);

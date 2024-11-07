@@ -47,6 +47,14 @@ struct player_action
 };
 ASSERT_STRUCT_SIZE(player_action, 0x60);
 
+struct s_player_interaction_context
+{
+	datum target_datum;
+	int32 field_4;
+	int32 field_8;
+};
+ASSERT_STRUCT_SIZE(s_player_interaction_context, 12);
+
 struct s_player_control
 {
 	datum unit_datum_index;
@@ -57,8 +65,8 @@ struct s_player_control
 	int32 field_14;
 	player_action actions;
 	int8 gap_78[4];
-	uint32 action_context;
-	int8 gap_80[25];
+	s_player_interaction_context action_context;
+	int8 gap_80[17];
 	bool zoom_input_held;
 	int16 field_9A;
 	int16 zoom_input_updates_held_count;
