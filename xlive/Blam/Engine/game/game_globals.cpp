@@ -246,7 +246,7 @@ void game_globals_add_lmao_representation(void)
 	return;
 }
 
-void game_globals_add_new_player_representations()
+void game_globals_add_new_player_representations(void)
 {
 	if (!Memory::IsDedicatedServer())
 	{
@@ -256,6 +256,7 @@ void game_globals_add_new_player_representations()
 		game_globals_add_flood_representation(scenario_definition);
 		game_globals_add_lmao_representation();
 	}
+	return;
 }
 
 void game_globals_apply_tag_patches(s_game_options* options)
