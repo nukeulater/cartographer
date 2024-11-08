@@ -18,7 +18,7 @@ s_game_engine_globals* game_engine_globals_get(void)
 
 c_game_engine** get_game_mode_engines()
 {
-	return Memory::GetAddress<c_game_engine**>(0x4D8548);
+	return Memory::GetAddress<c_game_engine**>(0x4D8548, 0x4F3CE4);
 }
 
 c_game_engine* get_slayer_engine()
