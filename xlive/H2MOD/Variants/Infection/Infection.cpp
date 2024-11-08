@@ -83,9 +83,6 @@ void Infection::sendTeamChange()
 						player_indexes[player_array_index] = i;
 						player_teams[player_array_index++] = team;
 
-						// ### TODO FIXME remove SendTeamChange() and team change packet before release !!!! !!!! !!!! !!!! 
-						NetworkMessage::SendTeamChange(NetworkSession::GetPeerIndex(i), team);
-
 						LOG_TRACE_GAME(L"[h2mod-infection] sent team change packet to player index: {}, with name: {}, infected?: {}", 
 							i, 
 							NetworkSession::GetPlayerName(i), 
@@ -221,9 +218,6 @@ void Infection::preSpawnServerSetup() {
 				if (NetworkSession::LocalPeerIsSessionHost())
 				{
 					// prevent the fucks from switching to humans in the pre-game lobby after joining
-
-					// ### TODO FIXME remove SendTeamChange() and team change packet before release !!!! !!!! !!!!
-					NetworkMessage::SendTeamChange(NetworkSession::GetPeerIndex(currentPlayerIndex), k_zombie_team); 
 					NetworkSession::GetActiveNetworkSession()->switch_player_team(player_it.get_current_player_datum_index(), k_zombie_team);
 				}
 			}

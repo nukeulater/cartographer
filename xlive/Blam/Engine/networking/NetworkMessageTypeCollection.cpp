@@ -97,9 +97,6 @@ void register_custom_network_message(void* network_messages)
 	register_network_message(network_messages, _custom_map_filename, "map-file-name", 0, sizeof(s_custom_map_filename), sizeof(s_custom_map_filename),
 		(void*)encode_map_file_name_message, (void*)decode_map_file_name_message, NULL);
 
-	register_network_message(network_messages, _team_change, "team-change", 0, sizeof(s_team_change), sizeof(s_team_change),
-		(void*)encode_team_change_message, (void*)decode_team_change_message, NULL);
-
 	register_network_message(network_messages, _rank_change, "rank-change", 0, sizeof(s_rank_change), sizeof(s_rank_change),
 		(void*)encode_rank_change_message, (void*)decode_rank_change_message, NULL);
 
@@ -210,18 +207,6 @@ void __stdcall handle_channel_message_hook(void* thisx, int network_channel_inde
 		break;
 	}
 
-	case _team_change:
-	{
-		if (peer_network_channel->is_channel_state_5())
-		{
-			s_team_change* received_data = (s_team_change*)packet;
-			LOG_TRACE_NETWORK(L"[H2MOD-CustomMessage] recieved on handle_channel_message_hook team_change: {}", (int16)received_data->team_index);
-			user_interface_controller_set_desired_team_index(_controller_index_0, received_data->team_index);
-			user_interface_controller_update_network_properties(_controller_index_0);
-		}
-		break;
-	}
-
 	case _rank_change:
 	{
 		if (peer_network_channel->is_channel_state_5())
@@ -325,26 +310,6 @@ void NetworkMessage::SendRequestMapFilename(int mapDownloadId)
 				observer_channel->observer_index,
 				observer_channel->field_1,
 				session->session_index);
-		}
-	}
-}
-
-void NetworkMessage::SendTeamChange(int peerIdx, e_game_team team)
-{
-	c_network_session* session = NetworkSession::GetActiveNetworkSession();
-	if (NetworkSession::LocalPeerIsSessionHost())
-	{
-		s_team_change data;
-		data.team_index = team;
-
-		c_network_observer* observer = session->p_network_observer;
-		s_session_observer_channel* observer_channel = NetworkSession::GetPeerObserverChannel(peerIdx);
-
-		if (peerIdx != NONE && !NetworkSession::IsPeerIndexLocal(peerIdx))
-		{
-			if (observer_channel->field_1) {
-				observer->send_message(session->session_index, observer_channel->observer_index, false, _team_change, sizeof(s_team_change), &data);
-			}
 		}
 	}
 }
