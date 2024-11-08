@@ -8,6 +8,7 @@
 #include "filesys/pc_file_system.h"
 #include "geometry/geometry_block.h"
 #include "models/render_model_definitions.h"
+#include "physics/collision_model_definitions.h"
 #include "physics/physics_model_definitions.h"
 #include "render/weather_definitions.h"
 #include "units/biped_definitions.h"
@@ -21,7 +22,7 @@
 #define k_relative_maps_directory L"\\maps\\"
 #define k_relative_mods_directory L"\\mods\\"
 #define k_relative_mods_maps_directory k_relative_mods_directory L"maps\\"
-#define k_relative_mods_plugin_directory k_relative_mods_directory L"definitions\\"
+#define k_relative_mods_plugin_directory k_relative_mods_directory L"plugins\\"
 
 
 c_tag_injecting_manager::c_tag_injecting_manager():

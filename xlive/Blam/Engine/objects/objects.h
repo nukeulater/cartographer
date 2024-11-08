@@ -1,16 +1,18 @@
 #pragma once
 #include "emblems.h"
 #include "object_placement.h"
-#include "object_type_list.h"
 
 #include "animations/animation_manager.h"
 #include "memory/data.h"
 #include "math/matrix_math.h"
-#include "models/render_model_definitions.h"
-#include "memory/memory_pool.h"
 #include "memory/static_arrays.h"
+#include "models/render_model_definitions.h"
+
+/* constants */
 
 #define k_maximum_objects_per_map 2048
+
+/* enums */
 
 enum e_object_data_flags : int32
 {
@@ -25,11 +27,11 @@ enum e_object_data_flags : int32
 	_object_connected_to_map_bit = 8,
 	_object_uses_collidable_list_bit = 9,
 	_object_mirrored_bit = 10,
-	_object_data_bit_11 = 11,
-	_object_data_bit_12 = 12,
-	_object_data_bit_13 = 13,
+	_object_dynamic_lighting_recompute_bit = 11,
+	_object_static_lighting_recompute_bit = 12,
+	_object_static_lighting_raycast_sideways_bit = 13,
 	_object_garbage_bit = 14,
-	_object_data_bit_15 = 15,
+	_object_cannot_be_garbage_bit = 15,
 	_object_shadowless_bit = 16,
 	_object_deleted_when_deactivated_bit = 17,
 	_object_outside_of_map_bit = 18,
@@ -83,6 +85,8 @@ enum e_object_header_flags : uint8
 	k_object_header_flags
 };
 
+/* structures */
+
 struct object_header_block_reference
 {
 	int16 size;
@@ -90,21 +94,20 @@ struct object_header_block_reference
 };
 ASSERT_STRUCT_SIZE(object_header_block_reference, 4);
 
-struct s_object_header
+struct object_header_datum
 {
-	int16 datum_salt;
+	int16 identifier;
 	c_flags<e_object_header_flags, uint8, k_object_header_flags> flags;
-	e_object_type object_type;
+	int8/*e_object_type*/ type;
 	int16 cluster_index;
-	int16 object_data_size;
-	void* object;
+	int16 data_size;
+	void* datum;
 };
-ASSERT_STRUCT_SIZE(s_object_header, 12);
+ASSERT_STRUCT_SIZE(object_header_datum, 12);
 
 struct s_object_payload
 {
-	e_object_type object_type;
-	int8 pad;
+	int16/*e_object_type*/ object_type;
 	uint16 object_collision_cull_flags;
 	real_point3d origin_point;
 	real32 bounding_sphere_radius;
@@ -163,7 +166,7 @@ struct object_datum
 	uint16 damage_owner_target_model_abs_index;
 	datum damage_owner_owner_index;
 	datum damage_owner_object_index;
-	datum cached_object_render_state_index;
+	datum cached_render_state_index;
 	int16 field_D0;
 	int8 model_variant_id;					// hlmt variant tag_block index
 	int8 gap_D3;
@@ -173,14 +176,16 @@ struct object_datum
 	datum object_projectile_datum;
 	uint16 destroyed_constraints_flag;
 	uint16 loosened_constraints_flag;
-	real32 body_max_vitality;
-	real32 shield_max_vitality;
-	real32 body_current_vitality;
-	real32 shield_current_vitality;
-	uint32 gap_F4[3];
-	real32 field_100;
-	uint16 shield_stun_ticks;
-	uint16 body_stun_ticks;
+	real32 maximum_body_vitality;
+	real32 maximum_shield_vitality;
+	real32 body_vitality;
+	real32 shield_vitality;
+	real32 current_shield_damage;
+	real32 current_body_damage;
+	real32 recent_shield_damage;
+	real32 recent_body_damage;
+	int16 shield_stun_ticks;
+	int16 body_stun_ticks;
 	int8 byte_108;
 	int8 byte_109;
 	e_object_damage_flags object_damage_flags;
@@ -205,22 +210,23 @@ struct object_marker
 };
 ASSERT_STRUCT_SIZE(object_marker, 112);
 
+/* prototypes */
+
 s_data_array* object_header_data_get(void);
 
-static s_object_header* object_get_header(datum object_idx)
+static object_header_datum* object_get_header(datum object_idx)
 {
-	return (s_object_header*)datum_get(object_header_data_get(), object_idx);
+	return (object_header_datum*)datum_get(object_header_data_get(), object_idx);
 }
 
 // Get the object fast, with no validation from datum index
 template<typename T = object_datum>
 static T* object_get_fast_unsafe(datum object_idx)
 {
-	s_object_header* header = object_get_header(object_idx);
-	return (T*)header->object;
+	object_header_datum* header = object_get_header(object_idx);
+	return (T*)header->datum;
 }
 
-s_memory_pool* get_object_table(void);
 
 // Gets the object and verifies the type, returns NULL if object doesn't match object type flags
 void* __cdecl object_try_and_get_and_verify_type(datum object_index, int32 object_type_flags);

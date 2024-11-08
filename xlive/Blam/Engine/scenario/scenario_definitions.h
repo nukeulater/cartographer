@@ -176,9 +176,8 @@ ASSERT_STRUCT_SIZE(scenario_environment_object, 64);
 struct scenario_object_name
 {
     char name[32];
-    e_object_type type;
-    int8 pad;
-    short placement_index;
+    int16/*e_object_type*/ runtime_object_type;
+    int16 runtime_scenario_datum_index;
 };
 ASSERT_STRUCT_SIZE(scenario_object_name, 36);
 

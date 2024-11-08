@@ -1,4 +1,5 @@
 #pragma once
+#include "leaf_map.h"
 #include "math/color_math.h"
 
 #define MAXIMUM_SURFACE_REFERENCES_PER_STRUCTURE 262144
@@ -15,6 +16,14 @@ struct structure_surface_reference
 	uint32 bsp_node_index;
 };
 ASSERT_STRUCT_SIZE(structure_surface_reference, 8);
+
+// max count: MAXIMUM_BSPS_PER_COLLISION_REGION
+struct node_render_leaves
+{
+	tag_block<structure_leaf> collision_leaves;
+	tag_block<structure_surface_reference> surface_references;
+};
+ASSERT_STRUCT_SIZE(node_render_leaves, 16);
 
 // max count: MAXIMUM_SURFACES_PER_COLLISION_BSP 131072
 struct bsp2d_ref

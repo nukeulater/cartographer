@@ -6,7 +6,6 @@
 #include "math/color_math.h"
 #include "math/function_definitions.h"
 
-#include "objects/object_type_list.h"
 #include "tag_files/string_id.h"
 
 #define k_maximum_object_functions 256
@@ -188,8 +187,7 @@ ASSERT_STRUCT_SIZE(object_change_color_definition, 16);
 
 struct object_definition
 {
-	e_object_type object_type;
-	int8 pad;
+	int16/*e_object_type*/ object_type;
 	e_object_definition_flags flags;
 	real32 bounding_radius;				// World Units
 	real_point3d bounding_offset;

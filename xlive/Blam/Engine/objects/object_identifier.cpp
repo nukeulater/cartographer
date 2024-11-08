@@ -41,7 +41,7 @@ e_object_source c_object_identifier::get_source() const
 
 e_object_type c_object_identifier::get_type() const
 {
-	return this->m_object_type;
+	return (e_object_type)this->m_object_type;
 }
 
 int32 c_object_identifier::get_unique_id() const

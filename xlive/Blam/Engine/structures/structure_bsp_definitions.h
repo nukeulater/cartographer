@@ -63,14 +63,6 @@ enum e_structure_cluster_flags : uint16
     _structure_cluster_is_the_sky = FLAG(3)
 };
 
-// max count: MAXIMUM_BSPS_PER_COLLISION_REGION
-struct node_render_leaves
-{
-    tag_block<structure_leaf> collision_leaves;
-    tag_block<structure_surface_reference> surface_references;
-};
-ASSERT_STRUCT_SIZE(node_render_leaves, 16);
-
 // max: MAXIMUM_NODES_PER_BSP3D
 struct unused_structure_node
 {
@@ -261,10 +253,8 @@ ASSERT_STRUCT_SIZE(structure_marker, 60);
 // max: MAXIMUM_ENVIRONMENT_OBJECT_PALETTE_ENTRIES_PER_STRUCTURE
 struct structure_environment_object_palette_entry
 {
-    // TagReference("scen")
-    tag_reference definition;
-    // TagReference("mode")
-    tag_reference model;
+    tag_reference definition;   // scen
+    tag_reference model;        // mode
     c_flags<e_object_type, uint32, k_object_types_count> object_flags;
 };
 ASSERT_STRUCT_SIZE(structure_environment_object_palette_entry, 20);
