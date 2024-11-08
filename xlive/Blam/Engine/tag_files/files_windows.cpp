@@ -46,7 +46,7 @@ bool __cdecl file_write(s_file_reference* file_reference, uint32 data_size, void
 
 bool __cdecl file_get_size(s_file_reference* file_reference, uint32* size)
 {
-	return INVOKE(0x63E10, 0x660EC, file_read_only, file_reference, size);
+	return INVOKE(0x63E10, 0x660EC, file_get_size, file_reference, size);
 }
 
 bool file_set_eof(s_file_reference* file_reference)
