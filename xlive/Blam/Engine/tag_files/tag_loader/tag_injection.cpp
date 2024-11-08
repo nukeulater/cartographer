@@ -16,18 +16,38 @@ cache_file_tag_instance* g_tag_table;
 
 bool tag_injection_check_map_exists(const wchar_t* map_name)
 {
-	return g_manager.find_map(map_name, nullptr);
+	if (!Memory::IsDedicatedServer())
+	{
+		return g_manager.find_map(map_name, nullptr);
+	}
+	else
+	{
+		// just in case
+		return false;
+	}
 }
 
 void tag_injection_set_active_map(const wchar_t* map_name)
 {
-	g_manager.set_active_map(map_name);
+	if (!Memory::IsDedicatedServer())
+	{
+		g_manager.set_active_map(map_name);
+	}
 }
 
 bool tag_injection_active_map_verified()
 {
-	return g_manager.get_active_map_verified();
+	if (Memory::IsDedicatedServer())
+	{
+		return g_manager.get_active_map_verified();
+	}
+	else
+	{
+		// Just in case
+		return false;
+	}
 }
+
 
 datum tag_injection_load(e_tag_group group, const char* tag_name, bool load_dependencies)
 {

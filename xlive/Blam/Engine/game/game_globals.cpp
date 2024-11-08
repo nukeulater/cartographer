@@ -248,11 +248,14 @@ void game_globals_add_lmao_representation(void)
 
 void game_globals_add_new_player_representations(void)
 {
-	scenario* scenario_definition = get_global_scenario();
+	if (!Memory::IsDedicatedServer())
+	{
+		scenario* scenario_definition = get_global_scenario();
 
-	game_globals_add_skeleton_representation(scenario_definition);
-	game_globals_add_flood_representation(scenario_definition);
-	game_globals_add_lmao_representation();
+		game_globals_add_skeleton_representation(scenario_definition);
+		game_globals_add_flood_representation(scenario_definition);
+		game_globals_add_lmao_representation();
+	}
 	return;
 }
 
