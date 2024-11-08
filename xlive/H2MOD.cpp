@@ -312,11 +312,12 @@ void H2MOD::custom_sound_play(const wchar_t* soundName, int delay)
 typedef void(__cdecl* player_died_t)(datum player_index);
 player_died_t p_player_died;
 
-void __cdecl OnPlayerDeath(datum playerIdx)
+void __cdecl OnPlayerDeath(datum player_index)
 {
-	CustomVariantHandler::OnPlayerDeath(ExecTime::_preEventExec, playerIdx);
-	p_player_died(playerIdx);
-	CustomVariantHandler::OnPlayerDeath(ExecTime::_postEventExec, playerIdx);
+	CustomVariantHandler::OnPlayerDeath(ExecTime::_preEventExec, player_index);
+	//p_player_died(player_index);
+	INVOKE(0x5587B, 0x5DD73, OnPlayerDeath, player_index);
+	CustomVariantHandler::OnPlayerDeath(ExecTime::_postEventExec, player_index);
 }
 
 /* This is technically closer to object death than player-death as it impacts anything with health at all. */
@@ -1022,7 +1023,9 @@ void H2MOD::ApplyHooks() {
 
 	// server/client detours 
 	DETOUR_ATTACH(p_player_spawn, Memory::GetAddress<player_spawn_t>(0x55952, 0x5DE4A), OnPlayerSpawn);
-	DETOUR_ATTACH(p_player_died, Memory::GetAddress<player_died_t>(0x5587B, 0x5DD73), OnPlayerDeath);
+	PatchCall(Memory::GetAddress(0x144919, 0x133769), OnPlayerDeath);
+	// ### FIXME: this detours all cases where a player dies, including after a new round/teleporting (pseudo-kill)
+	//DETOUR_ATTACH(p_player_died, Memory::GetAddress<player_died_t>(0x5587B, 0x5DD73), OnPlayerDeath);
 	DETOUR_ATTACH(p_map_cache_load, Memory::GetAddress<map_cache_load_t>(0x8F62, 0x1F35C), OnMapLoad);
 	DETOUR_ATTACH(p_object_deplete_body_internal, Memory::GetAddress<object_deplete_body_internal_t>(0x17B674, 0x152ED4), OnObjectDamage);
 	DETOUR_ATTACH(p_get_enabled_teams_flags, Memory::GetAddress<get_enabled_teams_flags_t>(0x1B087B, 0x19698B), get_enabled_team_flags);
