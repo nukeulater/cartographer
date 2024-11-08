@@ -24,7 +24,7 @@ std::vector<uint64> Infection::zombieIdentifiers;
 #define k_zombie_team _game_team_green
 
 bool initialSpawn;
-bool infectedPlayed;
+bool infectedPlayed[k_number_of_users]{};
 int32 zombiePlayerIndex = NONE;
 int32 last_time_at_game_should_not_end = 0;
 const wchar_t* infectionSoundTable[k_language_count][e_infection_sounds::_infection_end]
@@ -125,7 +125,9 @@ void Infection::InitClient()
 	LOG_TRACE_GAME("[h2mod-infection] Disabling slayer sounds");
 	h2mod->disable_score_announcer_sounds(FLAG(_sound_type_slayer) | ALL_SOUNDS_NO_SLAYER);
 
-	infectedPlayed = false;
+	for (int16 i = 0; i < infectedPlayed[i]; i++)
+		infectedPlayed[i] = false;
+
 	initialSpawn = true;
 
 	//Change Local Player's Team to Human if Not in Green
@@ -504,9 +506,10 @@ void Infection::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 
 				e_game_team team = (e_game_team)s_session_interface_globals::get()->users[player->user_index].properties.team_index;
 
-				if(team == k_zombie_team && infectedPlayed == false)
+				if(team == k_zombie_team && !infectedPlayed[player->user_index])
 				{
 					triggerSound(_snd_infected, 500);
+					infectedPlayed[player->user_index] = true;
 				}
 				if(team == k_humans_team)
 				{
