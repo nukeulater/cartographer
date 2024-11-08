@@ -2,14 +2,15 @@
 #include "game_engine_util.h"
 
 #include "game/game.h"
+#include "game/game_engine.h"
 
 /* public code */
 
-int current_game_engine()
+bool game_engine_in_round()
 {
-	typedef int(__cdecl* get_game_mode_engine_t)();
-	auto p_get_game_mode_engine = Memory::GetAddress<get_game_mode_engine_t>(0x5B15E, 0x3CDBE);
-	return p_get_game_mode_engine();
+	return current_game_engine() != NULL
+		&& game_engine_globals_get()->field_6C == 1
+		&& (game_is_predicted() || game_engine_globals_get()->field_C44 == 1);
 }
 
 void game_engine_check_for_round_winner()

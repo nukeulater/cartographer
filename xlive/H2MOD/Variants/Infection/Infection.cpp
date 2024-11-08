@@ -65,9 +65,9 @@ void Infection::sendTeamChange()
 	{
 		int32 player_count = NetworkSession::GetPlayerCount();
 
+		int32 player_array_index = 0;
 		if (player_count > 0)
 		{
-			int32 player_array_index = 0;
 			datum player_indexes[k_maximum_players] = {};
 			e_game_team player_teams[k_maximum_players] = {};
 
@@ -78,13 +78,10 @@ void Infection::sendTeamChange()
 					e_game_team team = zombiePlayerIndex == i ? k_zombie_team : k_humans_team;
 					bool is_current_player_zombie = zombiePlayerIndex == i;
 
-					if (!NetworkSession::IsPlayerLocal(i))
+					//if (!NetworkSession::IsPlayerLocal(i))
 					{
 						player_indexes[player_array_index] = i;
 						player_teams[player_array_index++] = team;
-
-						// ### TODO FIXME remove SendTeamChange() and team change packet before release !!!! !!!! !!!! !!!! 
-						NetworkMessage::SendTeamChange(NetworkSession::GetPeerIndex(i), team);
 
 						LOG_TRACE_GAME(L"[h2mod-infection] sent team change packet to player index: {}, with name: {}, infected?: {}", 
 							i, 
@@ -92,7 +89,7 @@ void Infection::sendTeamChange()
 							is_current_player_zombie
 						);
 					}
-					else 
+					/*else 
 					{
 						if (!Memory::IsDedicatedServer())
 						{
@@ -102,10 +99,11 @@ void Infection::sendTeamChange()
 							user_interface_controller_update_network_properties(local_player->controller_index);
 							LOG_TRACE_GAME(L"[h2mod-infection] setting local player team index, infected?: {}", is_current_player_zombie);
 						}
-					}
+					}*/
 				}
 			}
-			NetworkSession::GetActiveNetworkSession()->switch_players_to_teams(player_indexes, NetworkSession::GetPlayerCount(), player_teams);
+
+			NetworkSession::GetActiveNetworkSession()->switch_players_to_teams(player_indexes, player_array_index, player_teams);
 		}
 	}
 }
@@ -221,9 +219,6 @@ void Infection::preSpawnServerSetup() {
 				if (NetworkSession::LocalPeerIsSessionHost())
 				{
 					// prevent the fucks from switching to humans in the pre-game lobby after joining
-
-					// ### TODO FIXME remove SendTeamChange() and team change packet before release !!!! !!!! !!!!
-					NetworkMessage::SendTeamChange(NetworkSession::GetPeerIndex(currentPlayerIndex), k_zombie_team); 
 					NetworkSession::GetActiveNetworkSession()->switch_player_team(player_it.get_current_player_datum_index(), k_zombie_team);
 				}
 			}

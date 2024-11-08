@@ -58,7 +58,6 @@ enum e_network_message_type_collection : unsigned int
 	// custom network meesages below
 	_request_map_filename,
 	_custom_map_filename,
-	_team_change,
 	_rank_change,
 	_anti_cheat,
 	_custom_variant_settings,
@@ -178,7 +177,6 @@ namespace NetworkMessage
 {
 	void ApplyGamePatches();
 	void SendRequestMapFilename(int mapDownloadId);
-	void SendTeamChange(int peerIdx, e_game_team team);
 	void SendRankChange(int peerIdx, BYTE rank);
 	void SendAntiCheat(int peerIdx);
 }
