@@ -278,6 +278,24 @@ e_controller_index __cdecl user_interface_controller_get_controller_for_user(uin
 	return INVOKE(0x207365, 0x1F4415, user_interface_controller_get_controller_for_user, user_index);
 }
 
+e_controller_index __cdecl user_interface_controller_get_first_valid_controller()
+{
+	e_controller_index main_controller = k_no_controller;
+
+	for (e_controller_index controller = first_controller();
+		controller != k_no_controller;
+		controller = next_controller(controller))
+	{
+		if (user_interface_controller_is_player_profile_valid(controller))
+		{
+			main_controller = controller;
+			break;
+		}
+
+	}
+	return main_controller;
+}
+
 e_game_team __cdecl user_interface_controller_get_user_active_team(e_controller_index controller_index)
 {
 	return INVOKE(0x206907, 0, user_interface_controller_get_user_active_team, controller_index);
