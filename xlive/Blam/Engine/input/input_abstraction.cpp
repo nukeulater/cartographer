@@ -330,14 +330,16 @@ void input_abstraction_apply_raw_mouse_update(e_controller_index controller, s_g
 		input_state->mouse.yaw = (real32)-mouse_state->lX;
 		input_state->mouse.pitch = (real32)-mouse_state->lY;
 
-		// Multiply sensitivity by 0.033 milliseconds 
-		// We want to emulate the behaviour on og xbox (30 ticks per second), instead of scaling with tick length lol
-		const real32 tick_length = (1.f / 30.f);
-		input_state->mouse.yaw *= raw_mouse_sensitivity * tick_length;
-		input_state->mouse.pitch *= raw_mouse_sensitivity * tick_length;
+		// multiply by 0.016 milliseconds, while this is likely wrong
+		// emulate current behaviour at all tickrates, instead of scaling with tick length lol
+		// which is a higher value at 30 tick, resulting in higher mouse sensitivity
+		input_state->mouse.yaw *= raw_mouse_sensitivity * (1.f / 60.f);
+		input_state->mouse.pitch *= raw_mouse_sensitivity * (1.f / 60.f);
 
-		// If mouse invert is enabled we invert the pitch, otherwise leave it as the same
-		input_state->mouse.pitch = preference->mouse_invert_look ? -input_state->mouse.pitch : input_state->mouse.pitch;
+		if (preference->mouse_invert_look)
+		{
+			input_state->mouse.pitch = -0.0f - input_state->mouse.pitch;
+		}
 	}
 	else
 	{
