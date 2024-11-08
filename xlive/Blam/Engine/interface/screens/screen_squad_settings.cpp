@@ -412,7 +412,7 @@ void c_squad_settings_list::handle_item_switch_to_optimatch(s_event_record** pev
 	screen_error_ok_dialog_with_custom_text(
 		_user_interface_channel_type_dialog,
 		_ui_error_generic, _window_4,
-		FLAG((*pevent)->controller), nullptr, nullptr, L"Alert", L"Matchmaking is ready!");
+		FLAG((*pevent)->controller), nullptr, nullptr, L"Alert", L"This feature is not currently available");
 }
 void c_squad_settings_list::handle_item_change_hopper(s_event_record** pevent)
 {
