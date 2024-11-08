@@ -330,16 +330,14 @@ void input_abstraction_apply_raw_mouse_update(e_controller_index controller, s_g
 		input_state->mouse.yaw = (real32)-mouse_state->lX;
 		input_state->mouse.pitch = (real32)-mouse_state->lY;
 
-		// multiply by 0.016 milliseconds, while this is likely wrong
-		// emulate current behaviour at all tickrates, instead of scaling with tick length lol
-		// which is a higher value at 30 tick, resulting in higher mouse sensitivity
-		input_state->mouse.yaw *= raw_mouse_sensitivity * (1.f / 60.f);
-		input_state->mouse.pitch *= raw_mouse_sensitivity * (1.f / 60.f);
+		// Multiply sensitivity by 0.033 milliseconds 
+		// We want to emulate the behaviour on og xbox (30 ticks per second), instead of scaling with tick length lol
+		const real32 tick_length = (1.f / 30.f);
+		input_state->mouse.yaw *= raw_mouse_sensitivity * tick_length;
+		input_state->mouse.pitch *= raw_mouse_sensitivity * tick_length;
 
-		if (preference->mouse_invert_look)
-		{
-			input_state->mouse.pitch = -0.0f - input_state->mouse.pitch;
-		}
+		// If mouse invert is enabled we invert the pitch, otherwise leave it as the same
+		input_state->mouse.pitch = preference->mouse_invert_look ? -input_state->mouse.pitch : input_state->mouse.pitch;
 	}
 	else
 	{
@@ -419,7 +417,6 @@ void __cdecl input_abstraction_update()
 {
 	//INVOKE(0x628A8, 0x0, input_abstraction_update);
 
-	real_euler_angles2d left_stick, right_stick;
 
 	input_abstraction_store_windows_inputs();
 
@@ -427,11 +424,8 @@ void __cdecl input_abstraction_update()
 		controller != k_no_controller;
 		controller = next_controller(controller))
 	{
-		left_stick.yaw = 0.0f;
-		left_stick.pitch = 0.0f;
-		right_stick.yaw = 0.0f;
-		right_stick.pitch = 0.0f;
-
+		real_euler_angles2d left_stick = { 0.f, 0.f };
+		real_euler_angles2d right_stick = { 0.f, 0.f };
 
 		s_gamepad_input_button_state* gamepad_state = input_get_gamepad_state(controller);
 		s_game_input_state* game_input_state = &input_abstraction_globals->input_states[controller];
