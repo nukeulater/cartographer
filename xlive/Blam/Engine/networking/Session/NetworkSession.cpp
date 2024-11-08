@@ -236,6 +236,23 @@ s_session_interface_user* session_interface_get_local_user_properties(int32 user
 	return &s_session_interface_globals::get()->users[user_index];
 }
 
+e_network_session_class network_squad_session_get_session_class()
+{
+	//return INVOKE(0x1B1643, 0x0, network_squad_session_get_session_class);
+
+	e_network_session_class out_class = _network_session_class_unknown;
+	c_network_session* active_session;
+	if (network_life_cycle_in_squad_session(&active_session))
+	{
+		if (active_session->local_state_established())
+		{
+			out_class = active_session->m_session_class;
+		}
+	}
+	return out_class;
+}
+
+
 bool network_session_interface_set_local_user_character_type(int32 user_index, e_character_type character_type)
 {
 	s_session_interface_user* user_properties = session_interface_get_local_user_properties(user_index);

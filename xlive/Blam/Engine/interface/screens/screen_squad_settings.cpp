@@ -11,6 +11,7 @@
 #include "interface/user_interface_globals.h"
 #include "main/levels.h"
 #include "main/level_definitions.h"
+#include "networking/Session/NetworkSession.h"
 #include "saved_games/game_variant.h"
 #include "tag_files/global_string_ids.h"
 #include "tag_files/tag_loader/tag_injection.h"
@@ -378,6 +379,14 @@ void c_squad_settings_list::handle_item_switch_to_coop(s_event_record** pevent)
 	{
 		screen_error_ok_dialog_show(_user_interface_channel_type_game_error, _ui_error_beta_feature_disabled, _window_4, FLAG((*pevent)->controller), 0, 0);
 	}
+	else if (network_squad_session_get_session_class() == _network_session_class_system_link
+		|| network_squad_session_get_session_class() == _network_session_class_xbox_live)
+	{
+		screen_error_ok_dialog_with_custom_text(
+			_user_interface_channel_type_dialog,
+			_ui_error_generic, _window_4,
+			FLAG((*pevent)->controller), nullptr, nullptr, L"Access Denied", L"Coming Soon....");
+	}
 	else
 	{
 		user_interface_squad_clear_game_settings();
@@ -399,6 +408,11 @@ void c_squad_settings_list::handle_item_switch_to_optimatch(s_event_record** pev
 {
 	// maybe someday
 	//return INVOKE_TYPE(0x211BA1, 0x0, void(__thiscall*)(c_squad_settings_list*, s_event_record**), this, pevent);
+
+	screen_error_ok_dialog_with_custom_text(
+		_user_interface_channel_type_dialog,
+		_ui_error_generic, _window_4,
+		FLAG((*pevent)->controller), nullptr, nullptr, L"Alert", L"Matchmaking is ready!");
 }
 void c_squad_settings_list::handle_item_change_hopper(s_event_record** pevent)
 {

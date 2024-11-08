@@ -36,6 +36,17 @@ enum e_network_session_state : int32
 	k_network_session_state_count
 };
 
+enum e_network_session_class
+{
+	_network_session_class_unknown = NONE,
+	_network_session_class_offline = 0x0,
+	_network_session_class_system_link = 0x1,
+	_network_session_class_xbox_live = 0x2,
+
+	k_network_session_class_count = 0x3,
+};
+
+
 // forward declarations
 struct c_network_session;
 struct s_session_membership;
@@ -281,7 +292,7 @@ struct c_network_session
 	uint32 text_chat;
 	int32 session_index;
 	int32 field_18;
-	int32 network_protocol; // LIVE - 2, Network - 1
+	e_network_session_class m_session_class;
 	XNKID session_id;
 	wchar_t field_28[16];
 	char field_48;
@@ -480,7 +491,7 @@ struct c_network_session
 			"LIVE",
 		};
 
-		return this->network_protocol <= 2 ? network_protocols_str[this->network_protocol] : "<unknown>";
+		return this->m_session_class < k_network_session_class_count ? network_protocols_str[this->m_session_class] : "<unknown>";
 	}
 };
 ASSERT_STRUCT_SIZE(c_network_session, 31624);
@@ -496,6 +507,7 @@ bool network_life_cycle_in_squad_session(c_network_session** out_active_session)
 
 void network_session_membership_update_local_players_teams();
 
+e_network_session_class network_squad_session_get_session_class();
 bool network_session_interface_set_local_user_character_type(int32 user_index, e_character_type character_type);
 bool network_session_interface_get_local_user_identifier(int32 user_index, s_player_identifier* out_identifier);
 void network_session_interface_set_local_user_rank(int32 user_index, int8 rank);
