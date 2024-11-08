@@ -275,12 +275,16 @@ void ServerStartupFixes()
 void InitH2Startup() {
 	InitializeCriticalSection(&log_section);
 
+	DETOUR_BEGIN();
 	cseries_debug_initialize();
 	Memory::Initialize();
 
 	shell_windows_initialize();
+	shell_apply_patches();
+	shell_windows_apply_patches();
 	// ### TODO remove entirely
 	_Shell::Initialize();
+	DETOUR_COMMIT();
 
 	int ArgCnt;
 	LPWSTR* ArgList = CommandLineToArgvW(GetCommandLineW(), &ArgCnt);
@@ -301,6 +305,7 @@ void InitH2Startup() {
 
 	// initialize curl
 	curl_global_init(CURL_GLOBAL_ALL);
+	atexit([] { curl_global_cleanup(); });
 
 	// after localAppData filepath initialized, we can initialize OnScreenDebugLog
 	InitOnScreenDebugText();
@@ -385,5 +390,4 @@ void DeinitH2Startup() {
 	DeinitCustomLanguage();
 	DeinitH2Accounts();
 	DeinitH2Config();
-	curl_global_cleanup();
 }
