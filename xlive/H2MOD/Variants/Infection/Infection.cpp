@@ -125,7 +125,7 @@ void Infection::InitClient()
 	LOG_TRACE_GAME("[h2mod-infection] Disabling slayer sounds");
 	h2mod->disable_score_announcer_sounds(FLAG(_sound_type_slayer) | ALL_SOUNDS_NO_SLAYER);
 
-	for (int16 i = 0; i < infectedPlayed[i]; i++)
+	for (int16 i = 0; i < k_number_of_users; i++)
 		infectedPlayed[i] = false;
 
 	initialSpawn = true;
