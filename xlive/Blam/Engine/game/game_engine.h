@@ -1,4 +1,5 @@
 #pragma once
+
 #include "game/game_allegiance.h"
 #include "game_statborg.h"
 #include "math/color_math.h"
@@ -155,32 +156,33 @@ ASSERT_STRUCT_SIZE(s_game_engine_global_player_info, 24);
 
 struct s_game_engine_globals
 {
-	DWORD flags;
-	short team_flags;
-	WORD field_6;
-	WORD field_8;
+	uint32 flags;
+	int16 team_flags;
+	uint16 field_6;
+	uint16 field_8;
 	uint16 team_bitmask;
-	WORD field_C;
-	short field_E;
-	WORD field_10;
-	WORD field_12[8];
-	DWORD field_24;
-	DWORD field_28;
+	uint16 field_C;
+	int16 field_E;
+	uint16 field_10;
+	uint16 field_12[8];
+	uint32 field_24;
+	uint32 field_28;
 	int32 player_entity_index[k_maximum_players];
-	short field_6A;
-	short field_6C;
-	DWORD field_70;
-	DWORD gap_74[28];
+	int16 field_6C;
+	uint32 field_70;
+	uint32 gap_74[28];
 	real32 unk_local_player_hud_field[k_number_of_users];
-	byte field_F4;
-	byte pad_F5[4];
-	byte gapF9[523];
+	uint8 field_F4;
+	uint8 pad_F5[4];
+	uint8 gapF9[523];
 	c_game_statborg game_statborg;
 	s_game_engine_global_player_info player_info[k_maximum_players];
-	DWORD ticks;
-	BYTE gap71C[1336];
-	DWORD game_engine_index;
-	BYTE gapC58[132];
+	uint32 ticks;
+	uint8 gap71C[1320];
+	int32 field_C44;
+	uint8 gap_C48[12];
+	int32 game_engine_index;
+	uint8 gapC58[132];
 };
 ASSERT_STRUCT_SIZE(s_game_engine_globals, 0xCDC);
 
@@ -243,6 +245,8 @@ ASSERT_STRUCT_SIZE(s_multiplayer_event_response_definition, 0xA8);
 
 /* prototypes */
 
+c_game_engine* current_game_engine();
+
 s_game_engine_globals* game_engine_globals_get(void);
 
 bool __cdecl game_engine_get_change_colors(s_player_profile* player_profile, e_game_team team_index, real_rgb_color* change_colors);
@@ -254,3 +258,7 @@ void __cdecl game_engine_player_activated(datum player_index);
 bool __cdecl game_engine_team_is_enemy(e_game_team a, e_game_team b);
 
 void __cdecl game_engine_render(void);
+
+bool game_engine_in_round();
+
+c_game_engine** get_game_mode_engines();

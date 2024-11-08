@@ -1,7 +1,15 @@
 #include "stdafx.h"
 #include "game_engine.h"
 
+#include "game.h"
+#include "game_engine_util.h"
+
 /* public code */
+
+c_game_engine* current_game_engine()
+{
+	return get_game_mode_engines()[game_engine_globals_get()->game_engine_index];
+}
 
 s_game_engine_globals* game_engine_globals_get(void)
 {
