@@ -74,6 +74,19 @@ c_main_menu_list::c_main_menu_list(int16 user_flags) :
 	}
 
 	linker_type2.link(&m_slot);
+
+
+	//signout all controllers except the first , because mainmenu cant handle multi users
+	//todo : move this out of here
+	if (user_interface_controller_get_signed_in_controller_count() > 1)
+	{
+		for (e_controller_index controller = next_controller(user_interface_controller_get_first_valid_controller());
+			controller != k_no_controller;
+			controller = next_controller(controller))
+		{
+			user_interface_controller_sign_out(controller);
+		}
+	}
 }
 
 void c_main_menu_list::c_main_menu_list_ctor(int16 user_flags)
