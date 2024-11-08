@@ -127,7 +127,7 @@ void s_player::set_player_unit_grenade_count(datum player_index, int16 type, int
 {
     int32 abs_player_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index);
     datum unit_datum_index = s_player::get_unit_index(player_index);
-    unit_datum* unit = (unit_datum*)object_try_and_get_and_verify_type(unit_datum_index, FLAG(_object_type_biped));
+    unit_datum* unit = (unit_datum*)object_try_and_get_and_verify_type(unit_datum_index, _object_mask_biped);
 
     // send simulation update for grenades if we control the simulation
     if (unit != NULL && !game_is_predicted())
@@ -548,8 +548,8 @@ void __cdecl player_find_action_context(datum player_datum, s_player_interaction
             // Search 2 excludes weapons
             const uint32 search_types[2]
             {
-                 FLAG(_object_type_weapon),
-                 ~FLAG(_object_type_weapon),
+                _object_mask_weapon,
+                ~_object_mask_weapon
             };
             // We have a shorter search radius for weapons than other objects
             const real32 search_radius_types[2]
@@ -564,7 +564,7 @@ void __cdecl player_find_action_context(datum player_datum, s_player_interaction
                 const uint32 search_type = search_types[search_num];
                 const real32 search_radius = search_radius_types[search_num];
 
-                const uint32 objects_to_ignore = FLAG(_object_type_garbage) | FLAG(_object_type_projectile) | FLAG(_object_type_sound_scenery) | FLAG(_object_type_creature);
+                const uint32 objects_to_ignore = _object_mask_garbage | _object_mask_projectile | _object_mask_sound_scenery | _object_mask_creature;
 
                 datum nearby_objects[64];
 
@@ -594,7 +594,7 @@ void __cdecl player_find_action_context(datum player_datum, s_player_interaction
                         const real32 magnitude = magnitude_squared3d(&delta);
                         const real32 combined_radius = object->radius + search_radius;
 
-                        const uint32 object_types_to_skip_radius_check = FLAG(_object_type_weapon) | FLAG(_object_type_machine) | FLAG(_object_type_control);
+                        const uint32 object_types_to_skip_radius_check = _object_mask_weapon | _object_mask_machine | _object_mask_control;
 
                         // If the object is not of the following types then we have to run the following check:
                         // Compare the magnitude of the vector between the player and object and make sure we aren't going outside the combined radius squared

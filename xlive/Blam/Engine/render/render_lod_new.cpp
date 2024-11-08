@@ -213,11 +213,11 @@ void __cdecl object_build_render_cache_and_info(
         render_model_count = 0;
     }
 
-    s_object_header* object = object_get_header(object_index);
+    object_header_datum* object = object_get_header(object_index);
 
-    if (object->object_type == _object_type_scenery)
+    if (object->type == _object_type_scenery)
     {
-        uint8* object_data = (uint8*)object_try_and_get_and_verify_type(object_index, FLAG(_object_type_scenery));
+        uint8* object_data = (uint8*)object_try_and_get_and_verify_type(object_index, _object_mask_scenery);
         info->field_16A = *(int16*)(object_data + 308);
     }
     else
@@ -401,9 +401,9 @@ void __cdecl object_build_render_cache_and_info(
         {
             info->object_count++;
             object_datum* object = object_get_fast_unsafe(info->object_index[render_model_storage_index]);
-            if (object->cached_object_render_state_index != NONE)
+            if (object->cached_render_state_index != NONE)
             {
-                uint8* cached_object_render_state = (uint8*)datum_get(get_cached_object_render_states_array(), object->cached_object_render_state_index);
+                uint8* cached_object_render_state = (uint8*)datum_get(get_cached_object_render_states_array(), object->cached_render_state_index);
 
                 if (*(datum*)(cached_object_render_state + 4) == info->object_index[render_model_storage_index])
                 {

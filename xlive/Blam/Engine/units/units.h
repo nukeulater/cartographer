@@ -22,8 +22,8 @@ enum e_weapon_addition_method : int16
 
 enum e_unit_grenade_type : int16
 {
-	_unit_grenade_type_fragmentation = 0,
-	_unit_grenade_type_plasma = 1,
+	_unit_grenade_human_fragmentation = 0,
+	_unit_grenade_covenant_plasma = 1,
 	k_unit_grenade_types_count
 };
 

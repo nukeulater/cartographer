@@ -4,7 +4,7 @@
 #include "geometry/geometry_definitions_new.h"
 #include "math/matrix_math.h"
 #include "render/render_prt.h"
-#include "structures/structure_bsp_definitions.h"
+#include "structures/structures.h"
 #include "tag_files/string_id.h"
 #include "tag_files/tag_import_definitions.h"
 

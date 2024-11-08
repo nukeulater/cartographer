@@ -8,6 +8,7 @@
 #include "filesys/pc_file_system.h"
 #include "geometry/geometry_block.h"
 #include "models/render_model_definitions.h"
+#include "physics/collision_model_definitions.h"
 #include "physics/physics_model_definitions.h"
 #include "render/weather_definitions.h"
 #include "units/biped_definitions.h"

@@ -145,7 +145,7 @@ void __cdecl simulation_apply_before_game(simulation_update* update)
     for (int32 i = 0; i < k_maximum_players; i++)
     {
         datum control_unit_index = update->control_unit_index[i];
-        if (TEST_BIT(update->unit_control_mask, i) && object_try_and_get_and_verify_type(control_unit_index, FLAG(_object_type_vehicle) | FLAG(_object_type_biped)))
+        if (TEST_BIT(update->unit_control_mask, i) && object_try_and_get_and_verify_type(control_unit_index, _object_mask_unit))
         {
             unit_control(control_unit_index, &update->unit_control[i]);
         }

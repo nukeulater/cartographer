@@ -39,7 +39,7 @@ bool unit_is_dual_wielding(datum unit_index)
 
 datum player_index_from_unit_index(datum unit_index)
 {
-	unit_datum* unit = (unit_datum*)object_try_and_get_and_verify_type(unit_index, (FLAG(_object_type_biped) | FLAG(_object_type_vehicle)));
+	unit_datum* unit = (unit_datum*)object_try_and_get_and_verify_type(unit_index, _object_mask_unit);
 
 	return (unit ? unit->controlling_player_index : NONE);
 }
@@ -66,7 +66,7 @@ void __cdecl unit_control(datum unit_index, unit_control_data* control_data)
 
 e_game_team unit_get_team_index(datum unit_index)
 {
-	const unit_datum* unit = (unit_datum*)object_try_and_get_and_verify_type(unit_index, _object_type_flag_unit);
+	const unit_datum* unit = (unit_datum*)object_try_and_get_and_verify_type(unit_index, _object_mask_unit);
 	return (unit ? unit->unit_team : _game_team_none);
 }
 

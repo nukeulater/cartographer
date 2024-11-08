@@ -13,6 +13,7 @@
 #include "game/game.h"
 #include "items/weapons.h"
 #include "main/interpolator.h"
+#include "memory/memory_pool.h"
 #include "models/models.h"
 #include "objects/widgets/widgets.h"
 #include "physics/collisions.h"
@@ -24,14 +25,15 @@
 #include "tag_files/tag_files.h"
 
 
+/* prototypes */
+
+s_memory_pool* get_object_table(void);
+
+/* public code */
+
 s_data_array* object_header_data_get(void)
 {
 	return *Memory::GetAddress<s_data_array**>(0x4E461C, 0x50C8EC);
-};
-
-s_memory_pool* get_object_table(void)
-{
-	return *Memory::GetAddress<s_memory_pool**>(0x4E4610, 0x50C8E0);
 };
 
 void* __cdecl object_try_and_get_and_verify_type(datum object_index, int32 object_type_flags)
@@ -189,14 +191,14 @@ void __cdecl object_compute_node_matrices_with_children(datum object_index)
 bool object_can_activate_in_cluster(datum object_index, s_game_cluster_bit_vectors* cluster_activation)
 {
 	bool result = false;
-	s_object_header* object_header = (s_object_header*)datum_get(object_header_data_get(), object_index);
-	const object_datum* object = (object_datum*)object_header->object;
+	object_header_datum* object_header = (object_header_datum*)datum_get(object_header_data_get(), object_index);
+	const object_datum* object = (object_datum*)object_header->datum;
 
 	if (object->flags.test(_object_always_active_bit))
 	{
 		return true;
 	}
-	if (TEST_BIT(FLAG(object_header->object_type), _object_type_machine) && object_type_compute_activation(object_index, cluster_activation, &result) || object_header->cluster_index == NONE)
+	if (TEST_FLAG(FLAG(object_header->type), _object_mask_machine) && object_type_compute_activation(object_index, cluster_activation, &result) || object_header->cluster_index == NONE)
 	{
 		return result;
 	}
@@ -242,7 +244,7 @@ void get_object_payload(datum object_index, s_object_payload* payload)
 
 	ASSERT(payload);
 
-	payload->object_type = object->object_identifier.get_type();
+	payload->object_type = (int16)object->object_identifier.get_type();
 	payload->object_collision_cull_flags = object_collision_cull_flags;
 	payload->origin_point = object->object_origin_point;
 	payload->bounding_sphere_radius = object->shadow_sphere_radius;
@@ -252,8 +254,8 @@ void get_object_payload(datum object_index, s_object_payload* payload)
 // Reconnects an object to the current bsp that's loaded
 void object_reconnect_to_map(s_location* location, datum object_index)
 {
-	s_object_header* object_header = (s_object_header *)datum_get(object_header_data_get(), object_index);
-	object_datum* object = (object_datum *)object_header->object;
+	object_header_datum* object_header = (object_header_datum *)datum_get(object_header_data_get(), object_index);
+	object_datum* object = (object_datum *)object_header->datum;
 	bool cluster_index_is_null = object_header->cluster_index == NONE;
 
 	ASSERT(DATUM_INDEX_TO_IDENTIFIER(object_index));
@@ -381,10 +383,10 @@ void __cdecl attachments_new(datum object_index)
 
 void object_initialize_effects(datum object_index)
 {
-	const s_object_header* object_header = (s_object_header*)datum_get(object_header_data_get(), object_index);
-	object_datum* object = (object_datum*)object_header->object;
+	const object_header_datum* object_header = (object_header_datum*)datum_get(object_header_data_get(), object_index);
+	object_datum* object = (object_datum*)object_header->datum;
 
-	if (object_header->object_type == _object_type_projectile)
+	if (object_header->type == _object_type_projectile)
 	{
 		object->object_projectile_datum = NONE;
 	}
@@ -405,11 +407,11 @@ void object_occlusion_data_initialize(datum object_index)
 
 void free_object_memory(datum object_index)
 {
-	s_object_header* object_header = (s_object_header*)datum_get(object_header_data_get(), object_index);
+	object_header_datum* object_header = (object_header_datum*)datum_get(object_header_data_get(), object_index);
 	object_header->flags = (e_object_header_flags)0;
-	if (object_header->object != NULL)
+	if (object_header->datum != NULL)
 	{
-		memory_pool_block_free(get_object_table(), &object_header->object);
+		memory_pool_block_free(get_object_table(), &object_header->datum);
 	}
 	datum_delete(object_header_data_get(), object_index);
 	return;
@@ -467,13 +469,13 @@ datum object_allocate_header(datum tag_definition_index)
 	if (tag_definition_index != NONE)
 	{
 		const object_definition* object_def = (object_definition*)tag_get_fast(tag_definition_index);
-		const object_type_definition* object_type_definition = object_type_definition_get(object_def->object_type);
+		const object_type_definition* object_type_definition = object_type_definition_get((e_object_type)object_def->object_type);
 		const s_model_definition* model_definition = NULL;
 		object_index = object_header_new(object_type_definition->datum_size);
 
 		if (object_index != NONE)
 		{
-			s_object_header* object_header = (s_object_header*)datum_get(object_header_data_get(), object_index);
+			object_header_datum* object_header = (object_header_datum*)datum_get(object_header_data_get(), object_index);
 			object_datum* object = object_get_fast_unsafe(object_index);
 		}
 	}
@@ -486,7 +488,7 @@ datum object_new_internal(datum object_index, object_placement_data* data)
 	bool process_is_game_client = !Memory::IsDedicatedServer();
 
 	const object_definition* object_def = (object_definition*)tag_get_fast(data->tag_index);
-	const object_type_definition* object_type_definition = object_type_definition_get(object_def->object_type);
+	const object_type_definition* object_type_definition = object_type_definition_get((e_object_type)object_def->object_type);
 	const s_model_definition* model_definition = NULL;
 
 	if (object_def->model.index != NONE)
@@ -495,16 +497,16 @@ datum object_new_internal(datum object_index, object_placement_data* data)
 	}
 
 	halo_interpolator_setup_new_object(object_index);
-	s_object_header* object_header = (s_object_header*)datum_get(object_header_data_get(), object_index);
+	object_header_datum* object_header = (object_header_datum*)datum_get(object_header_data_get(), object_index);
 	object_datum* object = object_get_fast_unsafe(object_index);
 
 	object_header->flags.set(_object_header_post_update_bit, true);
-	object_header->object_type = object_def->object_type;
+	object_header->type = object_def->object_type;
 	object->tag_definition_index = data->tag_index;
 
 	if (data->object_identifier.get_source() == NONE)
 	{
-		object->object_identifier.create_dynamic(object_def->object_type);
+		object->object_identifier.create_dynamic((e_object_type)object_def->object_type);
 		object->placement_index = NONE;
 		object->structure_bsp_index = get_global_structure_bsp_index();
 	}
@@ -564,7 +566,7 @@ datum object_new_internal(datum object_index, object_placement_data* data)
 	object->damage_owner_owner_index = data->damage_owner.owner_index;
 	object->damage_owner_object_index = data->damage_owner.entity_index;
 	object->model_variant_id = NONE;
-	object->cached_object_render_state_index = NONE;
+	object->cached_render_state_index = NONE;
 	object->field_D0 = NONE;
 	object->physics_flags.set_unsafe(0);
 	object->physics_flags.set(_object_physics_bit_8, data->flags.test(_scenario_object_placement_bit_3));
@@ -617,17 +619,10 @@ datum object_new_internal(datum object_index, object_placement_data* data)
 			if (animation_manager.reset_graph(model_definition->animation_graph.index, object_def->model.index, true))
 			{
 				valid_animation_manager = true;
-				allow_interpolation = !TEST_FLAG(FLAG(object_def->object_type), (
-					FLAG(_object_type_sound_scenery) |
-					FLAG(_object_type_light_fixture) |
-					FLAG(_object_type_control) |
-					FLAG(_object_type_machine) |
-					FLAG(_object_type_scenery) |
-					FLAG(_object_type_projectile))
-				);
+				allow_interpolation = !TEST_FLAG(FLAG(object_def->object_type), _object_mask_cannot_interpolate);
 
 				// allow interpolation if object is device and device flags include interpolation
-				if (TEST_FLAG(FLAG(object_def->object_type), (FLAG(_object_type_light_fixture) | FLAG(_object_type_control) | FLAG(_object_type_machine))))
+				if (TEST_FLAG(FLAG(object_def->object_type), _object_mask_device))
 				{
 					_device_definition* device_def = (_device_definition*)tag_get_fast(data->tag_index);
 					if (TEST_FLAG(device_def->flags, _device_definition_allow_interpolation))
@@ -680,7 +675,7 @@ datum object_new_internal(datum object_index, object_placement_data* data)
 			bool graph_reset = animation_manager->reset_graph(model_definition->animation_graph.index, object_def->model.index, true);
 			ASSERT(graph_reset);
 
-			object->flags.set(_object_data_bit_11, graph_reset);
+			object->flags.set(_object_dynamic_lighting_recompute_bit, graph_reset);
 		}
 
 		// Null attachment block
@@ -967,10 +962,10 @@ void __cdecl objects_garbage_collection(void)
 
 void __cdecl objects_purge_deleted_objects(void)
 {
-	s_data_iterator<s_object_header> object_header_it(object_header_data_get());
+	s_data_iterator<object_header_datum> object_header_it(object_header_data_get());
 	while (object_header_it.get_next_datum())
 	{
-		s_object_header* object_header = object_header_it.get_current_datum();
+		object_header_datum* object_header = object_header_it.get_current_datum();
 		if (object_header->flags.test(_object_header_being_deleted_bit))
 		{
 			object_pre_delete_recursive(object_header_it.get_current_datum_index());
@@ -994,10 +989,10 @@ void __cdecl objects_post_update()
 {
 	object_globals_get()->objects_updating = true;
 
-	s_data_iterator<s_object_header> object_header_it(object_header_data_get());
+	s_data_iterator<object_header_datum> object_header_it(object_header_data_get());
 	while (object_header_it.get_next_datum())
 	{
-		s_object_header* object_header = object_header_it.get_current_datum();
+		object_header_datum* object_header = object_header_it.get_current_datum();
 		object_datum* object = object_get_fast_unsafe(object_header_it.get_current_datum_index());
 
 		object_header->flags.set(_object_header_do_not_update_bit, false);
@@ -1157,3 +1152,10 @@ void objects_apply_patches(void)
 	objects_apply_interpolation_patches();
 	return;
 }
+
+/* private code */
+
+s_memory_pool* get_object_table(void)
+{
+	return *Memory::GetAddress<s_memory_pool**>(0x4E4610, 0x50C8E0);
+};
