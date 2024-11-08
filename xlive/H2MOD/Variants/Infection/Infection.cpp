@@ -4,6 +4,7 @@
 #include "Blam/Cache/TagGroups/item_collection_definition.hpp"
 
 #include "game/game.h"
+#include "game/game_engine.h"
 #include "game/game_time.h"
 #include "interface/user_interface_controller.h"
 #include "scenario/scenario.h"
@@ -65,9 +66,9 @@ void Infection::sendTeamChange()
 	{
 		int32 player_count = NetworkSession::GetPlayerCount();
 
-		int32 player_array_index = 0;
 		if (player_count > 0)
 		{
+			int32 player_array_index = 0;
 			datum player_indexes[k_maximum_players] = {};
 			e_game_team player_teams[k_maximum_players] = {};
 
@@ -400,40 +401,42 @@ void Infection::OnPlayerDeath(ExecTime execTime, datum player_index)
 	{
 	case ExecTime::_preEventExec:
 		// to note after the original function executes, the controlled unit by this player is set to NONE
-
-		if (!Memory::IsDedicatedServer())
+		if (game_engine_in_round())
 		{
-			if (s_player::get_team(player_index) != k_zombie_team)
+			if (!Memory::IsDedicatedServer())
 			{
-				s_player* player = s_player::get(player_index);
+				if (s_player::get_team(player_index) != k_zombie_team)
+				{
+					s_player* player = s_player::get(player_index);
 
-				if(player->user_index != NONE)
-				{
-					LOG_TRACE_GAME(L"[h2mod-infection] Infected local player, Name={}, identifier={}", s_player::get_name(player_index_from_user_index(player->user_index)), player->identifier);
-					user_interface_controller_set_desired_team_index(player->controller_index, k_zombie_team);
-					user_interface_controller_update_network_properties(player->controller_index);
-					s_player::set_unit_character_type(player_index, _character_type_flood);
-				}
-				else
-				{
-					//if not, then this is a new zombie
-					LOG_TRACE_GAME(L"[h2mod-infection] Player died, name={}, identifer={}", s_player::get_name(player_index), player->identifier);
-					Infection::triggerSound(_snd_new_zombie, 1000);
+					if (player->user_index != NONE)
+					{
+						LOG_TRACE_GAME(L"[h2mod-infection] Infected local player, Name={}, identifier={}", s_player::get_name(player_index_from_user_index(player->user_index)), player->identifier);
+						user_interface_controller_set_desired_team_index(player->controller_index, k_zombie_team);
+						user_interface_controller_update_network_properties(player->controller_index);
+						s_player::set_unit_character_type(player_index, _character_type_flood);
+					}
+					else
+					{
+						//if not, then this is a new zombie
+						LOG_TRACE_GAME(L"[h2mod-infection] Player died, name={}, identifer={}", s_player::get_name(player_index), player->identifier);
+						Infection::triggerSound(_snd_new_zombie, 1000);
+					}
 				}
 			}
-		}
 
-		// host code
-		if (!game_is_predicted())
-		{
-			void* unit_object = object_try_and_get_and_verify_type(playerUnitDatum, FLAG(_object_type_biped));
-			if (unit_object) {
-				if (unit_get_team_index(playerUnitDatum) != k_zombie_team) {
-					Infection::setZombiePlayerStatus(s_player::get_id(player_index));
-				}
-				else {
-					// take away zombie's weapons
-					unit_delete_all_weapons(playerUnitDatum);
+			// host code
+			if (!game_is_predicted())
+			{
+				void* unit_object = object_try_and_get_and_verify_type(playerUnitDatum, FLAG(_object_type_biped));
+				if (unit_object) {
+					if (unit_get_team_index(playerUnitDatum) != k_zombie_team) {
+						Infection::setZombiePlayerStatus(s_player::get_id(player_index));
+					}
+					else {
+						// take away zombie's weapons
+						unit_delete_all_weapons(playerUnitDatum);
+					}
 				}
 			}
 		}
