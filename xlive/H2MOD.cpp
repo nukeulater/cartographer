@@ -914,8 +914,6 @@ void h2mod_apply_tweaks() {
 
 	H2MOD::RefreshTogglexDelay();
 
-	shell_windows_apply_patches();
-
 	if (Memory::IsDedicatedServer()) {
 	}
 	else {//is client
@@ -1156,9 +1154,6 @@ void H2MOD::Initialize()
 
 	// Apply patches
 	game_apply_pre_winmain_patches();
-
-	shell_apply_patches();
-	shell_windows_apply_patches();
 
 	custom_language_initialize();
 	main_loop_apply_patches();
