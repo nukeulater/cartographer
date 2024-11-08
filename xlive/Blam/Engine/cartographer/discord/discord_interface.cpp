@@ -192,7 +192,7 @@ void discord_interface_set_variant(e_context_variant variant, const utf8* varian
 
 
 	// Create image name we select for the difficulty
-	c_static_string<16> variant_image_name;
+	c_static_string<32> variant_image_name;
 	variant_image_name.set("gamemode_");
 	variant_image_name.append(name);
 
