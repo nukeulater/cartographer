@@ -1158,8 +1158,9 @@ static bool rasterizer_dx9_is_amd_or_ati_card(void)
     D3DADAPTER_IDENTIFIER9 identifier;
     dx9_globals->global_d3d_interface->GetAdapterIdentifier(D3DADAPTER_DEFAULT, 0, &identifier);
     
-    if ( StrStrIA(identifier.Description, "amd") != NULL || 
-        StrStrIA(identifier.Description, "ati") != NULL)
+    if (StrStrIA(identifier.Description, "amd") != NULL || 
+        StrStrIA(identifier.Description, "ati") != NULL ||
+        StrStrIA(identifier.Description, "radeon") != NULL)
     {
         LOG_INFO_GAME("AMD or ATI card in use.");
         result = true;
