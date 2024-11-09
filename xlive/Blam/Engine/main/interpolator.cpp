@@ -300,7 +300,7 @@ void halo_interpolator_object_populate_interpolation_data(
             }
             else
             {
-                bool object_is_biped = TEST_FLAG(object_header->type, _object_mask_biped);
+                bool object_is_biped = TEST_FLAG(FLAG(object_header->type), _object_mask_biped);
                 real32 crouch = 0.0f;
                 if (object_is_biped)
                 {
