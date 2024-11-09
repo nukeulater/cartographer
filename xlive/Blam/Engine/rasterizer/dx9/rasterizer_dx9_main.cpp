@@ -1115,36 +1115,6 @@ static bool rasterizer_dx9_create_device_interface(void)
     s_rasterizer_globals* rasterizer_globals = rasterizer_globals_get();
     s_rasterizer_dx9_main_globals* dx9_globals = rasterizer_dx9_main_globals_get();
 
-    if (rasterizer_globals->use_d3d9_ex)
-    {
-        HRESULT hr;
-        if (g_rasterizer_dx9on12_enabled)
-        {
-            hr = rasterizer_dx9_create_through_d3d9on12(&dx9_globals->global_d3d_interface, false /*use_warp*/);
-        }
-        else
-        {
-            hr = rasterizer_globals->d3d9_create_ex_proc(D3D_SDK_VERSION, &dx9_globals->global_d3d_interface);
-        }
-        if (FAILED(hr))
-        {
-            error(2, "### ERROR failed to create D3D object with the Ex version of D3D");
-            main_quit();
-            result = false;
-        }
-    }
-    else
-    {
-        if (g_rasterizer_dx9on12_enabled)
-        {
-            rasterizer_dx9_create_through_d3d9on12(&dx9_globals->global_d3d_interface, false /*use_warp*/);
-        }
-        else
-        {
-            dx9_globals->global_d3d_interface = (IDirect3D9Ex*)Direct3DCreate9(D3D_SDK_VERSION);
-        }
-    }
-
     HRESULT hr;
     if (g_rasterizer_dx9on12_enabled)
     {
