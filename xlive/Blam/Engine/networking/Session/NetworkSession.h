@@ -470,17 +470,7 @@ struct c_network_session
 	}
 
 	// switch multiple players with a single membership update
-	void switch_players_to_teams(datum* player_indexes, int32 player_count, e_game_team* team_indexes)
-	{
-		if (local_state_session_host())
-		{
-			for (int32 i = 0; i < player_count; i++)
-			{
-				get_player_membership(player_indexes[i])->properties[0].team_index = team_indexes[i];
-			}
-			request_membership_update();
-		}
-	}
+	void switch_players_to_teams(datum* player_indexes, int32 player_count, e_game_team* team_indexes);
 
 	const char* describe_network_protocol_type() const
 	{
@@ -491,7 +481,7 @@ struct c_network_session
 			"LIVE",
 		};
 
-		return this->m_session_class < k_network_session_class_count ? network_protocols_str[this->m_session_class] : "<unknown>";
+		return IN_RANGE(this->m_session_class, _network_session_class_offline, k_network_session_class_count - 1) ? network_protocols_str[this->m_session_class] : "<unknown>";
 	}
 };
 ASSERT_STRUCT_SIZE(c_network_session, 31624);
