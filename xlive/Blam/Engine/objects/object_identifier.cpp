@@ -4,7 +4,7 @@
 
 void c_object_identifier::clear()
 {
-	this->m_object_type = (e_object_type)NONE;
+	this->m_object_type = _object_type_none;
 	this->m_source = (e_object_source)NONE;
 	this->m_origin_bsp_index = NONE;
 	this->m_unique_id = NONE;
@@ -41,7 +41,7 @@ e_object_source c_object_identifier::get_source() const
 
 e_object_type c_object_identifier::get_type() const
 {
-	return (e_object_type)this->m_object_type;
+	return this->m_object_type;
 }
 
 int32 c_object_identifier::get_unique_id() const
