@@ -305,8 +305,7 @@ void network_session_membership_update_local_players_teams()
 	c_network_session* active_session;
 	if (network_life_cycle_in_squad_session(&active_session))
 	{
-		if ((active_session->local_state_established() || active_session->local_state_joining_session())
-			&& !active_session->local_state_session_host())
+		if (active_session->local_state_established() || active_session->local_state_joining_session())
 		{
 			int32 local_peer_index = active_session->get_local_peer_index();
 
@@ -354,4 +353,17 @@ bool network_life_cycle_in_squad_session(c_network_session** out_active_session)
 		*out_active_session = NetworkSession::GetActiveNetworkSession();
 
 	return true;
+}
+
+void c_network_session::switch_players_to_teams(datum* player_indexes, int32 player_count, e_game_team* team_indexes)
+{
+	if (local_state_session_host())
+	{
+		for (int32 i = 0; i < player_count; i++)
+		{
+			get_player_membership(player_indexes[i])->properties[0].team_index = team_indexes[i];
+		}
+		request_membership_update();
+		network_session_membership_update_local_players_teams();
+	}
 }

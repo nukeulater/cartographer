@@ -98,7 +98,7 @@ struct object_header_datum
 {
 	int16 identifier;
 	c_flags<e_object_header_flags, uint8, k_object_header_flags> flags;
-	int8/*e_object_type*/ type;
+	e_object_type type;
 	int16 cluster_index;
 	int16 data_size;
 	void* datum;

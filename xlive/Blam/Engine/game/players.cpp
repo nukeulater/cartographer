@@ -447,14 +447,14 @@ void __cdecl players_update_activation(void)
 
 void __cdecl player_examine_nearby_biped(datum biped_datum, datum player_datum, s_player_interaction_context* out_action_context)
 {
-    void* player_build_biped_interaction_usercall = Memory::GetAddress<void*>(0x53E43);
+    void* player_examine_nearby_biped_usercall = Memory::GetAddress<void*>(0x53E43);
     __asm
     {
         push out_action_context
         push player_datum
         mov ebx, biped_datum
 
-        call player_build_biped_interaction_usercall
+        call player_examine_nearby_biped_usercall
 
         add esp, 2 * 4
     }
@@ -462,14 +462,14 @@ void __cdecl player_examine_nearby_biped(datum biped_datum, datum player_datum, 
 
 void __cdecl player_examine_nearby_vehicle(datum vehicle_datum, datum player_datum, s_player_interaction_context* out_action_context)
 {
-    void* player_build_biped_interaction_usercall = Memory::GetAddress<void*>(0x53CC7);
+    void* player_examine_nearby_vehicle_usercall = Memory::GetAddress<void*>(0x53CC7);
     __asm
     {
         push out_action_context
         push player_datum
         mov eax, vehicle_datum
 
-        call player_build_biped_interaction_usercall
+        call player_examine_nearby_vehicle_usercall
 
         add esp, 2 * 4
     }
@@ -498,14 +498,14 @@ void player_examine_nearby_weapon(datum weapon_datum, datum player_datum, s_play
         if (!TEST_BIT(g_user_weapon_interactions_mask, player->user_index))
             return;
 
-    void* player_build_biped_interaction_usercall = Memory::GetAddress<void*>(0x53F17);
+    void* player_examine_nearby_weapon_usercall = Memory::GetAddress<void*>(0x53F17);
     __asm
     {
         push weapon_datum
         push player_datum
         mov eax, out_action_context
 
-        call player_build_biped_interaction_usercall
+        call player_examine_nearby_weapon_usercall
 
         add esp, 2 * 4
     }
@@ -513,14 +513,14 @@ void player_examine_nearby_weapon(datum weapon_datum, datum player_datum, s_play
 
 void __cdecl player_examine_nearby_control(datum control_datum, datum player_datum, s_player_interaction_context* out_action_context)
 {
-    void* player_build_biped_interaction_usercall = Memory::GetAddress<void*>(0x53E43);
+    void* player_examine_nearby_control_usercall = Memory::GetAddress<void*>(0x51FB2);
     __asm
     {
         push out_action_context
         push player_datum
         mov ebx, control_datum
 
-        call player_build_biped_interaction_usercall
+        call player_examine_nearby_control_usercall
 
         add esp, 2 * 4
     }

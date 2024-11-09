@@ -14,7 +14,7 @@ class c_object_identifier
 private:
 	int32 m_unique_id;
 	int16 m_origin_bsp_index;
-	int8/*e_object_type*/ m_object_type;
+	e_object_type m_object_type;
 	e_object_source m_source;
 
 public:
