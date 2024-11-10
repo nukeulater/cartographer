@@ -23,13 +23,13 @@ PS_OUTPUT main(PS_INPUT input) : COLOR
     depth.gb = 1.0;
 
     float2 proj_tc;
-    proj_tc.x = dot(depth.rgg, input.texcoord[1].xyz);
+    proj_tc.x = dot(depth.rbb, input.texcoord[1].xyz);
     proj_tc.y = dot(depth.rgb, input.texcoord[2].xyz);
 
-    float4 gradient = tex2D(sm[2], proj_tc);
+	float4 gradient = tex2D(sm[2], proj_tc);
     
-    float4 adjusted_blend = fog_atmospheric_secondary_color * gradient.b;
-    adjusted_blend+= fog_atmospheric_color * gradient.g;
+	float4 adjusted_blend = gradient.a * fog_atmospheric_secondary_color;
+	adjusted_blend = gradient.b * fog_atmospheric_color + adjusted_blend;
     
     float4 res = -adjusted_blend + fog_sky_color;
     
