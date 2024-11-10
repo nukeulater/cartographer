@@ -14,8 +14,13 @@
 #define D3D_DEBUG_INFO
 #endif
 
-#define WINVER _WIN32_WINNT_VISTA
-#define _WIN32_WINNT _WIN32_WINNT_VISTA
+#include <WinSDKVer.h>
+
+#define WINVER 0x0601
+#define _WIN32_WINNT 0x0601
+
+#include <sdkddkver.h>
+
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 // sets the dinput/xinput version, Halo 2 uses the older 9.1.0 version and DirectInput 0x0800
 #define XINPUT_USE_9_1_0
