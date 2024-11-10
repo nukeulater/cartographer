@@ -230,15 +230,12 @@ void c_main_menu_list::handle_item_campaign(s_event_record** pevent)
 		params.m_window_index = _window_4;
 		params.m_context = 0;
 		params.user_flags = FLAG((*pevent)->controller);
-		params.m_channel_type = _user_interface_channel_type_gameshell_screen;
+		params.m_channel_type = _user_interface_channel_type_dialog;
 		params.m_screen_state.field_0 = NONE;
 		params.m_screen_state.m_last_focused_item_order = NONE;
 		params.m_screen_state.m_last_focused_item_index = NONE;
 		params.m_load_function = &c_screen_campaign_options::load;
-
 		params.m_load_function(&params);
-
-		
 	}
 	else
 	{
@@ -394,7 +391,7 @@ bool __cdecl screen_show_campaign_options_without_achievement(e_controller_index
 	//return INVOKE(0x213673, 0x0, screen_show_campaign_options_without_achievement, controller_index);
 
 	s_screen_parameters params;
-	params.m_flags = 0xFF;
+	params.m_flags = 0;
 	params.m_window_index = _window_4;
 	params.m_context = 0;
 	params.user_flags = user_interface_controller_get_signed_in_controllers_mask(); //replacing 0xFF with active_controllers so that controller-removed-handler stops panicking here
