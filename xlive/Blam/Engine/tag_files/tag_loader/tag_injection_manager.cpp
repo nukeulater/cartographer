@@ -14,8 +14,9 @@
 #include "units/biped_definitions.h"
 #include "units/vehicle_definitions.h"
 
-#include "H2MOD/Modules/Shell/H2MODShell.h"
 #include "Util/filesys.h"
+
+extern bool g_force_cartographer_update;
 
 /* constants */
 
@@ -102,17 +103,12 @@ bool c_tag_injecting_manager::find_map(const wchar_t* map_name, c_static_wchar_s
 		// Exit and create a popup if a map is missing
 		else
 		{
-			const wchar_t* format = L"[c_tag_injecting_manager::set_active_map] could not locate %s.map in any valid content location";
+			const wchar_t* format = L"[c_tag_injecting_manager::find_map] could not locate %s.map in any valid content location";
 			wchar_t output_wide[NUMBEROF(format) + MAX_PATH];
 			
 			usnzprintf(output_wide, NUMBEROF(output_wide), format, map_name);
-
-			char output[(NUMBEROF(format) + MAX_PATH) * 2];
-			wchar_string_to_utf8_string(output_wide, output, NUMBEROF(output));
-
 			LOG_ERROR_GAME(output_wide);
-			_Shell::OpenMessageBox(NULL, MB_ICONERROR, "Missing Map File", output);
-			exit(EXIT_FAILURE);
+			g_force_cartographer_update = true;
 			return false;
 		}
 	}
@@ -518,13 +514,8 @@ bool c_tag_injecting_manager::initialize_agent(tag_group group)
 		wchar_t output_wide[NUMBEROF(format) + MAX_PATH];
 
 		usnzprintf(output_wide, NUMBEROF(output_wide), format, plugin_path.get_string());
-
-		char output[(NUMBEROF(format) + MAX_PATH) * 2];
-		wchar_string_to_utf8_string(output_wide, output, NUMBEROF(output));
-
 		LOG_ERROR_GAME(output_wide);
-		_Shell::OpenMessageBox(NULL, MB_ICONERROR, "Missing Plugin File", output);
-		exit(EXIT_FAILURE);
+		g_force_cartographer_update = true;
 		return false;
 	}
 	this->m_agents[tag_group_index].init(group, plugin_path.get_string());
@@ -575,21 +566,32 @@ datum c_tag_injecting_manager::load_tag(e_tag_group group, datum cache_datum, bo
 	s_tag_injecting_table_entry* new_entry = this->m_table.init_entry(cache_datum, group);
 
 	c_xml_definition_agent* agent = this->get_agent({group});
-	ASSERT(agent);
-	new_entry->loaded_data->init(
-		agent->get_definition(),
-		this->m_active_map_file_handle,
-		&this->m_active_map_cache_header,
-		&this->m_active_map_tags_header,
-		this->m_active_map_scenario_instance_offset,
-		cache_datum);
-
-	if (load_dependencies)
+	
+	datum result;
+	if (agent)
 	{
-		c_tag_injecting_manager::load_dependencies(this, new_entry);
+		new_entry->loaded_data->init(
+			agent->get_definition(),
+			this->m_active_map_file_handle,
+			&this->m_active_map_cache_header,
+			&this->m_active_map_tags_header,
+			this->m_active_map_scenario_instance_offset,
+			cache_datum);
+
+		if (load_dependencies)
+		{
+			c_tag_injecting_manager::load_dependencies(this, new_entry);
+		}
+		result = new_entry->injected_index;
+	}
+	// Force update if agent cannot be retrieved
+	else
+	{
+		g_force_cartographer_update = true;
+		result = NONE;
 	}
 
-	return new_entry->injected_index;
+	return result;
 }
 
 void c_tag_injecting_manager::load_tag_internal(c_tag_injecting_manager* manager, tag_group group, datum cache_datum,
