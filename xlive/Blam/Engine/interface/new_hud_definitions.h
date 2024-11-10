@@ -273,13 +273,14 @@ enum e_widget_state_unit_flags : short
     widget_state_unit_flag_dervish = FLAG(13)
 };
 
-enum e_widget_state_extra_flags : short
+enum e_widget_state_extra_flags : uint16
 {
-    widget_state_extra_flag_autoaimfriendly = FLAG(0),
-    widget_state_extra_flag_autoaimplasma = FLAG(1),
-    widget_state_extra_flag_autoaimheadshot = FLAG(2),
-    widget_state_extra_flag_autoaimvulnerable = FLAG(3),
-    widget_state_extra_flag_autoaiminvincible = FLAG(4)
+    widget_state_extra_flag_autoaimfriendly = 0,
+    widget_state_extra_flag_autoaimplasma = 1,
+    widget_state_extra_flag_autoaimheadshot = 2,
+    widget_state_extra_flag_autoaimvulnerable = 3,
+    widget_state_extra_flag_autoaiminvincible = 4,
+    k_widget_state_weapon_extra_flag_count
 };
 
 enum e_widget_state_weapon_flags : uint16
@@ -326,7 +327,7 @@ struct s_hud_widget_state_definition
     e_widget_state_game_engine_state_flags yes_game_engine_state_flags;
 
     e_widget_state_unit_flags no_unit_flags;
-    e_widget_state_extra_flags no_extra_flags;
+    c_flags_no_init<e_widget_state_extra_flags, uint16, k_widget_state_weapon_extra_flag_count> no_extra_flags;
     e_widget_state_weapon_flags no_weapon_flags;
     e_widget_state_game_engine_state_flags no_game_engine_state_flags;
 

@@ -28,6 +28,10 @@ static const pixel32 g_draw_hud_bitmap_widget_shield_pixel_colors[9]
 	D3DCOLOR_XRGB(0,120,240),
 };
 
+// storage for bitmaps that contain crosshairs
+uint32 g_draw_hud_crosshair_bitmap_cache_count;
+datum* g_draw_hud_crosshair_bitmap_cache;
+
 // k_number_of_users, we have 4 bits left to spare in this value
 uint8 g_draw_hud_user_draw_player_indicators_mask;
 
@@ -190,6 +194,15 @@ void hud_widget_anchor_calculate_point(e_hud_anchor anchor, real_point2d* out_po
 	INVOKE(0x223969, 0, hud_widget_anchor_calculate_point, anchor, out_point);
 }
 
+bool draw_hud_bitmap_is_crosshair(datum bitmap_datum)
+{
+	for(uint32 i = 0; i < g_draw_hud_crosshair_bitmap_cache_count; i++)
+		if (g_draw_hud_crosshair_bitmap_cache[i] == bitmap_datum)
+			return true;
+
+	return false;
+}
+
 void __cdecl draw_hud_bitmap_widget(uint32 local_render_user_index, s_new_hud_temporary_user_state* user_state, s_hud_bitmap_widget_definition* bitmap_widget, real32* widget_function_results)
 {
 	if (bitmap_widget->bitmap.index == NONE || bitmap_widget->shader.index == NONE)
@@ -223,9 +236,7 @@ void __cdecl draw_hud_bitmap_widget(uint32 local_render_user_index, s_new_hud_te
 
 	if (bitmap_widget->anchor == _hud_anchor_crosshair)
 	{
-		if ((bitmap_widget->widget_state.yes_weapon_flags.test(widget_state_weapon_flag_primary_weapon) ||
-			bitmap_widget->widget_state.yes_weapon_flags.test(widget_state_weapon_flag_secondary_weapon)) 
-			&& user_state->current_zoom_level == -1)
+		if(draw_hud_bitmap_is_crosshair(bitmap_widget->bitmap.index))
 		{
 			s_saved_game_cartographer_player_profile* profile_settings = cartographer_player_profile_get_by_user_index(local_render_user_index);
 			hud_scale = *get_secondary_hud_scale() * profile_settings->crosshair_scale;
@@ -746,6 +757,32 @@ void __cdecl draw_hud_player_indicators(uint32 local_render_user_index)
 		p_game_mode_engine_draw_team_indicators(local_render_user_index);
 }
 /* public code */
+
+void hud_draw_on_map_load()
+{
+	if (g_draw_hud_crosshair_bitmap_cache)
+		free(g_draw_hud_crosshair_bitmap_cache);
+
+	g_draw_hud_crosshair_bitmap_cache_count = 0;
+
+	// initial loop to find how many bitmaps there are
+	tag_iterator it;
+	tag_iterator_new(&it, e_tag_group::_tag_group_bitmap);
+	while (tag_iterator_next(&it) != NONE)
+		if (strstr(tag_get_name(it.current_tag_index), "new_hud\\crosshairs"))
+			g_draw_hud_crosshair_bitmap_cache_count++;
+
+	// allocate a storage for the datums
+	g_draw_hud_crosshair_bitmap_cache = (datum*)calloc(g_draw_hud_crosshair_bitmap_cache_count, sizeof(datum));
+
+	// do a second loop to store all the actual datums
+	g_draw_hud_crosshair_bitmap_cache_count = 0;
+
+	tag_iterator_new(&it, e_tag_group::_tag_group_bitmap);
+	while (tag_iterator_next(&it) != NONE)
+		if (strstr(tag_get_name(it.current_tag_index), "new_hud\\crosshairs"))
+			g_draw_hud_crosshair_bitmap_cache[g_draw_hud_crosshair_bitmap_cache_count++] = it.current_tag_index;
+}
 
 datum hud_bitmap_tag_index_get(void)
 {

@@ -390,7 +390,7 @@ bool __cdecl OnMapLoad(s_game_options* options)
 
 	MetaExtender::free_tag_blocks();
 	TagFixes::OnMapLoad();
-	
+
 	game_globals_apply_tag_patches(options);
 	ImGuiHandler::WeaponOffsets::MapLoad();
 
@@ -434,6 +434,7 @@ bool __cdecl OnMapLoad(s_game_options* options)
 		{
 			hud_patches_on_map_load();
 			main_tag_fixes();
+			hud_draw_on_map_load();
 		}
 
 		if (options->game_mode == _game_mode_multiplayer)

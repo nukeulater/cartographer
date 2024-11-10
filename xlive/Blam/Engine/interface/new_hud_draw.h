@@ -12,6 +12,8 @@ struct s_draw_hud_widget_input_results
 
 /* public code */
 
+void hud_draw_on_map_load(void);
+
 datum hud_bitmap_tag_index_get(void);
 
 int32 hud_bitmap_data_index_get(void);
