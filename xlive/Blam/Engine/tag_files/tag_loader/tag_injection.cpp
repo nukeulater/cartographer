@@ -51,13 +51,11 @@ bool tag_injection_active_map_verified()
 
 datum tag_injection_load(e_tag_group group, const char* tag_name, bool load_dependencies)
 {
-	//return -1;
 	return g_manager.load_tag(group, tag_name, load_dependencies);
 }
 
 datum tag_injection_load(e_tag_group group, datum cache_datum, bool load_dependencies)
 {
-	//return -1;
 	return g_manager.load_tag(group, cache_datum, load_dependencies);
 }
 
