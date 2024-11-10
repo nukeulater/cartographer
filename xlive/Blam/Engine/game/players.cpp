@@ -568,7 +568,7 @@ void __cdecl player_find_action_context(datum player_datum, s_player_interaction
 
                 datum nearby_objects[64];
 
-                const int16 number_of_objects = object_search_for_objects_in_radius(
+                const int16 number_of_initial_objects = object_search_for_objects_in_radius(
                     0,
                     (search_type & ~objects_to_ignore),
                     &player_unit->unit.object.location,
@@ -578,9 +578,9 @@ void __cdecl player_find_action_context(datum player_datum, s_player_interaction
                     NUMBEROF(nearby_objects));
 
                 // This is used later on in this function for the default condition in the examine switch case
-                int16 nearby_object_num = number_of_objects;
+                int16 nearby_object_num = number_of_initial_objects;
 
-                for (int16 object_num = 0; object_num < number_of_objects; object_num++)
+                for (int16 object_num = 0; object_num < nearby_object_num; object_num++)
                 {
                     const datum nearby_object_index = nearby_objects[object_num];
                     const object_datum* object = (object_datum*)object_get_fast_unsafe(nearby_object_index);
@@ -594,11 +594,11 @@ void __cdecl player_find_action_context(datum player_datum, s_player_interaction
                         const real32 magnitude = magnitude_squared3d(&delta);
                         const real32 combined_radius = object->radius + search_radius;
 
-                        const uint32 object_types_to_skip_radius_check = _object_mask_weapon | _object_mask_machine | _object_mask_control;
+                        const uint32 object_type_requires_radius_check = _object_mask_weapon | _object_mask_machine | _object_mask_control;
 
                         // If the object is not of the following types then we have to run the following check:
                         // Compare the magnitude of the vector between the player and object and make sure we aren't going outside the combined radius squared
-                        if (!TEST_BIT(object_types_to_skip_radius_check, type) || magnitude < combined_radius * combined_radius)
+                        if (!TEST_BIT(object_type_requires_radius_check, type) || magnitude <= combined_radius * combined_radius)
                         {
                             switch (type)
                             {
@@ -616,7 +616,7 @@ void __cdecl player_find_action_context(datum player_datum, s_player_interaction
                                 break;
                             default:
                             {
-
+                                // Search through the children of the object and add them to the nearby objects array
                                 for (datum current_weapon_datum = object->current_weapon_datum; current_weapon_datum != NONE; ++nearby_object_num)
                                 {
                                     if (nearby_object_num > NUMBEROF(nearby_objects))
