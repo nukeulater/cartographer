@@ -1141,9 +1141,10 @@ static bool rasterizer_dx9_create_device_interface(void)
         dx9_globals->global_d3d_interface = (IDirect3D9Ex*)Direct3DCreate9(D3D_SDK_VERSION);
     }
 
-    if (!dx9_globals->global_d3d_interface)
+    if (dx9_globals->global_d3d_interface == NULL)
     {
         error(3, "### ERROR failed to create D3D object");
+        main_quit();
         result = false;
     }
 

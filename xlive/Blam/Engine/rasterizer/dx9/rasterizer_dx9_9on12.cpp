@@ -18,6 +18,14 @@ HRESULT rasterizer_dx9_create_through_d3d9on12(IDirect3D9Ex** d3d, bool use_warp
     HMODULE h_dxgi = LoadLibrary(L"dxgi.dll");
     HMODULE h_d3d9 = LoadLibrary(L"d3d9.dll");
 
+    if (h_d3d12 == NULL
+        || h_dxgi == NULL
+        || h_d3d9 == NULL)
+    {
+        LOG_CRITICAL_GAME("Modules: d3d12, dxgi or d3d9 not available!");
+        return E_FAIL;
+    }
+
     decltype(CreateDXGIFactory1)* pfn_CreateDXGIFactory1 = (decltype(CreateDXGIFactory1)*)GetProcAddress(h_dxgi, "CreateDXGIFactory1");
     decltype(D3D12CreateDevice)* pfn_D3D12CreateDevice = (decltype(D3D12CreateDevice)*)GetProcAddress(h_d3d12, "D3D12CreateDevice");
     decltype(Direct3DCreate9On12)* pfn_Direct3DCreate9On12 = (decltype(Direct3DCreate9On12)*)GetProcAddress(h_d3d9, "Direct3DCreate9On12");
@@ -25,6 +33,7 @@ HRESULT rasterizer_dx9_create_through_d3d9on12(IDirect3D9Ex** d3d, bool use_warp
         || pfn_D3D12CreateDevice == NULL
         || pfn_Direct3DCreate9On12 == NULL)
     {
+        LOG_CRITICAL_GAME("Unable to resolve d3d12, dxgi or d3d9 function pointers!");
         return E_FAIL;
     }
 
