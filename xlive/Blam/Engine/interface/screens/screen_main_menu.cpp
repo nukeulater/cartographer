@@ -394,7 +394,7 @@ bool __cdecl screen_show_campaign_options_without_achievement(e_controller_index
 	//return INVOKE(0x213673, 0x0, screen_show_campaign_options_without_achievement, controller_index);
 
 	s_screen_parameters params;
-	params.m_flags = 0;
+	params.m_flags = 0xFF;
 	params.m_window_index = _window_4;
 	params.m_context = 0;
 	params.user_flags = user_interface_controller_get_signed_in_controllers_mask(); //replacing 0xFF with active_controllers so that controller-removed-handler stops panicking here
