@@ -523,7 +523,7 @@ bool __cdecl rasterizer_dx9_device_initialize(s_rasterizer_parameters* parameter
             }
             else
             {
-                fs_disp_mode.Size = 24;
+                fs_disp_mode.Size = sizeof(D3DDISPLAYMODEEX);
                 fs_disp_mode.Width = d3d_present_parameters.BackBufferWidth;
                 fs_disp_mode.Height = d3d_present_parameters.BackBufferHeight;
                 fs_disp_mode.RefreshRate = d3d_present_parameters.FullScreen_RefreshRateInHz;
@@ -566,7 +566,7 @@ bool __cdecl rasterizer_dx9_device_initialize(s_rasterizer_parameters* parameter
 
         if (rasterizer_globals->use_d3d9_ex)
         {
-            fs_disp_mode.Size = 24;
+            fs_disp_mode.Size = sizeof(D3DDISPLAYMODEEX);
             fs_disp_mode.Width = d3d_present_parameters.BackBufferWidth;
             fs_disp_mode.Height = d3d_present_parameters.BackBufferHeight;
             fs_disp_mode.RefreshRate = d3d_present_parameters.FullScreen_RefreshRateInHz;
