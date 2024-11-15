@@ -337,7 +337,16 @@ void __cdecl render_window(window_bound* window, bool is_texture_camera)
         g_render_current_controller_index = controller_index;
         g_render_current_user_index = window->user_index;
 
-        memcpy(&g_user_window_bounds[window->user_index], window, sizeof(window_bound));
+        // if user_index is NONE, likely we're in a cutscene
+        if (window->user_index != NONE)
+        {
+			csmemcpy(&g_user_window_bounds[window->user_index], window, sizeof(window_bound));
+        }
+        else
+        {
+            csmemset(&g_user_window_bounds[0], 0, sizeof(g_user_window_bounds));
+            csmemcpy(&g_user_window_bounds[0], window, sizeof(window_bound));
+        }
 
         render_view(
             &frustum_bounds,
