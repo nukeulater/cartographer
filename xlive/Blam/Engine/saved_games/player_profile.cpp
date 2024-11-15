@@ -59,7 +59,7 @@ bool saved_game_player_profile_read_file(uint32 enumerated_file_index, s_saved_g
 
 	int8 buffer[sizeof(s_saved_game_player_profile)];
 
-	bool result = saved_games_async_helper_read_file(enumerated_file_index, buffer,sizeof(s_saved_game_player_profile));
+	bool result = saved_games_async_helper_read_file(enumerated_file_index, buffer, sizeof(s_saved_game_player_profile));
 
 	if (result)
 		csmemcpy(profile, buffer, sizeof(s_saved_game_player_profile));

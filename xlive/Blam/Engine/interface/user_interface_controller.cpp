@@ -93,7 +93,6 @@ void __cdecl user_interface_controller_update_disconnect()
 
 			g_user_interface_controller_globals->controller_detached[controller] = result;
 
-
 			controller_data.m_flags.set(_controller_state_is_attached_bit, false);
 			controller_data.m_flags.set(_controller_state_bit1, false);
 			controller_data.m_flags.set(_controller_state_bit2, false);

@@ -629,11 +629,14 @@ bool __cdecl rasterizer_dx9_device_initialize(s_rasterizer_parameters* parameter
             xlive_init_info.cbSize = 28;
             xlive_init_info.pD3D = rasterizer_dx9_main_globals->global_d3d_device;
             xlive_init_info.pD3DPP = &d3d_present_parameters;
-            memset(&xlive_init_info.langID, 0, 12);
+            xlive_init_info.langID = 0;
+            xlive_init_info.wLivePortOverride = 0;
             xlive_init_info.dwFlags = 0;
+            xlive_init_info.pszAdapterName = NULL;
+
             if (network_adapter_index != NONE)
             {
-                xlive_init_info.dwFlags = 1;
+                xlive_init_info.dwFlags = 1 << 0;
                 xlive_init_info.pszAdapterName = (PCHAR)network_adapter_name_get(network_adapter_index);
             }
 

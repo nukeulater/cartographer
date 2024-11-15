@@ -43,7 +43,7 @@ void c_player_profile_list::update_displayed_profiles()
 
 	c_list_item_widget* current_child = (c_list_item_widget*)this->m_child_widget;
 
-	memset(profile_indices, NONE, sizeof(uint32) * 16);
+	memset(profile_indices, NONE, sizeof(profile_indices));
 	for (int32 current_child_widget_index = 0; current_child_widget_index < 16; ++current_child_widget_index)
 	{
 		if (current_child->get_last_data_index() != NONE)
