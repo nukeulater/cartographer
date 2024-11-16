@@ -5,8 +5,20 @@
 
 /* macro defines*/
 
+#define THUMBSTICK_PERCENTAGE_TO_POINT(_percentage) \
+	((real32)INT16_MAX * ((_percentage) / 100.f))
+
+#define THUMBSTICK_POINT_TO_PERCENTAGE(_point) \
+	(((real32)_point / (real32)INT16_MAX) * 100.f)
+
 #define k_maximum_number_of_game_function_binds 8
 #define k_last_used_device_was_gamepad 1
+
+#define k_default_right_thumbstick_deadzone_axial_percentage_x THUMBSTICK_POINT_TO_PERCENTAGE(XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE)
+#define k_default_right_thumbstick_deadzone_axial_percentage_y THUMBSTICK_POINT_TO_PERCENTAGE(XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE)
+
+// set this to a default of 8
+#define k_default_right_thumbstick_deadzone_radial_percentage THUMBSTICK_POINT_TO_PERCENTAGE(THUMBSTICK_PERCENTAGE_TO_POINT(8))
 
 /* enums */
 
@@ -219,7 +231,7 @@ void __cdecl input_abstraction_get_player_look_angular_velocity(e_controller_ind
 void __cdecl input_abstraction_get_player_look_angular_velocity_for_mouse(e_controller_index controller_index, real_euler_angles2d* angular_velocity);
 void input_abstraction_set_mouse_look_sensitivity(e_controller_index controller, real32 value);
 void input_abstraction_set_controller_look_sensitivity(e_controller_index controller, real32 value);
-void input_abstraction_set_controller_thumb_deadzone(e_controller_index controller);
+void input_abstraction_set_controller_right_thumb_deadzone(e_controller_index controller);
 bool __cdecl input_abstraction_controller_button_test(e_controller_index controller_index, e_button_functions button_index);
 e_button_functions __cdecl input_abstraction_get_primary_fire_button(datum unit);
 e_button_functions __cdecl input_abstraction_get_secondary_fire_button(datum unit);

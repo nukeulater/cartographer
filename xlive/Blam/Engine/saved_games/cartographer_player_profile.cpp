@@ -156,7 +156,7 @@ void cartographer_player_profile_sign_in(e_controller_index controller_index, ui
 	}
 
 	input_abstraction_set_controller_look_sensitivity(controller_index, current_profile->controller_sensitivity);
-	input_abstraction_set_controller_thumb_deadzone(controller_index);
+	input_abstraction_set_controller_right_thumb_deadzone(controller_index);
 	return;
 }
 
@@ -205,10 +205,11 @@ void cartographer_player_profile_new(s_saved_game_cartographer_player_profile_v2
 	settings->raw_mouse_input = false;
 	settings->controller_sensitivity = 0.f;
 	settings->controller_modern = false;
-	settings->controller_deadzone_type = 0;
-	settings->deadzone_axial.x = 26.f;
-	settings->deadzone_axial.y = 26.f;
-	settings->deadzone_radial = 1.f;
+	settings->controller_deadzone_type = _controller_deadzone_type_axial;
+	settings->deadzone_axial.x = k_default_right_thumbstick_deadzone_axial_percentage_x;
+	settings->deadzone_axial.y = k_default_right_thumbstick_deadzone_axial_percentage_y;
+	// set this default to 8 percent
+	settings->deadzone_radial = k_default_right_thumbstick_deadzone_radial_percentage;
 	settings->crosshair_offset = 0.138f;
 	settings->crosshair_scale = 1.f;
 	return;

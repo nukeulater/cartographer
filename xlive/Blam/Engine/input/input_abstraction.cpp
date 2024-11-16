@@ -102,24 +102,21 @@ uint32 input_abstraction_get_stick_type_for_function(e_button_functions function
 }
 
 
-void input_abstraction_update_default_throttle(point2d* thumb, real_euler_angles2d* stick)
+void input_abstraction_update_default_throttle(point2d* thumb, real_euler_angles2d* out_stick_euler_angles)
 {
-	constexpr real32 scale = 1.0f / INT16_MAX;
+	constexpr real32 normalize_scale = 1.0f / INT16_MAX;
 
-	real32 pointy = (real32)thumb->y;
-	real32 pointx = (real32)thumb->x;
-	real_angle angle = atan2(pointy, pointx);
+	real_point2d thumbstick_points = { thumb->x, thumb->y };
+	real_angle angle = atan2(thumbstick_points.y, thumbstick_points.x);
 
 	real32 magnitude = MAX(fabs(sin(angle)), fabs(cos(angle)));
 	real32 inverse_magnitude = 1.0f / magnitude;
 
-	real32 normalized_yaw = (real32)(pointx * inverse_magnitude) * scale;
-	real32 normalized_pitch = (real32)(pointy * inverse_magnitude) * scale;
+	out_stick_euler_angles->yaw = (real32)(thumbstick_points.x * inverse_magnitude) * normalize_scale;
+	out_stick_euler_angles->pitch = (real32)(thumbstick_points.y * inverse_magnitude) * normalize_scale;
 
-
-	stick->yaw = PIN(normalized_yaw, -1.0f, 1.0f);
-	stick->pitch = PIN(normalized_pitch, -1.0f, 1.0f);
-
+	out_stick_euler_angles->yaw = PIN(out_stick_euler_angles->yaw, -1.0f, 1.0f);
+	out_stick_euler_angles->pitch = PIN(out_stick_euler_angles->pitch, -1.0f, 1.0f);
 }
 void input_abstraction_post_update_throttle(real_euler_angles2d* stick, real_angle angle, bool right_stick)
 {
@@ -141,8 +138,7 @@ void input_abstraction_post_update_throttle(real_euler_angles2d* stick, real_ang
 
 	if (delta >= min_delta)
 	{
-
-		float sign = 0.0f;
+		real32 sign = 0.0f;
 		if (fabs(stick->yaw) <= fabs(stick->pitch))
 		{
 			sign = (stick->pitch >= 0.0f) ? 1.0f : -1.0f;
@@ -160,17 +156,17 @@ void input_abstraction_post_update_throttle(real_euler_angles2d* stick, real_ang
 	}
 	else
 	{
-		constexpr real32 scale = 1.0f / DEGREES_TO_RADIANS(35.0f);
+		constexpr real32 normalize_scale = 1.0f / DEGREES_TO_RADIANS(35.0f);
 
 		real_angle angle_abs = fabs(angle);
-		float sign = 0.f;
+		real32 sign = 0.f;
 		if (angle_abs < DEGREES_TO_RADIANS(45.0f) || (angle_abs > DEGREES_TO_RADIANS(135.0f)))
 		{
 			sign = (stick->yaw >= 0.0f) ? 1.0f : -1.0f;
 			stick->yaw = sign * magnitude;
 
 			sign = (stick->pitch >= 0.0f) ? 1.0f : -1.0f;
-			stick->pitch = (1.0f - (delta * scale)) * sign * magnitude;
+			stick->pitch = (1.0f - (delta * normalize_scale)) * sign * magnitude;
 		}
 		else
 		{
@@ -178,7 +174,7 @@ void input_abstraction_post_update_throttle(real_euler_angles2d* stick, real_ang
 			stick->pitch = sign * magnitude;
 
 			sign = (stick->yaw >= 0.0f) ? 1.0f : -1.0f;
-			stick->yaw = (1.0f - (delta * scale)) * sign * magnitude;
+			stick->yaw = (1.0f - (delta * normalize_scale)) * sign * magnitude;
 		}
 	}
 }
@@ -192,7 +188,6 @@ void input_abstraction_post_update_all_throttles(real_euler_angles2d* left_stick
 	uint32 extended_yaw_left_stick_type = input_abstraction_get_stick_type_for_function(_extended_button_gamepad_yaw_left);
 	uint32 strafe_left_stick_type = input_abstraction_get_stick_type_for_function(_button_strafe_left);
 	uint32 extended_pitch_fwd_stick_type = input_abstraction_get_stick_type_for_function(_extended_button_gamepad_pitch_forward);
-
 
 	if (move_fwd_stick_type == extended_yaw_left_stick_type && move_fwd_stick_type != NONE)
 	{
@@ -223,7 +218,6 @@ void input_abstraction_post_update_all_throttles(real_euler_angles2d* left_stick
 
 		left_stick->yaw = PIN(left_stick->yaw, -1.0f, 1.0f);
 		left_stick->pitch = PIN(left_stick->pitch, -1.0f, 1.0f);
-
 	}
 
 	if (adjust_right_stick)
@@ -245,12 +239,12 @@ void input_abstraction_update_throttles_legacy(s_gamepad_input_button_state* gam
 
 void input_abstraction_update_throttles_modern(s_gamepad_input_button_state* gamepad_state, real_euler_angles2d* left_stick, real_euler_angles2d* right_stick)
 {
-	constexpr real32 scale = 1.0f / INT16_MAX;
+	constexpr real32 normalize_scale = 1.0f / INT16_MAX;
 
-	left_stick->yaw = gamepad_state->thumb_left.x * scale;
-	left_stick->pitch = gamepad_state->thumb_left.y * scale;
-	right_stick->yaw = gamepad_state->thumb_right.x * scale;
-	right_stick->pitch = gamepad_state->thumb_right.y * scale;
+	left_stick->yaw = gamepad_state->thumb_left.x * normalize_scale;
+	left_stick->pitch = gamepad_state->thumb_left.y * normalize_scale;
+	right_stick->yaw = gamepad_state->thumb_right.x * normalize_scale;
+	right_stick->pitch = gamepad_state->thumb_right.y * normalize_scale;
 
 	left_stick->yaw = PIN(left_stick->yaw, -1.0f, 1.0f);
 	left_stick->pitch = PIN(left_stick->pitch, -1.0f, 1.0f);
@@ -259,7 +253,7 @@ void input_abstraction_update_throttles_modern(s_gamepad_input_button_state* gam
 	right_stick->pitch = PIN(right_stick->pitch, -1.0f, 1.0f);
 }
 
-void input_abstraction_set_controller_thumb_deadzone(e_controller_index controller)
+void input_abstraction_set_controller_right_thumb_deadzone(e_controller_index controller)
 {
 	s_gamepad_input_preferences* preference = &input_abstraction_globals->preferences[controller];
 	s_saved_game_cartographer_player_profile* profile_settings = cartographer_player_profile_get_by_controller_index(controller);
@@ -267,9 +261,8 @@ void input_abstraction_set_controller_thumb_deadzone(e_controller_index controll
 	if (profile_settings->controller_deadzone_type == _controller_deadzone_type_axial 
 		|| profile_settings->controller_deadzone_type == _controller_deadzone_type_combined) 
 	{
-		preference->gamepad_axial_deadzone_right.x = (real32)INT16_MAX * (profile_settings->deadzone_axial.x / 100);
-		preference->gamepad_axial_deadzone_right.y = (real32)INT16_MAX * (profile_settings->deadzone_axial.y / 100);
-
+		preference->gamepad_axial_deadzone_right.x = THUMBSTICK_PERCENTAGE_TO_POINT(profile_settings->deadzone_axial.x);
+		preference->gamepad_axial_deadzone_right.y = THUMBSTICK_PERCENTAGE_TO_POINT(profile_settings->deadzone_axial.y);
 	}
 	else
 	{
@@ -280,7 +273,7 @@ void input_abstraction_set_controller_thumb_deadzone(e_controller_index controll
 	if (profile_settings->controller_deadzone_type == _controller_deadzone_type_radial 
 		|| profile_settings->controller_deadzone_type == _controller_deadzone_type_combined)
 	{
-		g_controller_radial_deadzones[controller] = (real32)INT16_MAX * (profile_settings->deadzone_radial / 100);
+		g_controller_radial_deadzones[controller] = THUMBSTICK_PERCENTAGE_TO_POINT(profile_settings->deadzone_radial);
 	}
 	else
 	{

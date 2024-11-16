@@ -225,9 +225,9 @@ void __cdecl input_update_main_device_state()
 
 		uint32 device_flags = 0;
 		if (gamepad->m_device_just_left)
-			device_flags |= 0x0001u;
+			SET_FLAG(device_flags, 0, true);
 		if (gamepad->m_device_just_joined)
-			device_flags |= 0x2000u;
+			SET_FLAG(device_flags, 13, true);
 
 		input_abstraction_handle_device_change(device_flags);
 		device_index++;

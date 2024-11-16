@@ -24,7 +24,7 @@ uint16 g_controller_radial_deadzones[k_number_of_controllers]{};
 
 bool g_controller_home_button_state[k_number_of_controllers] = { false, false, false, false };
 
-uint32 XINPUT_BUTTON_FLAGS[k_number_of_xinput_buttons] =
+const uint32 XINPUT_BUTTON_FLAGS[k_number_of_xinput_buttons] =
 {
 	XINPUT_GAMEPAD_DPAD_UP,
 	XINPUT_GAMEPAD_DPAD_DOWN,
