@@ -1,9 +1,13 @@
 #include "stdafx.h"
+
 #include "input_abstraction.h"
+
 #include "game/game_time.h"
+#include "game/players.h"
+#include "saved_games/cartographer_player_profile.h"
+
 #include "H2MOD/GUI/imgui_integration/imgui_handler.h"
 #include "H2MOD/Modules/Shell/Config.h"
-#include "saved_games/cartographer_player_profile.h"
 
 /* globals */
 
@@ -15,7 +19,7 @@ s_game_abstracted_input_state g_abstract_input_states[k_number_of_controllers];
 DIMOUSESTATE2 old_mouse_state;
 uint16 old_mouse_buttons[8];
 s_keyboard_input_state old_keyboard_state;
-uint16 updating_gamepad_index = _controller_index_0;
+e_controller_index updating_gamepad_index = _controller_index_0;
 
 /* public code */
 
@@ -260,9 +264,11 @@ void input_abstraction_set_controller_thumb_deadzone(e_controller_index controll
 	s_gamepad_input_preferences* preference = &input_abstraction_globals->preferences[controller];
 	s_saved_game_cartographer_player_profile* profile_settings = cartographer_player_profile_get_by_controller_index(controller);
 
-	if (profile_settings->controller_deadzone_type == _controller_deadzone_type_axial || profile_settings->controller_deadzone_type == _controller_deadzone_type_combined) {
-		preference->gamepad_axial_deadzone_right.x = (uint16)((real32)INT16_MAX * (profile_settings->deadzone_axial.x / 100));
-		preference->gamepad_axial_deadzone_right.y = (uint16)((real32)INT16_MAX * (profile_settings->deadzone_axial.y / 100));
+	if (profile_settings->controller_deadzone_type == _controller_deadzone_type_axial 
+		|| profile_settings->controller_deadzone_type == _controller_deadzone_type_combined) 
+	{
+		preference->gamepad_axial_deadzone_right.x = (real32)INT16_MAX * (profile_settings->deadzone_axial.x / 100);
+		preference->gamepad_axial_deadzone_right.y = (real32)INT16_MAX * (profile_settings->deadzone_axial.y / 100);
 
 	}
 	else
@@ -270,9 +276,11 @@ void input_abstraction_set_controller_thumb_deadzone(e_controller_index controll
 		preference->gamepad_axial_deadzone_right.x = 0;
 		preference->gamepad_axial_deadzone_right.y = 0;
 	}
-	if (profile_settings->controller_deadzone_type == _controller_deadzone_type_radial || profile_settings->controller_deadzone_type == _controller_deadzone_type_combined)
+
+	if (profile_settings->controller_deadzone_type == _controller_deadzone_type_radial 
+		|| profile_settings->controller_deadzone_type == _controller_deadzone_type_combined)
 	{
-		g_controller_radial_deadzones[controller] = (uint16)((real32)INT16_MAX * (profile_settings->deadzone_radial / 100));
+		g_controller_radial_deadzones[controller] = (real32)INT16_MAX * (profile_settings->deadzone_radial / 100);
 	}
 	else
 	{
@@ -417,7 +425,7 @@ void input_abstraction_restore_abstracted_inputs(e_controller_index controller)
 		sizeof(s_game_abstracted_input_state));
 }
 
-bool g_controller_advanced_settings_toggle[4] {false, false, false, false};
+bool g_controller_advanced_settings_toggle[k_number_of_users] {};
 
 void __cdecl input_abstraction_update()
 {
@@ -537,7 +545,7 @@ void __cdecl input_abstraction_update()
 	input_abstraction_restore_windows_inputs();
 }
 
-void __cdecl input_abstraction_update_input_state(int controller_index, s_gamepad_input_preferences* preference, s_gamepad_input_button_state* gamepad_state, real_euler_angles2d* left_stick_analog, real_euler_angles2d* right_stick_analog, s_game_input_state* input_state)
+void __cdecl input_abstraction_update_input_state(e_controller_index controller_index, s_gamepad_input_preferences* preference, s_gamepad_input_button_state* gamepad_state, real_euler_angles2d* left_stick_analog, real_euler_angles2d* right_stick_analog, s_game_input_state* input_state)
 {
 	updating_gamepad_index = controller_index;
 
@@ -557,5 +565,4 @@ void input_abstraction_patches_apply()
 
 	PatchCall(Memory::GetAddress(0x39B82), input_abstraction_update);
 	PatchCall(Memory::GetAddress(0x61FBD), input_abstraction_controller_plugged_hook); //inside input_abstraction_update_input_state
-	input_abstraction_set_controller_thumb_deadzone(_controller_index_0);
 }

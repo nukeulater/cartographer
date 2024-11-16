@@ -224,7 +224,7 @@ bool __cdecl input_abstraction_controller_button_test(e_controller_index control
 e_button_functions __cdecl input_abstraction_get_primary_fire_button(datum unit);
 e_button_functions __cdecl input_abstraction_get_secondary_fire_button(datum unit);
 void __cdecl input_abstraction_update();
-void __cdecl input_abstraction_update_input_state(int controller_index, s_gamepad_input_preferences* preference, s_gamepad_input_button_state* gamepad_state, real_euler_angles2d* left_stick_analog, real_euler_angles2d* right_stick_analog, s_game_input_state* input_state);
+void __cdecl input_abstraction_update_input_state(e_controller_index controller_index, s_gamepad_input_preferences* preference, s_gamepad_input_button_state* gamepad_state, real_euler_angles2d* left_stick_analog, real_euler_angles2d* right_stick_analog, s_game_input_state* input_state);
 uint32 s_input_abstraction_globals_sub_45E501(e_button_functions button, void* a3);
 bool __cdecl input_abstraction_preferences_new(s_gamepad_input_preferences* preferences, int16 a2, bool a3, bool a4);
 int32 __cdecl input_abstraction_get_last_used_device(e_controller_index controller);

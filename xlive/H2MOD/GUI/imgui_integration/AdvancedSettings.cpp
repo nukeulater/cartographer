@@ -508,7 +508,7 @@ namespace ImGuiHandler {
 						ImGui::SliderFloat("##C_Deadzone_A_X_1", &current_cartographer_profile->deadzone_axial.x, 0, 100, "");
 						if (ImGui::IsItemEdited())
 						{
-							input_abstraction_set_controller_thumb_deadzone(_controller_index_0);
+							input_abstraction_set_controller_thumb_deadzone(current_controller_index);
 						}
 						ImGui::SameLine();
 						ImGui::PushItemWidth(WidthPercentage(13));
