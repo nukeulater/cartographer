@@ -153,10 +153,8 @@ struct s_gamepad_input_preferences
 	bool invert_dual_wield;
 	uint8 gap_1671[3];
 	real32 mouse_acceleration;
-	int16 gamepad_axial_deadzone_left_x;
-	int16 gamepad_axial_deadzone_left_y;
-	int16 gamepad_axial_deadzone_right_x;
-	int16 gamepad_axial_deadzone_right_y;
+	point2d gamepad_axial_deadzone_left;
+	point2d gamepad_axial_deadzone_right;
 };
 ASSERT_STRUCT_SIZE(s_gamepad_input_preferences, 0x1680);
 

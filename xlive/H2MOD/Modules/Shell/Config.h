@@ -18,12 +18,6 @@ struct _H2Config_language {
 	int code_variant;
 };
 
-enum H2Config_Deadzone_Type : byte {
-	Axial,
-	Radial,
-	Both
-};
-
 enum e_override_texture_resolution : int
 {
 	tex_low,

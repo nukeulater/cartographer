@@ -74,9 +74,9 @@ namespace ImGuiHandler {
 
 				draw_list->AddRectFilled(ImVec2(Center.x - 100, Center.y - 100), ImVec2(Center.x + 100, Center.y + 100), ImColor(20, 20, 20));
 				draw_list->AddCircleFilled(Center, 100, ImColor(255, 255, 255), 120);
-				if (current_cartographer_profile->controller_deadzone_type == Axial || current_cartographer_profile->controller_deadzone_type == Both) {
-					int X_Axis = (int)(100 * (current_cartographer_profile->deadzone_axial_x / 100));
-					int Y_Axis = (int)(100 * (current_cartographer_profile->deadzone_axial_y / 100));
+				if (current_cartographer_profile->controller_deadzone_type == _controller_deadzone_type_axial || current_cartographer_profile->controller_deadzone_type == _controller_deadzone_type_combined) {
+					int X_Axis = (int)(100 * (current_cartographer_profile->deadzone_axial.x / 100));
+					int Y_Axis = (int)(100 * (current_cartographer_profile->deadzone_axial.y / 100));
 					ImVec2 Y_TopLeft(
 						Center.x - 100,
 						Center.y - Y_Axis);
@@ -88,7 +88,7 @@ namespace ImGuiHandler {
 					ImVec2 X_BottomRight(Center.x + X_Axis, Center.y + 100);
 					draw_list->AddRectFilled(X_TopLeft, X_BottomRight, ImColor(20, 20, 20, 125));
 				}
-				if (current_cartographer_profile->controller_deadzone_type == Radial || current_cartographer_profile->controller_deadzone_type == Both) {
+				if (current_cartographer_profile->controller_deadzone_type == _controller_deadzone_type_radial || current_cartographer_profile->controller_deadzone_type == _controller_deadzone_type_combined) {
 					draw_list->AddCircleFilled(Center, current_cartographer_profile->deadzone_radial, ImColor(20, 20, 20, 125), 120);
 				}
 
@@ -99,9 +99,9 @@ namespace ImGuiHandler {
 						Center.x + (100 * (state->thumb_right.x / (float)MAXSHORT)),
 						Center.y - (100 * (state->thumb_right.y / (float)MAXSHORT)));
 					int axial_invalid = 0;
-					if (abs(state->thumb_right.x) <= ((float)MAXSHORT * (current_cartographer_profile->deadzone_axial_x / 100)))
+					if (abs(state->thumb_right.x) <= ((float)MAXSHORT * (current_cartographer_profile->deadzone_axial.x / 100)))
 						axial_invalid++;
-					if (abs(state->thumb_right.y) <= ((float)MAXSHORT * (current_cartographer_profile->deadzone_axial_y / 100)))
+					if (abs(state->thumb_right.y) <= ((float)MAXSHORT * (current_cartographer_profile->deadzone_axial.y / 100)))
 						axial_invalid++;
 					bool radial_invalid = false;
 					unsigned int ar = pow((short)((float)MAXSHORT * (current_cartographer_profile->deadzone_radial / 100)), 2);
@@ -113,10 +113,10 @@ namespace ImGuiHandler {
 						radial_invalid = true;
 					}
 					bool valid = true;
-					if (current_cartographer_profile->controller_deadzone_type == Axial || current_cartographer_profile->controller_deadzone_type == Both)
+					if (current_cartographer_profile->controller_deadzone_type == _controller_deadzone_type_axial || current_cartographer_profile->controller_deadzone_type == _controller_deadzone_type_combined)
 						if (axial_invalid == 2)
 							valid = false;
-					if (current_cartographer_profile->controller_deadzone_type == Radial || current_cartographer_profile->controller_deadzone_type == Both)
+					if (current_cartographer_profile->controller_deadzone_type == _controller_deadzone_type_radial || current_cartographer_profile->controller_deadzone_type == _controller_deadzone_type_combined)
 						if (radial_invalid)
 							valid = false;
 
@@ -492,7 +492,7 @@ namespace ImGuiHandler {
 					ImGui::PushItemWidth(ImGui::GetColumnWidth());
 					if (ImGui::Combo("##C_Deadzone_Type", &g_deadzone, items, 3))
 					{
-						current_cartographer_profile->controller_deadzone_type = (H2Config_Deadzone_Type)(byte)g_deadzone;
+						current_cartographer_profile->controller_deadzone_type = g_deadzone;
 						input_abstraction_set_controller_thumb_deadzone(current_controller_index);
 					}
 					if (ImGui::IsItemHovered())
@@ -502,61 +502,61 @@ namespace ImGuiHandler {
 					ImGui::PopItemWidth();
 					ImGui::Columns(1);
 
-					if (current_cartographer_profile->controller_deadzone_type == Axial || current_cartographer_profile->controller_deadzone_type == Both) {
+					if (current_cartographer_profile->controller_deadzone_type == _controller_deadzone_type_axial || current_cartographer_profile->controller_deadzone_type == _controller_deadzone_type_combined) {
 						ImGui::Text(advanced_settings_get_string(_advanced_string_axial_deadzone_X));
 						ImGui::PushItemWidth(WidthPercentage(75));
-						ImGui::SliderFloat("##C_Deadzone_A_X_1", &current_cartographer_profile->deadzone_axial_x, 0, 100, "");
+						ImGui::SliderFloat("##C_Deadzone_A_X_1", &current_cartographer_profile->deadzone_axial.x, 0, 100, "");
 						if (ImGui::IsItemEdited())
 						{
 							input_abstraction_set_controller_thumb_deadzone(_controller_index_0);
 						}
 						ImGui::SameLine();
 						ImGui::PushItemWidth(WidthPercentage(13));
-						ImGui::InputFloat("##C_Deadzone_A_X_2", &current_cartographer_profile->deadzone_axial_x, 0, 3);
+						ImGui::InputFloat("##C_Deadzone_A_X_2", &current_cartographer_profile->deadzone_axial.x, 0, 3);
 						if (ImGui::IsItemEdited())
 						{
-							if (current_cartographer_profile->deadzone_axial_x < 0)
-								current_cartographer_profile->deadzone_axial_x = 0;
-							if (current_cartographer_profile->deadzone_axial_x > 100)
-								current_cartographer_profile->deadzone_axial_x = 100;
+							if (current_cartographer_profile->deadzone_axial.x < 0)
+								current_cartographer_profile->deadzone_axial.x = 0;
+							if (current_cartographer_profile->deadzone_axial.x > 100)
+								current_cartographer_profile->deadzone_axial.x = 100;
 							input_abstraction_set_controller_thumb_deadzone(current_controller_index);
 						}
 						ImGui::SameLine();
 						ImGui::PushItemWidth(WidthPercentage(15));
 						if (ImGui::Button(advanced_settings_get_string(_advanced_string_default, "C_Deadzone_A_X_3"), ImVec2(WidthPercentage(12), item_size.y)))
 						{
-							current_cartographer_profile->deadzone_axial_x = (8689.0f / (float)MAXSHORT) * 100;
+							current_cartographer_profile->deadzone_axial.x = (8689.0f / (float)MAXSHORT) * 100;
 							input_abstraction_set_controller_thumb_deadzone(current_controller_index);
 						}
 						ImGui::PopItemWidth();
 						ImGui::Text(advanced_settings_get_string(_advanced_string_axial_deadzone_Y));
 						ImGui::PushItemWidth(WidthPercentage(75));
-						ImGui::SliderFloat("##C_Deadzone_A_Y_1", &current_cartographer_profile->deadzone_axial_y, 0, 100, "");
+						ImGui::SliderFloat("##C_Deadzone_A_Y_1", &current_cartographer_profile->deadzone_axial.y, 0, 100, "");
 						if (ImGui::IsItemEdited())
 						{
 							input_abstraction_set_controller_thumb_deadzone(current_controller_index);
 						}
 						ImGui::SameLine();
 						ImGui::PushItemWidth(WidthPercentage(13));
-						ImGui::InputFloat("##C_Deadzone_A_Y_2", &current_cartographer_profile->deadzone_axial_y, 0, 3);
+						ImGui::InputFloat("##C_Deadzone_A_Y_2", &current_cartographer_profile->deadzone_axial.y, 0, 3);
 						if (ImGui::IsItemEdited())
 						{
-							if (current_cartographer_profile->deadzone_axial_y < 0)
-								current_cartographer_profile->deadzone_axial_y = 0;
-							if (current_cartographer_profile->deadzone_axial_y > 100)
-								current_cartographer_profile->deadzone_axial_y = 100;
+							if (current_cartographer_profile->deadzone_axial.y < 0)
+								current_cartographer_profile->deadzone_axial.y = 0;
+							if (current_cartographer_profile->deadzone_axial.y > 100)
+								current_cartographer_profile->deadzone_axial.y = 100;
 							input_abstraction_set_controller_thumb_deadzone(current_controller_index);
 						}
 						ImGui::SameLine();
 						ImGui::PushItemWidth(WidthPercentage(12));
 						if (ImGui::Button(advanced_settings_get_string(_advanced_string_default, "C_Deadzone_A_Y_3"), ImVec2(WidthPercentage(12), item_size.y)))
 						{
-							current_cartographer_profile->deadzone_axial_y = (8689.0f / (float)MAXSHORT) * 100;
+							current_cartographer_profile->deadzone_axial.y = (8689.0f / (float)MAXSHORT) * 100;
 							input_abstraction_set_controller_thumb_deadzone(current_controller_index);
 						}
 						ImGui::PopItemWidth();
 					}
-					if (current_cartographer_profile->controller_deadzone_type == Radial || current_cartographer_profile->controller_deadzone_type == Both) {
+					if (current_cartographer_profile->controller_deadzone_type == _controller_deadzone_type_radial || current_cartographer_profile->controller_deadzone_type == _controller_deadzone_type_combined) {
 						ImGui::Text(advanced_settings_get_string(_advanced_string_radial_deadzone_radius));
 						ImGui::PushItemWidth(WidthPercentage(75));
 						ImGui::SliderFloat("##C_Deadzone_R_1", &current_cartographer_profile->deadzone_radial, 0, 100, "");

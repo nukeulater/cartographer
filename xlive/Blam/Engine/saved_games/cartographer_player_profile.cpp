@@ -57,7 +57,6 @@ void cartographer_player_profile_initialize(void)
 
 bool cartographer_player_profile_is_signed_in(e_controller_index controller_index)
 {
-
 	if (controller_index == k_no_controller)
 		return false;
 
@@ -207,8 +206,8 @@ void cartographer_player_profile_new(s_saved_game_cartographer_player_profile_v2
 	settings->controller_sensitivity = 0.f;
 	settings->controller_modern = false;
 	settings->controller_deadzone_type = 0;
-	settings->deadzone_axial_x = 26.f;
-	settings->deadzone_axial_y = 26.f;
+	settings->deadzone_axial.x = 26.f;
+	settings->deadzone_axial.y = 26.f;
 	settings->deadzone_radial = 1.f;
 	settings->crosshair_offset = 0.138f;
 	settings->crosshair_scale = 1.f;

@@ -13,6 +13,13 @@ enum e_saved_game_cartographer_player_profile_version : uint32
 	k_saved_game_cartographer_player_profile_version_invalid = 0
 };
 
+enum e_cartographer_controller_deadzone_type : uint8 
+{
+	_controller_deadzone_type_axial,
+	_controller_deadzone_type_radial,
+	_controller_deadzone_type_combined
+};
+
 /* structures */
 
 // THIS SHOULD NEVER CHANGE
@@ -47,8 +54,7 @@ struct s_saved_game_cartographer_player_profile_v2
 	int8 controller_deadzone_type;
 	uint8 pad_2[2];
 	ControllerInput::CustomControllerLayout custom_layout;
-	real32 deadzone_axial_x;
-	real32 deadzone_axial_y;
+	real_point2d deadzone_axial;
 	real32 deadzone_radial;
 	real32 crosshair_offset;
 	real32 crosshair_scale;

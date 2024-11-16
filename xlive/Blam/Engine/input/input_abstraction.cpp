@@ -8,7 +8,7 @@
 /* globals */
 
 s_input_abstraction_globals* input_abstraction_globals;
-extern uint16 radialDeadzone[k_number_of_controllers];
+extern uint16 g_controller_radial_deadzones[k_number_of_controllers];
 //we need this because theres only a single abstracted_inputs inside input_abstraction_globals for h2v
 s_game_abstracted_input_state g_abstract_input_states[k_number_of_controllers];
 //buffers to store old windows input states
@@ -260,27 +260,29 @@ void input_abstraction_set_controller_thumb_deadzone(e_controller_index controll
 	s_gamepad_input_preferences* preference = &input_abstraction_globals->preferences[controller];
 	s_saved_game_cartographer_player_profile* profile_settings = cartographer_player_profile_get_by_controller_index(controller);
 
-	if (profile_settings->controller_deadzone_type == Axial || profile_settings->controller_deadzone_type == Both) {
-		preference->gamepad_axial_deadzone_right_x = (uint16)((real32)INT16_MAX * (profile_settings->deadzone_axial_x / 100));
-		preference->gamepad_axial_deadzone_right_y = (uint16)((real32)INT16_MAX * (profile_settings->deadzone_axial_y / 100));
+	if (profile_settings->controller_deadzone_type == _controller_deadzone_type_axial || profile_settings->controller_deadzone_type == _controller_deadzone_type_combined) {
+		preference->gamepad_axial_deadzone_right.x = (uint16)((real32)INT16_MAX * (profile_settings->deadzone_axial.x / 100));
+		preference->gamepad_axial_deadzone_right.y = (uint16)((real32)INT16_MAX * (profile_settings->deadzone_axial.y / 100));
 
 	}
 	else
 	{
-		preference->gamepad_axial_deadzone_right_x = 0;
-		preference->gamepad_axial_deadzone_right_y = 0;
+		preference->gamepad_axial_deadzone_right.x = 0;
+		preference->gamepad_axial_deadzone_right.y = 0;
 	}
-	if (profile_settings->controller_deadzone_type == Radial || profile_settings->controller_deadzone_type == Both)
+	if (profile_settings->controller_deadzone_type == _controller_deadzone_type_radial || profile_settings->controller_deadzone_type == _controller_deadzone_type_combined)
 	{
-		radialDeadzone[controller] = (uint16)((real32)INT16_MAX * (profile_settings->deadzone_radial / 100));
+		g_controller_radial_deadzones[controller] = (uint16)((real32)INT16_MAX * (profile_settings->deadzone_radial / 100));
 	}
 	else
 	{
-		radialDeadzone[controller] = 0;
+		g_controller_radial_deadzones[controller] = 0;
 	}
 }
 void input_abstraction_set_controller_look_sensitivity(e_controller_index controller, real32 value)
 {
+	s_saved_game_cartographer_player_profile* cartographer_player_profile = cartographer_player_profile_get_by_user_index(controller);
+
 	if (value == 0.0f) return;
 
 	value = MAX(value - 1.0f, 0.0f);
@@ -289,6 +291,8 @@ void input_abstraction_set_controller_look_sensitivity(e_controller_index contro
 
 	preference->gamepad_yaw_rate = 80.0f + 20.0f * value; //x-axis
 	preference->gamepad_pitch_rate = 40.0f + 10.0f * value; //y-axis
+
+	// ### FIXME: uniform yaw, ptitch sensitivity
 }
 
 

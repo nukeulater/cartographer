@@ -8,11 +8,7 @@
 #include "saved_games/cartographer_player_profile.h"
 #include "H2MOD/Modules/Input/ControllerInput.h"
 
-
-#ifdef PC1
 #include "render/render.h"
-#endif
-
 
 /* globals */
 typedef DWORD(WINAPI* XInputGetStateEx_t)(DWORD dwUserIndex, XINPUT_STATE* pState);
@@ -24,7 +20,7 @@ bool g_input_feedback_suppress = false;
 XINPUT_VIBRATION g_xinput_vibration{};
 input_device** g_xinput_devices;
 uint32* g_main_controller_index;
-uint16 radialDeadzone[k_number_of_controllers] = {0,0,0,0};
+uint16 g_controller_radial_deadzones[k_number_of_controllers]{};
 
 bool g_controller_home_button_state[k_number_of_controllers] = { false, false, false, false };
 
@@ -169,7 +165,7 @@ void input_xinput_adjust_thumb_radial_deadzones(uint32 gamepad_index, s_gamepad_
 	uint32 rh = (rx * rx) + (ry * ry);
 
 	// If the radius of the stick moved is less than the deadzone radius set the stick positions to zero
-	uint32 radius = radialDeadzone[gamepad_index] * radialDeadzone[gamepad_index];
+	uint32 radius = g_controller_radial_deadzones[gamepad_index] * g_controller_radial_deadzones[gamepad_index];
 	if (lh <= radius)
 	{
 		gamepad_state->thumb_left.x = 0;
@@ -231,12 +227,12 @@ bool input_xinput_update_gamepad(uint32 gamepad_index, uint32 duration_ms, s_gam
 	s_gamepad_input_preferences preference;
 	input_abstraction_get_controller_preferences(controller, &preference);
 
-	gamepad_state->thumb_left.x = input_xinput_adjust_thumb_axis_deadzone(state.Gamepad.sThumbLX, preference.gamepad_axial_deadzone_left_x);
-	gamepad_state->thumb_left.y = input_xinput_adjust_thumb_axis_deadzone(state.Gamepad.sThumbLY, preference.gamepad_axial_deadzone_left_y);
-	gamepad_state->thumb_right.x = input_xinput_adjust_thumb_axis_deadzone(state.Gamepad.sThumbRX, preference.gamepad_axial_deadzone_right_x);
-	gamepad_state->thumb_right.y = input_xinput_adjust_thumb_axis_deadzone(state.Gamepad.sThumbRY, preference.gamepad_axial_deadzone_right_y);
+	gamepad_state->thumb_left.x = input_xinput_adjust_thumb_axis_deadzone(state.Gamepad.sThumbLX, preference.gamepad_axial_deadzone_left.x);
+	gamepad_state->thumb_left.y = input_xinput_adjust_thumb_axis_deadzone(state.Gamepad.sThumbLY, preference.gamepad_axial_deadzone_left.y);
+	gamepad_state->thumb_right.x = input_xinput_adjust_thumb_axis_deadzone(state.Gamepad.sThumbRX, preference.gamepad_axial_deadzone_right.x);
+	gamepad_state->thumb_right.y = input_xinput_adjust_thumb_axis_deadzone(state.Gamepad.sThumbRY, preference.gamepad_axial_deadzone_right.y);
 
-	if (radialDeadzone[gamepad_index])
+	if (g_controller_radial_deadzones[gamepad_index] > 0)
 	{
 		input_xinput_adjust_thumb_radial_deadzones(gamepad_index, gamepad_state);
 	}
