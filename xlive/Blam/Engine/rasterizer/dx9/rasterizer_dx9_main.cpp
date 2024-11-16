@@ -489,7 +489,7 @@ bool __cdecl rasterizer_dx9_device_initialize(s_rasterizer_parameters* parameter
     d3d_present_parameters.MultiSampleQuality = 0;
     d3d_present_parameters.SwapEffect = D3DSWAPEFFECT_DISCARD;
     d3d_present_parameters.FullScreen_RefreshRateInHz = is_fullscreen ? rasterizer_globals->display_parameters.refresh_rate : d3d_present_parameters.FullScreen_RefreshRateInHz;
-	d3d_present_parameters.PresentationInterval = 1;
+	d3d_present_parameters.PresentationInterval = D3DPRESENT_INTERVAL_ONE;
 
     if (shell_command_line_flag_is_set(_shell_command_line_flag_novsync) 
         /* || *load_low_detail_textures_get() */ 
