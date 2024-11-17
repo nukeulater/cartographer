@@ -74,7 +74,7 @@ const char* g_weapon_offsets_string_table_spanish[k_weapon_offsets_string_count]
 	u8"Rifle de Plasma Bruto",
 	u8"Disparo Bruto",
 	u8"Carabina",
-	u8"Espada de Energía",
+	u8"Espada de EnergÃ­a",
 	u8"Varilla de Combustible",
 	u8"Botella doble",
 	u8"Aguijoneador",
@@ -85,9 +85,9 @@ const char* g_weapon_offsets_string_table_spanish[k_weapon_offsets_string_count]
 	u8"Escopeta",
 	u8"Subfusil",
 	u8"Francotirador",
-	u8"Compensación de Armas X",
-	u8"Compensación de Armas Y",
-	u8"Compensación de Armas Z",
+	u8"CompensaciÃ³n de Armas X",
+	u8"CompensaciÃ³n de Armas Y",
+	u8"CompensaciÃ³n de Armas Z",
 	u8"Reiniciar"
 };
 
