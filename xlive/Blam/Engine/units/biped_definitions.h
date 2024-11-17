@@ -44,8 +44,6 @@ ASSERT_STRUCT_SIZE(biped_contact_point, 4);
 
 struct _biped_definition
 {
-    _unit_definition unit;
-
 	// Explaination("$$$ BIPED $$$", "")
 	
     real_angle moving_turning_speed; // Degrees Per Second
@@ -98,6 +96,13 @@ struct _biped_definition
     int16 death_spawn_count;
     int16 pad1;
 };
-ASSERT_STRUCT_SIZE(_biped_definition, 788)
+
+struct biped_definition
+{
+    _object_definition object;
+    _unit_definition unit;
+    _biped_definition biped;
+};
+ASSERT_STRUCT_SIZE(biped_definition, 788)
 
 void __cdecl biped_definitions_fixup(datum biped_datum);

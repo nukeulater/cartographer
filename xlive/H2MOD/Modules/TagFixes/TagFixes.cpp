@@ -140,9 +140,9 @@ namespace TagFixes
 
 			while (tag_iterator_next(&iterator) != NONE)
 			{
-				_biped_definition* biped = (_biped_definition*)tag_get_fast(iterator.current_tag_index);
-				biped->unit.object.abs_acceleration.lower *= 2.0f;
-				biped->unit.object.abs_acceleration.upper *= 2.0f;
+				biped_definition* biped = (biped_definition*)tag_get_fast(iterator.current_tag_index);
+				biped->object.abs_acceleration.lower *= 2.f;
+				biped->object.abs_acceleration.upper *= 2.f;
 			}
 		}
 

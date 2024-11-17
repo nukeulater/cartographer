@@ -186,9 +186,10 @@ struct object_change_color_definition
 };
 ASSERT_STRUCT_SIZE(object_change_color_definition, 16);
 
-struct object_definition
+// Internal object definition
+struct _object_definition
 {
-	e_object_type object_type;
+	int16/*e_object_type*/ object_type;
 	e_object_definition_flags flags;
 	real32 bounding_radius;				// World Units
 	real_point3d bounding_offset;
@@ -233,5 +234,11 @@ struct object_definition
 	tag_block<s_old_object_function_definition> old_functions;
 	tag_block<object_change_color_definition> change_colors;
 	tag_block<predicted_resource> predicted_resources;
+};
+ASSERT_STRUCT_SIZE(_object_definition, 188);
+
+struct object_definition
+{
+	_object_definition object;
 };
 ASSERT_STRUCT_SIZE(object_definition, 188);

@@ -10,8 +10,6 @@ enum e_item_definition_flags : uint32
 
 struct _item_definition
 {
-    object_definition object;
-
     // Explaination("$$$ ITEM $$$", "")
 
     e_item_definition_flags flags;
@@ -43,4 +41,10 @@ struct _item_definition
     tag_reference detonating_effect;            // effe
     tag_reference detonation_effect;            // effe
 };
-ASSERT_STRUCT_SIZE(_item_definition, 300);
+
+struct item_definition
+{
+    _object_definition object;
+    _item_definition item;
+};
+ASSERT_STRUCT_SIZE(item_definition, 300);

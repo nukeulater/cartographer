@@ -6,7 +6,7 @@ struct s_weapon_custom_offset
 	const real_point3d defaultOffset;
 	const char weaponPath[128];
 	real_point3d modifiedOffset;
-	_weapon_definition* tag;
+	weapon_definition* tag;
 };
 
 void ReadWeaponOffsetConfig(s_weapon_custom_offset* weaponOffsets, int count);

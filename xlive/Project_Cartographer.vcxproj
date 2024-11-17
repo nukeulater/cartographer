@@ -1090,7 +1090,6 @@
     <ClInclude Include="Blam\Cache\TagGroups\physics_model_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\multiplayer_globals_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\scenario_lightmap_definition.hpp" />
-    <ClInclude Include="Blam\Cache\TagGroups\scenery_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\shader_pass_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\user_interface_globals_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\user_interface_shared_globals_definition.hpp" />
@@ -1120,6 +1119,7 @@
     <ClInclude Include="Blam\Engine\objects\object_globals.h" />
     <ClInclude Include="Blam\Engine\objects\object_identifier.h" />
     <ClInclude Include="Blam\Engine\objects\object_type_list.h" />
+    <ClInclude Include="Blam\Engine\objects\scenery.h" />
     <ClInclude Include="Blam\Engine\objects\widgets\antenna_definitions.h" />
     <ClInclude Include="Blam\Engine\objects\widgets\widgets.h" />
     <ClInclude Include="Blam\Engine\physics\breakable_surface_definitions.h" />

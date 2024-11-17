@@ -4,8 +4,6 @@
 #include "../SpecialEventHelpers.h"
 
 #include "items/weapon_definitions.h"
-#include "game/game_globals.h"
-#include "H2MOD/Tags/MetaExtender.h"
 #include "tag_files/tag_loader/tag_injection.h"
 
 
@@ -24,9 +22,9 @@ void mook_event_map_load()
 	{
 		tag_injection_inject();
 
-		_weapon_definition* mook_ball_weapon = (_weapon_definition*)tag_get_fast(mook_ball_weapon_datum);
+		weapon_definition* mook_ball_weapon = (weapon_definition*)tag_get_fast(mook_ball_weapon_datum);
 
-		replace_fp_and_3p_models_from_weapon(ball_weapon_datum, mook_ball_weapon->item.object.model.index, mook_ball_weapon->item.object.model.index);
-		replace_fp_and_3p_models_from_weapon(bomb_weapon_datum, mook_ball_weapon->item.object.model.index, mook_ball_weapon->item.object.model.index);
+		replace_fp_and_3p_models_from_weapon(ball_weapon_datum, mook_ball_weapon->object.model.index, mook_ball_weapon->object.model.index);
+		replace_fp_and_3p_models_from_weapon(bomb_weapon_datum, mook_ball_weapon->object.model.index, mook_ball_weapon->object.model.index);
 	}
 }

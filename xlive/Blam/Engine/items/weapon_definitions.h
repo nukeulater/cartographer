@@ -397,8 +397,6 @@ ASSERT_STRUCT_SIZE(weapon_barrel_definition, 236);
 
 struct _weapon_definition
 {
-    _item_definition item;
-
     /* Explaination("$$$ WEAPON $$$", "All weapons should have 'primary trigger' and 'secondary trigger' markers as appropriate.
     Blurred permutations are called '$primary-blur' and '$secondary-blur'.")*/
 
@@ -514,8 +512,15 @@ struct _weapon_definition
     real_point3d first_person_weapon_offset;
     real_vector2d first_person_scope_size;
 };
-ASSERT_STRUCT_SIZE(_weapon_definition, 796);
 
-weapon_first_person_interface_definition* first_person_interface_definition_get(const _weapon_definition* definition, e_character_type character_type);
+struct weapon_definition
+{
+    _object_definition object;
+    _item_definition item;
+    _weapon_definition weapon;
+};
+ASSERT_STRUCT_SIZE(weapon_definition, 796);
+
+weapon_first_person_interface_definition* first_person_interface_definition_get(const weapon_definition* definition, e_character_type character_type);
 
 void weapon_definitions_apply_patches(void);

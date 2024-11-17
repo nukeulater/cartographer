@@ -5,10 +5,10 @@
 #include "MapObjectPlacements/Halloween/Lockout.h"
 
 #include "Blam/Cache/TagGroups/scenario_lightmap_definition.hpp"
-#include "Blam/Cache/TagGroups/scenery_definition.hpp"
 
 #include "models/models.h"
 #include "objects/objects.h"
+#include "objects/scenery.h"
 #include "scenario/scenario_definitions.h"
 #include "structures/structure_bsp_definitions.h"
 #include "tag_files/tag_loader/tag_injection.h"
@@ -28,8 +28,8 @@ void halloween_game_life_cycle_update(e_game_life_cycle state)
 	{
 		object_placement_data placement;
 
-		s_scenery_group_definition* pump = (s_scenery_group_definition*)tag_get_fast(pump_datum);
-		s_model_definition* pump_hmlt = (s_model_definition*)tag_get_fast(pump->objectTag.model.index);
+		scenery_definition* pump = (scenery_definition*)tag_get_fast(pump_datum);
+		s_model_definition* pump_hmlt = (s_model_definition*)tag_get_fast(pump->object.model.index);
 
 		const s_cache_header* cache_header = cache_files_get_header();
 		if (!strcmp(cache_header->name, "coagulation"))

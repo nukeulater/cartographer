@@ -356,9 +356,11 @@ void object_postprocess_node_matrices(datum object_index)
 {
 	const object_datum* object = object_get_fast_unsafe(object_index);
 	const object_definition* object_tag = (object_definition*)tag_get_fast(object->tag_definition_index);
-	if (object_tag->model.index != NONE)
+
+	const datum model_index = object_tag->object.model.index;
+	if (model_index != NONE)
 	{
-		const s_model_definition* model_tag = (s_model_definition*)tag_get_fast(object_tag->model.index);
+		const s_model_definition* model_tag = (s_model_definition*)tag_get_fast(model_index);
 		if (model_tag->render_model.index != NONE && model_tag->animation_graph.index != NONE)
 		{
 			int32 node_count;
@@ -424,9 +426,9 @@ void object_initialize_for_interpolation(datum object_index)
 	object_datum* object = object_get_fast_unsafe(object_index);
 	object_definition* object_def = (object_definition*)tag_get_fast(object->tag_definition_index);
 
-	if (object_def->model.index == NONE)
+	if (object_def->object.model.index == NONE)
 	{
-		if ((int16)object_def->attachments.count <= 0)
+		if ((int16)object_def->object.attachments.count <= 0)
 		{
 			return;
 		}
@@ -434,7 +436,7 @@ void object_initialize_for_interpolation(datum object_index)
 		int16 tag_block_index = 0;
 		while (1)
 		{
-			object_attachment_definition* attachment = object_def->attachments[tag_block_index];
+			object_attachment_definition* attachment = object_def->object.attachments[tag_block_index];
 			if (attachment->type.index != NONE)
 			{
 				tag_group type = attachment->type.group;
@@ -448,7 +450,7 @@ void object_initialize_for_interpolation(datum object_index)
 					break;
 				}
 			}
-			if (++tag_block_index >= (int16)object_def->attachments.count)
+			if (++tag_block_index >= (int16)object_def->object.attachments.count)
 			{
 				return;
 			}
@@ -469,7 +471,7 @@ datum object_allocate_header(datum tag_definition_index)
 	if (tag_definition_index != NONE)
 	{
 		const object_definition* object_def = (object_definition*)tag_get_fast(tag_definition_index);
-		const object_type_definition* object_type_definition = object_type_definition_get((e_object_type)object_def->object_type);
+		const object_type_definition* object_type_definition = object_type_definition_get((e_object_type)object_def->object.object_type);
 		const s_model_definition* model_definition = NULL;
 		object_index = object_header_new(object_type_definition->datum_size);
 
@@ -488,12 +490,13 @@ datum object_new_internal(datum object_index, object_placement_data* data)
 	bool process_is_game_client = !Memory::IsDedicatedServer();
 
 	const object_definition* object_def = (object_definition*)tag_get_fast(data->tag_index);
-	const object_type_definition* object_type_definition = object_type_definition_get((e_object_type)object_def->object_type);
+	const object_type_definition* object_type_definition = object_type_definition_get((e_object_type)object_def->object.object_type);
 	const s_model_definition* model_definition = NULL;
 
-	if (object_def->model.index != NONE)
+	const datum object_model_index = object_def->object.model.index;
+	if (object_model_index != NONE)
 	{
-		model_definition = (s_model_definition*)tag_get_fast(object_def->model.index);
+		model_definition = (s_model_definition*)tag_get_fast(object_model_index);
 	}
 
 	halo_interpolator_setup_new_object(object_index);
@@ -501,19 +504,19 @@ datum object_new_internal(datum object_index, object_placement_data* data)
 	object_datum* object = object_get_fast_unsafe(object_index);
 
 	object_header->flags.set(_object_header_post_update_bit, true);
-	object_header->type = object_def->object_type;
+	object_header->type = object_def->object.object_type;
 	object->tag_definition_index = data->tag_index;
 
 	if (data->object_identifier.get_source() == NONE)
 	{
-		object->object_identifier.create_dynamic((e_object_type)object_def->object_type);
+		object->object_identifier.create_dynamic((e_object_type)object_def->object.object_type);
 		object->placement_index = NONE;
 		object->structure_bsp_index = get_global_structure_bsp_index();
 	}
 	else
 	{
 		ASSERT(data->scenario_datum_index != NONE);
-		ASSERT(data->object_identifier.get_type() == object_def->object_type);
+		ASSERT(data->object_identifier.get_type() == object_def->object.object_type);
 		object->object_identifier = data->object_identifier;
 		object->placement_index = data->scenario_datum_index;
 		object->structure_bsp_index = data->object_identifier.get_origin_bsp();
@@ -547,7 +550,7 @@ datum object_new_internal(datum object_index, object_placement_data* data)
 	object->byte_108 = NONE;
 	object->byte_109 = NONE;
 	object->placement_policy = data->placement_policy;
-	if (TEST_FLAG(object_def->flags, _object_definition_does_not_cast_shadow))
+	if (TEST_FLAG(object_def->object.flags, _object_definition_does_not_cast_shadow))
 	{
 		object->flags.set(_object_shadowless_bit, true);
 	}
@@ -591,7 +594,7 @@ datum object_new_internal(datum object_index, object_placement_data* data)
 		}
 		else
 		{
-			const char* model_name = tag_get_name(object_def->model.index);
+			const char* model_name = tag_get_name(object_model_index);
 			const char* object_name = tag_get_name(data->tag_index);
 			error(8, 2, "object '%s' model '%s' has invalid node count %d!", object_name, model_name, model_definition->nodes.count);
 		}
@@ -603,7 +606,7 @@ datum object_new_internal(datum object_index, object_placement_data* data)
 		}
 		else
 		{
-			const char* model_name = tag_get_name(object_def->model.index);
+			const char* model_name = tag_get_name(object_model_index);
 			const char* object_name = tag_get_name(data->tag_index);
 			error(8, 2, "object '%s' model '%s' has invalid region count %d!", object_name, model_name, model_definition->collision_regions.count);
 		}
@@ -616,16 +619,16 @@ datum object_new_internal(datum object_index, object_placement_data* data)
 		if (model_definition->animation_graph.index != NONE)
 		{
 			c_animation_manager animation_manager;
-			if (animation_manager.reset_graph(model_definition->animation_graph.index, object_def->model.index, true))
+			if (animation_manager.reset_graph(model_definition->animation_graph.index, object_model_index, true))
 			{
 				valid_animation_manager = true;
-				allow_interpolation = !TEST_FLAG(FLAG(object_def->object_type), _object_mask_cannot_interpolate);
+				allow_interpolation = !TEST_FLAG(FLAG(object_def->object.object_type), _object_mask_cannot_interpolate);
 
 				// allow interpolation if object is device and device flags include interpolation
-				if (TEST_FLAG(FLAG(object_def->object_type), _object_mask_device))
+				if (TEST_FLAG(FLAG(object_def->object.object_type), _object_mask_device))
 				{
-					_device_definition* device_def = (_device_definition*)tag_get_fast(data->tag_index);
-					if (TEST_FLAG(device_def->flags, _device_definition_allow_interpolation))
+					device_definition* device_def = (device_definition*)tag_get_fast(data->tag_index);
+					if (TEST_FLAG(device_def->device.flags, _device_definition_allow_interpolation))
 					{
 						allow_interpolation = true;
 					}
@@ -633,7 +636,7 @@ datum object_new_internal(datum object_index, object_placement_data* data)
 			}
 			else
 			{
-				const char* model_path = tag_get_name(object_def->model.index);
+				const char* model_path = tag_get_name(object_model_index);
 				const char* model_name = tag_name_strip_path(model_path);
 				const char* graph_path = tag_get_name(model_definition->animation_graph.index);
 				const char* graph_name = tag_name_strip_path(graph_path);
@@ -649,9 +652,9 @@ datum object_new_internal(datum object_index, object_placement_data* data)
 
 	// Allocate object header blocks
 	bool can_create_object =
-		object_header_block_allocate(object_index, offsetof(object_datum, object_attachments_block), (uint16)8 * (uint16)object_def->attachments.count, 0)
+		object_header_block_allocate(object_index, offsetof(object_datum, object_attachments_block), (uint16)8 * (uint16)object_def->object.attachments.count, 0)
 		&& object_header_block_allocate(object_index, offsetof(object_datum, damage_sections_block), 8 * damage_info_damage_sections_size, 0)
-		&& object_header_block_allocate(object_index, offsetof(object_datum, change_color_block), (uint16)24 * (uint16)object_def->change_colors.count, 0)
+		&& object_header_block_allocate(object_index, offsetof(object_datum, change_color_block), (uint16)24 * (uint16)object_def->object.change_colors.count, 0)
 		&& object_header_block_allocate(object_index, offsetof(object_datum, nodes_block), sizeof(real_matrix4x3) * node_count, 0)
 		&& object_header_block_allocate(object_index, offsetof(object_datum, collision_regions_block), 10 * collision_regions_count, 0)
 		&& object_header_block_allocate(object_index, offsetof(object_datum, original_orientation_block), orientation_size, 4)
@@ -672,14 +675,14 @@ datum object_new_internal(datum object_index, object_placement_data* data)
 			c_animation_manager* animation_manager = (c_animation_manager*)object_header_block_get(object_index, &object->animation_manager_block);
 			animation_manager->initialize();
 			
-			bool graph_reset = animation_manager->reset_graph(model_definition->animation_graph.index, object_def->model.index, true);
+			bool graph_reset = animation_manager->reset_graph(model_definition->animation_graph.index, object_model_index, true);
 			ASSERT(graph_reset);
 
 			object->flags.set(_object_dynamic_lighting_recompute_bit, graph_reset);
 		}
 
 		// Null attachment block
-		if (object_def->attachments.count > 0)
+		if (object_def->object.attachments.count > 0)
 		{
 			ASSERT(object);
 			int32 attachments_count;
@@ -735,9 +738,10 @@ datum object_new_internal(datum object_index, object_placement_data* data)
 			object_initialize_effects(object_index);
 			object_type_create_children(object_index);
 
-			if (object_def->creation_effect.index != NONE)
+			const datum object_creation_effect_index = object_def->object.creation_effect.index;
+			if (object_creation_effect_index != NONE)
 			{
-				effect_new_from_object(object_def->creation_effect.index, &data->damage_owner, object_index, 0.0f, 0.0f, NULL, NULL);
+				effect_new_from_object(object_creation_effect_index, &data->damage_owner, object_index, 0.f, 0.f, NULL, NULL);
 			}
 
 			// Not 100% sure what this function does but it has to do with occlusion
@@ -808,7 +812,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 	 	const object_definition* object_def = (object_definition*)tag_get_fast(placement_data->tag_index);
 
 		if (
-			TEST_FLAG(FLAG(object_def->object_type), 
+			TEST_FLAG(FLAG(object_def->object.object_type),
 				(FLAG(_object_type_creature) | FLAG(_object_type_crate) | FLAG(_object_type_machine) | FLAG(_object_type_vehicle) | FLAG(_object_type_biped)))
 			)
 		{
@@ -1043,9 +1047,11 @@ int16 __cdecl internal_object_get_markers_by_string_id(datum object_index, strin
 	{
 		object_datum* object = object_get_fast_unsafe(index);
 		object_definition* object_def = (object_definition*)tag_get_fast(object->tag_definition_index);
-		if (object_def->model.index != NONE)
+
+		const datum object_model_index = object_def->object.model.index;
+		if (object_model_index != NONE)
 		{
-			s_model_definition* model_def = (s_model_definition*)tag_get_fast(object_def->model.index);
+			s_model_definition* model_def = (s_model_definition*)tag_get_fast(object_model_index);
 
 			int32 node_count;
 			real_matrix4x3* node_matrices;

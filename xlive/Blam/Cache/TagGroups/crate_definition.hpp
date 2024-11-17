@@ -11,7 +11,7 @@
 #pragma pack(push,1)
 struct s_crate_group_definition
 {
-	object_definition objectTag;
+	object_definition object;
 	enum class e_flags : __int16
 	{
 		does_not_block_aoe = FLAG(0),

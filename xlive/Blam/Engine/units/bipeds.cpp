@@ -39,16 +39,16 @@ void biped_build_2d_camera_frame(const real_vector3d* forward, const real_vector
 void __cdecl biped_offset_first_person_camera(const real_vector3d* camera_forward, datum object_index, real_point3d* camera_position, const real_vector3d* camera_up)
 {
     biped_datum* biped = (biped_datum*)object_get_fast_unsafe(object_index);
-    _biped_definition* biped_def = (_biped_definition*)tag_get_fast(biped->unit.object.tag_definition_index);
+    biped_definition* biped_def = (biped_definition*)tag_get_fast(biped->unit.object.tag_definition_index);
 
     ASSERT(camera_position);
     ASSERT(camera_forward);
     ASSERT(camera_up);
 
-    if (biped_def->camera_interpolation_end > biped_def->camera_interpolation_start)
+    if (biped_def->biped.camera_interpolation_end > biped_def->biped.camera_interpolation_start)
     {
         real32 v1;
-        real32 angle_range = biped_def->camera_interpolation_end - biped_def->camera_interpolation_start;
+        real32 angle_range = biped_def->biped.camera_interpolation_end - biped_def->biped.camera_interpolation_start;
         if (camera_forward->k > -1.0f)
         {
             if (camera_forward->k >= 0.0f)
@@ -67,7 +67,7 @@ void __cdecl biped_offset_first_person_camera(const real_vector3d* camera_forwar
 
         ASSERT(angle_range > 0.f);
 
-        real32 function_value = (v1 - biped_def->camera_interpolation_start) / angle_range;
+        real32 function_value = (v1 - biped_def->biped.camera_interpolation_start) / angle_range;
         real32 function_result;
         if (function_value >= 0.0f)
         {
@@ -109,18 +109,18 @@ void __cdecl biped_offset_first_person_camera(const real_vector3d* camera_forwar
 
             real_vector3d biped_vector = biped->vector_3E4;
 
-            if (biped->vector_3E4.i <= biped_def->camera_exclusion_distance)
+            if (biped->vector_3E4.i <= biped_def->biped.camera_exclusion_distance)
             {
-                biped_vector.i = biped_def->camera_exclusion_distance;
+                biped_vector.i = biped_def->biped.camera_exclusion_distance;
             }
 
             real32 i_diff = biped_vector.i - forward_product;
             real32 j_diff = biped_vector.j - up_product;
             real32 k_diff = biped_vector.k - camera_diff.k;
 
-            real32 forward_scale = biped_def->camera_forward_movement_scale * i_diff * function_result;
-            real32 side_scale = biped_def->camera_side_movement_scale * j_diff * function_result;
-            real32 vertical_offset = biped_def->camera_vertical_movement_scale * k_diff * function_result;
+            real32 forward_scale = biped_def->biped.camera_forward_movement_scale * i_diff * function_result;
+            real32 side_scale = biped_def->biped.camera_side_movement_scale * j_diff * function_result;
+            real32 vertical_offset = biped_def->biped.camera_vertical_movement_scale * k_diff * function_result;
 
             camera_position->x += (forward_out.i * forward_scale) + (up_out.i * side_scale);
             camera_position->y += (forward_out.j * forward_scale) + (up_out.j * side_scale);
@@ -157,7 +157,7 @@ void __cdecl biped_get_sight_position(
     }
 
     biped_datum* biped = (biped_datum*)object_get_fast_unsafe(biped_index);
-    _biped_definition* biped_def = (_biped_definition*)tag_get_fast(biped->unit.object.tag_definition_index);
+    biped_definition* biped_def = (biped_definition*)tag_get_fast(biped->unit.object.tag_definition_index);
 
     real32 crouching = 0.0f;
 
@@ -175,8 +175,8 @@ void __cdecl biped_get_sight_position(
     }
 
     // Camera height calculations
-    real32 standing_camera_height = (1.0f - crouching) * biped_def->standing_camera_height;
-    real32 crouching_camera_height = biped_def->crouching_camera_height * crouching;
+    real32 standing_camera_height = (1.f - crouching) * biped_def->biped.standing_camera_height;
+    real32 crouching_camera_height = biped_def->biped.crouching_camera_height * crouching;
     sight_position->z += (standing_camera_height + crouching_camera_height) * biped->unit.object.scale;
 
     real_point3d origin_copy = *sight_position;

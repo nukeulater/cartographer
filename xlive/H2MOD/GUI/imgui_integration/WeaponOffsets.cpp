@@ -41,7 +41,7 @@ namespace ImGuiHandler {
 		{
 			if (weapOffsets[weapon].tag != nullptr)
 			{
-				weapOffsets[weapon].tag->first_person_weapon_offset = weapOffsets[weapon].modifiedOffset;
+				weapOffsets[weapon].tag->weapon.first_person_weapon_offset = weapOffsets[weapon].modifiedOffset;
 			}
 		}
 		namespace
@@ -139,7 +139,7 @@ namespace ImGuiHandler {
 				datum weap_datum = tag_loaded(_tag_group_weapon, weapOffsets[i].weaponPath);
 				if (weap_datum != NONE)
 				{
-					weapOffsets[i].tag = (_weapon_definition*)tag_get_fast(weap_datum);
+					weapOffsets[i].tag = (weapon_definition*)tag_get_fast(weap_datum);
 					ApplyOffset(i);
 				}
 			}

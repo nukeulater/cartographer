@@ -3,7 +3,7 @@
 // TODO move this into object_types.h but currently getting issues
 // Has to do with header recursion and errors that pop up with tag definitions?
 
-enum e_object_type : int8
+enum e_object_type : int32
 {
 	_object_type_none = NONE,
 	_object_type_biped = 0,
@@ -20,11 +20,8 @@ enum e_object_type : int8
 	_object_type_crate = 11,
 	_object_type_creature = 12,
 	k_object_types_count,
-};
 
-enum e_object_mask : uint32
-{
-	_object_mask_all = (uint32)NONE,
+	_object_mask_all = NONE,
 	_object_mask_unit = FLAG(_object_type_biped) | FLAG(_object_type_vehicle),
 	_object_mask_biped = FLAG(_object_type_biped),
 	_object_mask_vehicle = FLAG(_object_type_vehicle),
@@ -50,4 +47,3 @@ enum e_object_mask : uint32
 	_object_mask_sightblocking = FLAG(_object_type_vehicle) | FLAG(_object_type_scenery) | FLAG(_object_type_machine),
 	_object_mask_cannot_interpolate = FLAG(_object_type_sound_scenery) | FLAG(_object_type_light_fixture) | FLAG(_object_type_control) | FLAG(_object_type_machine) | FLAG(_object_type_scenery) | FLAG(_object_type_projectile)
 };
-

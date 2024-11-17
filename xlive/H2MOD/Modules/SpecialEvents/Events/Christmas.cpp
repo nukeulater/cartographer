@@ -75,8 +75,8 @@ void christmas_event_map_load(void)
 		if (datum flood_datum = game_globals_get_representation(_character_type_flood)->third_person_unit.index;
 			flood_datum != NONE)
 		{
-			_biped_definition* flood_biped = (_biped_definition*)tag_get_fast(flood_datum);
-			add_hat_and_beard_to_model(flood_biped->unit.object.model.index, santa_hat_datum, beard_datum, false);
+			biped_definition* flood_biped = (biped_definition*)tag_get_fast(flood_datum);
+			add_hat_and_beard_to_model(flood_biped->object.model.index, santa_hat_datum, beard_datum, false);
 		}
 
 		// Change/Add weather system to bsp
@@ -93,17 +93,17 @@ void christmas_event_map_load(void)
 		}
 
 		// Change sword model to candy cane
-		_weapon_definition* sword_weapon = (_weapon_definition*)tag_get_fast(sword_weapon_datum);
+		weapon_definition* sword_weapon = (weapon_definition*)tag_get_fast(sword_weapon_datum);
 
-		datum sword_model_datum = sword_weapon->item.object.model.index;
+		datum sword_model_datum = sword_weapon->object.model.index;
 		s_model_definition* sword_model = (s_model_definition*)tag_get_fast(sword_model_datum);
 
 		sword_model->render_model.index = candy_cane_datum;
 
-		for (auto& first_person : sword_weapon->player_interface.first_person)
+		for (auto& first_person : sword_weapon->weapon.player_interface.first_person)
 			first_person.model.index = candy_cane_datum;
 
-		for (auto& attachment : sword_weapon->item.object.attachments)
+		for (auto& attachment : sword_weapon->object.attachments)
 		{
 			attachment.type.index = NONE;
 			attachment.type.group = { (e_tag_group)NONE };
@@ -112,7 +112,7 @@ void christmas_event_map_load(void)
 		}
 
 		// Change ghost to reindeer
-		_unit_definition* ghost_vehicle = (_unit_definition*)tag_get_fast(ghost_datum);
+		unit_definition* ghost_vehicle = (unit_definition*)tag_get_fast(ghost_datum);
 		ghost_vehicle->object.attachments.data = 0;
 		ghost_vehicle->object.attachments.count = 0;
 

@@ -42,10 +42,10 @@ void H2X::ApplyMapLoadPatches(bool enable)
 		datum weapon_datum = tag_loaded(_tag_group_weapon, weapon.tag_string);
 		if (weapon_datum != NONE)
 		{
-			_weapon_definition* weapon_tag = (_weapon_definition*)tag_get_fast(weapon_datum);
+			weapon_definition* weapon_tag = (weapon_definition*)tag_get_fast(weapon_datum);
 			weapon.rounds_per_second_based ?
-				weapon_tag->barrels[weapon.barrel_data_block_index]->rounds_per_second.upper = rof : 
-				weapon_tag->barrels[weapon.barrel_data_block_index]->fire_recovery_time_seconds = rof;
+				weapon_tag->weapon.barrels[weapon.barrel_data_block_index]->rounds_per_second.upper = rof :
+				weapon_tag->weapon.barrels[weapon.barrel_data_block_index]->fire_recovery_time_seconds = rof;
 		}
 	}
 }

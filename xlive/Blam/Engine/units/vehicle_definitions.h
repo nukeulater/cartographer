@@ -253,9 +253,8 @@ struct s_vehicle_gear
 
 struct _vehicle_definition
 {
-	_unit_definition unit;
-
 	// Explaination("$$$ VEHICLE $$$", "")
+
 	e_vehicle_definition_flags flags;
 	e_vehicle_definition_type type;
 	e_vehicle_definition_control control;
@@ -332,6 +331,13 @@ struct _vehicle_definition
 
 	s_havok_vehicle_physics_definition havok_vehicle_physics;
 };
-ASSERT_STRUCT_SIZE(_vehicle_definition, 768);
+
+struct vehicle_definition
+{
+	_object_definition object;
+	_unit_definition unit;
+	_vehicle_definition vehicle;
+};
+ASSERT_STRUCT_SIZE(vehicle_definition, 768);
 
 void __cdecl vehicle_definitions_fixup(datum vehicle_datum);
