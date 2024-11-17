@@ -131,7 +131,7 @@ bool c_custom_map_manager::read_custom_map_data_cache_from_file(const utf8* path
 	e_file_open_flags flags = (e_file_open_flags)(_file_open_sequential_scan_bit | _permission_read_bit);
 
 	// ### TODO FIXME clean this up
-	uint16 entry_count = 0;
+	uint32 entry_count = 0;
 	s_custom_map_entry* entry_list = get_custom_map_entry_list_from_header(custom_map_data_header);
 
 	do 
@@ -211,7 +211,7 @@ bool c_custom_map_manager::read_custom_map_data_cache_from_file(const utf8* path
 	if (success)
 	{
 		LOG_TRACE_GAME("loaded custom map paths: ");
-		for (uint16 i = 0; i < entry_count; i++)
+		for (uint32 i = 0; i < entry_count; i++)
 		{
 			LOG_TRACE_GAME(L"	custom map path: {}", entry_list[i].file_path);
 		}
