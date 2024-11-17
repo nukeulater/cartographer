@@ -368,7 +368,7 @@ ASSERT_STRUCT_SIZE(s_screen_parameters, 0x20);
 /* public methods */
 
 
-void render_menu_user_interface_to_usercall(int32 window_index, int32 controller_index, int32 player_count, rectangle2d* rect2d);
+void __cdecl render_menu_user_interface(int32 controller_index, e_user_interface_render_window render_window, rectangle2d* out_rect2d);
 
 const bool __cdecl user_interface_automation_is_active();
 uint32 __cdecl user_interface_milliseconds();

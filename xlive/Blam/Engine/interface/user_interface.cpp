@@ -73,18 +73,8 @@ void __cdecl user_interface_enter_game_shell(int32 context)
 	INVOKE(0x20CE70, 0x0, user_interface_enter_game_shell, context);
 }
 
-
-
-void render_menu_user_interface_to_usercall(int32 window_index, int32 controller_index, int32 player_count, rectangle2d* rect2d)
+void __cdecl render_menu_user_interface(int32 controller_index, e_user_interface_render_window render_window, rectangle2d* out_rect2d)
 {
-	static void* render_menu_user_interface = (void*)Memory::GetAddress(0x20B697);
-	__asm {
-		push rect2d
-		push player_count
-		push controller_index
-		mov esi, window_index
-		call render_menu_user_interface
-		add esp, 12
-	}
+	INVOKE(0x20B697, 0x0, render_menu_user_interface, controller_index, render_window, out_rect2d);
 	return;
 }

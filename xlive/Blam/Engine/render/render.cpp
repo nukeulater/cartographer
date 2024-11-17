@@ -973,7 +973,7 @@ void render_view(
             rasterizer_dx9_set_stencil_mode(0);
             hud_draw_screen();
             rasterizer_dx9_render_screen_flash();
-            render_menu_user_interface_to_usercall(0, controller_index, NONE, &camera->viewport_bounds);
+            render_menu_user_interface(controller_index, (e_user_interface_render_window)NONE, &camera->viewport_bounds);
             rasterizer_dx9_perf_event_end("interface");
 
 #ifndef NDEBUG
