@@ -37,7 +37,7 @@ void tag_injection_set_active_map(const wchar_t* map_name)
 
 bool tag_injection_active_map_verified()
 {
-	if (Memory::IsDedicatedServer())
+	if (!Memory::IsDedicatedServer())
 	{
 		return g_manager.get_active_map_verified();
 	}
