@@ -143,7 +143,7 @@ void render_apply_patches(void)
     return;
 }
 
-window_bound* get_user_window_bounds(uint32 user_index)
+window_bound* get_user_window_bounds(int32 user_index)
 {
     return &g_user_window_bounds[user_index];
 }
@@ -238,7 +238,7 @@ bool __cdecl structure_get_cluster_and_leaf_from_render_point(real_point3d* poin
     return INVOKE(0x191032, 0x0, structure_get_cluster_and_leaf_from_render_point, point, out_cluster_index, out_leaf_index);
 }
 
-e_screen_split_type get_screen_split_type(uint32 render_user_index)
+e_screen_split_type get_screen_split_type(int32 render_user_index)
 {
     switch(get_global_render_window_count())
     {

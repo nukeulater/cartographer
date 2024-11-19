@@ -69,7 +69,7 @@ s_new_hud_engine_globals* get_new_hud_engine_globals(void)
 	return *Memory::GetAddress<s_new_hud_engine_globals**>(0x9770F4, 0x99E93C);
 }
 
-s_new_hud_globals_player_info* new_hud_engine_globals_get_player_data(uint32 local_player_index)
+s_new_hud_globals_player_info* new_hud_engine_globals_get_player_data(int32 local_player_index)
 {
 	return INVOKE(0x2237ED, 0, new_hud_engine_globals_get_player_data, local_player_index);
 }

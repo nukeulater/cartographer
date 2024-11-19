@@ -17,15 +17,15 @@
 
 static const pixel32 g_draw_hud_bitmap_widget_shield_pixel_colors[9]
 {
-	D3DCOLOR_XRGB(0,0,0),
-	D3DCOLOR_XRGB(255, 0, 0),
-	D3DCOLOR_XRGB(0, 255, 0),
-	D3DCOLOR_XRGB(255, 255, 0),
-	D3DCOLOR_XRGB(0, 127, 0),
-	D3DCOLOR_XRGB(69, 5, 154),
-	D3DCOLOR_XRGB(156, 70, 193),
-	D3DCOLOR_XRGB(00, 85, 170),
-	D3DCOLOR_XRGB(0,120,240),
+	D3DCOLOR_ARGB(0, 0, 0, 0),
+	D3DCOLOR_ARGB(0, 255, 0, 0),
+	D3DCOLOR_ARGB(0, 0, 255, 0),
+	D3DCOLOR_ARGB(0, 255, 255, 0),
+	D3DCOLOR_ARGB(0, 127, 0, 255),
+	D3DCOLOR_ARGB(0, 69, 5, 154),
+	D3DCOLOR_ARGB(0, 156, 70, 193),
+	D3DCOLOR_ARGB(0, 00, 85, 170),
+	D3DCOLOR_ARGB(0, 0,120,240),
 };
 
 // storage for bitmaps that contain crosshairs
@@ -120,7 +120,7 @@ void draw_hud_get_bitmap_data(uint32 local_render_user_index, s_hud_bitmap_widge
 			return;
 
 		int32 bitmap_index = bitmap_sequence->first_bitmap_index;
-		if (bitmap_sequence->bitmap_count > 1 && player_unk_84_from_user_index(local_render_user_index))
+		if (bitmap_sequence->bitmap_count > 1 && player_user_is_elite_or_dervish(local_render_user_index))
 			bitmap_index += 1;
 
 		*out_width_pixels = bitmap->bitmaps[bitmap_index]->width;
@@ -135,7 +135,7 @@ void draw_hud_get_bitmap_data(uint32 local_render_user_index, s_hud_bitmap_widge
 	}
 
 	int32 sprite_index = 0;
-	if (bitmap_sequence->sprites.count > 1 && player_unk_84_from_user_index(local_render_user_index))
+	if (bitmap_sequence->sprites.count > 1 && player_user_is_elite_or_dervish(local_render_user_index))
 		sprite_index = 1;
 
 	bitmap_group_sprite* bitmap_sprite = bitmap_sequence->sprites[sprite_index];
@@ -203,7 +203,7 @@ bool draw_hud_bitmap_is_crosshair(datum bitmap_datum)
 	return false;
 }
 
-void __cdecl draw_hud_bitmap_widget(uint32 local_render_user_index, s_new_hud_temporary_user_state* user_state, s_hud_bitmap_widget_definition* bitmap_widget, real32* widget_function_results)
+void __cdecl draw_hud_bitmap_widget(int32 local_render_user_index, s_new_hud_temporary_user_state* user_state, s_hud_bitmap_widget_definition* bitmap_widget, real32* widget_function_results)
 {
 	if (bitmap_widget->bitmap.index == NONE || bitmap_widget->shader.index == NONE)
 		return;
@@ -269,17 +269,17 @@ void __cdecl draw_hud_bitmap_widget(uint32 local_render_user_index, s_new_hud_te
 		break;
 	}
 
-	real32 calc_registration_x = ((bitmap_bounds.x1 - bitmap_bounds.x0) * registration_point.x) * (float)bitmap_width;
+	real32 calc_registration_x = ((bitmap_bounds.x1 - bitmap_bounds.x0) * registration_point.x) * (real32)bitmap_width;
 	real32 calc_offset_x = (real32)screen_offset.x + offset_result.x;
 
-	real32 calc_registration_y = ((bitmap_bounds.y1 - bitmap_bounds.y0) * registration_point.y) * (float)bitmap_height;
+	real32 calc_registration_y = ((bitmap_bounds.y1 - bitmap_bounds.y0) * registration_point.y) * (real32)bitmap_height;
 	real32 calc_offset_y = (real32)screen_offset.y + offset_result.y;
 
 	real32 final_point_x = (((calc_offset_x - calc_registration_x) + bitmap_bounds.x0) * hud_scale) + anchor_point.x;
 	real32 final_point_y = (((calc_offset_y - calc_registration_y) + bitmap_bounds.y0) * hud_scale) + anchor_point.y;
 
 	real_point2d final_location{ final_point_x, final_point_y };
-	real_vector2d bitmap_size{ (float)bitmap_width, (float)bitmap_height };
+	real_point2d bitmap_size{ (real32)bitmap_width, (real32)bitmap_height };
 
 	if (bitmap_widget->flags.test(bitmap_widget_flag_flip_horizontally))
 	{
@@ -320,62 +320,57 @@ void __cdecl draw_hud_bitmap_widget(uint32 local_render_user_index, s_new_hud_te
 			special_draw_case = true;
 
 			s_new_hud_globals_player_info* player_info = new_hud_engine_globals_get_player_data(local_render_user_index);
-			int32 shield_layer_level = 0;
-
-			while (true)
+			for (int32 shield_layer_level = 0; shield_layer_level < 5; shield_layer_level++)
 			{
-				real32 shield_vitality = user_state->unit_current_shield_vitality - (float)shield_layer_level;
+				real32 shield_vitality = user_state->unit_current_shield_vitality - (real32)shield_layer_level;
+				shield_vitality = PIN(shield_vitality, 0.0f, 1.0f);
 
-				if (shield_vitality >= 0.f)
-					shield_vitality = shield_vitality <= 1.f ? shield_vitality : 1.f;
-				else
-					shield_vitality = 0;
+				real32 player_unk_0 = player_info->field_0 - (real32)shield_layer_level;
+				player_unk_0 = PIN(player_unk_0, 0.0f, 1.0f);
 
-				real32 player_unk_0 = player_info->unk_0 - (float)shield_layer_level;
-
-				if (shield_vitality >= 0.f)
-					player_unk_0 = player_unk_0 <= 1.f ? player_unk_0 : 1.f;
-				else
-					player_unk_0 = 0.f;
-
-				bool unk_bool = false;
-				real32 color_scale_something = player_info->unk_4;
+				bool shield_damaged = false;
+				real32 shield_damage_color_intensity;
 
 				if (player_unk_0 <= shield_vitality)
 				{
-					unk_bool = false;
-					color_scale_something = 0.f;
+					shield_damaged = false;
+					shield_damage_color_intensity = 0.0f;
 				}
 				else
 				{
-					unk_bool = true;
-					if (color_scale_something >= 0.f)
-						color_scale_something = color_scale_something <= 1.f ? color_scale_something : 1.f;
+					shield_damaged = true;
+
+					if (player_info->field_4 >= 0.0f)
+					{
+						shield_damage_color_intensity = PIN(1.0f - player_info->field_4, 0.0f, 1.0f);
+					}
 					else
-						color_scale_something = 0.f;
+					{
+						shield_damage_color_intensity = 0.0f;
+					}
 				}
 
 				real_rgb_color shield_color;
-				shield_color.red = 1.f * color_scale_something;
-				shield_color.green = 1.f * color_scale_something;
-				shield_color.blue = 1.f * color_scale_something;
+				shield_color.red = 1.f * shield_damage_color_intensity;
+				shield_color.green = 1.f * shield_damage_color_intensity;
+				shield_color.blue = 1.f * shield_damage_color_intensity;
 
-				if (!unk_bool)
+				if (!shield_damaged)
 					player_unk_0 = shield_vitality;
 
-				if (player_unk_0 <= 0 && shield_vitality <= 0)
+				if (player_unk_0 <= 0.0f && shield_vitality <= 0.0f)
 					break;
 
 				global_hud_draw_widget_function_results_get()->result_1 = player_unk_0;
 				global_hud_draw_widget_function_results_get()->result_2 = shield_vitality;
 				*global_hud_draw_widget_special_hud_type_color_primary_get() = shield_color;
 
-				if (shield_layer_level)
+				if (shield_layer_level != 0)
 				{
 					pixel32_to_real_rgb_color(g_draw_hud_bitmap_widget_shield_pixel_colors[shield_layer_level], global_hud_draw_widget_special_hud_type_secondary_color_get());
 					pixel32_to_real_rgb_color(g_draw_hud_bitmap_widget_shield_pixel_colors[shield_layer_level], global_hud_draw_widget_special_hud_type_tertiary_color_get());
 				}
-				else if (player_unk_84_from_user_index(local_render_user_index))
+				else if (player_user_is_elite_or_dervish(local_render_user_index))
 				{
 					pixel32_to_real_rgb_color(g_draw_hud_bitmap_widget_shield_pixel_colors[5], global_hud_draw_widget_special_hud_type_secondary_color_get());
 					pixel32_to_real_rgb_color(g_draw_hud_bitmap_widget_shield_pixel_colors[6], global_hud_draw_widget_special_hud_type_tertiary_color_get());
@@ -397,9 +392,6 @@ void __cdecl draw_hud_bitmap_widget(uint32 local_render_user_index, s_new_hud_te
 					bitmap_index,
 					&bitmap_bounds,
 					bitmap_widget->shader.index);
-
-				if (++shield_layer_level > 4)
-					break;
 			}
 			break;
 		}
@@ -460,8 +452,8 @@ void __cdecl draw_hud_bitmap_widget(uint32 local_render_user_index, s_new_hud_te
 		}
 		else
 		{
-			final_location.x = final_location.x - ((bitmap_size.i * hud_scale) * 9.f);
-			final_location.y = final_location.y - ((bitmap_size.j * hud_scale) * 9.f);
+			final_location.x = final_location.x - ((bitmap_size.x * hud_scale) * 9.f);
+			final_location.y = final_location.y - ((bitmap_size.y * hud_scale) * 9.f);
 
 			bitmap_bounds.y0 = bitmap_bounds.y0 - ((bitmap_bounds.y1 - bitmap_bounds.y0) * 9.f);
 			bitmap_bounds.x0 = bitmap_bounds.x0 - ((bitmap_bounds.x1 - bitmap_bounds.x0) * 9.f);
@@ -471,8 +463,8 @@ void __cdecl draw_hud_bitmap_widget(uint32 local_render_user_index, s_new_hud_te
 			render_ingame_user_interface_hud_element_hook(
 				final_location.x,
 				final_location.y,
-				bitmap_size.i,
-				bitmap_size.j,
+				bitmap_size.x,
+				bitmap_size.y,
 				hud_scale,
 				theta_result,
 				bitmap_widget->bitmap.index,
@@ -489,10 +481,10 @@ void __cdecl draw_hud_bitmap_widget(uint32 local_render_user_index, s_new_hud_te
 			flipped_bounds.x1 = bitmap_bounds.x0;
 
 			render_ingame_user_interface_hud_element_hook(
-				(bitmap_size.i * hud_scale) + final_location.x,
+				(bitmap_size.x * hud_scale) + final_location.x,
 				final_location.y,
-				bitmap_size.i,
-				bitmap_size.j,
+				bitmap_size.x,
+				bitmap_size.y,
 				hud_scale,
 				theta_result,
 				bitmap_widget->bitmap.index,
@@ -512,9 +504,9 @@ void __cdecl draw_hud_bitmap_widget(uint32 local_render_user_index, s_new_hud_te
 
 			render_ingame_user_interface_hud_element_hook(
 				final_location.x,
-				bitmap_size.j * hud_scale + final_location.y,
-				bitmap_size.i,
-				bitmap_size.j,
+				bitmap_size.y * hud_scale + final_location.y,
+				bitmap_size.x,
+				bitmap_size.y,
 				hud_scale,
 				theta_result,
 				bitmap_widget->bitmap.index,
@@ -531,10 +523,10 @@ void __cdecl draw_hud_bitmap_widget(uint32 local_render_user_index, s_new_hud_te
 			flipped_bounds.x0 = bitmap_bounds.x1;
 			flipped_bounds.x1 = bitmap_bounds.x0;
 			render_ingame_user_interface_hud_element_hook(
-				(bitmap_size.i * hud_scale) + final_location.x,
-				bitmap_size.j * hud_scale + final_location.y,
-				bitmap_size.i,
-				bitmap_size.j,
+				(bitmap_size.x * hud_scale) + final_location.x,
+				bitmap_size.y * hud_scale + final_location.y,
+				bitmap_size.x,
+				bitmap_size.y,
 				hud_scale,
 				theta_result,
 				bitmap_widget->bitmap.index,

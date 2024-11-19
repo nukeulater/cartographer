@@ -27,12 +27,12 @@ ASSERT_STRUCT_SIZE(s_hud_scripted_globals, 3);
 
 struct s_new_hud_globals_player_info
 {
-	real32 unk_0;
-	real32 unk_4;
-	int32 unk_8;
-	uint8 unk_C[76];
+	real32 field_0;
+	real32 field_4;
+	int32 field_8;
+	uint8 gap_C[76];
 	void* text_chat_widget;
-	uint8 unk_5C[36];
+	uint8 gap_5C[36];
 };
 ASSERT_STRUCT_SIZE(s_new_hud_globals_player_info, 128);
 
@@ -67,10 +67,10 @@ struct s_new_hud_temporary_user_state
 	int unk_18;
 	int8 unk_1C;
 	int8 gap_1D[3];
-	float primary_auto_aim_level;
-	float secondary_auto_aim_level;
-	float unit_current_vitality;
-	float unit_current_shield_vitality;
+	real32 primary_auto_aim_level;
+	real32 secondary_auto_aim_level;
+	real32 unit_current_vitality;
+	real32 unit_current_shield_vitality;
 	int8 gap_30[4];
 	int16 active_grenade_count;
 	int8 gap_36[2];
@@ -109,7 +109,7 @@ void new_hud_apply_patches(void);
 
 void should_draw_hud_override_set(bool flag);
 s_new_hud_engine_globals* get_new_hud_engine_globals(void);
-s_new_hud_globals_player_info* new_hud_engine_globals_get_player_data(uint32 local_player_index);
+s_new_hud_globals_player_info* new_hud_engine_globals_get_player_data(int32 local_player_index);
 void new_hud_engine_globals_set_drawing_player_index(datum player_datum);
 s_hud_scripted_globals* get_hud_scripted_globals(void);
 s_new_hud_temporary_user_state* get_new_hud_temporary_user_state(int32 local_user_index);

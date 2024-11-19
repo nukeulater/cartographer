@@ -234,9 +234,9 @@ e_controller_index players_get_controller_index_from_user_index(int32 user_index
     return result;
 }
 
-int8 __cdecl player_unk_84_from_user_index(int32 user_index)
+bool __cdecl player_user_is_elite_or_dervish(int32 user_index)
 {
-    return INVOKE(0x2220DC, 0, player_unk_84_from_user_index, user_index);
+    return INVOKE(0x2220DC, 0, player_user_is_elite_or_dervish, user_index);
 }
 
 bool __cdecl players_user_is_active(int32 user_index)

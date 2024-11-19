@@ -105,7 +105,7 @@ bool __cdecl render_ingame_user_interface_hud_element_hook(
 
 void render_apply_patches(void);
 
-window_bound* get_user_window_bounds(uint32 user_index);
+window_bound* get_user_window_bounds(int32 user_index);
 
 int32 get_global_render_window_count();
 
@@ -151,7 +151,7 @@ void render_scene_geometry(e_collection_type collection_type, e_render_layer ren
 // Return true if out_cluster_index and out_leaf_index are valid
 bool __cdecl structure_get_cluster_and_leaf_from_render_point(real_point3d* point, int32* out_cluster_index, int32* out_leaf_index);
 
-e_screen_split_type get_screen_split_type(uint32 render_user_index);
+e_screen_split_type get_screen_split_type(int32 render_user_index);
 
 void __cdecl render_frame(
 	uint32 frame_render_type,
