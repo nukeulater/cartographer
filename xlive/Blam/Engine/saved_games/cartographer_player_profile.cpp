@@ -100,64 +100,65 @@ void cartographer_player_profile_sign_in(e_controller_index controller_index, ui
 {
 	// The game will re-sign in the profiles when switching between maps no need to
 	// re-read the profile binary unless the player has actually signed out
-	if (enumerated_file_index == g_cartographer_profiles[controller_index].enumerated_file_index)
-		return;
-
-	s_saved_game_cartographer_player_profile* current_profile = &g_cartographer_profiles[controller_index].profile;
-
-	g_cartographer_profiles[controller_index].enumerated_file_index = enumerated_file_index;
-	g_cartographer_profiles[controller_index].controller_index = controller_index;
-
-	if (!ENUMERATED_INDEX_IS_DEFAULT_SAVE(enumerated_file_index))
+	if (enumerated_file_index != g_cartographer_profiles[controller_index].enumerated_file_index)
 	{
-		// try to load the profile
-		if (!saved_games_async_helper_read_saved_game_bin(k_cartographer_bin_name,
-			enumerated_file_index,
-			(int8*)current_profile,
-			sizeof(s_saved_game_cartographer_player_profile)))
+		s_saved_game_cartographer_player_profile* current_profile = &g_cartographer_profiles[controller_index].profile;
+
+		g_cartographer_profiles[controller_index].enumerated_file_index = enumerated_file_index;
+		g_cartographer_profiles[controller_index].controller_index = controller_index;
+
+		if (!ENUMERATED_INDEX_IS_DEFAULT_SAVE(enumerated_file_index))
 		{
-			// profile does not exist or is corrupted
-			cartographer_player_profile_new(current_profile);
-			cartographer_player_profile_save(controller_index);
-		}
-		else
-		{
-			// check the profile is valid
-			e_saved_game_cartographer_player_profile_version version;
-			if (!cartographer_player_profile_verify(current_profile, &version))
+			// try to load the profile
+			if (!saved_games_async_helper_read_saved_game_bin(k_cartographer_bin_name,
+				enumerated_file_index,
+				(int8*)current_profile,
+				sizeof(s_saved_game_cartographer_player_profile)))
 			{
-				// if the loaded profile is deemed invalid over-write it.
-				if (version == k_saved_game_cartographer_player_profile_version_invalid)
+				// profile does not exist or is corrupted
+				cartographer_player_profile_new(current_profile);
+				cartographer_player_profile_save(controller_index);
+			}
+			else
+			{
+				// check the profile is valid
+				e_saved_game_cartographer_player_profile_version version;
+				if (!cartographer_player_profile_verify(current_profile, &version))
 				{
-					cartographer_player_profile_new(current_profile);
-					cartographer_player_profile_save(controller_index);
-				}
-				else
-				{
-					bool upgraded_check = false;
-					// check if profile needs to be upgraded
-					if (cartographer_player_profile_upgrade_check(current_profile, &upgraded_check))
+					// if the loaded profile is deemed invalid over-write it.
+					if (version == k_saved_game_cartographer_player_profile_version_invalid)
 					{
-						// if profile was upgraded re-save it.
-						if (upgraded_check)
-						{
-							cartographer_player_profile_save(controller_index);
-						}
+						cartographer_player_profile_new(current_profile);
+						cartographer_player_profile_save(controller_index);
 					}
 					else
 					{
-						// upgrade check failed over-write original.
-						cartographer_player_profile_new(current_profile);
-						cartographer_player_profile_save(controller_index);
+						bool upgraded_check = false;
+						// check if profile needs to be upgraded
+						if (cartographer_player_profile_upgrade_check(current_profile, &upgraded_check))
+						{
+							// if profile was upgraded re-save it.
+							if (upgraded_check)
+							{
+								cartographer_player_profile_save(controller_index);
+							}
+						}
+						else
+						{
+							// upgrade check failed over-write original.
+							cartographer_player_profile_new(current_profile);
+							cartographer_player_profile_save(controller_index);
+						}
 					}
 				}
 			}
 		}
 	}
 
-	input_abstraction_set_controller_look_sensitivity(controller_index, current_profile->controller_sensitivity);
+	// always redo the input abstraction methods for custom values
+	// to write the custom settings into the input_preferences
+	input_abstraction_set_controller_look_sensitivity(controller_index, g_cartographer_profiles[controller_index].profile.controller_sensitivity);
 	input_abstraction_set_controller_right_thumb_deadzone(controller_index);
-	return;
 }
 
 void cartographer_player_profile_sign_out(e_controller_index controller_index)
