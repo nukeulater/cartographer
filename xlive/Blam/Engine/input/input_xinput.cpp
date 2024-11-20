@@ -241,6 +241,8 @@ bool input_xinput_update_gamepad(uint32 gamepad_index, uint32 duration_ms, s_gam
 		|| gamepad_state->thumb_left.y > 0
 		|| gamepad_state->thumb_right.x > 0
 		|| gamepad_state->thumb_right.y > 0
+		|| gamepad_state->trigger_button_frames_down[0] > 0
+		|| gamepad_state->trigger_button_frames_down[1] > 0
 		|| any_button_pressed;
 }
 
@@ -285,8 +287,6 @@ bool __cdecl xinput_load()
 	return INVOKE(0x8AD1B, 0, xinput_load);
 }
 
-TEST_N_DEF(PC1);
-
 void xinput_apply_patches(void)
 {
 	g_xinput_devices = Memory::GetAddress<input_device**>(0x479F00);
@@ -296,6 +296,5 @@ void xinput_apply_patches(void)
 	PatchCall(Memory::GetAddress(0x2FC34), input_xinput_clear_rumble_state);
 	PatchCall(Memory::GetAddress(0x2FD7E), xinput_load);
 
-	TEST_N_DEF(PC2);
 	return;
 }

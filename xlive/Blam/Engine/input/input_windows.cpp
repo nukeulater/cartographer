@@ -8,6 +8,7 @@
 #include "shell/shell_windows.h"
 
 #include "interface/user_interface_controller.h"
+#include "render/render.h"
 
 extern input_device** g_xinput_devices;
 extern s_input_abstraction_globals* input_abstraction_globals;
@@ -112,6 +113,8 @@ void __cdecl input_update_gamepads(uint32 duration_ms)
 		g_notified_to_change_mapping = false;
 		input_device_change_delay_timer = 0;
 	}
+
+	TEST_N_DEF(PC1);
 }
 
 void __cdecl input_update_mouse(DIMOUSESTATE2* mouse_state, uint32 duration_ms)

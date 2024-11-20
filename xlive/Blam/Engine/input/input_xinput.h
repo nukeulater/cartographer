@@ -23,6 +23,10 @@ public:
 };
 ASSERT_STRUCT_SIZE(xinput_device, 0x1C);
 
+int16 input_xinput_adjust_thumb_axis_deadzone(int16 thumb_axis, int16 thumb_deadzone);
+
+void input_xinput_adjust_thumb_radial_deadzones(uint32 gamepad_index, s_gamepad_input_button_state* gamepad_state);
+
 bool input_xinput_update_gamepad(uint32 gamepad_index, uint32 duration_ms, struct s_gamepad_input_button_state* gamepad_state);
 
 void xinput_apply_patches(void);
