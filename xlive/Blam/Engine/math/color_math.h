@@ -7,20 +7,31 @@ struct pixel32
 };
 ASSERT_STRUCT_SIZE(pixel32, sizeof(uint8) * 4);
 
-/* channel intensity is represented on a 0 to 1 scale */
-union real_argb_color
-{
-	real32 v[4];
-	struct { real32 alpha, red, green, blue; };
-};
-ASSERT_STRUCT_SIZE(real_argb_color, sizeof(real32) * 4);
-
 union real_rgb_color
 {
 	real32 v[3];
 	struct { real32 red, green, blue; };
 };
 ASSERT_STRUCT_SIZE(real_rgb_color, sizeof(real32) * 3);
+
+/* channel intensity is represented on a 0 to 1 scale */
+union real_argb_color
+{
+	real32 v[4];
+	struct
+	{
+		real32 alpha;
+		union
+		{
+			struct
+			{
+				real32 red, green, blue;
+			};
+			real_rgb_color rgb;
+		};
+	};
+};
+ASSERT_STRUCT_SIZE(real_argb_color, sizeof(real32) * 4);
 
 /* constants */
 
@@ -47,23 +58,23 @@ const real_argb_color* const global_real_argb_darkgreen = &global_real_argb_colo
 const real_argb_color* const global_real_argb_salmon = &global_real_argb_color_table[15];
 const real_argb_color* const global_real_argb_violet = &global_real_argb_color_table[16];
 
-const real_rgb_color* const global_real_rgb_white = (const real_rgb_color* const)&global_real_argb_color_table[0].red;
-const real_rgb_color* const global_real_rgb_grey = (const real_rgb_color* const)&global_real_argb_color_table[1].red;
-const real_rgb_color* const global_real_rgb_black = (const real_rgb_color* const)&global_real_argb_color_table[2].red;
-const real_rgb_color* const global_real_rgb_red = (const real_rgb_color* const)&global_real_argb_color_table[3].red;
-const real_rgb_color* const global_real_rgb_green = (const real_rgb_color* const)&global_real_argb_color_table[4].red;
-const real_rgb_color* const global_real_rgb_blue = (const real_rgb_color* const)&global_real_argb_color_table[5].red;
-const real_rgb_color* const global_real_rgb_cyan = (const real_rgb_color* const)&global_real_argb_color_table[6].red;
-const real_rgb_color* const global_real_rgb_yellow = (const real_rgb_color* const)&global_real_argb_color_table[7].red;
-const real_rgb_color* const global_real_rgb_magenta = (const real_rgb_color* const)&global_real_argb_color_table[8].red;
-const real_rgb_color* const global_real_rgb_pink = (const real_rgb_color* const)&global_real_argb_color_table[9].red;
-const real_rgb_color* const global_real_rgb_lightblue = (const real_rgb_color* const)&global_real_argb_color_table[10].red;
-const real_rgb_color* const global_real_rgb_orange = (const real_rgb_color* const)&global_real_argb_color_table[11].red;
-const real_rgb_color* const global_real_rgb_purple = (const real_rgb_color* const)&global_real_argb_color_table[12].red;
-const real_rgb_color* const global_real_rgb_aqua = (const real_rgb_color* const)&global_real_argb_color_table[13].red;
-const real_rgb_color* const global_real_rgb_darkgreen = (const real_rgb_color* const)&global_real_argb_color_table[14].red;
-const real_rgb_color* const global_real_rgb_salmon = (const real_rgb_color* const)&global_real_argb_color_table[15].red;
-const real_rgb_color* const global_real_rgb_violet = (const real_rgb_color* const)&global_real_argb_color_table[16].red;
+const real_rgb_color* const global_real_rgb_white = &global_real_argb_color_table[0].rgb;
+const real_rgb_color* const global_real_rgb_grey = &global_real_argb_color_table[1].rgb;
+const real_rgb_color* const global_real_rgb_black = &global_real_argb_color_table[2].rgb;
+const real_rgb_color* const global_real_rgb_red = &global_real_argb_color_table[3].rgb;
+const real_rgb_color* const global_real_rgb_green = &global_real_argb_color_table[4].rgb;
+const real_rgb_color* const global_real_rgb_blue = &global_real_argb_color_table[5].rgb;
+const real_rgb_color* const global_real_rgb_cyan = &global_real_argb_color_table[6].rgb;
+const real_rgb_color* const global_real_rgb_yellow = &global_real_argb_color_table[7].rgb;
+const real_rgb_color* const global_real_rgb_magenta = &global_real_argb_color_table[8].rgb;
+const real_rgb_color* const global_real_rgb_pink = &global_real_argb_color_table[9].rgb;
+const real_rgb_color* const global_real_rgb_lightblue = &global_real_argb_color_table[10].rgb;
+const real_rgb_color* const global_real_rgb_orange = &global_real_argb_color_table[11].rgb;
+const real_rgb_color* const global_real_rgb_purple = &global_real_argb_color_table[12].rgb;
+const real_rgb_color* const global_real_rgb_aqua = &global_real_argb_color_table[13].rgb;
+const real_rgb_color* const global_real_rgb_darkgreen = &global_real_argb_color_table[14].rgb;
+const real_rgb_color* const global_real_rgb_salmon = &global_real_argb_color_table[15].rgb;
+const real_rgb_color* const global_real_rgb_violet = &global_real_argb_color_table[16].rgb;
 
 /* public code */
 
