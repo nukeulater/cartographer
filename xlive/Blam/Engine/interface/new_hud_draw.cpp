@@ -350,10 +350,10 @@ void __cdecl draw_hud_bitmap_widget(int32 local_render_user_index, s_new_hud_tem
 					}
 				}
 
-				real_rgb_color shield_color;
-				shield_color.red = 1.f * shield_damage_color_intensity;
-				shield_color.green = 1.f * shield_damage_color_intensity;
-				shield_color.blue = 1.f * shield_damage_color_intensity;
+				real_rgb_color shield_meter_damage_color = *global_real_rgb_white;
+				shield_meter_damage_color.red *= shield_damage_color_intensity;
+				shield_meter_damage_color.green *= shield_damage_color_intensity;
+				shield_meter_damage_color.blue *= shield_damage_color_intensity;
 
 				if (!shield_damaged)
 					player_unk_0 = shield_vitality;
@@ -363,7 +363,7 @@ void __cdecl draw_hud_bitmap_widget(int32 local_render_user_index, s_new_hud_tem
 
 				global_hud_draw_widget_function_results_get()->result_1 = player_unk_0;
 				global_hud_draw_widget_function_results_get()->result_2 = shield_vitality;
-				*global_hud_draw_widget_special_hud_type_color_primary_get() = shield_color;
+				*global_hud_draw_widget_special_hud_type_color_primary_get() = shield_meter_damage_color;
 
 				if (shield_layer_level != 0)
 				{
