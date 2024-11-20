@@ -1,25 +1,48 @@
 #include "stdafx.h"
 #include "color_math.h"
 
+const real_rgb_color global_real_rgb_color_table[] =
+{
+	{ {  1.f,	1.f,	1.f } },
+	{ {  .5f,	.5f,	.5f } },
+	{ {  .0f,	.0f,	.0f } },
+	{ {  1.f,	.0f,	.0f } },
+	{ {  .0f,	1.f,	.0f } },
+	{ {  .0f,	.0f,	1.f } },
+	{ {  .0f,	1.f,	1.f } },
+	{ {  1.f,	1.f,	.0f } },
+	{ {  1.f,	.0f,	1.f } },
+	{ {  1.f,	.41f,	.7f } },
+	{ {  .39f,	.58f,	.93f } },
+	{ {  1.f,	.5f,	.0f } },
+	{ {  .44f,	.05f,	.43f } },
+	{ {  .5f,	1.f,	.83f } },
+	{ {  .0f,	.39f,	.0f } },
+	{ {  1.f,	.63f,	.48f } },
+	{ {  .81f,	.13f,	.56f } }
+};
+
 const real_argb_color global_real_argb_color_table[] =
 {
-	{ {  1.f,	1.f,	1.f,	1.f } },
-	{ {  1.f,	.5f,	.5f,	.5f } },
-	{ {  1.f,	.0f,	.0f,	.0f } },
-	{ {  1.f,	1.f,	.0f,	.0f } },
-	{ {  1.f,	.0f,	1.f,	.0f } },
-	{ {  1.f,	.0f,	.0f,	1.f } },
-	{ {  1.f,	.0f,	1.f,	1.f } },
-	{ {  1.f,	1.f,	1.f,	.0f } },
-	{ {  1.f,	1.f,	.0f,	1.f } },
-	{ {  1.f,	1.f,	.41f,	.7f } },
-	{ {  1.f,	.39f,	.58f,	.93f } },
-	{ {  1.f,	1.f,	.5f,	.0f } },
-	{ {  1.f,	.44f,	.05f,	.43f } },
-	{ {  1.f,	.5f,	1.f,	.83f } },
-	{ {  1.f,	.0f,	.39f,	.0f } },
-	{ {  1.f,	1.f,	.63f,	.48f } },
-	{ {  1.f,	.81f,	.13f,	.56f } }
+#define MAKE_REAL_ARGB_COLOR(_alpha, _rgb) { { _alpha, _rgb.red, _rgb.green, _rgb.blue } }
+	MAKE_REAL_ARGB_COLOR(1.0f, global_real_rgb_color_table[0]),
+	MAKE_REAL_ARGB_COLOR(1.0f, global_real_rgb_color_table[1]),
+	MAKE_REAL_ARGB_COLOR(1.0f, global_real_rgb_color_table[2]),
+	MAKE_REAL_ARGB_COLOR(1.0f, global_real_rgb_color_table[3]),
+	MAKE_REAL_ARGB_COLOR(1.0f, global_real_rgb_color_table[4]),
+	MAKE_REAL_ARGB_COLOR(1.0f, global_real_rgb_color_table[5]),
+	MAKE_REAL_ARGB_COLOR(1.0f, global_real_rgb_color_table[6]),
+	MAKE_REAL_ARGB_COLOR(1.0f, global_real_rgb_color_table[7]),
+	MAKE_REAL_ARGB_COLOR(1.0f, global_real_rgb_color_table[8]),
+	MAKE_REAL_ARGB_COLOR(1.0f, global_real_rgb_color_table[9]),
+	MAKE_REAL_ARGB_COLOR(1.0f, global_real_rgb_color_table[10]),
+	MAKE_REAL_ARGB_COLOR(1.0f, global_real_rgb_color_table[11]),
+	MAKE_REAL_ARGB_COLOR(1.0f, global_real_rgb_color_table[12]),
+	MAKE_REAL_ARGB_COLOR(1.0f, global_real_rgb_color_table[13]),
+	MAKE_REAL_ARGB_COLOR(1.0f, global_real_rgb_color_table[14]),
+	MAKE_REAL_ARGB_COLOR(1.0f, global_real_rgb_color_table[15]),
+	MAKE_REAL_ARGB_COLOR(1.0f, global_real_rgb_color_table[16]),
+#undef MAKE_REAL_ARGB_COLOR
 };
 
 pixel32 real_argb_color_to_pixel32(const real_argb_color* color)
