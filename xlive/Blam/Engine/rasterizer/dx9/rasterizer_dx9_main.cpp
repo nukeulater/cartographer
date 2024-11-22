@@ -626,7 +626,7 @@ bool __cdecl rasterizer_dx9_device_initialize(s_rasterizer_parameters* parameter
         {
             const int32 network_adapter_index = network_adapter_index_get();
             XLIVE_INITIALIZE_INFO xlive_init_info;
-            xlive_init_info.cbSize = 28;
+            xlive_init_info.cbSize = sizeof(XLIVE_INITIALIZE_INFO);
             xlive_init_info.pD3D = rasterizer_dx9_main_globals->global_d3d_device;
             xlive_init_info.pD3DPP = &d3d_present_parameters;
             xlive_init_info.langID = 0;

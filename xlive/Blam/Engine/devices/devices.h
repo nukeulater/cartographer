@@ -2,6 +2,8 @@
 #include "objects/object_definition.h"
 #include "tag_files/tag_reference.h"
 
+/* enums */
+
 enum e_device_definition_flags : int32
 {
     _device_definition_position_loops = FLAG(0),
@@ -15,11 +17,10 @@ enum e_device_lightmap_flags : int16
     _lightmap_dont_use_in_lightprobe = FLAG(1),
 };
 
+/* structures */
 
 struct _device_definition
 {
-    object_definition object;
-
     // Explaination("$$$ DEVICE $$$", "")
 
     e_device_definition_flags flags;
@@ -45,7 +46,13 @@ struct _device_definition
     tag_reference delay_effect;
     real32 automatic_activation_radius; // World units
 };
-ASSERT_STRUCT_SIZE(_device_definition, 284);
+
+struct device_definition
+{
+    _object_definition object;
+    _device_definition device;
+};
+ASSERT_STRUCT_SIZE(device_definition, 284);
 
 struct s_device_animation_args
 {

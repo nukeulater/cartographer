@@ -2,7 +2,14 @@
 #include "object_type_list.h"
 #include "object_placement.h"
 
-#include "scenario/scenario_definitions.h"
+#include "math/matrix_math.h"
+#include "structures/cluster_partitions.h"
+
+/* constants */
+
+#define k_max_object_type_inheritence 16
+
+/* typedefs */
 
 typedef void (*object_initialize_t)();
 typedef void (*object_dispose_t)();
@@ -12,7 +19,7 @@ typedef void (*object_initialize_for_new_structure_bsp_t)(datum);
 typedef void (*object_dispose_from_old_structure_bsp_t)(datum);
 typedef void (*object_adjust_placement_t)(object_placement_data*);
 typedef bool (*object_new_t)(datum, object_placement_data*, bool*);
-typedef void (*object_place_t)(datum, s_scenario_object*);
+typedef void (*object_place_t)(datum, void*);
 typedef void (*object_unplace_t)(datum);
 typedef void (*object_create_children_t)(datum);
 typedef void (*object_delete_t)(datum);
@@ -34,8 +41,8 @@ typedef void (*object_reset_t)(datum);
 typedef void (*object_notify_impulse_sound_t)(datum, int32, int32);
 typedef void (*object_render_debug)(datum);
 
+/* structures */
 
-#define k_max_object_type_inheritence 16
 struct object_type_definition
 {
 	const char* name;
@@ -73,13 +80,17 @@ struct object_type_definition
 	object_reset_t object_reset;
 	object_notify_impulse_sound_t object_notify_impulse_sound;
 	object_render_debug object_render_debug;
-	object_type_definition* base_object_types[k_max_object_type_inheritence];
-	void* next;
+	object_type_definition* part_definitions[k_max_object_type_inheritence];
+	object_type_definition* next;
 };
 ASSERT_STRUCT_SIZE(object_type_definition, 0xC8);
 
+/* prototypes */
+
 object_type_definition** get_object_type_definitions(void);
+
 object_type_definition* object_type_definition_get(e_object_type object_type);
+
 object_type_definition* get_game_object_type_definition(datum object_datum);
 
 void __cdecl object_type_adjust_placement(object_placement_data* placement_data);

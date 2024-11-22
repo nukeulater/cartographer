@@ -199,7 +199,6 @@ ASSERT_STRUCT_SIZE(s_unit_lipsync_scales, 8);
 
 struct _unit_definition
 {
-    object_definition object;
     e_unit_definition_flags flags;
     e_game_team default_team;
     e_ai_sound_volume constant_sound_volume;
@@ -261,4 +260,10 @@ struct _unit_definition
     // Explaination("Lipsync", "")
     s_unit_lipsync_scales lipsync;
 };
-ASSERT_STRUCT_SIZE(_unit_definition, 492);
+
+struct unit_definition
+{
+    _object_definition object;
+    _unit_definition unit;
+};
+ASSERT_STRUCT_SIZE(unit_definition, 492);

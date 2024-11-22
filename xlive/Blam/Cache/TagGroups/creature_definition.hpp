@@ -11,7 +11,7 @@
 #pragma pack(push,1)
 struct s_creature_group_definition
 {
-	object_definition objectTag;
+	object_definition object;
 	enum class e_flags : __int32
 	{
 		unused = FLAG(0),

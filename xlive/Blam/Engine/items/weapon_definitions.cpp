@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "weapon_definitions.h"
 
-weapon_first_person_interface_definition* first_person_interface_definition_get(const _weapon_definition* definition, e_character_type character_type)
+weapon_first_person_interface_definition* first_person_interface_definition_get(const weapon_definition* definition, e_character_type character_type)
 {
     weapon_first_person_interface_definition* result = NULL;
     int32 index = 0;
@@ -19,19 +19,19 @@ weapon_first_person_interface_definition* first_person_interface_definition_get(
     default:
         break;
 	}
-    int32 block_count = definition->player_interface.first_person.count;
+    int32 block_count = definition->weapon.player_interface.first_person.count;
     if (index >= block_count && block_count > 0)
     {
-        if (definition->player_interface.first_person.data != NONE)
+        if (definition->weapon.player_interface.first_person.data != NONE)
         {
-            result = definition->player_interface.first_person[0];
+            result = definition->weapon.player_interface.first_person[0];
         }
     }
     else
     {
-        if (definition->player_interface.first_person.data != NONE)
+        if (definition->weapon.player_interface.first_person.data != NONE)
         {
-            result = definition->player_interface.first_person[index];
+            result = definition->weapon.player_interface.first_person[index];
         }
     }
     return result;

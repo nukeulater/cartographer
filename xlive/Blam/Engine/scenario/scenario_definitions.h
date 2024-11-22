@@ -1219,5 +1219,3 @@ struct scenario
     tag_block<s_scenario_simulation_definition_table_element> simulation_definition_table;
 };
 ASSERT_STRUCT_SIZE(scenario, 992);
-
-typedef s_scenario_scenery s_scenario_object;

@@ -3,12 +3,10 @@
 #include "Paddy.h"
 #include "../SpecialEventHelpers.h"
 
-#include "Blam/Cache/TagGroups/scenery_definition.hpp"
-
 #include "items/weapon_definitions.h"
 #include "models/models.h"
 #include "models/render_model_definitions.h"
-
+#include "objects/scenery.h"
 #include "tag_files/tag_loader/tag_injection.h"
 
 void paddy_event_map_load()
@@ -23,8 +21,8 @@ void paddy_event_map_load()
 	{
 		tag_injection_inject();
 
-		s_scenery_group_definition* paddy_pot = (s_scenery_group_definition*)tag_get_fast(paddy_pot_datum);
-		s_model_definition* paddy_pot_model = (s_model_definition*)tag_get_fast(paddy_pot->objectTag.model.index);
+		scenery_definition* paddy_pot = (scenery_definition*)tag_get_fast(paddy_pot_datum);
+		s_model_definition* paddy_pot_model = (s_model_definition*)tag_get_fast(paddy_pot->object.model.index);
 
 		// Give Hat and Beard to Masterchief & Friends
 		if (datum hlmt_chief_datum = tag_loaded(_tag_group_model, "objects\\characters\\masterchief\\masterchief");
@@ -45,20 +43,20 @@ void paddy_event_map_load()
 		if (datum ball_weapon_datum = tag_loaded(_tag_group_weapon, "objects\\weapons\\multiplayer\\ball\\ball"); 
 			ball_weapon_datum != NONE)
 		{
-			_weapon_definition* ball_weapon = (_weapon_definition*)tag_get_fast(ball_weapon_datum);
-			s_model_definition* ball_model = (s_model_definition*)tag_get_fast(ball_weapon->item.object.model.index);
+			weapon_definition* ball_weapon = (weapon_definition*)tag_get_fast(ball_weapon_datum);
+			s_model_definition* ball_model = (s_model_definition*)tag_get_fast(ball_weapon->object.model.index);
 
 			ball_model->render_model.index = paddy_pot_model->render_model.index;
 
 			//Bounding Radius and Sweetener size
-			ball_weapon->item.object.bounding_radius = 0.3f;
-			ball_weapon->item.object.sweetener_size = _sweetener_size_medium;
+			ball_weapon->object.bounding_radius = 0.3f;
+			ball_weapon->object.sweetener_size = _sweetener_size_medium;
 		}
 		if (datum bomb_weapon_datum = tag_loaded(_tag_group_weapon, "objects\\weapons\\multiplayer\\assault_bomb\\assault_bomb");
 			bomb_weapon_datum != NONE)
 		{
-			_weapon_definition* bomb_weapon = (_weapon_definition*)tag_get_fast(bomb_weapon_datum);
-			s_model_definition* bomb_model = (s_model_definition*)tag_get_fast(bomb_weapon->item.object.model.index);
+			weapon_definition* bomb_weapon = (weapon_definition*)tag_get_fast(bomb_weapon_datum);
+			s_model_definition* bomb_model = (s_model_definition*)tag_get_fast(bomb_weapon->object.model.index);
 
 			bomb_model->render_model.index = paddy_pot_model->render_model.index;
 			render_model_definition* paddy_pot_render = (render_model_definition*)tag_get_fast(paddy_pot_model->render_model.index);
@@ -68,8 +66,8 @@ void paddy_event_map_load()
 			pot_node->default_translation.z = -0.1f;
 
 			// Bounding Radius and Sweetener size
-			bomb_weapon->item.object.bounding_radius = 0.3f;
-			bomb_weapon->item.object.sweetener_size = _sweetener_size_medium;
+			bomb_weapon->object.bounding_radius = 0.3f;
+			bomb_weapon->object.sweetener_size = _sweetener_size_medium;
 		}
 	}
 }
