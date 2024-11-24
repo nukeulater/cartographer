@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #include "TagFixes.h"
 
-#include "Blam/Cache/TagGroups/sound_classes_definition.hpp"
-
 #include "shaders/shader_definitions.h"
 #include "units/biped_definitions.h"
 
@@ -145,40 +143,6 @@ namespace TagFixes
 				biped->object.abs_acceleration.upper *= 2.f;
 			}
 		}
-
-		void sound_classes_fix()
-		{
-			// Change sound_classes data to equivalents in original halo 2
-			datum sound_classes_datum = tag_loaded(_tag_group_sound_classes, "sound\\sound_classes");
-			if (sound_classes_datum != NONE)
-			{
-				s_sound_classes_block* sound_classes = (s_sound_classes_block*)tag_get_fast(sound_classes_datum);
-
-				sound_classes->soundClasses[0]->gainBoundsDB = { -0.0f, -4.0f };
-				sound_classes->soundClasses[1]->gainBoundsDB = { -0.0f, -4.0f };
-				sound_classes->soundClasses[2]->gainBoundsDB = { -0.0f, -4.0f };
-				sound_classes->soundClasses[3]->gainBoundsDB = { -0.0f, -4.0f };
-				sound_classes->soundClasses[4]->gainBoundsDB = { -0.0f, -4.0f };
-				sound_classes->soundClasses[5]->gainBoundsDB = { -0.0f, -4.0f };
-				sound_classes->soundClasses[6]->gainBoundsDB = { -0.0f, -4.0f };
-				sound_classes->soundClasses[7]->gainBoundsDB = { -0.0f, -4.0f };
-				sound_classes->soundClasses[8]->gainBoundsDB = { -0.0f, -4.0f };
-				sound_classes->soundClasses[9]->gainBoundsDB = { -0.0f, -4.0f };
-				sound_classes->soundClasses[10]->gainBoundsDB = { -0.0f, -4.0f };
-				sound_classes->soundClasses[11]->gainBoundsDB = { -0.0f, -4.0f };
-				sound_classes->soundClasses[12]->gainBoundsDB = { -0.0f, -4.0f };
-				sound_classes->soundClasses[13]->gainBoundsDB = { -64.0f, -4.0f };
-				sound_classes->soundClasses[14]->gainBoundsDB = { -12.0f, -4.0f };
-				sound_classes->soundClasses[18]->gainBoundsDB = { -32.0f, -9.0f };
-				sound_classes->soundClasses[20]->gainBoundsDB = { -0.0f, -2.0f };
-				sound_classes->soundClasses[22]->gainBoundsDB = { -0.0f, -4.0f };
-				sound_classes->soundClasses[23]->gainBoundsDB = { -0.0f, -4.0f };
-				sound_classes->soundClasses[24]->gainBoundsDB = { -0.0f, -4.0f };
-				sound_classes->soundClasses[28]->gainBoundsDB = { -0.0f, -4.0f };
-				sound_classes->soundClasses[29]->gainBoundsDB = { -0.0f, -4.0f };
-				sound_classes->soundClasses[34]->gainBoundsDB = { -0.0f, -4.0f };
-			}
-		}
 	}
 
 	void OnMapLoad()
@@ -188,7 +152,6 @@ namespace TagFixes
 			fix_shaders_nvidia();
 			fix_dynamic_lights();
 			font_table_fix();
-			sound_classes_fix();
 			if (H2Config_shader_lod_max)
 			{
 				shader_lod_max();

@@ -541,7 +541,6 @@
     <ClInclude Include="3rdparty\zlib-1.1.4\src\zconf.h" />
     <ClInclude Include="3rdparty\zlib-1.1.4\src\zlib.h" />
     <ClInclude Include="3rdparty\zlib-1.1.4\src\zutil.h" />
-    <ClInclude Include="Blam\Cache\TagGroups\sound_classes_definition.hpp" />
     <ClInclude Include="Blam\Engine\ai\actors.h" />
     <ClInclude Include="Blam\Engine\ai\actor_firing_position.h" />
     <ClInclude Include="Blam\Engine\ai\actor_moving.h" />
@@ -1272,6 +1271,7 @@
     <ClInclude Include="Blam\Engine\simulation\simulation_watcher.h" />
     <ClInclude Include="Blam\Engine\simulation\simulation_world.h" />
     <ClInclude Include="Blam\Engine\sound\sound_cache_file_definitions.h" />
+    <ClInclude Include="Blam\Engine\sound\sound_classes.h" />
     <ClInclude Include="Blam\Engine\sound\sound_clusters.h" />
     <ClInclude Include="Blam\Engine\sound\sound_definitions.h" />
     <ClInclude Include="Blam\Engine\sound\sound_manager.h" />

@@ -1181,6 +1181,7 @@
     <ClInclude Include="Blam\Engine\input\input_process.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_error_dialog.h" />
     <ClInclude Include="Blam\Engine\objects\scenery.h" />
+    <ClInclude Include="Blam\Engine\sound\sound_classes.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />
