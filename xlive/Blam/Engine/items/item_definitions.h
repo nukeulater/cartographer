@@ -1,12 +1,16 @@
 #pragma once
 #include "objects/object_definition.h"
 
+/* enums */
+
 enum e_item_definition_flags : uint32
 {
     _item_definition_always_maintains_z_up = FLAG(0),
     _item_definition_destroyed_by_explosions = FLAG(1),
     _item_definition_unaffected_by_gravity = FLAG(2)
 };
+
+/* structures */
 
 struct _item_definition
 {
