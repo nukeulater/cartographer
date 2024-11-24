@@ -1,6 +1,8 @@
 #pragma once
 #include "user_interface.h"
+
 #include "math/color_math.h"
+#include "tag_files/tag_reference.h"
 
 /* enums */
 
@@ -20,6 +22,9 @@ enum e_user_interface_widget_type : int32
 	k_number_of_user_interface_widget_types
 };
 
+/* constants */
+
+#define k_maximum_number_of_screen_widgets 256
 
 /* forward declarations */
 
@@ -54,6 +59,13 @@ struct s_animation_transform
 	real32 current_alpha;
 };
 ASSERT_STRUCT_SIZE(s_animation_transform, 0x34);
+
+// max count: k_maximum_number_of_screen_widgets
+struct s_user_interface_widget_reference
+{
+	tag_reference widget;	// wgit
+};
+ASSERT_STRUCT_SIZE(s_user_interface_widget_reference, 8);
 
 /* classes */
 
