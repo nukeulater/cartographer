@@ -1,96 +1,78 @@
 #include "stdafx.h"
 #include "MapSlots.h"
 
+#include "filesys/pc_file_system.h"
 #include "game/game_globals.h"
 #include "main/level_definitions.h"
-
+#include "scenario/scenario_definitions.h"
 #include "tag_files/tag_loader/tag_injection.h"
 #include "Util/filesys.h"
 
 
 // TODO Move to Blam/Engine/main/levels once the below are complete
-// TODO remove std:: references used in here
 // TODO Cleanup this code
 // TODO Add support for singleplayer maps in the future
+
+/* enums */
+
+enum e_default_maps_to_add
+{
+	_default_map_to_add_tombstone,
+	_default_map_to_add_desolation,
+	k_default_map_to_add_count
+};
+
+/* constants */
 
 #define k_multiplayer_first_unused_slot 23
 #define k_max_map_slots 49
 #define k_starting_map_index 3000
 
+const wchar_t* k_default_maps_to_add[k_default_map_to_add_count] = 
+{
+	L"highplains",
+	L"derelict"
+};
+
+/* globals */
+
+s_multiplayer_ui_level_definition g_added_multiplayer_level_data[k_default_map_to_add_count] = {};
+
+/* prototypes */
+
+static void map_slots_get_multiplayer_level_data(FILE* map_handle, s_multiplayer_ui_level_definition* multiplayer_level_data);
+
+/* public code */
+
 namespace MapSlots
 {
-	std::vector<std::wstring> AddedMaps;
-	std::vector<s_multiplayer_ui_level_definition> MapData;
-	std::map<datum, std::wstring> BitmapsToLoad;
-
 	void CacheMapData(void)
 	{
 		//lots copied over from Tag Loader, using this function to grab the Level data in the scenario tag
 		//And using that to construct a new s_multiplayer_levels_block and grab the bitmap datum for tag loading
-		std::wstring def_maps_loc = GetExeDirectoryWide() + L"\\maps";
+		c_static_wchar_string260 game_path;
+		game_path.set(GetExeDirectoryWide().c_str());
+
 		LOG_TRACE_GAME("[Map Slots]: Startup - Caching map data");
-		for (const auto& map : AddedMaps)
+
+		for (uint32 i = 0; i < k_default_map_to_add_count; ++i)
 		{
-			std::wstring map_location = def_maps_loc + L"\\" + map + L".map";
-			if (std::filesystem::exists(map_location))
+			c_static_wchar_string260 map_location;
+			map_location.set(game_path.get_string());
+			map_location.append(L"\\maps\\");
+			map_location.append(k_default_maps_to_add[i]);
+			map_location.append(L".map");
+
+			FILE* map_handle = NULL;
+			errno_t error = _wfopen_s(&map_handle, map_location.get_string(), L"rb");
+			if (!error && map_handle != NULL)
 			{
-				LOG_TRACE_GAME(L"[Map Slots]: Startup - Caching {}", map);
-				std::ifstream fin(map_location.c_str(), std::ios::binary);
-				if (fin.is_open())
-				{
-					int table_off, table_size = 0;
-
-					fin.seekg(0x10);
-					fin.read((char*)&table_off, 4);
-					fin.read((char*)&table_size, 4);
-
-					fin.seekg(table_off + 4);
-					int temp;
-					fin.read((char*)&temp, 4);
-
-					int table_start = table_off + 0xC * temp + 0x20;
-					int scnr_off = table_off + table_size;
-
-					int scnr_memaddr;
-					fin.seekg(table_start + 0x8);
-					fin.read((char*)&scnr_memaddr, 4);
-
-					//Get the tag block info for the Sencario Level Data
-					int l_count, l_offset;
-					fin.seekg(scnr_off + 0x398);
-					fin.read((char*)&l_count, 4);
-					fin.read((char*)&l_offset, 4);
-
-					//Get the tag block info for the Multiplayer Level Description
-					int m_count, m_offset;
-					temp = scnr_off + (l_offset - scnr_memaddr);
-					fin.seekg(temp + 0x10);
-					fin.read((char*)&m_count, 4);
-					fin.read((char*)&m_offset, 4);
-
-					temp = scnr_off + (m_offset - scnr_memaddr);
-					s_multiplayer_ui_level_definition newBlock;
-
-					//The struct in the scenario is the same as the one inside the globals ui level data so just copy it into one
-					fin.seekg(temp);
-					fin.read((char*)&newBlock, sizeof(s_multiplayer_ui_level_definition));
-
-					//Fix incase the maps level data is incorrectly setup
-					if (strlen(newBlock.path) == 0) {
-						fin.seekg(0x1C8);
-						fin.read(newBlock.path, NUMBEROF(s_multiplayer_ui_level_definition::path));
-					}
-
-					MapData.emplace_back(newBlock);
-
-					//Store the bitmap datum for loading it into the main menu
-					BitmapsToLoad.emplace(newBlock.bitmap.index, map);
-					fin.close();
-				}
+				map_slots_get_multiplayer_level_data(map_handle, &g_added_multiplayer_level_data[i]);
+				fclose(map_handle);
 			}
 			else
 			{
-				LOG_TRACE_GAME(L"[Map Slots]: Startup - Map File Missing {}", map);
+				LOG_TRACE_GAME(L"[Map Slots]: Startup - Map File Missing {}", map_location.get_string());
 			}
 		}
 
@@ -104,7 +86,7 @@ namespace MapSlots
 		if (ui_levels)
 		{
 			int32 added_maps = 0;
-			for (const s_multiplayer_ui_level_definition& newSlot : MapData)
+			for (const s_multiplayer_ui_level_definition& newSlot : g_added_multiplayer_level_data)
 			{
 				if (added_maps + k_multiplayer_first_unused_slot < k_max_map_slots)
 				{
@@ -138,7 +120,7 @@ namespace MapSlots
 	{
 		int32 added_map_count = 0;
 		s_multiplayer_ui_level_definition* multiplayer_levels = Memory::GetAddress<s_multiplayer_ui_level_definition*>(0, 0x419510);
-		for (const s_multiplayer_ui_level_definition& newSlot : MapData)
+		for (const s_multiplayer_ui_level_definition& newSlot : g_added_multiplayer_level_data)
 		{
 			if (k_multiplayer_first_unused_slot + added_map_count < k_max_map_slots)
 			{
@@ -195,27 +177,28 @@ namespace MapSlots
 
 	void OnMapLoad(void)
 	{
-		if (!AddedMaps.empty())
+		// Load all the added maps bitmaps
+		LOG_TRACE_GAME("[Map Slots]: OnMapLoad - Tag Loading Bitmaps");
+		for (uint32 i = 0; i < k_default_map_to_add_count; ++i)
 		{
-			////Load all the added maps bitmaps
-			LOG_TRACE_GAME("[Map Slots]: OnMapLoad - Tag Loading Bitmaps");
-			for (const auto& item : BitmapsToLoad)
+			tag_injection_set_active_map(k_default_maps_to_add[i]);
+			if (tag_injection_active_map_verified())
 			{
-				tag_injection_set_active_map(item.second.c_str());
-				tag_injection_load(_tag_group_bitmap, item.first, false);
+				tag_injection_load(_tag_group_bitmap, g_added_multiplayer_level_data[i].bitmap.index, false);
 				tag_injection_inject();
 			}
-
-			add_new_multiplayer_map_slots_game();
+			else
+			{
+				g_added_multiplayer_level_data[i].bitmap.index = NONE;
+			}
 		}
 
+		add_new_multiplayer_map_slots_game();
 		return;
 	}
 
 	void Initialize(void)
 	{
-		AddedMaps.emplace_back(L"highplains");
-		AddedMaps.emplace_back(L"derelict");
 		CacheMapData();
 
 		if (Memory::IsDedicatedServer())
@@ -225,4 +208,53 @@ namespace MapSlots
 
 		return;
 	}
+}
+
+static void map_slots_get_multiplayer_level_data(FILE* map_handle, s_multiplayer_ui_level_definition* multiplayer_level_data)
+{
+	ASSERT(map_handle);
+	ASSERT(multiplayer_level_data);
+
+	// Read cache header from map file
+	s_cache_header cache_header;
+	file_seek_and_read(map_handle, 0, sizeof(s_cache_header), 1, &cache_header);
+
+	// Read tags header from map file
+	cache_file_tags_header cache_file_tags_header;
+	file_seek_and_read(map_handle, cache_header.tag_offset, sizeof(cache_file_tags_header), 1, &cache_file_tags_header);
+
+	const uint32 active_map_instance_table_offset = cache_header.tag_offset + sizeof(s_tag_group_link) * cache_file_tags_header.tag_group_link_set_count + sizeof(cache_file_tags_header);
+
+	// Read the scenario instance from map file
+	cache_file_tag_instance scenario_instance;
+	file_seek_and_read(map_handle, active_map_instance_table_offset, sizeof(cache_file_tag_instance), 1, &scenario_instance);
+
+	// Scenario is the first tag in the tag data, so we can just go to the starting offset of tag data
+	const uint32 tag_data_offset = cache_header.tag_offset + cache_header.data_offset;
+	
+	// Get the offset of the level data block
+	const uint32 level_data_block_offset = tag_data_offset + offsetof(scenario, level_data);
+
+	// Read tag block of level data
+	s_tag_block tag_block;
+	file_seek_and_read(map_handle, level_data_block_offset, sizeof(tag_block), 1, &tag_block);
+
+	const uint32 level_data_offset = tag_data_offset + (tag_block.data - scenario_instance.data_offset);
+	const uint32 multiplayer_level_data_block_offset = level_data_offset + offsetof(s_scenario_level_data, multiplayer);
+
+	// Read tag block of multiplayer level data
+	file_seek_and_read(map_handle, multiplayer_level_data_block_offset, sizeof(tag_block), 1, &tag_block);
+
+	const uint32 multiplayer_level_data_offset = tag_data_offset + (tag_block.data - scenario_instance.data_offset);
+
+	// Read the multiplayer level data
+	file_seek_and_read(map_handle, multiplayer_level_data_offset, sizeof(s_multiplayer_ui_level_definition), 1, multiplayer_level_data);
+
+	//Fix incase the maps level data is incorrectly setup
+	if (strlen(multiplayer_level_data->path) == 0)
+	{
+		csstrnzcpy(multiplayer_level_data->path, cache_header.scenario_path, NUMBEROF(multiplayer_level_data->path));
+	}
+
+	return;
 }
