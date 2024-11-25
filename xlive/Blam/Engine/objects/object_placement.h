@@ -4,7 +4,6 @@
 #include "object_identifier.h"
 
 #include "math/color_math.h"
-#include "memory/static_arrays.h"
 #include "tag_files/string_id.h"
 
 enum e_bsp_policy : int8

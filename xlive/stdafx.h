@@ -47,7 +47,7 @@ static_assert(EXECUTABLE_TYPE <= 7 && EXECUTABLE_TYPE >= 0, "EXECUTABLE_TYPE VAL
 #include <mmsystem.h>
 #include <windef.h>
 #include <DbgHelp.h>
-#include <ShlObj.h>
+#include <ShlObj_core.h>
 #include <psapi.h>
 #include <TlHelp32.h>
 #include <iphlpapi.h>
@@ -64,8 +64,6 @@ static_assert(EXECUTABLE_TYPE <= 7 && EXECUTABLE_TYPE >= 0, "EXECUTABLE_TYPE VAL
 #include <stdio.h>
 #include <stdlib.h>
 #include <float.h>
-//#include <Objbase.h>
-//#include <Shlwapi.h>
 #include <set>
 #include <unordered_set>
 #include <map>
@@ -94,6 +92,7 @@ static_assert(EXECUTABLE_TYPE <= 7 && EXECUTABLE_TYPE >= 0, "EXECUTABLE_TYPE VAL
 #include "math/math.h"
 #include "math/integer_math.h"
 #include "math/real_math.h"
+#include "memory/static_arrays.h"
 
 #include "Util/curl-interface.h"
 #include "Util/Hooks/Hook.h"

@@ -1,13 +1,10 @@
 #include "stdafx.h"
 #include "motion_sensor.h"
 
-#include "hud.h"
-#include "new_hud_draw.h"
+#include "camera/camera.h"
 #include "game/game_time.h"
 #include "game/players.h"
-#include "rasterizer/dx9/rasterizer_dx9_main.h"
-#include "rasterizer/dx9/shaders/compiled/motion_sensor_sweep.h"
-#include "rasterizer/rasterizer_globals.h"
+#include "render/render.h"
 
 /* constants */
 

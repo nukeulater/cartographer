@@ -13,6 +13,7 @@
 
 #include "bink/wmv_playback.h"
 #include "cache/pc_geometry_cache.h"
+#include "camera/camera.h"
 #include "effects/beam.h"
 #include "effects/player_effects.h"
 #include "game/players.h"

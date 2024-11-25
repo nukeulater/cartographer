@@ -6,6 +6,7 @@
 #include "new_hud.h"
 #include "new_hud_definitions.h"
 #include "bitmaps/bitmap_group.h"
+#include "camera/camera.h"
 #include "game/players.h"
 #include "rasterizer/dx9/rasterizer_dx9_shader_submit_new.h"
 #include "render/render.h"

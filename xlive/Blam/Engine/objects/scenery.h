@@ -1,7 +1,6 @@
 #pragma once
 #include "object_definition.h"
 
-#include "memory/static_arrays.h"
 
 /* enums */
 

@@ -9,7 +9,6 @@
 #include "cache/predicted_resources.h"
 #include "decorators/decorator_definitions.h"
 #include "game/game_portals.h"
-#include "memory/static_arrays.h"
 #include "physics/collision_bsp_definition.h"
 #include "physics/structure_physics.h"
 #include "render/render_debug_structure.h"

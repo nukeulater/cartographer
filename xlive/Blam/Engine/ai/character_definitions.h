@@ -1,5 +1,4 @@
 #pragma once
-#include "memory/static_arrays.h"
 #include "units/units.h"
 #include "tag_files/string_id.h"
 #include "tag_files/tag_block.h"

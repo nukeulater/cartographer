@@ -1,6 +1,5 @@
 #pragma once
 #include "player_profile.h"
-#include "memory/static_arrays.h"
 
 /* constants */
 
