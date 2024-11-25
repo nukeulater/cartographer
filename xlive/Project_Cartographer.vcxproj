@@ -602,6 +602,8 @@
     <ClInclude Include="Blam\Engine\decorators\decorator_definitions.h" />
     <ClInclude Include="Blam\Engine\decorators\decorator_projected_decals.h" />
     <ClInclude Include="Blam\Engine\devices\devices.h" />
+    <ClInclude Include="Blam\Engine\devices\device_controls.h" />
+    <ClInclude Include="Blam\Engine\devices\device_light_fixture.h" />
     <ClInclude Include="Blam\Engine\devices\device_machines.h" />
     <ClInclude Include="Blam\Engine\editor\editor_flags.h" />
     <ClInclude Include="Blam\Engine\cseries\cseries_windows_debug_pc.h" />
@@ -709,6 +711,8 @@
     <ClInclude Include="Blam\Engine\interface\user_interface_widget_text.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_widget_text_entry.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_widget_window.h" />
+    <ClInclude Include="Blam\Engine\items\equipment.h" />
+    <ClInclude Include="Blam\Engine\items\garbage.h" />
     <ClInclude Include="Blam\Engine\items\item_collection_definition.h" />
     <ClInclude Include="Blam\Engine\items\item_definitions.h" />
     <ClInclude Include="Blam\Engine\items\projectile_definition.h" />
@@ -1078,19 +1082,11 @@
     <ClInclude Include="3rdparty\spdlog\include\spdlog\tweakme.h" />
     <ClInclude Include="3rdparty\spdlog\include\spdlog\version.h" />
     <ClInclude Include="3rdparty\tinyxml\tinyxml2.h" />
-    <ClInclude Include="Blam\Cache\TagGroups\crate_definition.hpp" />
-    <ClInclude Include="Blam\Cache\TagGroups\creature_definition.hpp" />
-    <ClInclude Include="Blam\Cache\TagGroups\device_control_definition.hpp" />
-    <ClInclude Include="Blam\Cache\TagGroups\device_light_fixture_definition.hpp" />
-    <ClInclude Include="Blam\Cache\TagGroups\device_machine_definition.hpp" />
-    <ClInclude Include="Blam\Cache\TagGroups\equipment_definition.hpp" />
-    <ClInclude Include="Blam\Cache\TagGroups\garbage_definition.hpp" />
     <ClInclude Include="Blam\Engine\interface\hud_definitions.h" />
     <ClInclude Include="Blam\Cache\TagGroups\physics_model_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\multiplayer_globals_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\scenario_lightmap_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\shader_pass_definition.hpp" />
-    <ClInclude Include="Blam\Cache\TagGroups\user_interface_globals_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\user_interface_shared_globals_definition.hpp" />
     <ClInclude Include="Blam\Engine\cache\cache_files.h" />
     <ClInclude Include="Blam\Engine\Networking\network_configuration.h" />
@@ -1106,6 +1102,7 @@
     <ClInclude Include="Blam\Engine\Networking\replication\replication_event_manager.h" />
     <ClInclude Include="Blam\Engine\networking\transport\transport.h" />
     <ClInclude Include="Blam\Engine\networking\transport\transport_qos.h" />
+    <ClInclude Include="Blam\Engine\objects\crates.h" />
     <ClInclude Include="Blam\Engine\objects\damage.h" />
     <ClInclude Include="Blam\Engine\game\game_engine.h" />
     <ClInclude Include="Blam\Engine\game\game_globals.h" />

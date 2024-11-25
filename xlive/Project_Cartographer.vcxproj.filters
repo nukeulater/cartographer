@@ -538,13 +538,6 @@
     <ClInclude Include="3rdparty\spdlog\include\spdlog\tweakme.h" />
     <ClInclude Include="3rdparty\spdlog\include\spdlog\version.h" />
     <ClInclude Include="3rdparty\tinyxml\tinyxml2.h" />
-    <ClInclude Include="Blam\Cache\TagGroups\crate_definition.hpp" />
-    <ClInclude Include="Blam\Cache\TagGroups\creature_definition.hpp" />
-    <ClInclude Include="Blam\Cache\TagGroups\device_control_definition.hpp" />
-    <ClInclude Include="Blam\Cache\TagGroups\device_light_fixture_definition.hpp" />
-    <ClInclude Include="Blam\Cache\TagGroups\device_machine_definition.hpp" />
-    <ClInclude Include="Blam\Cache\TagGroups\equipment_definition.hpp" />
-    <ClInclude Include="Blam\Cache\TagGroups\garbage_definition.hpp" />
     <ClInclude Include="Blam\Engine\interface\hud_definitions.h" />
     <ClInclude Include="Blam\Cache\TagGroups\multiplayer_globals_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\user_interface_shared_globals_definition.hpp" />
@@ -1178,8 +1171,13 @@
     <ClInclude Include="Blam\Engine\input\input_process.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_error_dialog.h" />
     <ClInclude Include="Blam\Engine\objects\scenery.h" />
+    <ClInclude Include="Blam\Engine\devices\device_light_fixture.h" />
+    <ClInclude Include="Blam\Engine\items\equipment.h" />
+    <ClInclude Include="Blam\Engine\items\garbage.h" />
     <ClInclude Include="Blam\Engine\items\item_collection_definition.h" />
+    <ClInclude Include="Blam\Engine\objects\crates.h" />
     <ClInclude Include="Blam\Engine\sound\sound_classes.h" />
+    <ClInclude Include="Blam\Engine\devices\device_controls.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

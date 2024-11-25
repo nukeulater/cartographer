@@ -45,11 +45,11 @@ enum e_major_upgrade : short
     major_upgrade_all = 4
 };
 
-enum e_grenade_type : short
+enum e_actor_starting_location_grenade_type : int16
 {
-    grenade_type_none = 0,
-    grenade_type_human_grenade = 1,
-    grenade_type_covenant_plasma = 2
+    _actor_starting_location_grenade_type_none = 0,
+    _actor_starting_location_grenade_type_human_grenade = 1,
+    _actor_starting_location_grenade_type_covenant_plasma = 2
 };
 
 enum actor_starting_location_flags : int
@@ -96,7 +96,7 @@ struct actor_starting_location_definition
     short pad1;
     short vehicle_type;                     // Block index: vehicle_palette
     e_seat_type seat_type;
-    e_grenade_type grenade_type;
+    e_actor_starting_location_grenade_type grenade_type;
     short swarm_count;                      // number of cretures in swarm if a swarm is spawned at this location
     string_id actor_variant_name;
     string_id vehicle_variant_name;
@@ -130,7 +130,7 @@ struct squad_definition
     short pad1;
     short initial_weapon;                   // Block index: weapon_palette
     short initial_secondary_weapon;         // Block index: weapon_palette
-    e_grenade_type grenade_type;
+    e_actor_starting_location_grenade_type grenade_type;
     short initial_order;                    // Block index: orders
     string_id vehicle_variant;
     tag_block<actor_starting_location_definition> starting_locations;
