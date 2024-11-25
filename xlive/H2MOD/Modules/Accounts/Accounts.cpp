@@ -114,11 +114,12 @@ void SaveH2Accounts() {
 			CSimpleIniA ini;
 			ini.SetUnicode();
 
-			std::fstream(fileConfig) << 
+			fprintf(fileConfig, 
 				"#--- Halo 2 Project Cartographer Accounts File ---"
 				"\n\n"
 				"# DO NOT SHARE THE CONTENTS OF THIS FILE."
-				"\n\n";
+				"\n\n"
+			);
 
 			ini.SetLongValue(H2AccConfigVersionStr.c_str(), "last_used", H2AccountLastUsed);
 			ini.SetLongValue(H2AccConfigVersionStr.c_str(), "account_count", H2AccountCount);

@@ -153,8 +153,7 @@ void SaveH2Config() {
 		CSimpleIniA ini;
 		ini.SetUnicode();
 
-		std::fstream iniStringBuffer(fileConfig);
-		iniStringBuffer <<
+		fprintf(fileConfig,
 			"#--- Halo 2 Project Cartographer Configuration File ---"
 			"\n\n"
 			"# h2portable Options:"
@@ -172,10 +171,10 @@ void SaveH2Config() {
 			"\n# <IPv4> - External IP Address of the local / internal network user you are trying to connect to. If blank, the External IP returned from the Master Login is used."
 			"\n# <IPv4> - Internal IP Address of the local / internal network user you are trying to connect to."
 			"\n\n"
-			;
+		);
 
 		if (!Memory::IsDedicatedServer()) {
-			iniStringBuffer <<
+			fprintf(fileConfig,
 				"# language_code Options (Client):"
 				"\n# <main>x<variant> - Sets the main/custom language for the game."
 				"\n# --- <main> ---"
@@ -241,16 +240,18 @@ void SaveH2Config() {
 				"# hide_ingame_chat Options (Client):"
 				"\n# 0 - In-game chat is displayed normally."
 				"\n# 1 - In-game chat is hidden."
-				"\n\n";
+				"\n\n"
+			);
 		}
 
-		iniStringBuffer <<
+		fprintf(fileConfig,
 			"# enable_xdelay Options:"
 			"\n# 0 - Non-host players cannot delay the game start countdown timer."
 			"\n# 1 - Non-host players can delay the game start countdown timer (native default)."
-			"\n\n";
+			"\n\n"
+		);
 
-		iniStringBuffer <<
+		fprintf(fileConfig,
 			"# debug_log Options:"
 			"\n# 0 - Disables logging."
 			"\n# 1 - Enables logging."
@@ -268,10 +269,11 @@ void SaveH2Config() {
 			"# debug_log_console Options:"
 			"\n# 0 - Disables console window logging."
 			"\n# 1 - Enables console window logging, will display all output from all loggers."
-			"\n\n";
+			"\n\n"
+		);
 
 		if (Memory::IsDedicatedServer()) {
-			iniStringBuffer <<
+			fprintf(fileConfig,
 				"# server_name Options (Server):"
 				"\n# Sets the name of the server up to 15 characters long."
 				"\n# Leave blank/empty for no effect."
@@ -325,17 +327,19 @@ void SaveH2Config() {
 
 				"# enable_anti_cheat (Server):"
 				"\n# This flag will enable anti-cheat on your server."
-				"\n\n";
+				"\n\n"
+			);
       
 		}
 
 		if (!Memory::IsDedicatedServer()) {
-			iniStringBuffer <<
+			fprintf(fileConfig,
 				"# hotkey_... Options (Client):"
 				"\n# The number used is the keyboard Virtual-Key (VK) Code in base-10 integer form."
 				"\n# The codes in hexadecimal (base-16) form can be found here:"
 				"\n# https://msdn.microsoft.com/en-us/library/windows/desktop/dd375731(v=vs.85).aspx"
-				"\n\n";
+				"\n\n"
+			);
 		}
 
 		ini.SetBoolValue(k_h2config_version_section, "h2portable", H2Portable);

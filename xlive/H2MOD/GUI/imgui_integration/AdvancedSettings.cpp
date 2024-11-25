@@ -1,5 +1,8 @@
 #include "stdafx.h"
 
+#include "imgui.h"
+#include "imgui_handler.h"
+
 #include "AdvancedSettingsStringTable.h"
 
 #include "cartographer/twizzler/twizzler.h"
@@ -10,6 +13,7 @@
 #include "interface/first_person_weapons.h"
 #include "networking/NetworkMessageTypeCollection.h"
 #include "rasterizer/rasterizer_globals.h"
+#include "saved_games/cartographer_player_profile.h"
 
 #include "H2MOD.h"
 #include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
@@ -22,11 +26,6 @@
 #include "H2MOD/Modules/RenderHooks/RenderHooks.h"
 #include "H2MOD/Utils/Utils.h"
 #endif
-
-#include "imgui.h"
-#include "imgui_handler.h"
-#include "camera/observer.h"
-#include "saved_games/cartographer_player_profile.h"
 
 /* constants */
 

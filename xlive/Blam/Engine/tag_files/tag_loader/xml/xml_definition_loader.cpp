@@ -3,7 +3,6 @@
 
 #include "xml_definition_block.h"
 
-#include "bitmaps/bitmap_group.h"
 #include "cache/cache_files.h"
 #include "filesys/pc_file_system.h"
 #include "tag_files/data_reference.h"
@@ -60,17 +59,16 @@ void c_xml_definition_loader::init(c_xml_definition_block* definition, FILE* fil
 
 void c_xml_definition_loader::load_cache_info()
 {
-	uint32 instance_table_offset = this->m_cache_header->tag_offset + sizeof(s_tag_group_link) * this->m_tags_header->tag_group_link_set_count + 0x20;
+	uint32 instance_table_offset = this->m_cache_header->tag_offset + sizeof(s_tag_group_link) * this->m_tags_header->tag_group_link_set_count + sizeof(cache_file_tags_header);
 	uint32 tag_data_start_offset = this->m_cache_header->tag_offset + this->m_cache_header->data_offset;
 
 	uint32 tag_instance_offset = instance_table_offset + sizeof(cache_file_tag_instance) * DATUM_INDEX_TO_ABSOLUTE_INDEX(this->m_cache_index);
 
-	cache_file_tag_instance t_instance;
+	cache_file_tag_instance instance;
 	// read requested tag instance from file
-	fseek(this->m_file_handle, tag_instance_offset, SEEK_SET);
-	fread(&t_instance, sizeof(cache_file_tag_instance), 1, this->m_file_handle);
+	file_seek_and_read(this->m_file_handle, tag_instance_offset, sizeof(cache_file_tag_instance), 1, &instance);
 
-	this->m_instance = t_instance;
+	this->m_instance = instance;
 	this->m_file_offset = tag_data_start_offset + this->m_instance.data_offset - this->m_scenario_instance_offset;
 }
 

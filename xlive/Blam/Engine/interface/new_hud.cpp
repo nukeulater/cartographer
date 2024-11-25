@@ -1,14 +1,12 @@
 #include "stdafx.h"
 #include "new_hud.h"
 
-#include "bitmaps/bitmap_group.h"
 #include "camera/camera.h"
 #include "game/game.h"
 #include "interface/hud.h"
 #include "interface/new_hud_definitions.h"
 #include "main/main_screenshot.h"
 #include "networking/logic/life_cycle_manager.h"
-
 
 #include "H2MOD/Modules/Input/KeyboardInput.h"
 #include "H2MOD/Modules/Shell/Config.h"
@@ -26,29 +24,10 @@ bool __cdecl render_ingame_chat_check(void);
 // Hook for ui_get_hud_elements for modifying the hud anchor for text
 real_point2d* __cdecl ui_get_hud_element_position_hook(e_hud_anchor anchor, real_point2d* point);
 
-// Stores the bitmap width and height in crosshair_original_bitmap_sizes for use when scaling the crosshair bitmaps
-void initialize_crosshair_bitmap_data(void);
-
-// Checks if the vector contains the datum provided so we don't have duplicate datums in the vector
-bool crosshair_bitmap_vector_contains_datum(datum tag_index);
-
-// Gets all bitmap tags that are referenced as a crosshair from the new_hud_definition tags
-// Intended to grab all bitmaps referenced as crosshairs rather than just the original ones
-void get_crosshair_bitmap_datums(void);
-
-void initialize_crosshair_scale(bool game_mode_ui_shell);
-
-
 /* public code */
 
 void new_hud_apply_patches(void)
 {
-	KeyboardInput::RegisterHotkey(&H2Config_hotkeyIdToggleHideIngameChat,
-		[]() {
-			H2Config_hide_ingame_chat = !H2Config_hide_ingame_chat;
-		}
-	);
-
 	// Redirects the is_campaign call that the in-game chat renderer makes so we can show/hide it as we like.
 	PatchCall(Memory::GetAddress(0x22667B), render_ingame_chat_check);
 	PatchCall(Memory::GetAddress(0x226628), render_ingame_chat_check);
