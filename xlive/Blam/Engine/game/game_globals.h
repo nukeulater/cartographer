@@ -591,6 +591,11 @@ s_game_globals_player_representation* game_globals_get_representation(e_characte
 
 void game_globals_apply_tag_patches(s_game_options* options);
 
+static s_game_globals_rasterizer_data* rasterizer_globals_get_data(void)
+{
+    return *Memory::GetAddress<s_game_globals_rasterizer_data**>(0xA3DA3C);
+}
+
 static tag_reference game_globals_get_interface_tag_reference(e_interface_tag interface_tag_index)
 {
     return scenario_get_game_globals()->interface_tags[0]->interface_tag_references[interface_tag_index];

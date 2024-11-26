@@ -2,14 +2,14 @@
 #include "CustomMapDataCache.h"
 
 #include "cache/cache_files.h"
+#include "interface/signal_slot.h"
+#include "interface/user_interface_memory.h"
 #include "memory/data.h"
+#include "scenario/scenario_definitions.h"
 #include "shell/shell.h"
-#include "scenario/scenario.h"
 #include "tag_files/files_windows.h"
 #include "text/unicode.h"
 
-#include "interface/user_interface_headers.h"
-#include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 
 
 #pragma region 50 map limit removal
@@ -38,10 +38,14 @@ bool __cdecl scenario_is_supported_build(const char* build)
 		}
 	}
 
+	if (!result)
+	{
+		LOG_TRACE_FUNC("Build '{}' is not offically supported, consider repacking and updating map with supported tools!", build);
+	}
+
 	// allow map to be loaded regardless of the cache version
 	result = true;
 
-	LOG_TRACE_FUNC("Build '{}' is not offically supported, consider repacking and updating map with supported tools!", build);
 	return result;
 }
 

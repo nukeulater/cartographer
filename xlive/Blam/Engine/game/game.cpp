@@ -14,6 +14,7 @@
 #include "saved_games/game_state.h"
 #include "shell/shell.h"
 #include "simulation/simulation.h"
+#include "text/unicode.h"
 #include "rasterizer/rasterizer_globals.h"
 #include "rasterizer/dx9/rasterizer_dx9_main.h"
 
