@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "MapSlots.h"
 
+#include "cache/cache_files.h"
 #include "filesys/pc_file_system.h"
 #include "game/game_globals.h"
 #include "main/level_definitions.h"

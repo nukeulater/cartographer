@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "screen_xbox_live_task_progress_dialog.h"
 
+#include "cache/cache_files.h"
 #include "interface/user_interface_screen_widget_definition.h"
 #include "interface/user_interface_utilities.h"
 #include "interface/user_interface_memory.h"

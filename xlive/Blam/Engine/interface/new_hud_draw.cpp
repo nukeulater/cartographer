@@ -5,7 +5,9 @@
 #include "hud_definitions.h"
 #include "new_hud.h"
 #include "new_hud_definitions.h"
+
 #include "bitmaps/bitmap_group.h"
+#include "cache/cache_files.h"
 #include "camera/camera.h"
 #include "game/players.h"
 #include "rasterizer/dx9/rasterizer_dx9_shader_submit_new.h"
@@ -61,7 +63,7 @@ real_rgb_color* global_hud_draw_text_widget_primary_color_get()
 	return Memory::GetAddress<real_rgb_color*>(0x976650);
 }
 
-void draw_hud_get_bitmap_data(uint32 local_render_user_index, s_hud_bitmap_widget_definition* bitmap_widget, real_rectangle2d* bounds, uint32* out_bitmap_index, uint32* out_width_pixels, uint32* out_height_pixels)
+void draw_hud_get_bitmap_data(uint32 local_render_user_index, s_hud_bitmap_widget_definition* bitmap_widget, real_rectangle2d* bounds, int16* out_bitmap_index, int16* out_width_pixels, int16* out_height_pixels)
 {
 	ASSERT(bitmap_widget);
 	ASSERT(bounds);
@@ -120,7 +122,7 @@ void draw_hud_get_bitmap_data(uint32 local_render_user_index, s_hud_bitmap_widge
 		if (bitmap_sequence->bitmap_count <= 0)
 			return;
 
-		int32 bitmap_index = bitmap_sequence->first_bitmap_index;
+		int16 bitmap_index = bitmap_sequence->first_bitmap_index;
 		if (bitmap_sequence->bitmap_count > 1 && player_user_is_elite_or_dervish(local_render_user_index))
 			bitmap_index += 1;
 
@@ -135,16 +137,16 @@ void draw_hud_get_bitmap_data(uint32 local_render_user_index, s_hud_bitmap_widge
 		return;
 	}
 
-	int32 sprite_index = 0;
+	int8 sprite_index = 0;
 	if (bitmap_sequence->sprites.count > 1 && player_user_is_elite_or_dervish(local_render_user_index))
 		sprite_index = 1;
 
 	bitmap_group_sprite* bitmap_sprite = bitmap_sequence->sprites[sprite_index];
-	bitmap_data* bitmap_data = bitmap->bitmaps[bitmap_sprite->bitmapIndex];
+	bitmap_data* bitmap_data = bitmap->bitmaps[bitmap_sprite->bitmap_index];
 
 	*out_width_pixels = bitmap_data->width;
 	*out_height_pixels = bitmap_data->height;
-	*out_bitmap_index = bitmap_sprite->bitmapIndex;
+	*out_bitmap_index = bitmap_sprite->bitmap_index;
 	bounds->y0 = bitmap_sprite->bounds.y0;
 	bounds->y1 = bitmap_sprite->bounds.y1;
 	bounds->x0 = bitmap_sprite->bounds.x0;
@@ -210,9 +212,9 @@ void __cdecl draw_hud_bitmap_widget(int32 local_render_user_index, s_new_hud_tem
 		return;
 
 	real_rectangle2d bitmap_bounds{};
-	uint32 bitmap_index = NONE;
-	uint32 bitmap_width = 0;
-	uint32 bitmap_height = 0;
+	int16 bitmap_index = NONE;
+	int16 bitmap_width = 0;
+	int16 bitmap_height = 0;
 
 	draw_hud_get_bitmap_data(local_render_user_index, bitmap_widget, &bitmap_bounds, &bitmap_index, &bitmap_width, &bitmap_height);
 
@@ -230,8 +232,8 @@ void __cdecl draw_hud_bitmap_widget(int32 local_render_user_index, s_new_hud_tem
 	if (bitmap_widget->effect.count > 0)
 		hud_widget_effect_evaluate(local_render_user_index, user_state, bitmap_widget->effect[0], &offset_result, &scale_result, &theta_result);
 
-	bitmap_width = (uint32)(bitmap_width * scale_result.x);
-	bitmap_height = (uint32)(bitmap_height * scale_result.y);
+	bitmap_width = (int16)(bitmap_width * scale_result.x);
+	bitmap_height = (int16)(bitmap_height * scale_result.y);
 
 	real32 hud_scale = *get_primary_hud_scale();
 
@@ -760,21 +762,34 @@ void hud_draw_on_map_load()
 
 	// initial loop to find how many bitmaps there are
 	tag_iterator it;
-	tag_iterator_new(&it, e_tag_group::_tag_group_bitmap);
+	tag_iterator_new(&it, _tag_group_bitmap);
 	while (tag_iterator_next(&it) != NONE)
+	{
 		if (strstr(tag_get_name(it.current_tag_index), "new_hud\\crosshairs"))
+		{
 			g_draw_hud_crosshair_bitmap_cache_count++;
+		}
+	}
 
 	// allocate a storage for the datums
 	g_draw_hud_crosshair_bitmap_cache = (datum*)calloc(g_draw_hud_crosshair_bitmap_cache_count, sizeof(datum));
 
 	// do a second loop to store all the actual datums
-	g_draw_hud_crosshair_bitmap_cache_count = 0;
-
-	tag_iterator_new(&it, e_tag_group::_tag_group_bitmap);
+	size_t i = 0;
+	tag_iterator_new(&it, _tag_group_bitmap);
 	while (tag_iterator_next(&it) != NONE)
-		if (strstr(tag_get_name(it.current_tag_index), "new_hud\\crosshairs"))
-			g_draw_hud_crosshair_bitmap_cache[g_draw_hud_crosshair_bitmap_cache_count++] = it.current_tag_index;
+	{
+		if (strstr(tag_get_name(it.current_tag_index), "new_hud\\crosshairs") && i < g_draw_hud_crosshair_bitmap_cache_count)
+		{
+			g_draw_hud_crosshair_bitmap_cache[i++] = it.current_tag_index;
+		}
+		// Exit when we've cached all the bitmap datums
+		else if (i >= g_draw_hud_crosshair_bitmap_cache_count) {
+			break;
+		}
+	}
+
+	return;
 }
 
 datum hud_bitmap_tag_index_get(void)

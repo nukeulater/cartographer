@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "tag_fixes.h"
 
+#include "cache/cache_files.h"
 #include "game/game_globals.h"
 #include "interface/new_hud_definitions.h"
 #include "scenario/scenario.h"

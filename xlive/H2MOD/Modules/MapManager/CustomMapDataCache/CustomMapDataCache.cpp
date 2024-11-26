@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "CustomMapDataCache.h"
 
-
+#include "cache/cache_files.h"
 #include "memory/data.h"
 #include "shell/shell.h"
 #include "scenario/scenario.h"

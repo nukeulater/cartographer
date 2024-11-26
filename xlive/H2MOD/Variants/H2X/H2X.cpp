@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "H2X.h"
 
+#include "cache/cache_files.h"
 #include "items/weapon_definitions.h"
 #include "game/game_time.h"
 

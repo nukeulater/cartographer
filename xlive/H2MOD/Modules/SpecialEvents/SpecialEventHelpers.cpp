@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "SpecialEventHelpers.h"
 
-
+#include "cache/cache_files.h"
 #include "items/weapon_definitions.h"
 #include "models/models.h"
 #include "models/render_model_definitions.h"

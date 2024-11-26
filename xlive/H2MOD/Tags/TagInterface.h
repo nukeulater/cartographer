@@ -1,5 +1,4 @@
 #pragma once
-#include "cache/cache_files.h"
 #include "tag_files/tag_groups.h"
 
 namespace tags
@@ -13,13 +12,6 @@ namespace tags
 	};
 	ASSERT_STRUCT_SIZE(tag_instance, 16);
 	
-	struct tag_parent_info
-	{
-		tag_group tag;
-		tag_group parent;
-		tag_group grandparent;
-	};
-
 	/*
 		Tag Interface
 
@@ -45,24 +37,4 @@ namespace tags
 
 	/* Returns a pointer to the tag instance array */
 	tag_instance* get_tag_instance(datum tag_index);
-
-	/* Returns the number of tags, pretty self explanatory */
-	inline int32 get_tag_count()
-	{
-		return cache_files_get_tags_header()->tag_count;
-	}
-
-	/* Convert a tag index to a tag datum */
-	inline datum index_to_datum(int16 idx)
-	{
-		if (idx >= get_tag_count())
-		{
-			LOG_ERROR_FUNC("Index out of bounds");
-			return NONE;
-		}
-		tag_instance* instance = get_tag_instance(idx);
-		datum tag_datum = instance->datum_index;
-		LOG_CHECK(DATUM_INDEX_TO_ABSOLUTE_INDEX(tag_datum) == idx); // should always be true
-		return tag_datum;
-	}
 }

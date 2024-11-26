@@ -3,6 +3,7 @@
 #include "Mook.h"
 #include "../SpecialEventHelpers.h"
 
+#include "cache/cache_files.h"
 #include "items/weapon_definitions.h"
 #include "tag_files/tag_loader/tag_injection.h"
 

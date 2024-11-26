@@ -5,6 +5,8 @@
 #include "screen_bungie_news.h"
 #include "screen_press_start_introduction.h"
 #include "screen_xbox_live_task_progress_dialog.h"
+
+#include "cache/cache_files.h"
 #include "input/input_process.h"
 #include "interface/user_interface.h"
 #include "interface/user_interface_bitmap_block.h"
