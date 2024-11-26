@@ -1,5 +1,4 @@
 #pragma once
-
 #include "H2MOD/Variants/VariantSystem.h"
 
 class GunGame : public ICustomGameVariant
@@ -28,9 +27,7 @@ public:
 
 	virtual bool c_game_statborg__adjust_player_stat(ExecTime execTime, c_game_statborg* statborg, datum player_datum, e_statborg_entry statistic, short count, int game_results_statistic, bool adjust_team_stat) override;
 
-	static void InitWeaponLevels();
 	static void ResetPlayerLevels();
 
-	static std::unordered_map<int, datum> levelWeapon;
 	static std::unordered_map<unsigned long long, int> gungamePlayers;
 };
