@@ -7,7 +7,7 @@
 #include "models/render_model_definitions.h"
 #include "tag_files/global_string_ids.h"
 
-#include "H2MOD/Tags/MetaExtender.h"
+#include "tag_files/tag_loader/tag_injection.h"
 
 // Add new marker for elites
 void add_special_event_markers(void)
@@ -17,10 +17,12 @@ void add_special_event_markers(void)
 	{
 		render_model_definition* mode_elite = (render_model_definition*)tag_get_fast(mode_elite_datum);
 		
-		render_model_marker_group* new_marker_group = MetaExtender::add_tag_block2<render_model_marker_group>((unsigned long)std::addressof(mode_elite->marker_groups));
+		render_model_marker_group* new_marker_group = (render_model_marker_group*)tag_injection_extend_block(&mode_elite->marker_groups, mode_elite->marker_groups.type_size(), 1);
+			
 		new_marker_group->name = new_elite_head_marker;
 		
-		render_model_marker* new_marker = MetaExtender::add_tag_block2<render_model_marker>((unsigned long)std::addressof(new_marker_group->markers));
+		render_model_marker* new_marker = (render_model_marker*)tag_injection_extend_block(&new_marker_group->markers, new_marker_group->markers.type_size(), 1);
+
 		LOG_INFO_GAME("[{}] {:x}", __FUNCTION__, (unsigned long)std::addressof(new_marker));
 		new_marker->node_index = 19;
 		new_marker->permutation_index = NONE;
@@ -50,26 +52,36 @@ void replace_fp_and_3p_models_from_weapon(datum weapon_datum, datum fp_model_dat
 	return;
 }
 
-void add_hat_to_model(datum player_hlmt_datum, datum hat_scenery_datum, bool is_elite)
-{
-	s_model_definition* model = (s_model_definition*)tag_get_fast(player_hlmt_datum);
-	s_model_variant* variant = model->variants[0];
-	s_model_variant_object* hat = MetaExtender::add_tag_block2<s_model_variant_object>((unsigned long)std::addressof(variant->objects));
-	hat->parent_marker = (is_elite == false ? string_id(_string_id_head) : new_elite_head_marker);
-	hat->child_object.group.group = _tag_group_scenery;
-	hat->child_object.index = hat_scenery_datum;
-	return;
-}
-
 void add_hat_and_beard_to_model(datum player_hlmt_datum, datum hat_scenery_datum, datum beard_scenery_datum, bool is_elite)
 {
-	add_hat_to_model(player_hlmt_datum, hat_scenery_datum, is_elite);
+	uint32 block_count = 0;
+
+	if (hat_scenery_datum != NONE)
+		++block_count;
+	if (beard_scenery_datum != NONE)
+		++block_count;
 
 	s_model_definition* model = (s_model_definition*)tag_get_fast(player_hlmt_datum);
 	s_model_variant* variant = model->variants[0];
-	s_model_variant_object* beard = MetaExtender::add_tag_block2<s_model_variant_object>((unsigned long)std::addressof(variant->objects));
-	beard->parent_marker = (is_elite == false ? string_id(_string_id_head) : new_elite_head_marker);
-	beard->child_object.group.group = _tag_group_scenery;
-	beard->child_object.index = beard_scenery_datum;
-	return;
+
+	s_model_variant_object* blocks = (s_model_variant_object*)tag_injection_extend_block(&variant->objects, variant->objects.type_size(), block_count);
+
+	block_count = 0;
+
+	if(hat_scenery_datum != NONE)
+	{
+		
+		blocks[block_count].parent_marker = (is_elite == false ? string_id(_string_id_head) : new_elite_head_marker);
+		blocks[block_count].child_object.group.group = _tag_group_scenery;
+		blocks[block_count].child_object.index = hat_scenery_datum;
+		++block_count;
+	}
+
+	if(beard_scenery_datum != NONE)
+	{
+		blocks[block_count].parent_marker = (is_elite == false ? string_id(_string_id_head) : new_elite_head_marker);
+		blocks[block_count].child_object.group.group = _tag_group_scenery;
+		blocks[block_count].child_object.index = beard_scenery_datum;
+		++block_count;
+	}
 }

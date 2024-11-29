@@ -18,7 +18,6 @@
 #include "tag_files/global_string_ids.h"
 
 #include "tag_files/tag_loader/tag_injection.h"
-#include "H2MOD/Tags/MetaExtender.h"
 
 /* macro defines */
 
@@ -403,7 +402,7 @@ void c_screen_settings::apply_patches_on_map_load()
 	s_user_interface_screen_widget_definition* main_widget_tag = (s_user_interface_screen_widget_definition*)tag_get_fast(main_widget_datum_index);
 
 	//    add window_pane for guide option 
-	MetaExtender::add_tag_block3<s_window_pane_reference>((uint32)&main_widget_tag->panes, k_number_of_addition_panes_for_settings_screen);
+	tag_injection_extend_block(&main_widget_tag->panes, main_widget_tag->panes.type_size(), k_number_of_addition_panes_for_settings_screen);
 	//copy data from about_pane
 	csmemcpy(main_widget_tag->panes[_settings_pane_guide], main_widget_tag->panes[_settings_pane_about], sizeof(s_window_pane_reference));
 	//updating the new number of visible items in each pane
@@ -434,8 +433,10 @@ void c_screen_settings::apply_patches_on_map_load()
 	}
 
 	s_window_pane_reference* guide_pane = main_widget_tag->panes[_settings_pane_guide];
+
 	//clone blocks into a seperate memory (so we dont end up affecting about_pane)
-	MetaExtender::add_tag_block3<s_text_block_reference>((uint32)&main_widget_tag->panes[_settings_pane_guide]->text_blocks, k_number_of_addition_texts_for_guide_pane);
+	tag_injection_extend_block(&main_widget_tag->panes[_settings_pane_guide]->text_blocks, sizeof(s_text_block_reference), k_number_of_addition_texts_for_guide_pane);
+
 	//copy data from existing blocks
 	csmemcpy(guide_pane->text_blocks[_pane_guide_text_custom_flavor_text1], guide_pane->text_blocks[_pane_guide_text_flavor_text33], sizeof(s_text_block_reference));
 	csmemcpy(guide_pane->text_blocks[_pane_guide_text_custom_flavor_text2], guide_pane->text_blocks[_pane_guide_text_flavor_text33], sizeof(s_text_block_reference));

@@ -19,6 +19,8 @@
 #define k_maximum_material_types 256
 #define k_game_globals_maximum_multiplayer_colors 32
 
+#define k_cartographer_custom_representation_count 3
+
 enum e_game_globals_rasterizer_flags : int16
 {
     _game_globals_rasterizer_flag_tint_edge_density = FLAG(0)
@@ -577,6 +579,16 @@ struct s_game_globals
     c_language_pack language_pack[k_language_count];
 };
 ASSERT_STRUCT_SIZE(s_game_globals, 644);
+
+struct s_game_globals_custom_representation_result
+{
+    bool success;
+    e_character_type fallback_character_type;
+    datum biped;
+    datum first_person;
+    datum body;
+    string_id variant;
+};
 
 /* public code */
 

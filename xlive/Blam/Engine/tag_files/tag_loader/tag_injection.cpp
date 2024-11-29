@@ -112,6 +112,11 @@ void tag_injection_scenario_load_setup(uint32 allocation_size)
 	}
 }
 
+int8* tag_injection_extend_block(void* block, uint32 entry_size, uint32 count)
+{
+	return g_manager.extend_tag_block(block, entry_size, count);
+}
+
 void tag_injection_apply_hooks()
 {
 }
