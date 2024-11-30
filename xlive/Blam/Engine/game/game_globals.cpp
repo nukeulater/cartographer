@@ -18,21 +18,13 @@ struct s_game_globals_custom_representation_result
 {
 	bool success;
 	e_character_type fallback_character_type;
-	datum biped;
-	datum first_person;
-	datum body;
+	datum third_person_unit;
+	datum first_person_hands;
+	datum first_person_body;
 	string_id variant;
 };
 
 /* prototypes */
-
-static void game_globals_prepare_skeleton_representation(s_game_globals_custom_representation_result* result);
-static void game_globals_prepare_flood_representation(s_game_globals_custom_representation_result* result);
-static void game_globals_prepare_lmao_representation(s_game_globals_custom_representation_result* result);
-
-static void add_new_representations(s_game_globals_custom_representation_result* representations);
-static void add_simulation_table_entries(s_game_globals_custom_representation_result* representations);
-
 
 // Set the masterchief representation to the multiplayer version only in multiplayer
 // This prevents server owners from forcing masterchief 
@@ -40,6 +32,13 @@ static void game_globals_remove_singleplayer_representation(void);
 
 // Adds new representations to the globals tag
 static void game_globals_add_new_player_representations(void);
+
+static void game_globals_prepare_skeleton_representation(s_game_globals_custom_representation_result* result);
+static void game_globals_prepare_flood_representation(s_game_globals_custom_representation_result* result);
+static void game_globals_prepare_lmao_representation(s_game_globals_custom_representation_result* result);
+
+static void add_new_representations(s_game_globals_custom_representation_result* representations);
+static void add_simulation_table_entries(s_game_globals_custom_representation_result* representations);
 
 /* constants */
 
@@ -95,7 +94,9 @@ s_game_globals_player_representation* game_globals_get_representation(e_characte
 	return scenario_get_game_globals()->player_representation[type];
 }
 
-void game_globals_remove_singleplayer_representation(void)
+/* private code */
+
+static void game_globals_remove_singleplayer_representation(void)
 {
 	s_game_globals* globals = scenario_get_game_globals();
 
@@ -106,7 +107,26 @@ void game_globals_remove_singleplayer_representation(void)
 	return;
 }
 
-void game_globals_prepare_skeleton_representation(s_game_globals_custom_representation_result* result)
+static void game_globals_add_new_player_representations(void)
+{
+	if (!Memory::IsDedicatedServer())
+	{
+		scenario* scenario_definition = get_global_scenario();
+
+		s_game_globals_custom_representation_result representations[k_cartographer_custom_representation_count]{};
+		for (uint32 i = 0; i < k_cartographer_custom_representation_count; ++i)
+		{
+			ASSERT(k_game_globals_custom_representation_function_table[i]);
+			k_game_globals_custom_representation_function_table[i](&representations[i]);
+		}
+
+		add_new_representations(representations);
+		add_simulation_table_entries(representations);
+	}
+	return;
+}
+
+static void game_globals_prepare_skeleton_representation(s_game_globals_custom_representation_result* result)
 {
 	result->success = false;
 	result->fallback_character_type = _character_type_spartan;
@@ -121,14 +141,15 @@ void game_globals_prepare_skeleton_representation(s_game_globals_custom_represen
 		tag_injection_inject();
 
 		result->success = true;
-		result->biped = skele_datum;
-		result->first_person = skele_fp_datum;
-		result->body = skele_body_datum;
+		result->third_person_unit = skele_datum;
+		result->first_person_hands = skele_fp_datum;
+		result->first_person_body = skele_body_datum;
 		result->variant = NONE;
 	}
+	return;
 }
 
-void game_globals_prepare_flood_representation(s_game_globals_custom_representation_result* result)
+static void game_globals_prepare_flood_representation(s_game_globals_custom_representation_result* result)
 {
 	result->success = false;
 	result->fallback_character_type = _character_type_elite;
@@ -144,14 +165,15 @@ void game_globals_prepare_flood_representation(s_game_globals_custom_representat
 		tag_injection_inject();
 
 		result->success = true;
-		result->biped = flood_datum;
-		result->first_person = flood_arms_datum;
-		result->body = flood_body_datum;
+		result->third_person_unit = flood_datum;
+		result->first_person_hands = flood_arms_datum;
+		result->first_person_body = flood_body_datum;
 		result->variant = NONE;
 	}
+	return;
 }
 
-void game_globals_prepare_lmao_representation(s_game_globals_custom_representation_result* result)
+static void game_globals_prepare_lmao_representation(s_game_globals_custom_representation_result* result)
 {
 	result->success = false;
 	result->fallback_character_type = _character_type_spartan;
@@ -212,76 +234,49 @@ void game_globals_prepare_lmao_representation(s_game_globals_custom_representati
 		}
 
 		result->success = true;
-		result->biped = NONE;
-		result->first_person = NONE;
-		result->body = NONE;
+		result->third_person_unit = NONE;
+		result->first_person_hands = NONE;
+		result->first_person_body = NONE;
 		result->variant = new_variant->name;
 	}
+	return;
 }
 
-void add_new_representations(s_game_globals_custom_representation_result* representations)
+static void add_new_representations(s_game_globals_custom_representation_result* representations)
 {
 	s_game_globals* globals = scenario_get_game_globals();
-
 	s_game_globals_player_representation* new_blocks = (s_game_globals_player_representation*)tag_injection_extend_block(&globals->player_representation, globals->player_representation.type_size(), k_cartographer_custom_representation_count);
 
 	for (uint32 index = 0; index < k_cartographer_custom_representation_count; index++)
 	{
-		s_game_globals_custom_representation_result* representation_result = &representations[index];
+		const s_game_globals_custom_representation_result* representation_result = &representations[index];
+		const e_character_type fallback_character = representation_result->fallback_character_type;
+
 		s_game_globals_player_representation* new_representation = &new_blocks[index];
 
 		if (representation_result->success)
 		{
-			if (representation_result->first_person != NONE)
-			{
-				new_representation->first_person_hands.group.group = _tag_group_render_model;
-				new_representation->first_person_hands.index = representation_result->first_person;
-			}
-			else
-			{
-				new_representation->first_person_hands = globals->player_representation[representation_result->fallback_character_type]->first_person_hands;
-			}
+			const tag_reference fp_hands_tag_ref = { _tag_group_render_model, representation_result->first_person_hands };
+			const tag_reference fp_body_tag_ref = { _tag_group_render_model, representation_result->first_person_body };
+			const tag_reference unit_tag_ref = { _tag_group_biped, representation_result->third_person_unit };
 
-			if (representation_result->body != NONE)
-			{
-				new_representation->first_person_body.group.group = _tag_group_render_model;
-				new_representation->first_person_body.index = representation_result->body;
-			}
-			else
-			{
-				new_representation->first_person_body = globals->player_representation[representation_result->fallback_character_type]->first_person_body;
-			}
-
-			if (representation_result->biped != NONE)
-			{
-				new_representation->third_person_unit.group.group = _tag_group_biped;
-				new_representation->third_person_unit.index = representation_result->biped;
-			}
-			else
-			{
-				new_representation->third_person_unit = globals->player_representation[representation_result->fallback_character_type]->third_person_unit;
-			}
-
-			if (representation_result->variant != NONE)
-			{
-				new_representation->third_person_variant = representation_result->variant;
-			}
-			else
-			{
-				new_representation->third_person_variant = globals->player_representation[representation_result->fallback_character_type]->third_person_variant;
-			}
+			new_representation->first_person_hands = representation_result->first_person_hands != NONE ? fp_hands_tag_ref : globals->player_representation[fallback_character]->first_person_hands;
+			new_representation->first_person_body = representation_result->first_person_body != NONE ? fp_body_tag_ref : globals->player_representation[fallback_character]->first_person_body;
+			new_representation->third_person_unit = representation_result->third_person_unit != NONE ? unit_tag_ref : globals->player_representation[fallback_character]->third_person_unit;
+			new_representation->third_person_variant = representation_result->variant != NONE ? representation_result->variant : globals->player_representation[fallback_character]->third_person_variant;
 		}
 		else
 		{
-			new_representation->first_person_hands = globals->player_representation[representation_result->fallback_character_type]->first_person_hands;
-			new_representation->first_person_body = globals->player_representation[representation_result->fallback_character_type]->first_person_body;
-			new_representation->third_person_unit = globals->player_representation[representation_result->fallback_character_type]->third_person_unit;
-			new_representation->third_person_variant = globals->player_representation[representation_result->fallback_character_type]->third_person_variant;
+			new_representation->first_person_hands = globals->player_representation[fallback_character]->first_person_hands;
+			new_representation->first_person_body = globals->player_representation[fallback_character]->first_person_body;
+			new_representation->third_person_unit = globals->player_representation[fallback_character]->third_person_unit;
+			new_representation->third_person_variant = globals->player_representation[fallback_character]->third_person_variant;
 		}
 	}
+	return;
 }
 
-void add_simulation_table_entries(s_game_globals_custom_representation_result* representations)
+static void add_simulation_table_entries(s_game_globals_custom_representation_result* representations)
 {
 	scenario* scenario = get_global_scenario();
 
@@ -290,41 +285,21 @@ void add_simulation_table_entries(s_game_globals_custom_representation_result* r
 
 	for(uint32 i = 0; i < k_cartographer_custom_representation_count; ++i)
 	{
-		if (representations[i].success && representations[i].biped != NONE)
+		if (representations[i].success && representations[i].third_person_unit != NONE)
 			++new_entry_count;
 	}
 
 	// do a second pass to place them into the new table
 	s_scenario_simulation_definition_table_element* new_blocks = (s_scenario_simulation_definition_table_element*)tag_injection_extend_block(&scenario->simulation_definition_table, scenario->simulation_definition_table.type_size(), new_entry_count);
 	new_entry_count = 0;
-	
+
 	for(uint32 i = 0; i < k_cartographer_custom_representation_count; ++i)
 	{
-		if(representations[i].success && representations[i].biped != NONE)
+		if(representations[i].success && representations[i].third_person_unit != NONE)
 		{
-			new_blocks[new_entry_count].tag_datum = representations[i].biped;
+			new_blocks[new_entry_count].tag_datum = representations[i].third_person_unit;
 			++new_entry_count;
 		}
 	}
-
-}
-
-static void game_globals_add_new_player_representations(void)
-{
-	if (!Memory::IsDedicatedServer())
-	{
-		scenario* scenario_definition = get_global_scenario();
-
-		s_game_globals_custom_representation_result representations[k_cartographer_custom_representation_count]{};
-		for (uint32 i = 0; i < k_cartographer_custom_representation_count; ++i)
-		{
-			ASSERT(k_game_globals_custom_representation_function_table[i]);
-			k_game_globals_custom_representation_function_table[i](&representations[i]);
-		}
-
-		add_new_representations(representations);
-		add_simulation_table_entries(representations);
-	}
 	return;
 }
-
