@@ -5,7 +5,7 @@
 #include "interface/user_interface_screen_widget_definition.h"
 #include "interface/user_interface_widget_window.h"
 #include "interface/user_interface_networking.h"
-#include "H2MOD/Tags/MetaExtender.h"
+#include "tag_files/tag_loader/tag_injection.h"
 
 
 enum e_pregame_lobby_button_blocks
@@ -644,7 +644,7 @@ void c_screen_multiplayer_pregame_lobby::apply_patches_on_map_load()
 	s_window_pane_reference* cooperative_pane = main_widget_tag->panes[1];
 
 	//	add missing text_chat block
-	MetaExtender::add_tag_block3<s_bitmap_block_reference>((uint32)&cooperative_pane->text_blocks, k_number_of_pregame_pane_1_text_addons);
+	tag_injection_extend_block(&cooperative_pane->text_blocks, cooperative_pane->text_blocks.type_size(), k_number_of_pregame_pane_1_text_addons);
 
 	//	fix bitmap offsets
 	for (uint8 block_idx = 0; block_idx <= _pregame_lobby_pane_1_bitmap_game_settings; block_idx++)

@@ -727,3 +727,26 @@ void c_tag_injecting_manager::inject_tags()
 	LOG_DEBUG_GAME("[c_tag_injecting_manager::inject_tags] Injection Complete");
 #endif
 }
+
+void* c_tag_injecting_manager::extend_tag_block(void* block, uint32 entry_size, uint32 count)
+{
+	s_tag_block* basic_block = (s_tag_block*)block;
+
+	uint32 base_block_total_size = entry_size * basic_block->count;
+	uint32 new_block_total_size = base_block_total_size + (entry_size * count);
+
+	int8* base_block_location = (int8*)(tags::get_tag_data() + basic_block->data);
+
+	uint32 injection_offset = this->m_base_tag_data_size + this->m_injectable_used_size;
+	int8* injection_location = (int8*)(tags::get_tag_data() + injection_offset);
+
+	memcpy(injection_location, base_block_location, base_block_total_size);
+
+	basic_block->data = injection_offset;
+	basic_block->count += count;
+
+	this->m_injectable_used_size += new_block_total_size;
+
+	// return the location in memory where the first newly added block exists
+	return (void*)(tags::get_tag_data() + injection_offset + base_block_total_size);
+}

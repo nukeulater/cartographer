@@ -580,6 +580,8 @@ ASSERT_STRUCT_SIZE(s_game_globals, 644);
 
 /* public code */
 
+void game_globals_apply_tag_patches(s_game_options* options);
+
 s_game_globals* scenario_get_game_globals(void);
 
 s_camera_track_definition* game_globals_get_default_camera_track();
@@ -588,8 +590,6 @@ void scenario_set_game_globals(s_game_globals* globals);
 
 s_ui_levels_definition* game_globals_get_ui_levels(void);
 s_game_globals_player_representation* game_globals_get_representation(e_character_type type);
-
-void game_globals_apply_tag_patches(s_game_options* options);
 
 static s_game_globals_rasterizer_data* rasterizer_globals_get_data(void)
 {
