@@ -33,7 +33,7 @@ void __cdecl editor_camera_orbiting_update(s_editor_camera* camera, s_director_u
 		observer_command->flags = 1;
 	}
 
-	observer_command->position.orientation = global_zero_vector3d;
+	observer_command->position.orientation = *global_zero_vector3d;
 	observer_command->focus_distance = camera->focus_distance;
 
 	s_saved_game_cartographer_player_profile* player_profile = cartographer_player_profile_get_by_user_index(director_update->user_index);

@@ -160,14 +160,14 @@ bool __stdcall c_particle_system::frame_advance(c_particle_system* thisx, real32
 				switch (marker_name.get_id())
 				{
 				case _string_id_up:
-					marker_matrix.vectors.forward = global_up3d;
-					marker_matrix.vectors.up = global_forward3d;
-					marker_matrix.vectors.left = global_left3d;
+					marker_matrix.vectors.forward = *global_up3d;
+					marker_matrix.vectors.up = *global_forward3d;
+					marker_matrix.vectors.left = *global_left3d;
 					break;
 				case _string_id_gravity:
-					marker_matrix.vectors.forward = global_down3d;
-					marker_matrix.vectors.up = global_back3d;
-					marker_matrix.vectors.left = global_left3d;
+					marker_matrix.vectors.forward = *global_down3d;
+					marker_matrix.vectors.up = *global_backward3d;
+					marker_matrix.vectors.left = *global_left3d;
 					break;
 				default:
 					scale_vector3d(&particle->m_velocity, -1.0f, &marker_matrix.vectors.forward);

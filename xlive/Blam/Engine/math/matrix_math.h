@@ -1,24 +1,6 @@
 #pragma once
 #include "real_math.h"
 
-union real_matrix3x3
-{
-	struct { real_vector3d forward, left, up; };
-	struct { real32 n[9]; } v;						// Array of values
-	real32 matrix[3][3];							// Matrix of values
-};
-ASSERT_STRUCT_SIZE(real_matrix3x3, 36);
-
-struct real_matrix4x3
-{
-	real32 scale;
-	real_matrix3x3 vectors;
-	real_point3d position;
-};
-ASSERT_STRUCT_SIZE(real_matrix4x3, 52);
-
-const real_matrix4x3 global_identity4x3 = { 1.0f, { global_forward3d, global_left3d, global_up3d }, {0.f, 0.f, 0.f} };
-
 real_matrix3x3* matrix3x3_from_forward_and_up(real_matrix3x3* matrix, const real_vector3d* forward, const real_vector3d* up);
 
 real_matrix3x3* matrix3x3_rotation_from_quaternion(real_matrix3x3* matrix, const real_quaternion* quaternion);

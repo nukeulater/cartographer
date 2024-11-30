@@ -19,7 +19,7 @@ void __cdecl first_person_camera_build_observer_command(datum player_unit_index,
 
 	observer_command->timer = 0;
 	observer_command->flags = 0;
-	observer_command->position.orientation = global_zero_vector3d;
+	observer_command->position.orientation = *global_zero_vector3d;
 	observer_command->focus_distance = 0.f;
 	observer_command->forward = *unit_facing;
 	observer_command->field_of_view = DEGREES_TO_RADIANS(70.f);

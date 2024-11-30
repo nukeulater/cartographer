@@ -95,7 +95,7 @@ void dequantize_unit_vector(int32 quantized_unit_vector, real_vector3d* out_unit
 		*out_unit_vector = { dequantized_f1, dequantized_f2, -1.0f };
 		break;
 	default:
-		*out_unit_vector = global_up3d;
+		*out_unit_vector = *global_up3d;
 		break;
 	}
 

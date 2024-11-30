@@ -3,6 +3,72 @@
 
 #include "matrix_math.h"
 
+/* constants */
+
+const real_vector3d private_zero_vector[2] =
+{
+	{ 0.f, 0.f, 0.f },
+	{ 0.f, 0.f, 0.f }
+};
+
+const real_orientation private_identity_orientation =
+{
+	{ 0.f, 0.f, 0.f, 1.f },
+	{ 0.f, 0.f, 0.f },
+	1.f
+};
+
+const real_matrix4x3 private_identity4x3 =
+{
+	1.f,
+	{
+		{ 1.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 1.f }
+	},
+	{ 0.f, 0.f, 0.f }
+};
+
+const real_matrix4x3 private_negative_identity4x3 =
+{
+	1.f,
+	{
+		{ -1.f, 0.f, 0.f,  0.f, -1.f, 0.f, 0.f, 0.f, -1.f }
+	},
+	{ 0.f, 0.f, 0.f }
+};
+
+const real_rectangle3d private_null_rectangle =
+{
+	{ 3.4028235e38f, -3.4028235e38f, 3.4028235e38f, -3.4028235e38f, 3.4028235e38f, -3.4028235e38f }
+};
+
+const real_point2d* const global_origin2d = (const real_point2d* const)&private_zero_vector;
+const real_vector2d* const global_zero_vector2d = (const real_vector2d* const)&private_zero_vector;
+const real_vector2d* const global_forward2d = (const real_vector2d* const)&private_identity4x3.vectors.forward;
+const real_vector2d* const global_left2d = (const real_vector2d* const)&private_identity4x3.vectors.left;
+
+const real_point3d* const global_origin3d = (const real_point3d* const)&private_zero_vector;
+const real_vector3d* const global_zero_vector3d = (const real_vector3d* const)&private_zero_vector;
+const real_vector3d* const global_forward3d = (const real_vector3d* const)&private_identity4x3.vectors.forward;
+const real_vector3d* const global_left3d = (const real_vector3d* const)&private_identity4x3.vectors.left;
+const real_vector3d* const global_up3d = (const real_vector3d* const)&private_identity4x3.vectors.up;
+
+const real_vector3d* const global_backward3d = (const real_vector3d* const)&private_negative_identity4x3.vectors.forward;
+const real_vector3d* const global_right3d = (const real_vector3d* const)&private_negative_identity4x3.vectors.left;
+const real_vector3d* const global_down3d = (const real_vector3d* const)&private_negative_identity4x3.vectors.up;
+
+const real_vector4d* const global_zero_vector4d = (const real_vector4d* const)&private_zero_vector;
+const real_euler_angles2d* const global_zero_angles2d = (const real_euler_angles2d* const)&private_zero_vector;
+const real_quaternion* const global_identity_quaternion = (const real_quaternion* const)&private_identity_orientation;
+const real_matrix4x3* const global_identity4x3 = &private_identity4x3;
+
+const real_orientation* const global_identity_orientation = &private_identity_orientation;
+
+const real_rectangle2d* const global_null_rectangle2d = (const real_rectangle2d* const)&private_null_rectangle;
+const real_rectangle3d* const global_null_rectangle3d = &private_null_rectangle;
+
+
+/* public code */
+
 void __cdecl real_math_initialize(void)
 {
 	INVOKE(0x340D7, 0x27754, real_math_initialize);

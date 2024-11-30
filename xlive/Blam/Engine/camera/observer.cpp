@@ -134,7 +134,7 @@ void __cdecl observer_update(real32 dt)
 
 void observer_update_internal(int32 user_index)
 {
-	real_matrix4x3 camera_effect_matrix = global_identity4x3;
+	real_matrix4x3 camera_effect_matrix = *global_identity4x3;
 	s_observer* observer = observer_get_from_user(user_index);
 	if (user_index != NONE)
 	{
@@ -162,12 +162,12 @@ void observer_update_internal(int32 user_index)
 
 	if (!valid_real_vector3d_axes2(&forward, &up))
 	{
-		normalize3d_with_default(&forward, &global_forward3d);
-		normalize3d_with_default(&up, &global_forward3d);
+		normalize3d_with_default(&forward, global_forward3d);
+		normalize3d_with_default(&up, global_forward3d);
 		if (!valid_real_vector3d_axes2(&forward, &up))
 		{
-			forward = global_forward3d;
-			up = global_up3d;
+			forward = *global_forward3d;
+			up = *global_up3d;
 		}
 	}
 
