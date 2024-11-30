@@ -7,8 +7,6 @@ namespace ImGuiHandler
 {
 	namespace ImDebugOverlay
 	{
-		std::string windowName = "debug_overlay";
-
 		struct DebugWatchItem
 		{
 			std::string Description;
@@ -18,7 +16,8 @@ namespace ImGuiHandler
 		void Render(bool* p_open)
 		{
 			const ImGuiViewport* viewport = ImGui::GetMainViewport();
-			s_aspect_ratio ratio = GetAspectRatio(viewport->WorkSize);
+			const real_point2d size = { viewport->WorkSize.x, viewport->WorkSize.y };
+			e_imgui_aspect_ratio ratio = GetAspectRatio(&size);
 
 			ImDrawList* draw_list = ImGui::GetForegroundDrawList();
 

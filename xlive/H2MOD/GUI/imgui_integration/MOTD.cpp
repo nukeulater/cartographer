@@ -1,17 +1,24 @@
 #include "stdafx.h"
 #include "imgui_handler.h"
-#include "game/players.h"
 
-#include "input/input_windows.h"
-#include "H2MOD/Modules/Shell/Startup/Startup.h"
+#include "cseries/cseries_strings.h"
+#include "game/players.h"
 #include "input/input_abstraction.h"
+#include "input/input_windows.h"
+
+#include "H2MOD/Modules/Shell/Config.h"
+#include "H2MOD/Modules/Shell/Startup/Startup.h"
+
+#include "imgui.h"
+
+const char* k_motd_url = "http://www.halo2pc.com/motd.png";
+const wchar_t* k_motd_filename = L"motd.png";
 
 extern int notify_xlive_ui;
 
 namespace ImGuiHandler
 {
 	namespace ImMOTD {
-		std::string windowName = "motd";
 
 		namespace
 		{
@@ -22,20 +29,19 @@ namespace ImGuiHandler
 			int X;
 			int Y;
 		}
-		bool DownloadMOTD(const std::wstring& file_path, s_aspect_ratio ratio)
+		bool DownloadMOTD(const wchar_t* file_path, e_imgui_aspect_ratio ratio)
 		{
 			FILE* fp = NULL;
 			CURL* curl;
 			CURLcode res;
-			std::string url = "http://www.halo2pc.com/motd.png";
 
 			bool success = false;
 
 			curl = curl_interface_init_no_verify();
 			if (curl)
 			{
-				fp = _wfopen(file_path.c_str(), L"wb");
-				curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+				fp = _wfopen(file_path, L"wb");
+				curl_easy_setopt(curl, CURLOPT_URL, k_motd_url);
 				curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, NULL);
 				curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
 				res = curl_easy_perform(curl);
@@ -59,24 +65,34 @@ namespace ImGuiHandler
 
 			return success;
 		}
-		bool LoadMOTD(const std::wstring& file_path, s_aspect_ratio ratio)
+		bool LoadMOTD(const wchar_t* file_path, e_imgui_aspect_ratio ratio)
 		{
 			if (std::filesystem::exists(file_path))
 			{
-				return ImGuiHandler::LoadTextureFromFile(file_path.c_str(), patch_notes, &X, &Y);
+				return ImGuiHandler::LoadTextureFromFile(file_path, patch_notes, &X, &Y);
 			}
 			return false;
 		}
 		void DownloadAndLoadMOTD()
 		{
 			motd_texture_load_in_progress = true;
-			std::wstring motd_path_wide = std::wstring(H2AppDataLocal) + L"motd.png";
+
+			c_static_wchar_string<MAX_PATH> motd_path_wide;
+			const wchar_t* motd_initial_path = H2Portable ? H2ProcessFilePath : H2AppDataLocal;	// Use process path if portable, Appdata otherwise
+			motd_path_wide.set(motd_initial_path);
+			motd_path_wide.append(k_motd_filename);
+
+			const ImVec2 size_imgui = ImGui::GetMainViewport()->WorkSize;
+			const real_point2d size = { size_imgui.x, size_imgui.y };
+
+			const e_imgui_aspect_ratio aspect_ratio = GetAspectRatio(&size);
+
 			if (!download_complete)
 			{
-				download_success = DownloadMOTD(motd_path_wide, GetAspectRatio(ImGui::GetMainViewport()->WorkSize));
+				download_success = DownloadMOTD(motd_path_wide.get_string(), aspect_ratio);
 				download_complete = true;
 			}
-			load_complete = LoadMOTD(motd_path_wide, GetAspectRatio(ImGui::GetMainViewport()->WorkSize));
+			load_complete = LoadMOTD(motd_path_wide.get_string(), aspect_ratio);
 			motd_texture_load_in_progress = false;
 		}
 
@@ -89,7 +105,7 @@ namespace ImGuiHandler
 			// if MOTD cannot be loaded, just close the menu
 			if (!load_complete)
 			{
-				ImGuiHandler::ToggleWindow(ImGuiHandler::ImMOTD::windowName);
+				ImGuiHandler::ToggleWindow(k_motd_window_name);
 				return;
 			}
 
@@ -164,13 +180,13 @@ namespace ImGuiHandler
 					if (input_abstraction_globals->input_has_gamepad[gamepad_index] &&
 						input_get_gamepad_state(gamepad_index)->button_frames_down[_xinput_gamepad_a])
 					{
-						ImGuiHandler::ToggleWindow(ImGuiHandler::ImMOTD::windowName);
+						ImGuiHandler::ToggleWindow(k_motd_window_name);
 					}
 				}
 
 				if (ImGui::IsItemClicked())
 				{
-					ImGuiHandler::ToggleWindow(ImGuiHandler::ImMOTD::windowName);
+					ImGuiHandler::ToggleWindow(k_motd_window_name);
 				}
 				else
 				{
@@ -178,7 +194,7 @@ namespace ImGuiHandler
 					{
 						if (ImGui::IsKeyPressed(i))
 						{
-							ImGuiHandler::ToggleWindow(ImGuiHandler::ImMOTD::windowName);
+							ImGuiHandler::ToggleWindow(k_motd_window_name);
 							break;
 						}
 					}

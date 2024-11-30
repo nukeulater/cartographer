@@ -12,6 +12,12 @@
 #include "Console/ImGui_ConsoleImpl.h"
 #include "ImGui_NetworkStatsOverlay.h"
 
+
+const char* k_advanced_settings_window_name = "advanced_settings";
+const char* k_weapon_offsets_window_name = "Weapon Offsets";
+const char* k_motd_window_name = "motd";
+const char* k_debug_overlay_window_name = "debug_overlay";
+
 namespace ImGuiHandler
 {
 	std::vector<s_imgui_window> imgui_windows;
@@ -155,11 +161,11 @@ namespace ImGuiHandler
 		p_d3d_device = pDevice;
 
 		imgui_windows.emplace_back("Weapon Offsets", false, WeaponOffsets::Render, WeaponOffsets::Open, WeaponOffsets::Close);
-		imgui_windows.emplace_back(ImMOTD::windowName, false, ImMOTD::Render, ImMOTD::Open, ImMOTD::Close);
-		imgui_windows.emplace_back(ImDebugOverlay::windowName, false, ImDebugOverlay::Render, ImDebugOverlay::Open, ImDebugOverlay::Close);
+		imgui_windows.emplace_back(k_motd_window_name, false, ImMOTD::Render, ImMOTD::Open, ImMOTD::Close);
+		imgui_windows.emplace_back(k_debug_overlay_window_name, false, ImDebugOverlay::Render, ImDebugOverlay::Open, ImDebugOverlay::Close);
 		imgui_windows.emplace_back(ImMessageBox::windowName, false, ImMessageBox::Render, ImMessageBox::Open, ImMessageBox::Close);
 		imgui_windows.emplace_back(k_advanced_settings_window_name, false, ImAdvancedSettings::Render, ImAdvancedSettings::Open, ImAdvancedSettings::Close);
-		imgui_windows.emplace_back(CartographerConsole::windowName, false, CartographerConsole::Render, CartographerConsole::Open, CartographerConsole::Close);
+		imgui_windows.emplace_back(k_cartographer_console_window_name, false, CartographerConsole::Render, CartographerConsole::Open, CartographerConsole::Close);
 
 		atexit([]() {
 			ImGui_ImplDX9_Shutdown();
@@ -233,9 +239,9 @@ namespace ImGuiHandler
 		g_patch_notes_texture = nullptr;
 	}
 
-	s_aspect_ratio GetAspectRatio(const ImVec2 displaySize)
+	e_imgui_aspect_ratio GetAspectRatio(const real_point2d* display_size)
 	{
-		if (displaySize.x / displaySize.y >= 1.6f)
+		if (display_size->x / display_size->y >= 1.6f)
 		{
 			return sixten_nine;
 		}

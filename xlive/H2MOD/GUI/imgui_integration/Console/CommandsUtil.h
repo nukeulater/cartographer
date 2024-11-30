@@ -1,7 +1,5 @@
 #pragma once
 
-#include "imgui.h"
-
 struct StringLineHeader;
 typedef int StringHeaderFlags;
 
@@ -144,8 +142,8 @@ public:
 		m_line_buf_size = newLineBufSize;
 
 		size_t newBufferSize = GetBufferSize();
-		IM_ASSERT(newBufferSize > oldBufferSize);
-		char* new_buffer = (char*)IM_ALLOC(newBufferSize);
+		ASSERT(newBufferSize > oldBufferSize);
+		char* new_buffer = (char*)malloc(newBufferSize);
 		if (m_buf != NULL)
 		{
 			memcpy(new_buffer, m_buf, GetBufferSize());
@@ -168,7 +166,7 @@ public:
 
 		size_t nullCharIdx = characterCount;
 
-		IM_ASSERT(characterCount < m_line_buf_size - 1 || source[nullCharIdx] == '\0');
+		ASSERT(characterCount < m_line_buf_size - 1 || source[nullCharIdx] == '\0');
 
 		char* destinationBuffer;
 		size_t destinationBufferSize = GetNewlineBuffer(m_line_buf_size, &destinationBuffer);
@@ -222,7 +220,7 @@ public:
 
 	const char* GetStringAtIndex(size_t headerIdx) const
 	{
-		assert(headerIdx < GetHeaderCount());
+		ASSERT(headerIdx < GetHeaderCount());
 		const StringLineHeader& string_header = GetHeader(headerIdx);
 		return GetStringAtIdx(string_header.idx);
 	}
