@@ -728,7 +728,7 @@ void c_tag_injecting_manager::inject_tags()
 #endif
 }
 
-int8* c_tag_injecting_manager::extend_tag_block(void* block, uint32 entry_size, uint32 count)
+void* c_tag_injecting_manager::extend_tag_block(void* block, uint32 entry_size, uint32 count)
 {
 	s_tag_block* basic_block = (s_tag_block*)block;
 
@@ -748,5 +748,5 @@ int8* c_tag_injecting_manager::extend_tag_block(void* block, uint32 entry_size, 
 	this->m_injectable_used_size += new_block_total_size;
 
 	// return the location in memory where the first newly added block exists
-	return (int8*)(tags::get_tag_data() + injection_offset + base_block_total_size);
+	return (void*)(tags::get_tag_data() + injection_offset + base_block_total_size);
 }

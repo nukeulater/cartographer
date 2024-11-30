@@ -16,14 +16,11 @@ void add_special_event_markers(void)
 	if (mode_elite_datum != NONE)
 	{
 		render_model_definition* mode_elite = (render_model_definition*)tag_get_fast(mode_elite_datum);
-		
 		render_model_marker_group* new_marker_group = (render_model_marker_group*)tag_injection_extend_block(&mode_elite->marker_groups, mode_elite->marker_groups.type_size(), 1);
 			
 		new_marker_group->name = new_elite_head_marker;
 		
 		render_model_marker* new_marker = (render_model_marker*)tag_injection_extend_block(&new_marker_group->markers, new_marker_group->markers.type_size(), 1);
-
-		LOG_INFO_GAME("[{}] {:x}", __FUNCTION__, (unsigned long)std::addressof(new_marker));
 		new_marker->node_index = 19;
 		new_marker->permutation_index = NONE;
 		new_marker->region_index = NONE;

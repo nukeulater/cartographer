@@ -12,31 +12,55 @@
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
 #include "tag_files/tag_loader/tag_injection.h"
 
-/*
- *	New Player Representations Read Me
- *
- *	adding a new representation to the project requires adding a new value to e_character_type
- *  once you have done that add a new function here to prepare the s_game_globals_custom_representation_result
- *  the function should load/create all necessary data required to create the custom representation (fp, body, biped, variant, etc)
- *	then in game_globals_add_new_player_representations place the new function in the proper order following e_character_type
- *	also increase the size of k_cartographer_custom_representation_count to match the new count of custom representations.
- */
+/* structures */
 
-void game_globals_prepare_skeleton_representation(s_game_globals_custom_representation_result* result);
-void game_globals_prepare_flood_representation(s_game_globals_custom_representation_result* result);
-void game_globals_prepare_lmao_representation(s_game_globals_custom_representation_result* result);
+struct s_game_globals_custom_representation_result
+{
+	bool success;
+	e_character_type fallback_character_type;
+	datum biped;
+	datum first_person;
+	datum body;
+	string_id variant;
+};
 
-void add_new_representations(s_game_globals_custom_representation_result* representations);
-void add_simulation_table_entries(s_game_globals_custom_representation_result* representations);
+/* prototypes */
+
+static void game_globals_prepare_skeleton_representation(s_game_globals_custom_representation_result* result);
+static void game_globals_prepare_flood_representation(s_game_globals_custom_representation_result* result);
+static void game_globals_prepare_lmao_representation(s_game_globals_custom_representation_result* result);
+
+static void add_new_representations(s_game_globals_custom_representation_result* representations);
+static void add_simulation_table_entries(s_game_globals_custom_representation_result* representations);
 
 
 // Set the masterchief representation to the multiplayer version only in multiplayer
 // This prevents server owners from forcing masterchief 
-void game_globals_remove_singleplayer_representation(void);
+static void game_globals_remove_singleplayer_representation(void);
 
 // Adds new representations to the globals tag
-void game_globals_add_new_player_representations(void);
+static void game_globals_add_new_player_representations(void);
 
+/* constants */
+
+void (*k_game_globals_custom_representation_function_table[k_cartographer_custom_representation_count])(s_game_globals_custom_representation_result*)
+{
+	game_globals_prepare_skeleton_representation,
+	game_globals_prepare_flood_representation,
+	game_globals_prepare_lmao_representation
+};
+
+/* public code */
+
+void game_globals_apply_tag_patches(s_game_options* options)
+{
+	if (options->game_mode == _game_mode_multiplayer)
+	{
+		game_globals_add_new_player_representations();
+		game_globals_remove_singleplayer_representation();
+	}
+	return;
+}
 
 s_game_globals* scenario_get_game_globals(void)
 {
@@ -285,20 +309,18 @@ void add_simulation_table_entries(s_game_globals_custom_representation_result* r
 
 }
 
-void game_globals_add_new_player_representations(void)
+static void game_globals_add_new_player_representations(void)
 {
 	if (!Memory::IsDedicatedServer())
 	{
 		scenario* scenario_definition = get_global_scenario();
 
 		s_game_globals_custom_representation_result representations[k_cartographer_custom_representation_count]{};
-
-		//_character_type_skeleton
-		game_globals_prepare_skeleton_representation(&representations[0]);
-		//_character_type_flood
-		game_globals_prepare_flood_representation(&representations[1]);
-		//_character_type_lmao
-		game_globals_prepare_lmao_representation(&representations[2]);
+		for (uint32 i = 0; i < k_cartographer_custom_representation_count; ++i)
+		{
+			ASSERT(k_game_globals_custom_representation_function_table[i]);
+			k_game_globals_custom_representation_function_table[i](&representations[i]);
+		}
 
 		add_new_representations(representations);
 		add_simulation_table_entries(representations);
@@ -306,12 +328,3 @@ void game_globals_add_new_player_representations(void)
 	return;
 }
 
-void game_globals_apply_tag_patches(s_game_options* options)
-{
-	if (options->game_mode == _game_mode_multiplayer)
-	{
-		game_globals_add_new_player_representations();
-		game_globals_remove_singleplayer_representation();
-	}
-	return;
-}

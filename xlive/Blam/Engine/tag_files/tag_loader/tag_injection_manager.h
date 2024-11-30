@@ -42,7 +42,7 @@ public:
 	static void load_dependencies(c_tag_injecting_manager* manager, const s_tag_injecting_table_entry* new_entry);
 
 	void inject_tags();
-	int8* extend_tag_block(void* block, uint32 entry_size, uint32 count);
+	void* extend_tag_block(void* block, uint32 entry_size, uint32 count);
 private:
 	c_tag_injection_table m_table;
 	c_static_flags<k_tag_group_count> m_agents_initialized;

@@ -33,6 +33,14 @@ enum e_player_color : int8
 	k_player_color_count
 };
 
+/*
+ *	New Player Representations Read Me
+ *
+ *	adding a new representation to the project requires adding a new value to the enum below
+ *  once you have done that add a new function in game_globals.cpp to prepare the s_game_globals_custom_representation_result
+ *  the function should load/create all necessary data required to create the custom representation (fp, body, biped, variant, etc)
+ *	then add the function into the k_game_globals_custom_representation_function_table constant
+ */
 enum e_character_type : int8
 {
 	_character_type_masterchief = 0,
@@ -40,11 +48,15 @@ enum e_character_type : int8
 	_character_type_spartan = 2,
 	_character_type_elite = 3,
 
+	k_player_character_type_count_original,	// Original count of characters that shipped with the game
+
 	// cartographer added characters
 	_character_type_skeleton = 4,
 	_character_type_flood = 5,
 	_character_type_lmao = 6,
-	k_player_character_type_count
+	k_player_character_type_count,
+
+	k_cartographer_custom_representation_count = k_player_character_type_count - k_player_character_type_count_original
 };
 
 enum e_handicap : int8

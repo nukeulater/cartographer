@@ -19,8 +19,6 @@
 #define k_maximum_material_types 256
 #define k_game_globals_maximum_multiplayer_colors 32
 
-#define k_cartographer_custom_representation_count 3
-
 enum e_game_globals_rasterizer_flags : int16
 {
     _game_globals_rasterizer_flag_tint_edge_density = FLAG(0)
@@ -580,17 +578,9 @@ struct s_game_globals
 };
 ASSERT_STRUCT_SIZE(s_game_globals, 644);
 
-struct s_game_globals_custom_representation_result
-{
-    bool success;
-    e_character_type fallback_character_type;
-    datum biped;
-    datum first_person;
-    datum body;
-    string_id variant;
-};
-
 /* public code */
+
+void game_globals_apply_tag_patches(s_game_options* options);
 
 s_game_globals* scenario_get_game_globals(void);
 
@@ -600,8 +590,6 @@ void scenario_set_game_globals(s_game_globals* globals);
 
 s_ui_levels_definition* game_globals_get_ui_levels(void);
 s_game_globals_player_representation* game_globals_get_representation(e_character_type type);
-
-void game_globals_apply_tag_patches(s_game_options* options);
 
 static s_game_globals_rasterizer_data* rasterizer_globals_get_data(void)
 {
