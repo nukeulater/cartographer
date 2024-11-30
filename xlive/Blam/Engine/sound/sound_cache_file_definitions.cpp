@@ -2,6 +2,8 @@
 #include "sound_cache_file_definitions.h"
 
 #include "sound_definitions.h"
+
+#include "cache/cache_files.h"
 #include "cseries/cseries_system_memory.h"
 #include "game/game_globals.h"
 

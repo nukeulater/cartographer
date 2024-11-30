@@ -6,52 +6,31 @@
 #include "units/units.h"
 #include "H2MOD.h"
 
-using namespace NetworkSession;
-
-static int weapon_one = 0;
-static int weapon_two = 0;
-static int weapon_three = 0;
-static int weapon_four = 0;
-static int weapon_five = 0;
-static int weapon_six = 0;
-static int weapon_seven = 0;
-static int weapon_eight = 0;
-static int weapon_nine = 0;
-static int weapon_ten = 0;
-static int weapon_eleven = 0;
-static int weapon_tweleve = 0;
-static int weapon_thirteen = 0;
-static int weapon_fourteen = 0;
-static int weapon_fiffteen = 0;
-static int weapon_sixteen = 0;
-
-
 // TODO(PermaNull): Add additional levels with dual weilding
 
-std::unordered_map<int, datum> GunGame::levelWeapon;
+datum k_level_weapons[15] =
+{
+	e_weapons_datum_index::energy_blade_useless,
+	e_weapons_datum_index::needler,
+	e_weapons_datum_index::plasma_pistol,
+	e_weapons_datum_index::magnum,
+	e_weapons_datum_index::smg,
+	e_weapons_datum_index::plasma_rifle,
+	e_weapons_datum_index::brute_plasma_rifle,
+	e_weapons_datum_index::juggernaut_powerup,
+	e_weapons_datum_index::shotgun,
+	e_weapons_datum_index::brute_shot,
+	e_weapons_datum_index::covenant_carbine,
+	e_weapons_datum_index::battle_rifle,
+	e_weapons_datum_index::beam_rifle,
+	e_weapons_datum_index::sniper_rifle,
+	e_weapons_datum_index::rocket_launcher
+};
+
 std::unordered_map<uint64, int> GunGame::gungamePlayers;
 
 GunGame::GunGame()
 {
-}
-
-
-void GunGame::InitWeaponLevels() {
-	GunGame::levelWeapon[0] = e_weapons_datum_index::energy_blade_useless;
-	GunGame::levelWeapon[1] = e_weapons_datum_index::needler;
-	GunGame::levelWeapon[2] = e_weapons_datum_index::plasma_pistol;
-	GunGame::levelWeapon[3] = e_weapons_datum_index::magnum;
-	GunGame::levelWeapon[4] = e_weapons_datum_index::smg;
-	GunGame::levelWeapon[5] = e_weapons_datum_index::plasma_rifle;
-	GunGame::levelWeapon[6] = e_weapons_datum_index::brute_plasma_rifle;
-	GunGame::levelWeapon[7] = e_weapons_datum_index::juggernaut_powerup;
-	GunGame::levelWeapon[8] = e_weapons_datum_index::shotgun;
-	GunGame::levelWeapon[9] = e_weapons_datum_index::brute_shot;
-	GunGame::levelWeapon[10] = e_weapons_datum_index::covenant_carbine;
-	GunGame::levelWeapon[11] = e_weapons_datum_index::battle_rifle;
-	GunGame::levelWeapon[12] = e_weapons_datum_index::beam_rifle;
-	GunGame::levelWeapon[13] = e_weapons_datum_index::sniper_rifle;
-	GunGame::levelWeapon[14] = e_weapons_datum_index::rocket_launcher;	
 }
 
 void GunGame::ResetPlayerLevels() {
@@ -60,7 +39,6 @@ void GunGame::ResetPlayerLevels() {
 
 void GunGame::Initialize()
 {
-	GunGame::InitWeaponLevels();
 	if (NetworkSession::LocalPeerIsSessionHost())
 	{
 		GunGame::ResetPlayerLevels();
@@ -158,19 +136,19 @@ void GunGame::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 			if (unit_object) {
 
 				int level = 0;
-				auto gungamePlayer = gungamePlayers.find(GetPlayerId(absPlayerIdx));
+				auto gungamePlayer = gungamePlayers.find(NetworkSession::GetPlayerId(absPlayerIdx));
 				if (gungamePlayer != gungamePlayers.end())
 				{
 					level = gungamePlayer->second;
 				}
 				else
 				{
-					gungamePlayers.insert(std::make_pair(GetPlayerId(absPlayerIdx), level));
+					gungamePlayers.insert(std::make_pair(NetworkSession::GetPlayerId(absPlayerIdx), level));
 				}
 
 				LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} - player index: {}, player name: {1} - Level: {2}", __FUNCTIONW__, absPlayerIdx, s_player::get_name(playerIdx), level);
 
-				datum currentWeapon = GunGame::levelWeapon[level];
+				datum currentWeapon = k_level_weapons[level];
 
 				if (level < 15) {
 					call_give_player_weapon(absPlayerIdx, currentWeapon, 1);
@@ -199,7 +177,7 @@ bool GunGame::c_game_statborg__adjust_player_stat(ExecTime execTime, c_game_stat
 {
 	int absPlayerIdx = DATUM_INDEX_TO_ABSOLUTE_INDEX(player_datum);
 	datum playerUnitDatum = s_player::get_unit_index(player_datum);
-	unsigned long long playerId = GetPlayerId(absPlayerIdx);
+	uint64 playerId = NetworkSession::GetPlayerId(absPlayerIdx);
 
 	// in gungame we just keep track of the score
 	bool handled = false;
@@ -228,7 +206,7 @@ bool GunGame::c_game_statborg__adjust_player_stat(ExecTime execTime, c_game_stat
 			if (level < 15) {
 				LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} - {} on level {} giving them weapon...", __FUNCTIONW__, s_player::get_name(player_datum), level);
 
-				datum LevelWeapon = GunGame::levelWeapon[level];
+				datum LevelWeapon = k_level_weapons[level];
 				s_player::set_player_unit_grenade_count(player_datum, _unit_grenade_human_fragmentation, 0, true);
 				s_player::set_player_unit_grenade_count(player_datum, _unit_grenade_covenant_plasma, 0, true);
 				call_give_player_weapon(absPlayerIdx, LevelWeapon, 1);

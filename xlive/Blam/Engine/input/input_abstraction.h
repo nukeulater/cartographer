@@ -20,6 +20,8 @@
 // set this to a default of 8
 #define k_default_right_thumbstick_deadzone_radial_percentage THUMBSTICK_POINT_TO_PERCENTAGE(THUMBSTICK_PERCENTAGE_TO_POINT(8))
 
+#define NUMBER_OF_GAMEPAD_STICKS 2
+
 /* enums */
 
 enum e_input_preference_device_type :uint32
@@ -113,6 +115,8 @@ enum e_gamepad_buttons
 	_gamepad_binary_button_b = 0xD,
 	_gamepad_binary_button_x = 0xE,
 	_gamepad_binary_button_y = 0xF,
+	NUMBER_OF_GAMEPAD_BUTTONS,
+
 	_gamepad_analog_left_stick_up = 0x10,
 	_gamepad_analog_left_stick_down = 0x11,
 	_gamepad_analog_left_stick_left = 0x12,
@@ -123,12 +127,10 @@ enum e_gamepad_buttons
 	_gamepad_analog_right_stick_right = 0x17,
 
 	NUMBER_OF_GAMEPAD_BUTTON_STRINGS = 0x18,
-	NUMBER_OF_GAMEPAD_BUTTONS = 0x10,
 };
 
 /* structures */
 
-#pragma pack(push,1)
 struct s_game_function_bind
 {
 	e_input_preference_device_type m_device_type;
@@ -216,7 +218,6 @@ struct s_input_abstraction_globals
 	uint8 gap_5EB1[7];
 };
 ASSERT_STRUCT_SIZE(s_input_abstraction_globals, 0x5EB8);
-#pragma pack(pop)
 
 
 extern s_input_abstraction_globals* input_abstraction_globals;

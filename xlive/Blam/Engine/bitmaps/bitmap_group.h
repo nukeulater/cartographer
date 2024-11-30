@@ -92,7 +92,7 @@ enum e_bitmap_type : int16
 #define MAXIMUM_SPRITES_PER_SEQUENCE 64
 struct bitmap_group_sprite
 {
-    short bitmapIndex;
+    short bitmap_index;
     short pad0;
     DWORD pad1;
     real_rectangle2d bounds;

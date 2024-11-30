@@ -5,7 +5,6 @@
 #include "animations/animation_manager.h"
 #include "memory/data.h"
 #include "math/matrix_math.h"
-#include "memory/static_arrays.h"
 #include "models/render_model_definitions.h"
 
 /* constants */

@@ -6,6 +6,7 @@
 #include "items/weapon_definitions.h"
 #include "game/game_globals.h"
 #include "shaders/shader_definitions.h"
+#include "cache/cache_files.h"
 #include "tag_files/tag_loader/tag_injection.h"
 
 void birthday_event_map_load()

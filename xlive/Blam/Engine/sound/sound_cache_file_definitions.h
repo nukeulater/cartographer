@@ -1,7 +1,6 @@
 #pragma once
 #include "geometry/geometry_block.h"
 #include "math/function_definitions.h"
-#include "memory/static_arrays.h"
 #include "tag_files/data_reference.h"
 #include "tag_files/string_id.h"
 #include "tag_files/tag_block.h"

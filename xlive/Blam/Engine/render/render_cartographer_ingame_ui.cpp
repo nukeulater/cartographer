@@ -2,6 +2,7 @@
 #include "render_cartographer_ingame_ui.h"
 
 #include "cartographer/twizzler/twizzler.h"
+#include "cseries/cseries_strings.h"
 #include "game/game.h"
 #include "rasterizer/rasterizer_globals.h"
 #include "rasterizer/rasterizer_text.h"

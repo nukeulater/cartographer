@@ -4,6 +4,7 @@
 #include "screen_single_player_level_select.h"
 
 #include "bitmaps/bitmap_group.h"
+#include "cache/cache_files.h"
 #include "interface/user_interface_controller.h"
 #include "interface/user_interface_networking.h"
 #include "interface/user_interface_memory.h"

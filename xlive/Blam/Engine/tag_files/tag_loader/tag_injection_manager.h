@@ -1,9 +1,7 @@
 #pragma once
 #include "tag_injection_table.h"
-#include "memory/static_arrays.h"
 #include "tag_files/tag_groups.h"
 #include "xml/xml_agent.h"
-#include "xml/xml_definition_loader.h"
 
 #define k_first_injected_datum 15268
 #define k_max_tag_instance_count 65535

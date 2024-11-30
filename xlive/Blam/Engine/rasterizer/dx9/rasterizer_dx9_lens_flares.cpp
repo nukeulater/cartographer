@@ -9,7 +9,9 @@
 #include "rasterizer_dx9_shader_submit.h"
 #include "rasterizer_dx9_submit.h"
 
+#include "cache/cache_files.h"
 #include "effects/lens_flares.h"
+#include "game/game_globals.h"
 #include "math/color_math.h"
 #include "rasterizer/dx9/shaders/compiled/sun_glow_convolve.h"
 #include "rasterizer/rasterizer_globals.h"

@@ -4,6 +4,8 @@
 #include "rasterizer_dx9_main.h"
 #include "rasterizer_dx9_targets.h"
 
+#include "cache/cache_files.h"
+#include "game/game_globals.h"
 #include "interface/new_hud_draw.h"
 #include "objects/light_definitions.h"
 #include "rasterizer/rasterizer_globals.h"

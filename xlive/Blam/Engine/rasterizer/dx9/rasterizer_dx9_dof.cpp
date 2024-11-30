@@ -6,6 +6,8 @@
 #include "rasterizer_dx9_submit.h"
 #include "rasterizer_dx9_shader_submit.h"
 
+#include "game/game_globals.h"
+
 /* structures */
 
 struct s_convolution_d3d_vertex

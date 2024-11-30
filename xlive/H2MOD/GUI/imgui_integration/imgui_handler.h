@@ -28,12 +28,12 @@ namespace ImGuiHandler
 	{
 		std::string name;
 		bool doRender;
-		std::function<void(bool*)> renderFunc;
-		std::function<void()> openFunc;
-		std::function<void()> closeFunc;
+		void(__cdecl* renderFunc)(bool*);
+		void(__cdecl* openFunc)();
+		void(__cdecl* closeFunc)();
 		ImWWindowHandlerFlags flags;
 
-		s_imgui_window(const std::string& _name, bool _doRender, std::function<void(bool*)> _renderFunc, std::function<void()> _openFunc, std::function<void()> _closeFunc, ImWWindowHandlerFlags _flags = 0)
+		s_imgui_window(const std::string& _name, bool _doRender, void(__cdecl* _renderFunc)(bool*), void(__cdecl* _openFunc)(), void(__cdecl* _closeFunc)(), ImWWindowHandlerFlags _flags = 0)
 		{
 			name = _name;
 			doRender = _doRender;
@@ -43,7 +43,7 @@ namespace ImGuiHandler
 			flags = _flags;
 		}
 
-		bool NoImInput()
+		bool NoImInput() const
 		{
 			return (flags & _ImWindow_no_input) != 0;
 		}

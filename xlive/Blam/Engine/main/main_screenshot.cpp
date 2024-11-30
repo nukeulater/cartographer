@@ -7,6 +7,7 @@
 #include "bitmaps/tiff_file.h"
 #include "cache/pc_geometry_cache.h"
 #include "cache/pc_texture_cache.h"
+#include "cseries/cseries_strings.h"
 #include "game/game_time.h"
 #include "main/main.h"
 #include "rasterizer/dx9/rasterizer_dx9_main.h"

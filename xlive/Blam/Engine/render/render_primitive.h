@@ -1,8 +1,6 @@
 #pragma once
 #include "render_layers.h"
 
-#include "memory/static_arrays.h"
-
 /* classes */
 
 class c_render_primitive

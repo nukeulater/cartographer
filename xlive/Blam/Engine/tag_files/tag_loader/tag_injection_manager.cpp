@@ -143,7 +143,7 @@ void c_tag_injecting_manager::set_active_map(const wchar_t* map_name)
 	file_seek_and_read(this->m_active_map_file_handle, this->m_active_map_cache_header.tag_offset, sizeof(cache_file_tags_header), 1, &this->m_active_map_tags_header);
 
 
-	this->m_active_map_instance_table_offset = this->m_active_map_cache_header.tag_offset + sizeof(s_tag_group_link) * this->m_active_map_tags_header.tag_group_link_set_count + 0x20;
+	this->m_active_map_instance_table_offset = this->m_active_map_cache_header.tag_offset + sizeof(s_tag_group_link) * this->m_active_map_tags_header.tag_group_link_set_count + sizeof(cache_file_tags_header);
 
 	// Read the scenario instance from map file
 	cache_file_tag_instance temp_instance;

@@ -1,18 +1,31 @@
 #include "stdafx.h"
 #include "KeyboardInput.h"
 
+#include "input/controllers.h"
+
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/GUI/XLiveRendering.h"
 #include "H2MOD/GUI/ImGui_Integration/ImGui_Handler.h"
 #include "H2MOD/GUI/ImGui_Integration/Console/ImGui_ConsoleImpl.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Utils/Utils.h"
-#include "input/controllers.h"
 
+/* structures */
+
+struct s_keyboard_hotkey_data
+{
+	int* message;
+	void(__cdecl* callback)();
+};
+
+/* constants */
 
 static BYTE enableKeyboard3[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-RECT rectScreenOriginal;
 
+/* globals */
+
+s_keyboard_hotkey_data g_keyboard_hotkey_data[6] = {};
+RECT rectScreenOriginal;
 
 void KeyboardInput::ToggleKeyboardInput()
 {
@@ -42,31 +55,17 @@ void KeyboardInput::ToggleKeyboardInput()
 		WriteBytes(Memory::GetAddress() + 0x2FA09, getFocusE, 6);
 	}
 }
-std::map<int*, std::function<void()>> hotKeyMap;
-void KeyboardInput::RegisterHotkey(int* hotkey, std::function<void()> callback)
-{
-	if(hotKeyMap.count(hotkey) == 0)
-	{
-		hotKeyMap.emplace(hotkey, callback);
-	} 
-	else
-	{
-		LOG_ERROR_GAME("Hotkey {} is already in use", GetVKeyCodeString(*hotkey));
-	}
-}
-
-void KeyboardInput::RemoveHotkey(int* hotkey)
-{
-	hotKeyMap.erase(hotkey);
-}
 
 void KeyboardInput::ExecuteHotkey(WPARAM message)
 {
-	for(auto &hk : hotKeyMap)
+	for(auto &hk : g_keyboard_hotkey_data)
 	{
-		if (*hk.first == message)
-			hk.second();
+		if (*hk.message == message)
+		{
+			hk.callback();
+		}
 	}
+	return;
 }
 
 void hotkeyFuncHelp() {
@@ -157,7 +156,7 @@ void hotkeyFuncWindowMode() {
 		long borderPadY = 0;
 		int excessY = GetSystemMetrics(SM_CYCAPTION);
 
-		WINDOWPLACEMENT place3;
+		WINDOWPLACEMENT place3 = {};
 		GetWindowPlacement(H2hWnd, &place3);
 		if ((place3.flags & WPF_RESTORETOMAXIMIZED) == WPF_RESTORETOMAXIMIZED) {
 			WINDOWPLACEMENT place2;
@@ -209,13 +208,13 @@ void KeyboardInput::Initialize()
 		}
 	}
 	ToggleKeyboardInput();
+
 	addDebugText("Registering Hotkeys");
-	KeyboardInput::RegisterHotkey(&H2Config_hotkeyIdHelp, hotkeyFuncHelp);
-	KeyboardInput::RegisterHotkey(&H2Config_hotkeyIdAlignWindow, hotkeyFuncAlignWindow);
-	KeyboardInput::RegisterHotkey(&H2Config_hotkeyIdWindowMode, hotkeyFuncWindowMode);
-	KeyboardInput::RegisterHotkey(&H2Config_hotkeyIdGuide, hotkeyFuncGuide);
-	KeyboardInput::RegisterHotkey(&H2Config_hotkeyIdConsole, hotkeyFuncConsole);
-	// KeyboardInput::RegisterHotkey(&pause, hotkeyFuncDebug);
+	g_keyboard_hotkey_data[0] = { &H2Config_hotkeyIdHelp, hotkeyFuncHelp };
+	g_keyboard_hotkey_data[1] = { &H2Config_hotkeyIdAlignWindow, hotkeyFuncAlignWindow };
+	g_keyboard_hotkey_data[2] = { &H2Config_hotkeyIdWindowMode, hotkeyFuncWindowMode };
+	g_keyboard_hotkey_data[3] = { &H2Config_hotkeyIdGuide, hotkeyFuncGuide };
+	g_keyboard_hotkey_data[4] = { &H2Config_hotkeyIdConsole, hotkeyFuncConsole };
+	g_keyboard_hotkey_data[5] = { &H2Config_hotkeyIdToggleHideIngameChat, []() { H2Config_hide_ingame_chat = !H2Config_hide_ingame_chat; } };
+	return;
 }
-
-

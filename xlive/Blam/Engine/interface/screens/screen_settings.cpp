@@ -1,11 +1,14 @@
 #include "stdafx.h"
 #include "screen_settings.h"
+
 #include "screen_audio_settings.h"
 #include "screen_video_settings.h"
 #include "screen_about_dialog.h"
 #include "screen_network_adapter.h"
 #include "screen_variant_game_engine_type.h"
 #include "screen_single_player_profile_select.h"
+
+#include "cache/cache_files.h"
 #include "interface/user_interface_controller.h"
 #include "interface/user_interface_memory.h"
 #include "interface/user_interface_networking.h"

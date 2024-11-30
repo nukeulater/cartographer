@@ -1,7 +1,5 @@
 #pragma once
 
-#include "memory/static_arrays.h"
-
 enum e_render_lod : int8
 {
 	_render_lod_disabled = 0,

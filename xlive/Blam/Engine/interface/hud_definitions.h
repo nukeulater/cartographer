@@ -15,8 +15,7 @@ enum e_button_icon_flags : byte
 	button_icon_flag_width_offset_is_absolute_icon_width = FLAG(2),
 };
 
-#define NUMBER_OF_GAMEPAD_BUTTONS 16
-#define NUMBER_OF_GAMEPAD_STICKS 2
+
 struct icon_hud_element_definition
 {
 	short sequence_index;

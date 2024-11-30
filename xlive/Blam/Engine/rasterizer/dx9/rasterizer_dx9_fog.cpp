@@ -7,6 +7,7 @@
 #include "rasterizer_dx9_submit.h"
 #include "rasterizer_dx9_shader_submit.h"
 
+#include "game/game_globals.h"
 #include "rasterizer/rasterizer_globals.h"
 #include "rasterizer/dx9/shaders/compiled/fog_atmospheric_apply.h"
 #include "render/render_patchy_fog.h"
