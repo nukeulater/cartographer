@@ -1,8 +1,5 @@
 #pragma once
 #include "interface/user_interface_headers.h"
-#include "main/game_preferences.h"
-
-#include "H2MOD/Modules/Accounts/Accounts.h"
 
 /* macro defines */
 

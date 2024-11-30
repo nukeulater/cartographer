@@ -835,14 +835,10 @@ void add_button_key_split_input(c_text_widget* button_key_text)
 
 	c_static_wchar_string<512> temp, old;
 	old.set(button_key_text->get_interface()->get_raw_string());
-	if(!input_windows_has_split_device_active())
-	{
-		usnzprintf(temp.get_buffer(), temp.max_length(), L"%c ADD SPLIT ", _private_use_character_x_button);
-	}
-	else
-	{
-		usnzprintf(temp.get_buffer(), temp.max_length(), L"%c REMOVE SPLIT ", _private_use_character_x_button);
-	}
+
+	const wchar_t* split_text = !input_windows_has_split_device_active() ? L"%c ADD SPLIT " : L"%c REMOVE SPLIT ";
+	usnzprintf(temp.get_buffer(), temp.max_length(), split_text, _private_use_character_x_button);
+
 	button_key_text->set_text(temp.get_string());
 	button_key_text->append_text(old.get_string());
 }

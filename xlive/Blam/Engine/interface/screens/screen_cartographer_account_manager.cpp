@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "screen_cartographer_account_manager.h"
 
+#include "main/game_preferences.h"
 #include "memory/data.h"
 #include "interface/screens/screen_xbox_live_task_progress_dialog.h"
 
