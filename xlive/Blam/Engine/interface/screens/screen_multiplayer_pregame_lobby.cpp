@@ -1,6 +1,7 @@
 #include "stdafx.h"
-
 #include "screen_multiplayer_pregame_lobby.h"
+
+#include "cache/cache_files.h"
 #include "interface/user_interface_screen_widget_definition.h"
 #include "interface/user_interface_widget_window.h"
 #include "interface/user_interface_networking.h"

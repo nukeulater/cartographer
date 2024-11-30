@@ -3,7 +3,6 @@
 #include "shader_postprocess_definitions.h"
 
 #include "math/color_math.h"
-#include "memory/static_arrays.h"
 #include "tag_files/data_reference.h"
 #include "tag_files/string_id.h"
 #include "tag_files/tag_block.h"

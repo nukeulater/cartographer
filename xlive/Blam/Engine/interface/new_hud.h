@@ -1,7 +1,7 @@
 #pragma once
 #include "game/game_engine_territories.h"
-#include "game/players.h"
 #include "math/color_math.h"
+#include "saved_games/player_profile.h"
 
 /* enums */
 

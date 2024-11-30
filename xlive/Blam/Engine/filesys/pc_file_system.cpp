@@ -20,6 +20,7 @@ void file_seek_and_read(FILE* file_handle, uint32 file_offset, uint32 read_size,
 	ASSERT(seek_result);
 	bool read_result = fread(out_buffer, read_size, read_count, file_handle);
 	ASSERT(read_result);
+	return;
 }
 
 int __cdecl pc_file_system_create_directory_hierarchy(e_pc_file_system_type type, wchar_t* buffer, wchar_t* buffer_2, bool is_folder)

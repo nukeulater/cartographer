@@ -1,5 +1,5 @@
 #pragma once
-#include "memory/static_arrays.h"
+#include "units/units.h"
 #include "tag_files/string_id.h"
 #include "tag_files/tag_block.h"
 #include "tag_files/tag_reference.h"
@@ -18,12 +18,6 @@ enum e_character_grenade_trajectory_type : uint16
 	_character_grenade_trajectory_type_toss = 0,
 	_character_grenade_trajectory_type_lob = 1,
 	_character_grenade_trajectory_type_bounce = 2
-};
-
-enum e_character_grenade_type : uint16
-{
-	_character_grenade_type_human_fragmentation = 0,
-	_character_grenade_type_covenant_plasma = 1
 };
 
 enum e_character_grenade_flags : uint32
@@ -342,7 +336,7 @@ ASSERT_STRUCT_SIZE(character_vehicle_properties, 180);
 struct character_grenade_properties
 {
 	c_flags_no_init<e_character_grenade_flags, uint32, k_character_grenade_flags_count> flags;
-	e_character_grenade_type type;
+	e_unit_grenade_type type;
 	e_character_grenade_trajectory_type trajectory;
 
 	int16 pad;

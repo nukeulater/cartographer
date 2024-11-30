@@ -6,7 +6,7 @@
 #include "items/weapon_definitions.h"
 #include "game/game_globals.h"
 #include "models/models.h"
-#include "scenario/scenario.h"
+#include "structures/structure_bsp_definitions.h"
 #include "tag_files/tag_loader/tag_injection.h"
 #include "units/biped_definitions.h"
 
@@ -80,7 +80,7 @@ void christmas_event_map_load(void)
 		}
 
 		// Change/Add weather system to bsp
-		structure_bsp* bsp_definition = (structure_bsp*)tag_get_fast(get_global_scenario()->structure_bsps[0]->structure_bsp.index);
+		structure_bsp* bsp_definition = get_global_structure_bsp();
 		structure_weather_palette_entry* weat_block = MetaExtender::add_tag_block2<structure_weather_palette_entry>((unsigned long)std::addressof(bsp_definition->weather_palette));
 		const char new_name[] = "snow_cs";
 		csstrnzcpy(weat_block->name, new_name, NUMBEROF(new_name));

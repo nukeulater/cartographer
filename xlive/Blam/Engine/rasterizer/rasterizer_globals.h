@@ -1,5 +1,5 @@
 #pragma once
-#include "game/game_globals.h"
+#include "bitmaps/bitmap_group.h"
 
 /* constants */
 
@@ -122,8 +122,6 @@ ASSERT_STRUCT_SIZE(s_rasterizer_globals, 4336);
 /* prototypes */
 
 s_rasterizer_globals* rasterizer_globals_get(void);
-
-s_game_globals_rasterizer_data* rasterizer_globals_get_data(void);
 
 uint32 rasterizer_get_width(void);
 

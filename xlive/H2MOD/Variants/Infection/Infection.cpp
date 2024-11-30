@@ -1,15 +1,13 @@
 #include "stdafx.h"
 #include "Infection.h"
 
-#include "Blam/Cache/TagGroups/item_collection_definition.hpp"
-
 #include "game/game.h"
 #include "game/game_engine.h"
 #include "game/game_time.h"
 #include "interface/user_interface_controller.h"
+#include "items/item_collection_definition.h"
 #include "scenario/scenario.h"
 #include "networking/logic/life_cycle_manager.h"
-#include "networking/NetworkMessageTypeCollection.h"
 #include "units/units.h"
 
 #include "H2MOD.h"
@@ -290,7 +288,7 @@ void Infection::removeUnwantedItems()
 			strncmp(tag_name, "multiplayer\\single_weapons\\frag_grenades", 256) == 0 ||
 			strncmp(tag_name, "multiplayer\\single_weapons\\plasma_grenades", 256) == 0)
 		{
-			s_item_collection_group_definition* itmc = (s_item_collection_group_definition*)tag_get_fast(iterator.current_tag_index);
+			item_collection_definition* itmc = (item_collection_definition*)tag_get_fast(iterator.current_tag_index);
 
 			for (int i = 0; i < itmc->item_permutations.count; i++)
 			{

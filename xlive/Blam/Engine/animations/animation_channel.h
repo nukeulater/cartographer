@@ -1,8 +1,6 @@
 #pragma once
 #include "animation_definitions.h"
 
-
-#include "memory/static_arrays.h"
 #include "tag_files/string_id.h"
 
 // TODO populate flags

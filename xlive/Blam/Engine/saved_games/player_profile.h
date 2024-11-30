@@ -3,7 +3,6 @@
 
 #include "game/players.h"
 #include "input/input_abstraction.h"
-#include "memory/static_arrays.h"
 
 #define k_default_profiles_count 1
 

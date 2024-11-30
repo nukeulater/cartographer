@@ -1,19 +1,45 @@
 #include "stdafx.h"
 #include "tag_fixes.h"
 
+#include "cache/cache_files.h"
+#include "game/game_globals.h"
 #include "interface/new_hud_definitions.h"
 #include "scenario/scenario.h"
 #include "shaders/shader_definitions.h"
+#include "sound/sound_classes.h"
 #include "structures/structure_bsp_definitions.h"
 #include "tag_files/tag_loader/tag_injection.h"
 
-void tag_fixes_masterchief(void);
-void tag_fixes_grunt(void);
-void tag_fixes_brute(void);
-void tag_fixes_smg(void);
-void tag_fixes_environment(void);
-void tag_fixes_misty_rain(void);
-void tag_fixes_split_screen_hud();
+/* prototypes */
+
+//Fix incorrect values on Masterchief shaders
+static void tag_fixes_masterchief(void);
+
+//Fix incorrect values on Grunt shaders
+static void tag_fixes_grunt(void);
+
+// Fix brute shaders
+static void tag_fixes_brute(void);
+
+// Fix smg shaders
+static void tag_fixes_smg(void);
+
+// Fix tags that are related to the environment (the maps themselves)
+static void tag_fixes_environment(void);
+
+// Add back misty rain weather effect on delta halo
+static void tag_fixes_misty_rain(void);
+
+// Explanation:
+// Hud offsets were doubled as a hack by hired gun when they upscaled the hud for H2V by 2
+// However, these numbers were only doubled for fullscreen offsets and not the offsets used when in splitscreen
+// We double these to fix the hud in splitscreen
+static void tag_fixes_split_screen_hud(void);
+
+// Change sound_classes data to equivalents in original halo 2
+static void sound_classes_fix_values(void);
+
+/* public code */
 
 void main_tag_fixes(void)
 {
@@ -27,16 +53,16 @@ void main_tag_fixes(void)
 	return;
 }
 
+/* private code */
 
-//Fix incorrect values on Masterchief shaders
-void tag_fixes_masterchief(void)
+static void tag_fixes_masterchief(void)
 {
 	//Fix the Masterchief FP arms shader
 	datum fp_shader_datum = tag_loaded(_tag_group_shader, "objects\\characters\\masterchief\\fp\\shaders\\fp_arms");
 	if (fp_shader_datum != NONE)
 	{
 		s_shader_definition* fp_shader = (s_shader_definition*)tag_get_fast(fp_shader_datum);
-		fp_shader->lightmap_specular_brightness = 1.0f;
+		fp_shader->lightmap_specular_brightness = 1.f;
 	}
 
 	//Fix the visor
@@ -50,34 +76,32 @@ void tag_fixes_masterchief(void)
 	return;
 }
 
-//Fix incorrect values on Grunt shaders
-void tag_fixes_grunt(void)
+static void tag_fixes_grunt(void)
 {
 	datum grunt_arm_shader_datum = tag_loaded(_tag_group_shader, "objects\\characters\\grunt\\shaders\\grunt_arms");
 	if (grunt_arm_shader_datum != NONE)
 	{
 		s_shader_definition* grunt_arm_shader = (s_shader_definition*)tag_get_fast(grunt_arm_shader_datum);
-		grunt_arm_shader->lightmap_specular_brightness = 1.0f;
+		grunt_arm_shader->lightmap_specular_brightness = 1.f;
 	}
 
 	datum grunt_backpack_shader_datum = tag_loaded(_tag_group_shader, "objects\\characters\\grunt\\shaders\\grunt_backpack");
 	if (grunt_backpack_shader_datum != NONE)
 	{
 		s_shader_definition* grunt_backpack_shader = (s_shader_definition*)tag_get_fast(grunt_backpack_shader_datum);
-		grunt_backpack_shader->lightmap_specular_brightness = 1.0f;
+		grunt_backpack_shader->lightmap_specular_brightness = 1.f;
 	}
 
 	datum grunt_torso_shader_datum = tag_loaded(_tag_group_shader, "objects\\characters\\grunt\\shaders\\grunt_torso");
 	if (grunt_torso_shader_datum != NONE)
 	{
 		s_shader_definition* grunt_torso_shader = (s_shader_definition*)tag_get_fast(grunt_torso_shader_datum);
-		grunt_torso_shader->lightmap_specular_brightness = 1.0f;
+		grunt_torso_shader->lightmap_specular_brightness = 1.f;
 	}
 	return;
 }
 
-// Fix brute shaders
-void tag_fixes_brute(void)
+static void tag_fixes_brute(void)
 {
 	datum brute_shader_index = tag_loaded(_tag_group_shader, "objects\\characters\\brute\\shaders\\brute");
 	datum brute_head_shader_index = tag_loaded(_tag_group_shader, "objects\\characters\\brute\\shaders\\brute_head");
@@ -94,8 +118,7 @@ void tag_fixes_brute(void)
 	return;
 }
 
-// Fix smg shaders
-void tag_fixes_smg(void)
+static void tag_fixes_smg(void)
 {
 	datum smg_painted_metal_index = tag_loaded(_tag_group_shader, "objects\\weapons\\rifle\\smg\\shaders\\smg_painted_metal");
 	if (smg_painted_metal_index != NONE)
@@ -116,8 +139,7 @@ void tag_fixes_smg(void)
 	return;
 }
 
-// Fix tags that are related to the environment (the maps themselves)
-void tag_fixes_environment(void)
+static void tag_fixes_environment(void)
 {
 	// Fix glass shaders
 	datum glass_interrior_index = tag_loaded(_tag_group_shader, "scenarios\\shaders\\human\\military\\glass\\glass_interior");
@@ -143,7 +165,7 @@ void tag_fixes_environment(void)
 	return;
 }
 
-void tag_fixes_misty_rain(void)
+static void tag_fixes_misty_rain(void)
 {
 	const s_cache_header* cache_header = cache_files_get_header();
 
@@ -188,7 +210,7 @@ void tag_fixes_misty_rain(void)
 int32* already_adjusted_blocks;
 uint32 adjusted_blocks_count = 0;
 
-bool tag_fixes_split_screen_block_adjusted(int32 block_offset)
+static bool tag_fixes_split_screen_block_adjusted(int32 block_offset)
 {
 	for(uint32 index = 0; index < adjusted_blocks_count; index++)
 		if (already_adjusted_blocks[index] == block_offset)
@@ -197,11 +219,7 @@ bool tag_fixes_split_screen_block_adjusted(int32 block_offset)
 	return false;
 }
 
-// Explanation:
-// Hud offsets were doubled as a hack by hired gun when they upscaled the hud for H2V by 2
-// However, these numbers were only doubled for fullscreen offsets and not the offsets used when in splitscreen
-// We double these to fix the hud in splitscreen
-void tag_fixes_split_screen_hud(void)
+static void tag_fixes_split_screen_hud(void)
 {
 	already_adjusted_blocks = (int32*)malloc(sizeof(int32) * 255);
 	adjusted_blocks_count = 0;
@@ -269,5 +287,40 @@ void tag_fixes_split_screen_hud(void)
 	}
 
 	free(already_adjusted_blocks);
+	return;
+}
+
+static void sound_classes_fix_values(void)
+{
+	const s_game_globals* game_globals = scenario_get_game_globals();
+	const s_sound_globals_definition* sound_globals = game_globals->sound_globals[0];
+	if (game_globals->sound_globals.count > 0 && sound_globals->sound_classes.index != NONE)
+	{
+		s_sound_classes_definition* sound_classes = (s_sound_classes_definition*)tag_get_fast(sound_globals->sound_classes.index);
+
+		sound_classes->sound_classes[_sound_class_projectile_impact]->gain_bounds = { -0.f, -4.f };
+		sound_classes->sound_classes[_sound_class_projectile_detonation]->gain_bounds = { -0.f, -4.f };
+		sound_classes->sound_classes[_sound_class_projectile_flyby]->gain_bounds = { -0.f, -4.f };
+		sound_classes->sound_classes[_sound_class_projectile_unused1]->gain_bounds = { -0.f, -4.f };
+		sound_classes->sound_classes[_sound_class_weapon_fire]->gain_bounds = { -0.f, -4.f };
+		sound_classes->sound_classes[_sound_class_weapon_ready]->gain_bounds = { -0.f, -4.f };
+		sound_classes->sound_classes[_sound_class_weapon_reload]->gain_bounds = { -0.f, -4.f };
+		sound_classes->sound_classes[_sound_class_weapon_empty]->gain_bounds = { -0.f, -4.f };
+		sound_classes->sound_classes[_sound_class_weapon_charge]->gain_bounds = { -0.f, -4.f };
+		sound_classes->sound_classes[_sound_class_weapon_overheat]->gain_bounds = { -0.f, -4.f };
+		sound_classes->sound_classes[_sound_class_weapon_idle]->gain_bounds = { -0.f, -4.f };
+		sound_classes->sound_classes[_sound_class_weapon_melee]->gain_bounds = { -0.f, -4.f };
+		sound_classes->sound_classes[_sound_class_weapon_animation]->gain_bounds = { -0.f, -4.f };
+		sound_classes->sound_classes[_sound_class_object_impacts]->gain_bounds = { -64.f, -4.f };
+		sound_classes->sound_classes[_sound_class_particle_impacts]->gain_bounds = { -12.f, -4.f };
+		sound_classes->sound_classes[_sound_class_footstep]->gain_bounds = { -32.f, -9.f };
+		sound_classes->sound_classes[_sound_class_unit_animation]->gain_bounds = { -0.f, -2.f };
+		sound_classes->sound_classes[_sound_class_vehicle_impact]->gain_bounds = { -0.f, -4.f };
+		sound_classes->sound_classes[_sound_class_vehicle_engine]->gain_bounds = { -0.f, -4.f };
+		sound_classes->sound_classes[_sound_class_vehicle_animation]->gain_bounds = { -0.f, -4.f };
+		sound_classes->sound_classes[_sound_class_device_machinery]->gain_bounds = { -0.f, -4.f };
+		sound_classes->sound_classes[_sound_class_device_stationary]->gain_bounds = { -0.f, -4.f };
+		sound_classes->sound_classes[_sound_class_ambient_machinery]->gain_bounds = { -0.f, -4.f };
+	}
 	return;
 }

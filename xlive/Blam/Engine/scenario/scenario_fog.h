@@ -1,7 +1,6 @@
 #pragma once
-#include "camera/camera.h"
 #include "math/color_math.h"
-#include "memory/static_arrays.h"
+#include "render/render_cameras.h"
 #include "tag_files/string_id.h"
 #include "tag_files/tag_block.h"
 #include "tag_files/tag_reference.h"
