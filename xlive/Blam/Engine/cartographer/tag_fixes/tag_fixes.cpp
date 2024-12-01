@@ -108,12 +108,12 @@ static void tag_fixes_brute(void)
 	if (brute_shader_index != NONE && brute_head_shader_index != NONE)
 	{
 		s_shader_definition* shader = (s_shader_definition*)tag_get_fast(brute_shader_index);
-		shader->postprocess_definition[0]->pixel_constants[0]->color = D3DCOLOR_RGBA(87, 79, 69, 0);
-		shader->postprocess_definition[0]->pixel_constants[1]->color = D3DCOLOR_RGBA(180, 179, 189, 0);
+		*shader->postprocess_definition[0]->pixel_constants[0] = D3DCOLOR_RGBA(87, 79, 69, 0);
+		*shader->postprocess_definition[0]->pixel_constants[1] = D3DCOLOR_RGBA(180, 179, 189, 0);
 
 		shader = (s_shader_definition*)tag_get_fast(brute_head_shader_index);
-		shader->postprocess_definition[0]->pixel_constants[0]->color = D3DCOLOR_RGBA(255, 255, 255, 0);
-		shader->postprocess_definition[0]->pixel_constants[1]->color = D3DCOLOR_RGBA(180, 179, 189, 0);
+		*shader->postprocess_definition[0]->pixel_constants[0] = D3DCOLOR_RGBA(255, 255, 255, 0);
+		*shader->postprocess_definition[0]->pixel_constants[1] = D3DCOLOR_RGBA(180, 179, 189, 0);
 	}
 	return;
 }

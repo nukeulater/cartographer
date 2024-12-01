@@ -120,17 +120,51 @@ struct real_orientation
 };
 ASSERT_STRUCT_SIZE(real_orientation, 32);
 
-const real_vector2d global_forward2d = { 1.0f, 0.0f };
-const real_vector3d global_forward3d = { 1.0f, 0.0f, 0.0f };
-const real_vector3d global_left3d = { 0.0f, 1.0f, 0.0f };
-const real_vector3d global_up3d = { 0.0f, 0.0f, 1.0f };
+union real_matrix3x3
+{
+	struct { real_vector3d forward, left, up; };
+	struct { real32 n[9]; } v;						// Array of values
+	real32 matrix[3][3];							// Matrix of values
+};
+ASSERT_STRUCT_SIZE(real_matrix3x3, 36);
 
-const real_vector3d global_back3d = { -1.0f, 0.0f, 0.0f };
-const real_vector3d global_right3d = { 0.0f, -1.0f, 0.0f };
-const real_vector3d global_down3d = { 0.0f, 0.0f, -1.0f };
+struct real_matrix4x3
+{
+	real32 scale;
+	real_matrix3x3 vectors;
+	real_point3d position;
+};
+ASSERT_STRUCT_SIZE(real_matrix4x3, 52);
 
-const real_vector3d global_zero_vector3d = { 0.0f, 0.0f, 0.0f };
-const real_orientation global_identity_orientation = { {0.0f, 0.0f, 0.0f, 1.0f,}, { 0.f, 0.f, 0.f }, 1.0f};
+/* constants */
+
+extern const real_point2d* const global_origin2d;
+extern const real_vector2d* const global_zero_vector2d;
+extern const real_vector2d* const global_forward2d;
+extern const real_vector2d* const global_left2d;
+
+extern const real_point3d* const global_origin3d;
+extern const real_vector3d* const global_zero_vector3d;
+extern const real_vector3d* const global_forward3d;
+extern const real_vector3d* const global_left3d;
+extern const real_vector3d* const global_up3d;
+
+extern const real_vector3d* const global_backward3d;
+extern const real_vector3d* const global_right3d;
+extern const real_vector3d* const global_down3d;
+
+extern const real_vector4d* const global_zero_vector4d;
+extern const real_euler_angles2d* const global_zero_angles2d;
+extern const real_quaternion* const global_identity_quaternion;
+extern const real_matrix4x3* const global_identity4x3;
+
+extern const real_orientation* const global_identity_orientation;
+
+extern const real_rectangle2d* const global_null_rectangle2d;
+extern const real_rectangle3d* const global_null_rectangle3d;
+
+
+/* public code */
 
 static BLAM_MATH_INL real32 square_root(real32 f)
 {

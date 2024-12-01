@@ -1,12 +1,12 @@
 #pragma once
-#include "imgui.h"
 #include "input/controllers.h"
 
 /* constants */
 
-#define k_advanced_settings_window_name "advanced_settings"
-#define k_weapon_offsets_window_name "Weapon Offsets"
-
+extern const char* k_advanced_settings_window_name;
+extern const char* k_weapon_offsets_window_name;
+extern const char* k_motd_window_name;
+extern const char* k_debug_overlay_window_name;
 
 namespace ImGuiHandler
 {
@@ -49,7 +49,7 @@ namespace ImGuiHandler
 		}
 	};
 
-	enum s_aspect_ratio : byte
+	enum e_imgui_aspect_ratio : byte
 	{
 		four_three,
 		sixten_nine
@@ -68,14 +68,12 @@ namespace ImGuiHandler
 	bool LoadTextureFromFile(const wchar_t* filename, s_imgui_images image, int* out_width, int* out_height);
 	PDIRECT3DTEXTURE9 GetTexture(s_imgui_images image);
 	void ReleaseTextures();
-	s_aspect_ratio GetAspectRatio(const ImVec2 displaySize);
+	e_imgui_aspect_ratio GetAspectRatio(const real_point2d* display_size);
 	namespace ImMOTD {
-		bool DownloadMOTD(const std::wstring& motd_path, s_aspect_ratio ratio);
+		bool DownloadMOTD(const std::wstring& motd_path, e_imgui_aspect_ratio ratio);
 		void Render(bool* p_open);
 		void Open();
 		void Close();
-
-		extern std::string windowName;
 	}
 	namespace ImAdvancedSettings
 	{
@@ -91,8 +89,6 @@ namespace ImGuiHandler
 		void UpdateWatchItem(std::string Key, std::string Value);
 		void Open();
 		void Close();
-
-		extern std::string windowName;
 	}
 	namespace ImMessageBox
 	{

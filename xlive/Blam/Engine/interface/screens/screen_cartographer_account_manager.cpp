@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "screen_cartographer_account_manager.h"
 
+#include "main/game_preferences.h"
 #include "memory/data.h"
 #include "interface/screens/screen_xbox_live_task_progress_dialog.h"
 
@@ -804,7 +805,7 @@ void xbox_live_task_progress_callback(c_screen_xbox_live_task_progress_dialog* d
 					ui_load_cartographer_update_notice_menu();
 					return;
 				}
-				ImGuiHandler::ToggleWindow(ImGuiHandler::ImMOTD::windowName);
+				ImGuiHandler::ToggleWindow(k_motd_window_name);
 				// extern int notify_xlive_ui;
 				// notify_xlive_ui = 0;
 				// sub_248beb_nak_deconstructor_Login_Warn();

@@ -652,7 +652,7 @@ render_postprocess:
                         0,
                         NULL,
                         D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER,
-                        global_white_pixel32.color,
+                        global_white_pixel32,
                         1.f,
                         0);
 

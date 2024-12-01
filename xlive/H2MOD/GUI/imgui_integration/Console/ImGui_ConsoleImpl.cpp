@@ -7,10 +7,9 @@
 #define CONSOLE_CLAMP(V, MN, MX)     ((V) < (MN) ? (MN) : (V) > (MX) ? (MX) : (V))
 
 const char command_error_bad_arg[] = "# exception catch (bad arg): ";
+const char* k_cartographer_console_window_name = "console";
 
 ConsoleCommand console_opacity_var_cmd("var_console_opacity", "set console opacity, 1 parameter(s): <float>", 1, 1, CartographerConsole::set_opacity_cb);
-
-std::string CartographerConsole::windowName = "console";
 
 CartographerConsole* GetMainConsoleInstance()
 {
@@ -395,7 +394,7 @@ void CartographerConsole::Draw(const char* title, bool* p_open)
 		{
 			if (ImGui::MenuItem("Clear")) { ClearMainOutput(); }
 			if (ImGui::MenuItem(m_docked ? "Undock console" : "Dock console", NULL)) { m_docked = !m_docked; }
-			if (ImGui::MenuItem("Close Window")) { ImGuiHandler::ToggleWindow(windowName); }
+			if (ImGui::MenuItem("Close Window")) { ImGuiHandler::ToggleWindow(k_cartographer_console_window_name); }
 			ImGui::EndMenu();
 		}
 
@@ -405,7 +404,7 @@ void CartographerConsole::Draw(const char* title, bool* p_open)
 	// Poput Context Window
 	if (ImGui::BeginPopupContextWindow(NULL, ImGuiPopupFlags_NoOpenOverItems | ImGuiPopupFlags_MouseButtonRight))
 	{
-		if (ImGui::MenuItem("Close Window")) { ImGuiHandler::ToggleWindow(windowName); }
+		if (ImGui::MenuItem("Close Window")) { ImGuiHandler::ToggleWindow(k_cartographer_console_window_name); }
 		ImGui::EndPopup();
 	}
 
@@ -463,7 +462,7 @@ void CartographerConsole::Draw(const char* title, bool* p_open)
 	{
 		if (GetMainOutput()->GetHeaderCount() > 0)
 			if (ImGui::MenuItem("Clear")) { ClearMainOutput(); }
-		if (ImGui::MenuItem("Close Window")) { ImGuiHandler::ToggleWindow(windowName); }
+		if (ImGui::MenuItem("Close Window")) { ImGuiHandler::ToggleWindow(k_cartographer_console_window_name); }
 		ImGui::EndPopup();
 	}
 

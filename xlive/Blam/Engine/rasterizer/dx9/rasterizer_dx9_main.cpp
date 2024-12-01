@@ -192,7 +192,6 @@ static const D3DPOOL** g_d3d9_texture_pool_get(void);
 static const uint32** g_d3d9_vertex_usage_get(void);
 static const D3DPOOL** g_d3d9_vertex_pool_get(void);
 
-static void __cdecl rasterizer_dx9_clear_target(uint32 flags, D3DCOLOR color, real32 z, bool stencil);
 static void __cdecl rasterizer_set_stream_source(void);
 static void __cdecl debug_frame_usage_draw(void);
 static void __cdecl rasterizer_present_backbuffer(void);
@@ -342,7 +341,7 @@ void rasterizer_dx9_present(bitmap_data* screenshot_bitmap, bool a2)
                 result = false;
             }
             rasterizer_dx9_set_render_target_internal(dx9_globals->global_d3d_surface_render_primary, (IDirect3DSurface9*)NONE, true);
-            rasterizer_dx9_clear_target(0, global_white_pixel32.color, 0.0f, false);
+            rasterizer_dx9_clear_render_target(0, global_white_pixel32, 0.0f, false);
         }
 
         rasterizer_set_stream_source();
@@ -892,6 +891,12 @@ bool __cdecl rasterizer_dx9_render_scene_end(void)
     return INVOKE(0x262215, 0x0, rasterizer_dx9_render_scene_end);
 }
 
+void __cdecl rasterizer_dx9_clear_render_target(uint32 flags, D3DCOLOR color, real32 z, bool stencil)
+{
+    INVOKE(0x25FC2A, 0x0, rasterizer_dx9_clear_render_target, flags, color, z, stencil);
+    return;
+}
+
 /* private code */
 
 static PALETTEENTRY* g_d3d_palettes_get(void)
@@ -927,12 +932,6 @@ static const uint32** g_d3d9_vertex_usage_get(void)
 static const D3DPOOL** g_d3d9_vertex_pool_get(void)
 {
     return Memory::GetAddress<const D3DPOOL**>(0xA3C634);
-}
-
-static void __cdecl rasterizer_dx9_clear_target(uint32 flags, D3DCOLOR color, real32 z, bool stencil)
-{
-    INVOKE(0x25FC2A, 0x0, rasterizer_dx9_clear_target, flags, color, z, stencil);
-    return;
 }
 
 static void __cdecl rasterizer_set_stream_source(void)

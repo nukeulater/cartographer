@@ -44,7 +44,7 @@ bool __cdecl rasterizer_dx9_weather_plate_setup_pipeline(const c_animated_backgr
 	rasterizer_dx9_set_render_state(D3DRS_SRCBLEND, D3DBLEND_BLENDFACTOR);
 	rasterizer_dx9_set_render_state(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
 	rasterizer_dx9_set_render_state(D3DRS_BLENDOP, D3DBLENDOP_ADD);
-	rasterizer_dx9_set_render_state(D3DRS_BLENDFACTOR, global_white_pixel32.color);
+	rasterizer_dx9_set_render_state(D3DRS_BLENDFACTOR, global_white_pixel32);
 	rasterizer_dx9_set_render_state(D3DRS_ZENABLE, FALSE);
 	rasterizer_dx9_set_render_state(D3DRS_ZWRITEENABLE, FALSE);
 	rasterizer_dx9_set_render_state(D3DRS_ZFUNC, D3DCMP_ALWAYS);	// D3DCMP_LESSEQUAL on xbox?
@@ -194,15 +194,15 @@ bool rasterizer_dx9_draw_weather_particles(c_particle_system_lite* system)
 		rasterizer_dx9_initialize_camera_projection(false, &global_window_parameters->camera, &global_window_parameters->projection, *rasterizer_dx9_main_render_target_get());
 
 		real_vector2d rain_vector;
-		pixel32 lower_rain_color;
-		pixel32 upper_rain_color;
+		pixel32 lower_rain_alpha;
+		pixel32 upper_rain_alpha;
 		if (is_rain)
 		{
 			rain_vector.i = global_window_parameters->camera.forward.i;
 			rain_vector.j = global_window_parameters->camera.forward.j;
 			
-			lower_rain_color = real_alpha_to_pixel32(system->m_opacity.lower);
-			upper_rain_color = real_alpha_to_pixel32(system->m_opacity.upper);
+			lower_rain_alpha = real_alpha_to_pixel32(system->m_opacity.lower);
+			upper_rain_alpha = real_alpha_to_pixel32(system->m_opacity.upper);
 		}
 		else
 		{
@@ -251,12 +251,12 @@ bool rasterizer_dx9_draw_weather_particles(c_particle_system_lite* system)
 					current_primitive->position.y = render_data->m_position.y - update_data->m_velocity.j * scale * dt;
 					current_primitive->position.z = render_data->m_position.z - update_data->m_velocity.k * scale * dt;
 					current_primitive->scale = 1.f;
-					current_primitive->color = { lower_rain_color.color | render_data->m_color.color & 0x00FFFFFF };
+					current_primitive->color = { lower_rain_alpha| render_data->m_color & 0x00FFFFFF };
 					++current_primitive;
 
 					current_primitive->position = render_data->m_position;
 					current_primitive->scale = 1.f;
-					current_primitive->color = { upper_rain_color.color | render_data->m_color.color & 0x00FFFFFF };
+					current_primitive->color = { upper_rain_alpha| render_data->m_color & 0x00FFFFFF };
 
 					++current_primitive;
 
@@ -264,7 +264,7 @@ bool rasterizer_dx9_draw_weather_particles(c_particle_system_lite* system)
 					current_primitive->position.y = render_data->m_position.y + system->m_rain_line_width * rain_vector.i;
 					current_primitive->position.z = render_data->m_position.z;
 					current_primitive->scale = 1.f;
-					current_primitive->color = { upper_rain_color.color | render_data->m_color.color & 0x00FFFFFF };
+					current_primitive->color = { upper_rain_alpha | render_data->m_color & 0x00FFFFFF };
 				}
 				else
 				{

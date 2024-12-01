@@ -8,6 +8,8 @@
 #include "H2MOD/GUI/ImGui_Integration/ImGui_Handler.h"
 #include "H2MOD/Modules/WeaponOffsets/WeaponOffsetConfig.h"
 
+#include "imgui.h"
+
 /* globals */
 
 c_static_string<256> g_weapon_offsets_temp_string;
@@ -157,19 +159,8 @@ namespace ImGuiHandler {
 
 const char* weapon_offsets_get_string(e_weapon_offsets_string string, const char* id)
 {
-	e_language language = get_current_language();
-	const char* result;
-
-	if (g_weapon_offsets_string_table[language] != NULL &&
-		g_weapon_offsets_string_table[language][string] != NULL)
-	{
-		result = g_weapon_offsets_string_table[language][string];
-	}
-	else
-	{
-		result = g_weapon_offsets_string_table[_language_english][string];
-	}
-
+	const e_language language = get_current_language();
+	const char* result = g_weapon_offsets_string_table[language][string];
 
 	if (id != NULL)
 	{

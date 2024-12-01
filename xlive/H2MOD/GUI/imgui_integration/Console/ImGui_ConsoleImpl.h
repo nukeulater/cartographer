@@ -1,7 +1,6 @@
 #pragma once
 
 #include "imgui.h"
-#include "ComVar.h"
 #include "CommandHandler.h"
 
 class CartographerConsole;
@@ -11,6 +10,7 @@ typedef CartographerConsole CartConsole;
 CartographerConsole* GetMainConsoleInstance();
 
 #define CONSOLE_TABS 2
+extern const char* k_cartographer_console_window_name;
 
 static const char* console_tab_name[CONSOLE_TABS] = 
 {
@@ -63,7 +63,6 @@ private:
     };
 
 public:
-    static std::string                 windowName;
     float                              m_console_opacity;
     ComVar<float>                      m_console_opacity_comvar;
 
@@ -103,7 +102,7 @@ public:
     static void Render(bool* b_open)
     {
 		auto console = GetMainConsoleInstance();
-		console->Draw(windowName.c_str(), b_open);
+        console->Draw(k_cartographer_console_window_name, b_open);
     }
 
     static void LogToTab(ConsoleTabs tab, const char* fmt, ...)

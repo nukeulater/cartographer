@@ -30,7 +30,7 @@ void biped_build_2d_camera_frame(const real_vector3d* forward, const real_vector
         }
         if (normalize2d(forward_out) == 0.0f)
         {
-            *forward_out = global_forward2d;
+            *forward_out = *global_forward2d;
         }
     }
     perpendicular2d(forward_out, up_out);

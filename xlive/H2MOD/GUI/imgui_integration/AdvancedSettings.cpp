@@ -1124,19 +1124,8 @@ namespace ImGuiHandler {
 
 const char* advanced_settings_get_string(e_advanced_string string, const char* id)
 {
-	e_language language = get_current_language();
-	const char* result;
-
-	if (g_advanced_settings_string_table[language] != NULL && 
-		g_advanced_settings_string_table[language][string] != NULL)
-	{
-		result = g_advanced_settings_string_table[language][string];
-	}
-	else
-	{
-		result = g_advanced_settings_string_table[_language_english][string];
-	}
-	
+	const e_language language = get_current_language();
+	const char* result = g_advanced_settings_string_table[language][string];
 
 	if (id != NULL)
 	{

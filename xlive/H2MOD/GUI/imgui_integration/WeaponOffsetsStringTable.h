@@ -91,15 +91,16 @@ const char* g_weapon_offsets_string_table_spanish[k_weapon_offsets_string_count]
 	u8"Reiniciar"
 };
 
+// TODO: finish localization
 const char** g_weapon_offsets_string_table[k_language_count] =
 {
 	g_weapon_offsets_string_table_english,
-	NULL,
-	NULL,
-	NULL,
+	g_weapon_offsets_string_table_english,
+	g_weapon_offsets_string_table_english,
+	g_weapon_offsets_string_table_english,
 	g_weapon_offsets_string_table_spanish,
-	NULL,
-	NULL,
-	NULL,
-	NULL
+	g_weapon_offsets_string_table_english,
+	g_weapon_offsets_string_table_english,
+	g_weapon_offsets_string_table_english,
+	g_weapon_offsets_string_table_english
 };

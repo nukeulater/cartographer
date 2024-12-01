@@ -440,7 +440,7 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal
 			vector_from_points3d(player_origin, &m_target_point, &target_point_vector);
 			real32 distance_to_target_point = magnitude3d(&target_point_vector);
 
-			real_vector3d current_translational_velocity_per_tick = m_melee_tick == 0 ? global_zero_vector3d : *translational_velocity;
+			real_vector3d current_translational_velocity_per_tick = m_melee_tick == 0 ? *global_zero_vector3d : *translational_velocity;
 			scale_vector3d(&current_translational_velocity_per_tick, game_tick_length(), &current_translational_velocity_per_tick);
 
 			// check if we should start decelerating

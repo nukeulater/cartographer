@@ -3,9 +3,9 @@
 
 /* macro defines */
 
-#define K_PRIVATE_USE_CHARACTER_SPACE_START 0xE000u
-#define K_PRIVATE_USE_CHARACTER_SPACE_END 0xF8FFu
-#define TO_PRIVATE_CHAR(id) ((K_PRIVATE_USE_CHARACTER_SPACE_START + (id)))
+#define k_private_use_character_space_start 0xE000u
+#define k_private_use_character_space_end 0xF8FFu
+#define TO_PRIVATE_CHAR(id) ((k_private_use_character_space_start + (id)))
 
 /* enums */
 
@@ -194,7 +194,7 @@ enum e_private_use_characters
 	_private_use_character_vote_variant = TO_PRIVATE_CHAR(0x48F),
 	_private_use_character_vote_mapname = TO_PRIVATE_CHAR(0x490),
 	_private_use_character_pending_votes = TO_PRIVATE_CHAR(0x491),
-	_private_use_character_resolution_change_seconds_remaining = TO_PRIVATE_CHAR(0x492),
+	_private_use_character_resolution_change_seconds_remaining = TO_PRIVATE_CHAR(0x492)
 };
 
 

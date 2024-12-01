@@ -341,15 +341,16 @@ const char* g_advanced_settings_string_table_spanish[k_advanced_string_count]
 	u8"Cambia a tu bípedo para que sea un esqueleto espeluznante y aterrador para el evento de Halloween."
 };
 
+// TODO: finish localization
 const char** g_advanced_settings_string_table[k_language_count] =
 {
 	g_advanced_settings_string_table_english,
-	NULL,
-	NULL,
-	NULL,
+	g_advanced_settings_string_table_english,
+	g_advanced_settings_string_table_english,
+	g_advanced_settings_string_table_english,
 	g_advanced_settings_string_table_spanish,
-	NULL,
-	NULL,
-	NULL,
-	NULL
+	g_advanced_settings_string_table_english,
+	g_advanced_settings_string_table_english,
+	g_advanced_settings_string_table_english,
+	g_advanced_settings_string_table_english
 };

@@ -188,9 +188,9 @@ void __fastcall matrix4x3_multiply(const real_matrix4x3* matrix1, const real_mat
 void matrix4x3_translation(real_matrix4x3* matrix, const real_point3d* position)
 {
 	matrix->scale = 1.0f;
-	matrix->vectors.forward = global_forward3d;
-	matrix->vectors.left = global_left3d;
-	matrix->vectors.up = global_up3d;
+	matrix->vectors.forward = *global_forward3d;
+	matrix->vectors.left = *global_left3d;
+	matrix->vectors.up = *global_up3d;
 	matrix->position = *position;
 	return;
 }
@@ -198,9 +198,9 @@ void matrix4x3_translation(real_matrix4x3* matrix, const real_point3d* position)
 real_matrix4x3* matrix4x3_identity(real_matrix4x3* matrix)
 {
 	matrix->scale = 1.0f;
-	matrix->vectors.forward = global_forward3d;
-	matrix->vectors.left = global_left3d;
-	matrix->vectors.up = global_up3d;
+	matrix->vectors.forward = *global_forward3d;
+	matrix->vectors.left = *global_left3d;
+	matrix->vectors.up = *global_up3d;
 	set_real_point3d(&matrix->position, 0.0f, 0.0f, 0.0f);
 	return matrix;
 }

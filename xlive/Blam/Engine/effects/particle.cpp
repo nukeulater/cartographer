@@ -37,7 +37,7 @@ void c_particle::adjust_initial_position(
 
 		if (particle_system->parent_effect_index == NONE)
 		{
-			parent_velocity = &global_zero_vector3d;
+			parent_velocity = global_zero_vector3d;
 		}
 		else
 		{

@@ -1,7 +1,4 @@
 #pragma once
-
-#include "interface/signal_slot.h"
-#include "interface/user_interface_widget_list.h"
 #include "interface/user_interface_widget_window.h"
 
 /* enums */

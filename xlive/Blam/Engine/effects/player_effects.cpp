@@ -31,7 +31,7 @@ void player_effect_apply_camera_effect_matrix(int32 user_index, real_matrix4x3* 
         if (player_effects_globals->flags.test(_player_effect_global_bit_0))
         {
             real32 vibration_intensity = player_effects_globals->max_intensity;
-            effect_matrix = global_identity4x3;
+            effect_matrix = *global_identity4x3;
 
             if (player_effects_globals->attack_time_passed_ticks > 0)
             {
@@ -91,7 +91,7 @@ void player_effect_apply_camera_effect_matrix(int32 user_index, real_matrix4x3* 
                 }
 
                 real_vector3d v1;
-                cross_product3d(&global_up3d, &user_effect->jitter, &v1);
+                cross_product3d(global_up3d, &user_effect->jitter, &v1);
 
                 real32 rotation = user_effect->camera_impulse.temporary_rotation * transition_result;
                 matrix4x3_rotation_from_axis_and_angle(&effect_matrix, &v1, sin(rotation), cos(rotation));
@@ -108,7 +108,7 @@ void player_effect_apply_camera_effect_matrix(int32 user_index, real_matrix4x3* 
             bool apply_camera_shake = user_effect->flags.test(_player_effect_apply_camera_shake);
             if (user_effect->camera_shake_countdown > 0 || apply_camera_shake)
             {
-                effect_matrix = global_identity4x3;
+                effect_matrix = *global_identity4x3;
 
                 real32 transition_function_result;
                 if (apply_camera_shake)

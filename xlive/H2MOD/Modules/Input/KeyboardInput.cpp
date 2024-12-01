@@ -78,9 +78,9 @@ void hotkeyFuncHelp() {
 	addDebugText("%s - Toggles hiding the Console Menu.", GetVKeyCodeString(H2Config_hotkeyIdConsole).c_str());
 	addDebugText("------------------------------");
 
-	if (!ImGuiHandler::IsWindowActive(CartographerConsole::windowName))
+	if (!ImGuiHandler::IsWindowActive(k_cartographer_console_window_name))
 	{
-		ImGuiHandler::ToggleWindow(CartographerConsole::windowName);
+		ImGuiHandler::ToggleWindow(k_cartographer_console_window_name);
 	}
 	GetMainConsoleInstance()->SwitchToTab(_console_tab_logs);
 }
@@ -194,10 +194,10 @@ void hotkeyFuncGuide() {
 }
 
 void hotkeyFuncDebug() {
-	ImGuiHandler::ToggleWindow(ImGuiHandler::ImDebugOverlay::windowName);
+	ImGuiHandler::ToggleWindow(k_debug_overlay_window_name);
 }
 void hotkeyFuncConsole() {
-	ImGuiHandler::ToggleWindow(CartographerConsole::windowName);
+	ImGuiHandler::ToggleWindow(k_cartographer_console_window_name);
 }
 
 void KeyboardInput::Initialize()
