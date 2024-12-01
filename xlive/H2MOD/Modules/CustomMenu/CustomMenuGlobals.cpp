@@ -2,7 +2,6 @@
 #include "CustomMenuGlobals.h"
 
 #include "game/game_globals.h"
-#include "H2MOD/Tags/TagInterface.h"
 
 std::chrono::time_point<std::chrono::high_resolution_clock> lastOuterMenuUse;
 void* lastOuterMenuFuncPtr = 0;

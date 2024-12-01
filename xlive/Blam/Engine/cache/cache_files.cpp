@@ -39,24 +39,56 @@ void cache_files_apply_patches(void)
 	return;
 }
 
+HANDLE* cache_file_handle_get()
+{
+	return Memory::GetAddress<HANDLE*>(0x4AE8A8, 0x4CF128);
+}
+
 s_cache_file_memory_globals* cache_file_memory_globals_get(void)
 {
 	return Memory::GetAddress<s_cache_file_memory_globals*>(0x47CD60, 0x4A29C8);
 }
 
+bool cache_file_is_loaded()
+{
+	const s_cache_file_memory_globals* cache_file_memory_globals = cache_file_memory_globals_get();
+
+	return cache_file_memory_globals->tags_loaded;
+}
+
 s_cache_header* cache_files_get_header(void)
 {
-	return Memory::GetAddress<s_cache_header*>(0x47CD68, 0x4A29D0);
+	s_cache_file_memory_globals* cache_file_memory_globals = cache_file_memory_globals_get();
+
+	return &cache_file_memory_globals->header;
 }
 
 cache_file_tags_header* cache_files_get_tags_header(void)
 {
-	return tags::get_at_tag_data_offset<cache_file_tags_header>(cache_files_get_header()->tag_offset_mask);
+	const s_cache_file_memory_globals* cache_file_memory_globals = cache_file_memory_globals_get();
+
+	return cache_file_memory_globals->tags_header;
 }
 
 cache_file_tag_instance* global_tag_instances_get(void)
 {
-	return *Memory::GetAddress<cache_file_tag_instance**>(0x47CD50, 0x4A29B8);
+	const s_cache_file_memory_globals* cache_file_memory_globals = cache_file_memory_globals_get();
+
+	return cache_file_memory_globals->tags_header->tag_instances;
+}
+
+int8* cache_get_tag_data(uint32 offset)
+{
+	const s_cache_file_memory_globals* cache_file_memory_globals = cache_file_memory_globals_get();
+
+	return (int8*)(cache_file_memory_globals->tag_cache_base_address + offset);
+}
+
+cache_file_tag_instance* cache_get_tag_instance(datum tag_index)
+{
+	const s_cache_file_memory_globals* cache_file_memory_globals = cache_file_memory_globals_get();
+
+	return &cache_file_memory_globals->tags_header->tag_instances[DATUM_INDEX_TO_ABSOLUTE_INDEX(tag_index)];
 }
 
 tag_iterator* tag_iterator_new(tag_iterator* itr, e_tag_group type)
@@ -79,8 +111,9 @@ void cache_file_map_clear_all_failures(void)
 
 void* __cdecl tag_get_fast(datum tag_index)
 {
-	//return INVOKE(0x239623, 0x217295, tag_get_fast, tag_index);
-	return tags::get_tag_data() + tags::get_tag_instance(tag_index)->data_offset;
+	const s_cache_file_memory_globals* cache_file_memory_globals = cache_file_memory_globals_get();
+
+	return (void*)(cache_file_memory_globals->tag_cache_base_address + 	cache_get_tag_instance(tag_index)->data_offset);
 }
 
 void __cdecl cache_file_close()

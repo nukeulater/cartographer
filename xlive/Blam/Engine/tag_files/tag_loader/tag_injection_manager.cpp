@@ -214,7 +214,7 @@ void c_tag_injecting_manager::load_raw_data_from_cache(datum injected_index) con
 	*g_cache_handle_geometry_block_size = 0x0;
 
 	cache_file_tag_instance* tag_info = &this->m_instances[DATUM_INDEX_TO_ABSOLUTE_INDEX(injected_index)];
-	uint8* tag_data = tags::get_tag_data() + this->m_instances[DATUM_INDEX_TO_ABSOLUTE_INDEX(injected_index)].data_offset;
+	uint8* tag_data = (uint8*)cache_get_tag_data() + this->m_instances[DATUM_INDEX_TO_ABSOLUTE_INDEX(injected_index)].data_offset;
 
 	//fail safe
 	if (DATUM_INDEX_TO_ABSOLUTE_INDEX(tag_info->tag_index) != DATUM_INDEX_TO_ABSOLUTE_INDEX(injected_index))
@@ -380,7 +380,7 @@ datum c_tag_injecting_manager::get_tag_datum_by_name(e_tag_group group, const ch
 
 			if(csstricmp(tag_name, name_buffer) == 0)
 			{
-				file_seek_and_read(this->m_active_map_file_handle, this->m_active_map_instance_table_offset + (current_index * sizeof(tags::tag_instance)), sizeof(tags::tag_instance), 1, &temp_instance);
+				file_seek_and_read(this->m_active_map_file_handle, this->m_active_map_instance_table_offset + (current_index * sizeof(cache_file_tag_instance)), sizeof(cache_file_tag_instance), 1, &temp_instance);
 				if (temp_instance.group_tag.group == group)
 					return temp_instance.tag_index;
 			}
@@ -398,7 +398,7 @@ datum c_tag_injecting_manager::get_tag_datum_by_name(e_tag_group group, const ch
 
 			if (csstricmp(tag_name, name_buffer) == 0)
 			{
-				file_seek_and_read(this->m_active_map_file_handle, this->m_active_map_instance_table_offset + (current_index * sizeof(tags::tag_instance)), sizeof(tags::tag_instance), 1, &temp_instance);
+				file_seek_and_read(this->m_active_map_file_handle, this->m_active_map_instance_table_offset + (current_index * sizeof(cache_file_tag_instance)), sizeof(cache_file_tag_instance), 1, &temp_instance);
 				if (temp_instance.group_tag.group == group)
 					return temp_instance.tag_index;
 			}
@@ -681,12 +681,12 @@ void c_tag_injecting_manager::inject_tags()
 		uint32 injection_offset = this->m_base_tag_data_size + this->m_injectable_used_size;
 
 #if TAG_INJECTION_DEBUG
-		const uint32 start = (uint32)tags::get_tag_data();
+		const uint32 start = (uint32)cache_get_tag_data();
 		const uint32 end = start + this->get_base_map_tag_data_size() + k_injectable_allocation_size;
-		bool in_range = ((uint32)tags::get_tag_data() + injection_offset) >= start && ((uint32)tags::get_tag_data() + injection_offset) < end;
+		bool in_range = ((uint32)cache_get_tag_data() + injection_offset) >= start && ((uint32)cache_get_tag_data() + injection_offset) < end;
 
 		LOG_DEBUG_GAME("[c_tag_injecting_manager::inject_tags] injection_offset: {:x} is valid: {} start: {:x} end: {:x}",
-			(uint32)tags::get_tag_data() + injection_offset, in_range, start, end);
+			(uint32)cache_get_tag_data() + injection_offset, in_range, start, end);
 #endif
 
 
@@ -711,7 +711,7 @@ void c_tag_injecting_manager::inject_tags()
 		LOG_DEBUG_GAME("[c_tag_injecting_manager::inject_tags] type: {} injection_offset: {:x} data_size: {:x} tag_name: {} datum: {:x}", tag_class, injection_offset, injection_instance->size, tag_name.get_string(), entry->injected_index);
 #endif
 
-		entry->loaded_data->copy_tag_data((int8*)(tags::get_tag_data() + injection_offset), injection_offset);
+		entry->loaded_data->copy_tag_data((int8*)(cache_get_tag_data() + injection_offset), injection_offset);
 
 		if(entry->type.group == _tag_group_bitmap || entry->type.group == _tag_group_render_model || entry->type.group == _tag_group_weather_system)
 			this->load_raw_data_from_cache(entry->injected_index);
@@ -735,10 +735,10 @@ void* c_tag_injecting_manager::extend_tag_block(void* block, uint32 entry_size, 
 	uint32 base_block_total_size = entry_size * basic_block->count;
 	uint32 new_block_total_size = base_block_total_size + (entry_size * count);
 
-	int8* base_block_location = (int8*)(tags::get_tag_data() + basic_block->data);
+	int8* base_block_location = (int8*)(cache_get_tag_data() + basic_block->data);
 
 	uint32 injection_offset = this->m_base_tag_data_size + this->m_injectable_used_size;
-	int8* injection_location = (int8*)(tags::get_tag_data() + injection_offset);
+	int8* injection_location = (int8*)(cache_get_tag_data() + injection_offset);
 
 	memcpy(injection_location, base_block_location, base_block_total_size);
 
@@ -748,5 +748,5 @@ void* c_tag_injecting_manager::extend_tag_block(void* block, uint32 entry_size, 
 	this->m_injectable_used_size += new_block_total_size;
 
 	// return the location in memory where the first newly added block exists
-	return (void*)(tags::get_tag_data() + injection_offset + base_block_total_size);
+	return (void*)(cache_get_tag_data() + injection_offset + base_block_total_size);
 }

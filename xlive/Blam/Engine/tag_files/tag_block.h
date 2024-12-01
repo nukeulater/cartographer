@@ -1,5 +1,5 @@
 #pragma once
-#include "H2MOD/Tags/TagInterface.h"
+#include "cache/cache_files.h"
 
 // ### TODO Rename to c_tag_block and refactor
 
@@ -21,7 +21,7 @@ struct tag_block
 	{
 		if (this->data != NONE)
 		{
-			uint8* tag_data_table = tags::get_tag_data();
+			uint8* tag_data_table = (uint8*)cache_get_tag_data();
 #ifdef DEBUG
 			if (LOG_CHECK(tag_data_table))
 #endif
