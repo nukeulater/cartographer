@@ -72,7 +72,7 @@ bool __cdecl rasterizer_dx9_atmospheric_fog_pipeline_setup(void* data)
 	rasterizer_dx9_set_render_state(D3DRS_COLORWRITEENABLE, D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN | D3DCOLORWRITEENABLE_BLUE | D3DCOLORWRITEENABLE_ALPHA);
 	rasterizer_dx9_set_render_state(D3DRS_ALPHABLENDENABLE, TRUE);
 	rasterizer_dx9_set_render_state(D3DRS_SRCBLEND, D3DBLEND_BLENDFACTOR);
-	rasterizer_dx9_set_render_state(D3DRS_BLENDFACTOR, global_white_pixel32.color);
+	rasterizer_dx9_set_render_state(D3DRS_BLENDFACTOR, global_white_pixel32);
 	rasterizer_dx9_set_render_state(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
 	rasterizer_dx9_set_render_state(D3DRS_BLENDOP, D3DBLENDOP_ADD);
 	rasterizer_dx9_set_render_state(D3DRS_ALPHATESTENABLE, FALSE);
@@ -159,7 +159,7 @@ bool rasterizer_dx9_patchy_fog_apply_separate_layers_pipeline_setup(void* data)
 	rasterizer_dx9_set_render_state(D3DRS_SRCBLEND, D3DBLEND_BLENDFACTOR);
 	rasterizer_dx9_set_render_state(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
 	rasterizer_dx9_set_render_state(D3DRS_BLENDOP, D3DBLENDOP_ADD);
-	rasterizer_dx9_set_render_state(D3DRS_BLENDFACTOR, global_white_pixel32.color);
+	rasterizer_dx9_set_render_state(D3DRS_BLENDFACTOR, global_white_pixel32);
 	rasterizer_dx9_set_render_state(D3DRS_ALPHATESTENABLE, false);
 	rasterizer_dx9_set_render_state(D3DRS_CULLMODE, D3DCULL_NONE);
 	rasterizer_dx9_set_render_state(D3DRS_ZENABLE, FALSE);

@@ -44,7 +44,7 @@ void rasterizer_dx9_perf_event_begin(const char* event_description, real_argb_co
         
     // If color is null set the color of the event to white
     pixel32 d3dcolor = (color ? real_argb_color_to_pixel32(color) : global_white_pixel32 );
-    D3DPERF_BeginEvent(d3dcolor.color, (LPCWSTR)wide_string);
+    D3DPERF_BeginEvent(d3dcolor, (LPCWSTR)wide_string);
 #endif
     return;
 }

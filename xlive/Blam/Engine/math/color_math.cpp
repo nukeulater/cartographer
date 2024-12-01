@@ -60,20 +60,18 @@ const real_rgb_color* const global_real_rgb_darkgreen = &global_real_argb_color_
 const real_rgb_color* const global_real_rgb_salmon = &global_real_argb_color_table[15].rgb;
 const real_rgb_color* const global_real_rgb_violet = &global_real_argb_color_table[16].rgb;
 
-const pixel32 global_white_pixel32 = { D3DCOLOR_ARGB(255, 255, 255, 255) };
-const pixel32 global_yellow_pixel32 = { D3DCOLOR_ARGB(255, 255, 255, 0) };
+const pixel32 global_white_pixel32 = D3DCOLOR_ARGB(255, 255, 255, 255);
+const pixel32 global_yellow_pixel32 = D3DCOLOR_ARGB(255, 255, 255, 0);
 
 /* public code */
 
 pixel32 real_argb_color_to_pixel32(const real_argb_color* color)
 {
-    pixel32 result = { D3DCOLOR_ARGB(
-        (int32)(color->alpha * 255), 
-        (int32)(color->red * 255),
-        (int32)(color->green * 255),
-        (int32)(color->blue * 255)
-    ) };
-    return result;
+    return D3DCOLOR_ARGB(
+		(int32)(color->alpha * 255),
+		(int32)(color->red * 255),
+		(int32)(color->green * 255),
+		(int32)(color->blue * 255));
 }
 
 void pixel32_to_real_rgb_color(pixel32 pixel_color, real_rgb_color* out_color)
@@ -85,6 +83,6 @@ void pixel32_to_real_rgb_color(pixel32 pixel_color, real_rgb_color* out_color)
 pixel32 real_alpha_to_pixel32(real32 alpha)
 {
     ASSERT(alpha >= 0.f && alpha <= 1.f);
-    pixel32 color = { (int32)(alpha * 255.f) << 24 };
+    pixel32 color = (int32)(alpha * 255.f) << 24;
     return color;
 }

@@ -118,8 +118,7 @@ void render_splitscreen_line(void)
 	const int32 line_size = resolution_y / 480;		
 	
 	rectangle2d line;
-	pixel32 color;
-	color.color = k_splitscreen_line_colour;
+	pixel32 color = k_splitscreen_line_colour;
 	if (player_window_count > 1)
 	{
 		if (get_display_split_type() == _display_split_type_horizontal)

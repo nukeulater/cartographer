@@ -1,15 +1,11 @@
 #pragma once
 
 /* structures */
-struct pixel32
-{
-	D3DCOLOR color;
-};
-ASSERT_STRUCT_SIZE(pixel32, sizeof(uint8) * 4);
+typedef D3DCOLOR pixel32;
 
 union real_rgb_color
 {
-	real32 v[3];
+	real32 n[3];
 	struct { real32 red, green, blue; };
 };
 ASSERT_STRUCT_SIZE(real_rgb_color, sizeof(real32) * 3);
@@ -17,7 +13,7 @@ ASSERT_STRUCT_SIZE(real_rgb_color, sizeof(real32) * 3);
 /* channel intensity is represented on a 0 to 1 scale */
 union real_argb_color
 {
-	real32 v[4];
+	real32 n[4];
 	struct
 	{
 		real32 alpha;
