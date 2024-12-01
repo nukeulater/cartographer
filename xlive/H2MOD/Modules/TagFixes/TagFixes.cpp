@@ -5,7 +5,6 @@
 #include "units/biped_definitions.h"
 
 #include "H2MOD/Modules/Shell/Config.h"
-#include "H2MOD/Tags/TagInterface.h"
 #include "objects/light_definitions.h"
 
 // ### TODO Cleanup
@@ -38,11 +37,11 @@ namespace TagFixes
 						tag_block<int> *shader_post = reinterpret_cast<tag_block<int>*>(shader + 0x20);
 						if(shader_post->count > 0)
 						{
-							auto shader_post_data = tags::get_tag_data() + shader_post->data;
+							auto shader_post_data = cache_get_tag_data(shader_post->data);
 							auto shader_post_bitmap = reinterpret_cast<tag_block<int>*>(shader_post_data + 0x4);
 							if(shader_post_bitmap->count >= bitmap_idx + 1)
 							{
-								auto bitmap_data = tags::get_tag_data() + (shader_post_bitmap->data + (bitmap_idx * 0xC));
+								auto bitmap_data = cache_get_tag_data( (shader_post_bitmap->data + (bitmap_idx * 0xC)));
 								datum* bitmap = reinterpret_cast<datum*>(bitmap_data);
 								if(*bitmap == bitmap_to_fix)
 									*bitmap = NONE;
@@ -79,11 +78,11 @@ namespace TagFixes
 				tag_block<int> *shadow_pp = reinterpret_cast<tag_block<int>*>(shadow_tag + 0x1C);
 				if(shadow_pp->count > 0 && shadow_pp->data != NONE)
 				{
-					auto shadow_pp_data = tags::get_tag_data() + shadow_pp->data;
+					auto shadow_pp_data = cache_get_tag_data(shadow_pp->data);
 					tag_block<int>*shadow_impl_block = reinterpret_cast<tag_block<int>*>(shadow_pp_data);
 					if(shadow_pp->count > 0 && shadow_impl_block->data != NONE)
 					{
-						auto shadow_impl = tags::get_tag_data() + shadow_impl_block->data;
+						auto shadow_impl = cache_get_tag_data(shadow_impl_block->data);
 						tag_reference* impl_1 = reinterpret_cast<tag_reference*>(shadow_impl + (0x14A) + 0xFC);
 						tag_reference* impl_2 = reinterpret_cast<tag_reference*>(shadow_impl + (0x14A*2) + 0xFC);
 

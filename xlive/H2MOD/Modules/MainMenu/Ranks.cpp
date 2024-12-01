@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
+#include "cache/cache_files.h"
 #include "H2MOD/Modules/OnScreenDebug/OnScreenDebug.h"
-#include "H2MOD/Tags/TagInterface.h"
 
 
 
@@ -46,30 +46,30 @@ void UIRankPatch()
 	const WORD HeightValue = 0x0020;	//Value : 32 (decimal)
 
 	//Sets Pregame Lobby 
-	WriteValue((DWORD)&tags::get_tag_data()[TagOffsetPreGameLobby + (pSkinChunkIndex * pSkinChunkSize) + yDefOffset], yValuePGL);
-	WriteValue((DWORD)&tags::get_tag_data()[TagOffsetPreGameLobby + (pSkinChunkIndex * pSkinChunkSize) + bitmOffset], RankIconSM);
-	WriteValue((DWORD)&tags::get_tag_data()[TagOffsetPreGameLobby + (pSkinChunkIndex * pSkinChunkSize) + xDefOffset], xValuePGL);
+	WriteValue((DWORD)&cache_get_tag_data()[TagOffsetPreGameLobby + (pSkinChunkIndex * pSkinChunkSize) + yDefOffset], yValuePGL);
+	WriteValue((DWORD)&cache_get_tag_data()[TagOffsetPreGameLobby + (pSkinChunkIndex * pSkinChunkSize) + bitmOffset], RankIconSM);
+	WriteValue((DWORD)&cache_get_tag_data()[TagOffsetPreGameLobby + (pSkinChunkIndex * pSkinChunkSize) + xDefOffset], xValuePGL);
 
 	//Sets Postgame Carnage Report 1
-	WriteValue((DWORD)&tags::get_tag_data()[TagOffsetPostGameCarnage1 + (pSkinChunkIndex * pSkinChunkSize) + xDefOffset], xValuePCR);
-	WriteValue((DWORD)&tags::get_tag_data()[TagOffsetPostGameCarnage1 + (pSkinChunkIndex * pSkinChunkSize) + yDefOffset], yValuePCR);
-	WriteValue((DWORD)&tags::get_tag_data()[TagOffsetPostGameCarnage1 + (pSkinChunkIndex * pSkinChunkSize) + bitmOffset], RankIconSM);
+	WriteValue((DWORD)&cache_get_tag_data()[TagOffsetPostGameCarnage1 + (pSkinChunkIndex * pSkinChunkSize) + xDefOffset], xValuePCR);
+	WriteValue((DWORD)&cache_get_tag_data()[TagOffsetPostGameCarnage1 + (pSkinChunkIndex * pSkinChunkSize) + yDefOffset], yValuePCR);
+	WriteValue((DWORD)&cache_get_tag_data()[TagOffsetPostGameCarnage1 + (pSkinChunkIndex * pSkinChunkSize) + bitmOffset], RankIconSM);
 
 	//Sets Postgame Carnage Report 2
-	WriteValue((DWORD)&tags::get_tag_data()[TagOffsetPostGameCarnage2 + (pSkinChunkIndex * pSkinChunkSize) + xDefOffset], xValuePCR);
-	WriteValue((DWORD)&tags::get_tag_data()[TagOffsetPostGameCarnage2 + (pSkinChunkIndex * pSkinChunkSize) + yDefOffset], yValuePCR);
-	WriteValue((DWORD)&tags::get_tag_data()[TagOffsetPostGameCarnage2 + (pSkinChunkIndex * pSkinChunkSize) + bitmOffset], RankIconSM);
+	WriteValue((DWORD)&cache_get_tag_data()[TagOffsetPostGameCarnage2 + (pSkinChunkIndex * pSkinChunkSize) + xDefOffset], xValuePCR);
+	WriteValue((DWORD)&cache_get_tag_data()[TagOffsetPostGameCarnage2 + (pSkinChunkIndex * pSkinChunkSize) + yDefOffset], yValuePCR);
+	WriteValue((DWORD)&cache_get_tag_data()[TagOffsetPostGameCarnage2 + (pSkinChunkIndex * pSkinChunkSize) + bitmOffset], RankIconSM);
 
 	//Sets Ranks 
 	for (RankChunkIndex = 0; RankChunkIndex < 50; RankChunkIndex++)
 	{
 		//Setting Rank bitmap size
-		WriteValue((DWORD)&tags::get_tag_data()[RankIconOff + (RankChunkIndex * RankChunkSize) + WidthDefOff], WidthValue);
-		WriteValue((DWORD)&tags::get_tag_data()[RankIconOff + (RankChunkIndex * RankChunkSize) + HeightDefOff], HeightValue);
+		WriteValue((DWORD)&cache_get_tag_data()[RankIconOff + (RankChunkIndex * RankChunkSize) + WidthDefOff], WidthValue);
+		WriteValue((DWORD)&cache_get_tag_data()[RankIconOff + (RankChunkIndex * RankChunkSize) + HeightDefOff], HeightValue);
 
 		//Setting Small Rank bitmap size
-		WriteValue((DWORD)&tags::get_tag_data()[RankIconSMOff + (RankChunkIndex * RankChunkSize) + WidthDefOff], WidthValue);
-		WriteValue((DWORD)&tags::get_tag_data()[RankIconSMOff + (RankChunkIndex * RankChunkSize) + HeightDefOff], HeightValue);
+		WriteValue((DWORD)&cache_get_tag_data()[RankIconSMOff + (RankChunkIndex * RankChunkSize) + WidthDefOff], WidthValue);
+		WriteValue((DWORD)&cache_get_tag_data()[RankIconSMOff + (RankChunkIndex * RankChunkSize) + HeightDefOff], HeightValue);
 	}		
 
 	addDebugText("Rank bitmaps patched.");

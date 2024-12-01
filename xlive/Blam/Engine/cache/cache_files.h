@@ -140,13 +140,21 @@ ASSERT_STRUCT_SIZE(tag_iterator, 20);
 
 void cache_files_apply_patches(void);
 
+HANDLE* cache_file_handle_get();
+
 s_cache_file_memory_globals* cache_file_memory_globals_get(void);
+
+bool cache_file_is_loaded();
 
 s_cache_header* cache_files_get_header(void);
 
 cache_file_tags_header* cache_files_get_tags_header(void);
 
 cache_file_tag_instance* global_tag_instances_get(void);
+
+int8* cache_get_tag_data(uint32 offset = 0);
+
+cache_file_tag_instance* cache_get_tag_instance(datum tag_index);
 
 tag_iterator* tag_iterator_new(tag_iterator* itr, e_tag_group type);
 
@@ -156,6 +164,7 @@ void cache_file_map_clear_all_failures(void);
 
 // Get tag data from tag index
 void* __cdecl tag_get_fast(datum tag_index);
+
 
 void __cdecl cache_file_close();
 
