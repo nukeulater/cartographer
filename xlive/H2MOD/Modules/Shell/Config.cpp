@@ -75,7 +75,7 @@ H2Config_Experimental_Rendering_Mode H2Config_experimental_fps = _rendering_mode
 // for now improve the code by simplifying it
 template<typename T>
 static std::enable_if_t<!std::is_same_v<T, bool> && std::is_integral_v<T>, bool>
-	get_conf_value(CSimpleIniA* simple_ini, const char* section_key, const char* config_name, const char* default_setting, T* out_value)
+	get_config_entry(CSimpleIniA* simple_ini, const char* section_key, const char* config_name, const char* default_setting, T* out_value)
 {
 	bool result = false;
 	std::string exception;
@@ -93,8 +93,39 @@ static std::enable_if_t<!std::is_same_v<T, bool> && std::is_integral_v<T>, bool>
 	return result;
 }
 
-#define GET_CONF(_simple_ini, _config_name, _default_setting, _out_value) \
-	get_conf_value(_simple_ini, k_h2config_version_section, _config_name, _default_setting, _out_value)
+template<typename T>
+static std::enable_if_t<std::is_same_v<T, bool>, bool>
+	get_config_entry(CSimpleIniA* simple_ini, const char* section_key, const char* config_name, const char* default_setting, T* out_value)
+{
+	bool result = false;
+	std::string exception;
+	std::string str_value = simple_ini->GetValue(section_key, config_name, default_setting);
+	if (ComVar(out_value).SetFromStr(str_value))
+	{
+		//CartographerConsole::LogToTab(_console_tab_logs, "config: success setting \"%s\"", config_name);
+		result = true;
+	}
+	else
+	{
+		CartographerConsole::LogToTab(_console_tab_logs, "config: %s, default: %s - threw exception: [%s]", config_name, default_setting, exception.c_str());
+	}
+
+	return result;
+}
+
+template<typename T>
+static std::enable_if_t<std::is_same_v<std::remove_all_extents_t<T>, char>, bool>
+get_config_entry(CSimpleIniA* simple_ini, const char* section_key, const char* config_name, const char* default_setting, const T** out_value)
+{
+	bool result = false;
+	std::string exception;
+	*out_value = simple_ini->GetValue(section_key, config_name, default_setting);
+	result = true;
+	return result;
+}
+
+#define GET_CONFIG(_simple_ini, _config_name, _default_setting, _out_value) \
+	get_config_entry(_simple_ini, k_h2config_version_section, _config_name, _default_setting, _out_value)
 
 e_override_texture_resolution H2Config_Override_Shadows;
 e_override_texture_resolution H2Config_Override_Water;
@@ -513,17 +544,17 @@ void ReadH2Config() {
 		}
 		else
 		{
-			// global
-			H2Portable = ini.GetBoolValue(k_h2config_version_section, "h2portable", false);
-			H2Config_base_port = ini.GetLongValue(k_h2config_version_section, "base_port", H2Config_base_port);
-			H2Config_upnp_enable = ini.GetBoolValue(k_h2config_version_section, "upnp", true);
-			H2Config_xDelay = ini.GetBoolValue(k_h2config_version_section, "enable_xdelay", H2Config_xDelay);
+			GET_CONFIG(&ini, "h2portable", "false", &H2Portable);
+			GET_CONFIG(&ini, "base_port", "2000", &H2Config_base_port);
+			GET_CONFIG(&ini, "upnp", "true", &H2Config_upnp_enable);
+			GET_CONFIG(&ini, "enable_xdelay", "true", &H2Config_xDelay);
 
-			H2Config_debug_log = ini.GetBoolValue(k_h2config_version_section, "debug_log", H2Config_debug_log);
-			H2Config_debug_log_level = ini.GetLongValue(k_h2config_version_section, "debug_log_level", H2Config_debug_log_level);
-			H2Config_debug_log_console = ini.GetBoolValue(k_h2config_version_section, "debug_log_console", H2Config_debug_log_console);
+			GET_CONFIG(&ini, "debug_log", "true", &H2Config_debug_log);
+			GET_CONFIG(&ini, "debug_log_level", "2", &H2Config_debug_log_level);
+			GET_CONFIG(&ini, "debug_log_console", "false", &H2Config_debug_log_console);
 
-			const char* ip_wan = ini.GetValue(k_h2config_version_section, "wan_ip");
+			const char* ip_wan = nullptr;
+			GET_CONFIG(&ini, "wan_ip", "", &ip_wan);
 			if (ip_wan
 				&& strnlen_s(ip_wan, 15) >= 7
 				&& inet_addr(ip_wan) != INADDR_NONE)
@@ -532,7 +563,8 @@ void ReadH2Config() {
 				H2Config_ip_wan = inet_addr(H2Config_str_wan);
 			}
 
-			const char* ip_lan = ini.GetValue(k_h2config_version_section, "lan_ip");
+			const char* ip_lan = nullptr;
+			GET_CONFIG(&ini, "lan_ip", "", &ip_lan);
 			if (ip_lan
 				&& strnlen_s(ip_lan, 15) >= 7
 				&& inet_addr(ip_lan) != INADDR_NONE)
@@ -544,26 +576,29 @@ void ReadH2Config() {
 			// client only
 			if (!Memory::IsDedicatedServer())
 			{
-				std::string language_code(ini.GetValue(k_h2config_version_section, "language_code", "-1x0"));
-				if (!language_code.empty())
+				const char* language_code;
+				GET_CONFIG(&ini, "language_code", "-1x0", &language_code);
+
+				std::string language_code_str(language_code);
+				if (!language_code_str.empty())
 				{
-					size_t delimiter_offset = language_code.find('x');
+					size_t delimiter_offset = language_code_str.find('x');
 					if (delimiter_offset != std::string::npos)
 					{
-						std::string code_main_substr = language_code.substr(0, delimiter_offset);
-						std::string code_variant_substr = language_code.substr(delimiter_offset + 1, language_code.size());
+						std::string code_main_substr = language_code_str.substr(0, delimiter_offset);
+						std::string code_variant_substr = language_code_str.substr(delimiter_offset + 1, language_code_str.size());
 
 						H2Config_language.code_main = stol(code_main_substr);
 						H2Config_language.code_variant = stol(code_variant_substr);
 					}
 				}
 
-				H2Config_custom_labels_capture_missing = ini.GetBoolValue(k_h2config_version_section, "language_label_capture", H2Config_custom_labels_capture_missing);
-				H2Config_skip_intro = ini.GetBoolValue(k_h2config_version_section, "skip_intro", H2Config_skip_intro);
-				H2Config_discord_enable = ini.GetBoolValue(k_h2config_version_section, "discord_enable", H2Config_discord_enable);
-				H2Config_fps_limit = ini.GetLongValue(k_h2config_version_section, "fps_limit", H2Config_fps_limit);
+				GET_CONFIG(&ini, "language_label_capture", "false", &H2Config_custom_labels_capture_missing);
+				GET_CONFIG(&ini, "skip_intro", "false", &H2Config_skip_intro);
+				GET_CONFIG(&ini, "discord_enable", "true", &H2Config_discord_enable);
+				GET_CONFIG(&ini, "fps_limit", "120", &H2Config_fps_limit);
 
-				GET_CONF(&ini, "static_lod_state", "0", &H2Config_static_lod_state);
+				GET_CONFIG(&ini, "static_lod_state", "0", &H2Config_static_lod_state);
 
 				switch(1)
 				{
@@ -579,25 +614,28 @@ void ReadH2Config() {
 						break;
 				}
 				
-				H2Config_shader_lod_max = ini.GetBoolValue(k_h2config_version_section, "shader_lod_max", H2Config_shader_lod_max);
-				H2Config_light_suppressor = ini.GetBoolValue(k_h2config_version_section, "light_suppressor", H2Config_light_suppressor);
-				H2Config_disable_ingame_keyboard = ini.GetBoolValue(k_h2config_version_section, "disable_ingame_keyboard", H2Config_disable_ingame_keyboard);
-				H2Config_hide_ingame_chat = ini.GetBoolValue(k_h2config_version_section, "hide_ingame_chat", H2Config_hide_ingame_chat);
-			
-				H2Config_hotkeyIdHelp = ini.GetLongValue(k_h2config_version_section, "hotkey_help", H2Config_hotkeyIdHelp);
-				H2Config_hotkeyIdAlignWindow = ini.GetLongValue(k_h2config_version_section, "hotkey_align_window", H2Config_hotkeyIdAlignWindow);
-				H2Config_hotkeyIdWindowMode = ini.GetLongValue(k_h2config_version_section, "hotkey_window_mode", H2Config_hotkeyIdWindowMode);
-				H2Config_hotkeyIdToggleHideIngameChat = ini.GetLongValue(k_h2config_version_section, "hotkey_hide_ingame_chat", H2Config_hotkeyIdToggleHideIngameChat);
-				H2Config_hotkeyIdGuide = ini.GetLongValue(k_h2config_version_section, "hotkey_guide", H2Config_hotkeyIdGuide);
-				H2Config_hotkeyIdConsole = ini.GetLongValue(k_h2config_version_section, "hotkey_console", H2Config_hotkeyIdConsole);
+				GET_CONFIG(&ini, "shader_lod_max", "false", &H2Config_shader_lod_max);
+				GET_CONFIG(&ini, "light_suppressor", "false", &H2Config_light_suppressor);
+				GET_CONFIG(&ini, "disable_ingame_keyboard", "false", &H2Config_disable_ingame_keyboard);
+				GET_CONFIG(&ini, "hide_ingame_chat", "false", &H2Config_hide_ingame_chat);
 
-				switch(std::stoi(ini.GetValue(k_h2config_version_section, "override_shadows", "1")))
+				GET_CONFIG(&ini, "hotkey_help", "0x72", &H2Config_hotkeyIdHelp); // VK_F2
+				GET_CONFIG(&ini, "hotkey_align_window", "0x76", &H2Config_hotkeyIdAlignWindow); // VK_F7
+				GET_CONFIG(&ini, "hotkey_window_mode", "0x77", &H2Config_hotkeyIdWindowMode); // VK_F8
+				GET_CONFIG(&ini, "hotkey_hide_ingame_chat", "0x78", &H2Config_hotkeyIdToggleHideIngameChat); // VK_F9
+				GET_CONFIG(&ini, "hotkey_guide", "0x24", &H2Config_hotkeyIdGuide); // VK_HOME
+				GET_CONFIG(&ini, "hotkey_console", "0x79", &H2Config_hotkeyIdConsole); // VK_F10
+
+				int shadows_override;
+				GET_CONFIG(&ini, "override_shadows", "1", &shadows_override);
+
+				switch(shadows_override)
 				{
 					case 0:
 						H2Config_Override_Shadows = e_override_texture_resolution::tex_low;
 					break;
-					default:
 					case 1:
+					default:
 						H2Config_Override_Shadows = e_override_texture_resolution::tex_default;
 					break;
 					case 2:
@@ -607,7 +645,11 @@ void ReadH2Config() {
 						H2Config_Override_Shadows = e_override_texture_resolution::tex_ultra;
 					break;
 				}
-				switch(std::stoi(ini.GetValue(k_h2config_version_section, "override_water", "1")))
+
+				int water_override;
+				GET_CONFIG(&ini, "override_water", "1", &water_override);
+
+				switch(water_override)
 				{
 					case 0:
 						H2Config_Override_Water = e_override_texture_resolution::tex_low;
@@ -623,53 +665,66 @@ void ReadH2Config() {
 						H2Config_Override_Water = e_override_texture_resolution::tex_ultra;
 						break;
 				}
-				H2Config_no_events = ini.GetBoolValue(k_h2config_version_section, "no_events", H2Config_no_events);
-				H2Config_spooky_boy = ini.GetBoolValue(k_h2config_version_section, "skeleton_biped", H2Config_spooky_boy);
+				GET_CONFIG(&ini, "no_events", "false", &H2Config_no_events);
+				GET_CONFIG(&ini, "skeleton_biped", "true", &H2Config_spooky_boy);
+
 #ifndef NDEBUG
 				H2Config_forced_event = ini.GetLongValue(k_h2config_version_section, "forced_event", H2Config_forced_event);
 #endif
-				H2Config_force_off_d3d9ex = ini.GetBoolValue(k_h2config_version_section, "force_off_d3d9ex", H2Config_force_off_d3d9ex);
-				H2Config_force_off_sm3 = ini.GetBoolValue(k_h2config_version_section, "force_off_sm3", H2Config_force_off_sm3);
-				g_rasterizer_dx9on12_enabled = ini.GetBoolValue(k_h2config_version_section, "use_d3d9on12", g_rasterizer_dx9on12_enabled);
-				g_rasterizer_dx9_driver_globals.disable_amd_or_ati_patches = ini.GetBoolValue(
-					k_h2config_version_section,
+
+				GET_CONFIG(&ini, "force_off_d3d9ex", "false", &H2Config_force_off_d3d9ex);
+				GET_CONFIG(&ini, "force_off_sm3", "false", &H2Config_force_off_sm3);
+				GET_CONFIG(&ini, "use_d3d9on12", "false", &g_rasterizer_dx9on12_enabled);
+				GET_CONFIG(
+					&ini,
 					"disable_amd_or_ati_patches",
-					g_rasterizer_dx9_driver_globals.disable_amd_or_ati_patches);
-				*Memory::GetAddress<bool*>(0x41F6A9) = !ini.GetBoolValue(k_h2config_version_section, "intel_sky_hack", H2Config_intel_sky_hack);
+					"false",
+					&g_rasterizer_dx9_driver_globals.disable_amd_or_ati_patches);
+
+
+				GET_CONFIG(&ini, "intel_sky_hack", "false", &H2Config_intel_sky_hack);
+				*Memory::GetAddress<bool*>(0x41F6A9) = H2Config_intel_sky_hack;
 			}
 
 			// dedicated server only
 			if (Memory::IsDedicatedServer())
 			{
-				const char* server_name = ini.GetValue(k_h2config_version_section, "server_name", H2Config_dedi_server_name);
+				const char* server_name = NULL; 
+				GET_CONFIG(&ini, "server_name", "", &server_name);
 				if (server_name) {
 					strncpy(H2Config_dedi_server_name, server_name, XUSER_MAX_NAME_LENGTH);
 				}
 
-				const char* server_playlist = ini.GetValue(k_h2config_version_section, "server_playlist", H2Config_dedi_server_playlist);
+				const char* server_playlist = NULL;
+				GET_CONFIG(&ini, "server_playlist", "", &server_playlist);
 				if (server_playlist) {
 					strncpy(H2Config_dedi_server_playlist, server_playlist, sizeof(H2Config_dedi_server_playlist));
 				}
 
-				H2Config_additional_pcr_time = ini.GetLongValue(k_h2config_version_section, "additional_pcr_time", H2Config_additional_pcr_time);
+				GET_CONFIG(&ini, "additional_pcr_time", "25", &H2Config_additional_pcr_time);
         
-				H2Config_minimum_player_start = ini.GetLongValue(k_h2config_version_section, "minimum_player_start", H2Config_minimum_player_start);
-				H2Config_vip_lock = ini.GetBoolValue(k_h2config_version_section, "vip_lock", H2Config_vip_lock);
-				H2Config_even_shuffle_teams = ini.GetBoolValue(k_h2config_version_section, "shuffle_even_teams", H2Config_even_shuffle_teams);
-				H2Config_koth_random = ini.GetBoolValue(k_h2config_version_section, "koth_random", H2Config_koth_random);
-				twizzler_set_status(ini.GetBoolValue(k_h2config_version_section, "enable_anti_cheat", g_twizzler_status));
+				GET_CONFIG(&ini, "minimum_player_start", "0", &H2Config_minimum_player_start);
+				GET_CONFIG(&ini, "vip_lock", "false", &H2Config_vip_lock);
+				GET_CONFIG(&ini, "shuffle_even_teams", "false", &H2Config_even_shuffle_teams);
+				GET_CONFIG(&ini, "koth_random", "true", &H2Config_koth_random);
 
-				const char* login_identifier = ini.GetValue(k_h2config_version_section, "login_identifier", H2Config_login_identifier);
+				GET_CONFIG(&ini, "enable_anti_cheat", "true", &g_twizzler_status);
+				twizzler_set_status(g_twizzler_status);
+
+				const char* login_identifier = NULL;
+				GET_CONFIG(&ini, "login_identifier", "", &login_identifier);
 				if (login_identifier) {
 					strncpy(H2Config_login_identifier, login_identifier, sizeof(H2Config_login_identifier));
 				}
 
-				const char* login_password = ini.GetValue(k_h2config_version_section, "login_password", H2Config_login_password);
+				const char* login_password = NULL;
+				GET_CONFIG(&ini, "login_password", "", &login_password);
 				if (login_password) {
 					strncpy(H2Config_login_password, login_password, sizeof(H2Config_login_password));
 				}
 
-				const char* stats_authkey = ini.GetValue(k_h2config_version_section, "stats_auth_key", H2Config_stats_authkey);
+				const char* stats_authkey = NULL;
+				GET_CONFIG(&ini, "stats_auth_key", "", &stats_authkey);
 				if (stats_authkey) {
 					strncpy(H2Config_stats_authkey, stats_authkey, sizeof(H2Config_stats_authkey) - 1); // - 1 for the null character
 				}
