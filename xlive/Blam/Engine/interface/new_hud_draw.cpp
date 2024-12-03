@@ -223,7 +223,7 @@ void __cdecl draw_hud_bitmap_widget(int32 local_render_user_index, s_new_hud_tem
 
 	s_draw_hud_widget_input_results* hud_input_results = global_hud_draw_widget_function_results_get();
 
-	memcpy(hud_input_results, widget_function_results, sizeof(int32) * 4);
+	memcpy(hud_input_results, widget_function_results, sizeof(real32) * 4);
 
 	real_point2d offset_result{ 0, 0 };
 	real_point2d scale_result{ 1.f, 1.f };
@@ -810,7 +810,7 @@ void hud_player_indicators_draw_enabled_set(int32 user_index, bool enabled)
 
 void hud_player_indicators_draw_reset(void)
 {
-	g_draw_hud_user_draw_player_indicators_mask = 0xFF;	// Set all bits to 1
+	g_draw_hud_user_draw_player_indicators_mask = FLAG(k_number_of_users) - 1;	// Set all bits representing local users to 1
 	return;
 }
 
