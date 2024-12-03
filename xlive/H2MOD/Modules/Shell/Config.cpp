@@ -683,7 +683,7 @@ void ReadH2Config() {
 
 
 				GET_CONFIG(&ini, "intel_sky_hack", "false", &H2Config_intel_sky_hack);
-				*Memory::GetAddress<bool*>(0x41F6A9) = H2Config_intel_sky_hack;
+				*Memory::GetAddress<bool*>(0x41F6A9) = !H2Config_intel_sky_hack;
 			}
 
 			// dedicated server only
