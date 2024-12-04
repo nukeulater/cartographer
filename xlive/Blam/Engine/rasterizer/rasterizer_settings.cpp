@@ -104,6 +104,11 @@ s_rasterizer_settings* rasterizer_settings_get(void)
 	return Memory::GetAddress<s_rasterizer_settings*>(0xA3D9F8);
 }
 
+int32* rasterizer_low_level_texture_detail_get(void)
+{
+	return Memory::GetAddress<int32*>(0x4E6A60);
+}
+
 void __cdecl rasterizer_settings_set_antialiasing(uint32* out_quality)
 {
 	D3DMULTISAMPLE_TYPE multisample_type;
@@ -219,7 +224,7 @@ void __cdecl rasterizer_settings_apply_settings(int32 setting)
 	// Don't change the formats for low settings on d3d9ex
 	if (rasterizer_globals_get()->use_d3d9_ex)
 	{
-		*load_low_detail_textures_get() = false;
+		*rasterizer_low_level_texture_detail_get() = false;
 	}
 	return;
 }

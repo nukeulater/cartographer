@@ -490,9 +490,10 @@ bool __cdecl rasterizer_dx9_device_initialize(s_rasterizer_parameters* parameter
     d3d_present_parameters.FullScreen_RefreshRateInHz = is_fullscreen ? rasterizer_globals->display_parameters.refresh_rate : d3d_present_parameters.FullScreen_RefreshRateInHz;
 	d3d_present_parameters.PresentationInterval = D3DPRESENT_INTERVAL_ONE;
 
+    // ### FIXME: make VSYNC configurable (UI required) !!
     if (shell_command_line_flag_is_set(_shell_command_line_flag_novsync) 
-        /* || *load_low_detail_textures_get() */ 
-        || !*allow_vsync_get()) // low detail textures checked for vsync???? 
+        /* || *rasterizer_low_level_texture_detail_get() */ // low detail textures checked for no vsync
+        || !*allow_vsync_get())    
     {
 		d3d_present_parameters.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
     }

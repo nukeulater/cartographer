@@ -230,11 +230,6 @@ uint32* global_frame_num_get(void)
     return Memory::GetAddress<uint32*>(0x4E695C);
 }
 
-int32* load_low_detail_textures_get(void)
-{
-    return Memory::GetAddress<int32*>(0x4E6A60);
-}
-
 bool __cdecl structure_get_cluster_and_leaf_from_render_point(real_point3d* point, int32* out_cluster_index, int32* out_leaf_index)
 {
     return INVOKE(0x191032, 0x0, structure_get_cluster_and_leaf_from_render_point, point, out_cluster_index, out_leaf_index);
@@ -248,7 +243,7 @@ e_screen_split_type get_screen_split_type(int32 render_user_index)
 	        return _screen_split_type_half;
 	    case 3:
 	        if (render_user_index == 0)
-	            return _screen_split_type_half;
+	            return _screen_split_type_half; 
 	        return _screen_split_type_quarter;
 	    case 4:
 	        return _screen_split_type_quarter;
