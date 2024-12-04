@@ -139,12 +139,31 @@ ASSERT_STRUCT_SIZE(real_matrix4x3, 52);
 /* constants */
 
 extern const real_point2d* const global_origin2d;
+
+extern const real_point2d* const global_x_axis2d;
+extern const real_point2d* const global_y_axis2d;
+
+extern const real_point2d* const global_negative_x_axis2d;
+extern const real_point2d* const global_negative_y_axis2d;
+
 extern const real_vector2d* const global_zero_vector2d;
 extern const real_vector2d* const global_forward2d;
 extern const real_vector2d* const global_left2d;
 
+extern const real_vector2d* const global_backward2d;
+extern const real_vector2d* const global_right2d;
+
 extern const real_point3d* const global_origin3d;
+
+extern const real_point3d* const global_x_axis3d;
+extern const real_point3d* const global_y_axis3d;
+extern const real_point3d* const global_z_axis3d;
+extern const real_point3d* const global_negative_x_axis3d;
+extern const real_point3d* const global_negative_y_axis3d;
+extern const real_point3d* const global_negative_z_axis3d;
+
 extern const real_vector3d* const global_zero_vector3d;
+
 extern const real_vector3d* const global_forward3d;
 extern const real_vector3d* const global_left3d;
 extern const real_vector3d* const global_up3d;
@@ -155,14 +174,16 @@ extern const real_vector3d* const global_down3d;
 
 extern const real_vector4d* const global_zero_vector4d;
 extern const real_euler_angles2d* const global_zero_angles2d;
+extern const real_euler_angles3d* const global_zero_angles3d;
 extern const real_quaternion* const global_identity_quaternion;
+
 extern const real_matrix4x3* const global_identity4x3;
+extern const real_matrix4x3* const global_negative_identity4x3;
 
 extern const real_orientation* const global_identity_orientation;
 
 extern const real_rectangle2d* const global_null_rectangle2d;
 extern const real_rectangle3d* const global_null_rectangle3d;
-
 
 /* public code */
 
