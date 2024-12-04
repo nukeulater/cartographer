@@ -84,7 +84,6 @@
 #include "H2MOD/Modules/GamePhysics/Patches/ProjectileFix.h"
 #include "H2MOD/Modules/HaloScript/HaloScript.h"
 #include "H2MOD/Modules/Input/KeyboardInput.h"
-#include "H2MOD/Modules/KantTesting/KantTesting.h"
 #include "H2MOD/Modules/MainMenu/MapSlots.h"
 #include "H2MOD/Modules/MainMenu/Ranks.h"
 #include "H2MOD/Modules/MapManager/MapManager.h"
@@ -1187,7 +1186,6 @@ void H2MOD::Initialize()
 	MeleeFix::Initialize();
 	MapSlots::Initialize();
 	HaloScript::Initialize();
-	KantTesting::Initialize();
 	ProjectileFix::ApplyPatches();
 	H2X::ApplyPatches();
 	H2MOD::ApplyHooks();

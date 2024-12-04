@@ -57,7 +57,6 @@
     <ClCompile Include="XLive\XStorage\XStorage.cpp" />
     <ClCompile Include="H2MOD\Modules\Input\PlayerControl.cpp" />
     <ClCompile Include="H2MOD\Modules\Input\KeyboardInput.cpp" />
-    <ClCompile Include="H2MOD\Tags\MetaExtender.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\ImGui_Handler.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\AdvancedSettings.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\MOTD.cpp" />
@@ -602,7 +601,6 @@
     <ClInclude Include="XLive\XStorage\XStorage.h" />
     <ClInclude Include="H2MOD\Modules\Input\PlayerControl.h" />
     <ClInclude Include="H2MOD\Modules\Input\KeyboardInput.h" />
-    <ClInclude Include="H2MOD\Tags\MetaExtender.h" />
     <ClInclude Include="Blam\Engine\game\game_options.h" />
     <ClInclude Include="H2MOD\Modules\Input\ControllerInput.h" />
     <ClInclude Include="H2MOD\GUI\ImGui_Integration\ImGui_Handler.h" />
