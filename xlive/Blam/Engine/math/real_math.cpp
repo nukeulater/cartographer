@@ -42,12 +42,31 @@ const real_rectangle3d private_null_rectangle =
 };
 
 const real_point2d* const global_origin2d = (const real_point2d* const)&private_zero_vector;
+
+const real_point2d* const global_x_axis2d = (const real_point2d* const)&private_identity4x3.vectors.forward;
+const real_point2d* const global_y_axis2d = (const real_point2d* const)&private_identity4x3.vectors.left;
+
+const real_point2d* const global_negative_x_axis2d = (const real_point2d* const)&private_negative_identity4x3.vectors.forward;
+const real_point2d* const global_negative_y_axis2d = (const real_point2d* const)&private_negative_identity4x3.vectors.left;
+
 const real_vector2d* const global_zero_vector2d = (const real_vector2d* const)&private_zero_vector;
 const real_vector2d* const global_forward2d = (const real_vector2d* const)&private_identity4x3.vectors.forward;
 const real_vector2d* const global_left2d = (const real_vector2d* const)&private_identity4x3.vectors.left;
 
+const real_vector2d* const global_backward2d = (const real_vector2d* const)&private_negative_identity4x3.vectors.forward;
+const real_vector2d* const global_right2d = (const real_vector2d* const)&private_negative_identity4x3.vectors.left;
+
 const real_point3d* const global_origin3d = (const real_point3d* const)&private_zero_vector;
+
+const real_point3d* const global_x_axis3d = (const real_point3d* const)&private_identity4x3.vectors.forward;
+const real_point3d* const global_y_axis3d = (const real_point3d* const)&private_identity4x3.vectors.left;
+const real_point3d* const global_z_axis3d = (const real_point3d* const)&private_identity4x3.vectors.up;
+const real_point3d* const global_negative_x_axis3d = (const real_point3d* const)&private_negative_identity4x3.vectors.forward;
+const real_point3d* const global_negative_y_axis3d = (const real_point3d* const)&private_negative_identity4x3.vectors.left;
+const real_point3d* const global_negative_z_axis3d = (const real_point3d* const)&private_negative_identity4x3.vectors.up;
+
 const real_vector3d* const global_zero_vector3d = (const real_vector3d* const)&private_zero_vector;
+
 const real_vector3d* const global_forward3d = (const real_vector3d* const)&private_identity4x3.vectors.forward;
 const real_vector3d* const global_left3d = (const real_vector3d* const)&private_identity4x3.vectors.left;
 const real_vector3d* const global_up3d = (const real_vector3d* const)&private_identity4x3.vectors.up;
@@ -58,14 +77,16 @@ const real_vector3d* const global_down3d = (const real_vector3d* const)&private_
 
 const real_vector4d* const global_zero_vector4d = (const real_vector4d* const)&private_zero_vector;
 const real_euler_angles2d* const global_zero_angles2d = (const real_euler_angles2d* const)&private_zero_vector;
-const real_quaternion* const global_identity_quaternion = (const real_quaternion* const)&private_identity_orientation;
+const real_euler_angles3d* const global_zero_angles3d = (const real_euler_angles3d* const)&private_zero_vector;
+const real_quaternion* const global_identity_quaternion = (const real_quaternion* const)&private_identity_orientation.rotation;
+
 const real_matrix4x3* const global_identity4x3 = &private_identity4x3;
+const real_matrix4x3* const global_negative_identity4x3 = &private_negative_identity4x3;
 
 const real_orientation* const global_identity_orientation = &private_identity_orientation;
 
 const real_rectangle2d* const global_null_rectangle2d = (const real_rectangle2d* const)&private_null_rectangle;
 const real_rectangle3d* const global_null_rectangle3d = &private_null_rectangle;
-
 
 /* public code */
 
