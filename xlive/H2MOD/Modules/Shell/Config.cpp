@@ -100,7 +100,7 @@ static std::enable_if_t<std::is_same_v<T, bool>, bool>
 	bool result = false;
 	std::string exception;
 	std::string str_value = simple_ini->GetValue(section_key, config_name, default_setting);
-	if (ComVar(out_value).SetFromStr(str_value))
+	if (ComVar(out_value).SetFromStr(str_value, exception))
 	{
 		//CartographerConsole::LogToTab(_console_tab_logs, "config: success setting \"%s\"", config_name);
 		result = true;
@@ -118,7 +118,6 @@ static std::enable_if_t<std::is_same_v<std::remove_all_extents_t<T>, char>, bool
 get_config_entry(CSimpleIniA* simple_ini, const char* section_key, const char* config_name, const char* default_setting, const T** out_value)
 {
 	bool result = false;
-	std::string exception;
 	*out_value = simple_ini->GetValue(section_key, config_name, default_setting);
 	result = true;
 	return result;
