@@ -97,13 +97,13 @@ protected:
 public:
 	c_user_interface_widget(e_user_interface_widget_type widget_type, uint16 user_flags);
 
-	e_controller_index get_any_responding_controller();
-	int16 get_animation_type();
-	e_user_interface_widget_type get_type();
-	c_user_interface_widget* get_next();
-	c_user_interface_widget* get_previous();
-	c_user_interface_widget* get_parent();
-	c_user_interface_widget* get_children();
+	e_controller_index get_any_responding_controller() const;
+	int16 get_animation_type() const;
+	e_user_interface_widget_type get_type() const;
+	c_user_interface_widget* get_next() const;
+	c_user_interface_widget* get_previous() const;
+	c_user_interface_widget* get_parent() const;
+	c_user_interface_widget* get_children() const;
 	c_user_interface_widget* try_find_child(e_user_interface_widget_type type, uint32 idx, bool recursive_search);
 	c_text_widget* try_find_text_widget(uint32 idx);
 	c_hud_widget* try_find_hud_widget(uint32 idx);
@@ -116,7 +116,7 @@ public:
 	void set_child_visible(e_user_interface_widget_type type, uint32 idx,  bool visible);
 	void set_allocated(bool allocated);
 	void add_new_child(c_user_interface_widget* child);
-	void get_bounds(rectangle2d* bounds);
+	void get_bounds(rectangle2d* bounds) const;
 	void set_bounds(rectangle2d* bounds);
 	void set_controller_mask(uint32 user_mask);
 	void set_controller_mask_recursive(uint32 user_mask);

@@ -1,5 +1,7 @@
 #pragma once
-#include "interface/user_interface_headers.h"
+#include "interface/user_interface_widget_button.h"
+#include "interface/user_interface_widget_window.h"
+
 #include "saved_games/saved_game_files.h"
 
 /* macro defines */

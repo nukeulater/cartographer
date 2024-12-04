@@ -3,6 +3,8 @@
 
 #include "screen_cartographer_account_manager.h"
 
+#include "interface/user_interface_controller.h"
+#include "interface/user_interface_memory.h"
 #include "interface/user_interface_utilities.h"
 #include "main/game_preferences.h"
 

@@ -1,12 +1,13 @@
 #include "stdafx.h"
 #include "screen_cartographer_account_manager.h"
 
-#include "main/game_preferences.h"
-#include "memory/data.h"
-#include "interface/screens/screen_xbox_live_task_progress_dialog.h"
-
 #include "screen_cartographer_errors.h"
 #include "screen_virtual_keyboard.h"
+
+#include "main/game_preferences.h"
+#include "memory/data.h"
+#include "interface/user_interface_memory.h"
+#include "interface/screens/screen_xbox_live_task_progress_dialog.h"
 
 #include "H2MOD/GUI/ImGui_Integration/ImGui_Handler.h"
 

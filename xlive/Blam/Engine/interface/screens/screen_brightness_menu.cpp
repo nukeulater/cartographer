@@ -1,6 +1,7 @@
 #include "stdafx.h"
-
 #include "screen_brightness_menu.h"
+
+#include "interface/user_interface_memory.h"
 
 /*
 	Re-implementation of default brightness menu
