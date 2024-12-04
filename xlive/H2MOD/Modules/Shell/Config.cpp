@@ -87,7 +87,7 @@ static std::enable_if_t<!std::is_same_v<T, bool> && std::is_integral_v<T>, bool>
 	}
 	else
 	{
-		CartographerConsole::LogToTab(_console_tab_logs, "config: %s, default: %s - threw exception: [%s]", config_name, default_setting, exception.c_str());
+		CartographerConsole::LogToTab(_console_tab_logs, "get config: %s, default: %s - threw exception: [%s]", config_name, default_setting, exception.c_str());
 	}
 
 	return result;
@@ -107,7 +107,7 @@ static std::enable_if_t<std::is_same_v<T, bool>, bool>
 	}
 	else
 	{
-		CartographerConsole::LogToTab(_console_tab_logs, "config: %s, default: %s - threw exception: [%s]", config_name, default_setting, exception.c_str());
+		CartographerConsole::LogToTab(_console_tab_logs, "get config: %s, default: %s - threw exception: [%s]", config_name, default_setting, exception.c_str());
 	}
 
 	return result;
@@ -123,8 +123,57 @@ get_config_entry(CSimpleIniA* simple_ini, const char* section_key, const char* c
 	return result;
 }
 
-#define GET_CONFIG(_simple_ini, _config_name, _default_setting, _out_value) \
+#define CONFIG_GET(_simple_ini, _config_name, _default_setting, _out_value) \
 	get_config_entry(_simple_ini, k_h2config_version_section, _config_name, _default_setting, _out_value)
+
+template<typename T>
+static std::enable_if_t<std::is_integral_v<T> && !std::is_same_v<T, char>, bool>
+set_config_entry(CSimpleIniA* simple_ini, const char* section_key, const char* config_name, T* value, const char* comment = NULL)
+{
+	bool result = true;
+	std::string value_as_string;
+
+	try
+	{
+		value_as_string = ComVar(value).GetValStr();
+	}
+	catch (...)
+	{
+		result = false;
+		CartographerConsole::LogToTab(_console_tab_logs, "set config: %s, threw exception!", config_name);
+	}
+
+	if (result)
+	{
+		simple_ini->SetValue(section_key, config_name, value_as_string.c_str(), comment);
+	}
+
+	return result;
+}
+
+template<typename T>
+static std::enable_if_t<std::is_integral_v<T> && !std::is_same_v<T, char>, bool>
+set_config_entry(CSimpleIniA* simple_ini, const char* section_key, const char* config_name, T value, const char* comment = NULL)
+{
+	return set_config_entry(simple_ini , section_key, config_name, &value, comment);
+}
+
+template<typename T>
+static std::enable_if_t<std::is_same_v<std::remove_all_extents_t<T>, char>, bool>
+set_config_entry(CSimpleIniA* simple_ini, const char* section_key, const char* config_name, const T* value, const char* comment = NULL)
+{
+	bool result = true;
+	simple_ini->SetValue(section_key, config_name, value, comment);
+	return result;
+}
+
+// sets a config with comment
+#define CONFIG_SET_C(_simple_ini, _config_name, _value, _comment) \
+	set_config_entry(_simple_ini, k_h2config_version_section, _config_name, _value, _comment)
+
+// and without
+#define CONFIG_SET(_simple_ini, _config_name, _value) \
+	set_config_entry(_simple_ini, k_h2config_version_section, _config_name, _value)
 
 e_override_texture_resolution H2Config_Override_Shadows;
 e_override_texture_resolution H2Config_Override_Water;
@@ -372,82 +421,80 @@ void SaveH2Config() {
 			);
 		}
 
-		ini.SetBoolValue(k_h2config_version_section, "h2portable", H2Portable);
-		ini.SetLongValue(k_h2config_version_section, "base_port", H2Config_base_port);
+		CONFIG_SET(&ini, "h2portable", &H2Portable);
+		CONFIG_SET(&ini, "base_port", &H2Config_base_port);
 
-		ini.SetValue(k_h2config_version_section, "wan_ip", H2Config_str_wan);
+		CONFIG_SET(&ini, "wan_ip", H2Config_str_wan);
+		CONFIG_SET(&ini, "lan_ip", H2Config_str_lan);
 
-		ini.SetValue(k_h2config_version_section, "lan_ip", H2Config_str_lan);
-
-		ini.SetBoolValue(k_h2config_version_section, "upnp", H2Config_upnp_enable);
+		CONFIG_SET(&ini, "upnp", &H2Config_upnp_enable);
 
 		if (!Memory::IsDedicatedServer()) {
 			std::string lang_str(std::to_string(H2Config_language.code_main) + "x" + std::to_string(H2Config_language.code_variant));
-			ini.SetValue(k_h2config_version_section, "language_code", lang_str.c_str());
+			CONFIG_SET(&ini, "language_code", lang_str.c_str());
 		}
 
 		if (!Memory::IsDedicatedServer()) {
-			ini.SetBoolValue(k_h2config_version_section, "language_label_capture", H2Config_custom_labels_capture_missing);
+			CONFIG_SET(&ini, "language_label_capture", &H2Config_custom_labels_capture_missing);
 
-			ini.SetBoolValue(k_h2config_version_section, "skip_intro", H2Config_skip_intro);
+			CONFIG_SET(&ini, "skip_intro", &H2Config_skip_intro);
 
-			ini.SetBoolValue(k_h2config_version_section, "discord_enable", H2Config_discord_enable);
+			CONFIG_SET(&ini, "discord_enable", &H2Config_discord_enable);
 
-			ini.SetLongValue(k_h2config_version_section, "fps_limit", H2Config_fps_limit);
+			CONFIG_SET(&ini, "fps_limit", &H2Config_fps_limit);
 
-			ini.SetLongValue(k_h2config_version_section, "static_lod_state", H2Config_static_lod_state);
+			CONFIG_SET(&ini, "static_lod_state", &H2Config_static_lod_state);
 
-			ini.SetBoolValue(k_h2config_version_section, "shader_lod_max", H2Config_shader_lod_max);
+			CONFIG_SET(&ini, "shader_lod_max", &H2Config_shader_lod_max);
 
-			ini.SetBoolValue(k_h2config_version_section, "light_suppressor", H2Config_light_suppressor);
+			CONFIG_SET(&ini, "light_suppressor", &H2Config_light_suppressor);
 
-			ini.SetBoolValue(k_h2config_version_section, "disable_ingame_keyboard", H2Config_disable_ingame_keyboard);
+			CONFIG_SET(&ini, "disable_ingame_keyboard", &H2Config_disable_ingame_keyboard);
 
-			ini.SetBoolValue(k_h2config_version_section, "hide_ingame_chat", H2Config_hide_ingame_chat);
+			CONFIG_SET(&ini, "hide_ingame_chat", &H2Config_hide_ingame_chat);
 
-			ini.SetValue(k_h2config_version_section, "override_shadows", std::to_string(H2Config_Override_Shadows).c_str());
-			ini.SetValue(k_h2config_version_section, "override_water", std::to_string(H2Config_Override_Water).c_str());
+			CONFIG_SET(&ini, "override_shadows", std::to_string(H2Config_Override_Shadows).c_str());
+			CONFIG_SET(&ini, "override_water", std::to_string(H2Config_Override_Water).c_str());
 
-			ini.SetBoolValue(k_h2config_version_section, "no_events", H2Config_no_events);
+			CONFIG_SET(&ini, "no_events", &H2Config_no_events);
 
-			ini.SetBoolValue(k_h2config_version_section, "skeleton_biped", H2Config_spooky_boy);
+			CONFIG_SET(&ini, "skeleton_biped", &H2Config_spooky_boy);
 #ifndef NDEBUG
-			ini.SetLongValue(k_h2config_version_section, "forced_event", H2Config_forced_event);
+			CONFIG_SET(&ini, "forced_event", &H2Config_forced_event);
 #endif
-			ini.SetBoolValue(k_h2config_version_section, "force_off_d3d9ex", H2Config_force_off_d3d9ex);
-			ini.SetBoolValue(k_h2config_version_section, "force_off_sm3", H2Config_force_off_sm3);
-			ini.SetBoolValue(k_h2config_version_section, "use_d3d9on12", g_rasterizer_dx9on12_enabled);
-			ini.SetBoolValue(k_h2config_version_section, "disable_amd_or_ati_patches", g_rasterizer_dx9_driver_globals.disable_amd_or_ati_patches);
-			ini.SetBoolValue(k_h2config_version_section, "intel_sky_hack", H2Config_intel_sky_hack);
+			CONFIG_SET(&ini, "force_off_d3d9ex", &H2Config_force_off_d3d9ex);
+			CONFIG_SET(&ini, "force_off_sm3", &H2Config_force_off_sm3);
+			CONFIG_SET(&ini, "use_d3d9on12", &g_rasterizer_dx9on12_enabled);
+			CONFIG_SET(&ini, "disable_amd_or_ati_patches", &g_rasterizer_dx9_driver_globals.disable_amd_or_ati_patches);
+			CONFIG_SET(&ini, "intel_sky_hack", &H2Config_intel_sky_hack);
 		}
 
-		ini.SetBoolValue(k_h2config_version_section, "enable_xdelay", H2Config_xDelay);
+		CONFIG_SET(&ini, "enable_xdelay", &H2Config_xDelay);
 
-		ini.SetBoolValue(k_h2config_version_section, "debug_log", H2Config_debug_log);
-
-		ini.SetLongValue(k_h2config_version_section, "debug_log_level", H2Config_debug_log_level);
-
-		ini.SetBoolValue(k_h2config_version_section, "debug_log_console", H2Config_debug_log_console);
+		CONFIG_SET(&ini, "debug_log", &H2Config_debug_log);
+		CONFIG_SET(&ini, "debug_log_level", &H2Config_debug_log_level);
+		CONFIG_SET(&ini, "debug_log_console", &H2Config_debug_log_console);
 
 		if (Memory::IsDedicatedServer()) {
-			ini.SetValue(k_h2config_version_section, "server_name", H2Config_dedi_server_name);
+			CONFIG_SET(&ini, "server_name", H2Config_dedi_server_name);
 
-			ini.SetValue(k_h2config_version_section, "server_playlist", H2Config_dedi_server_playlist);
+			CONFIG_SET(&ini, "server_playlist", H2Config_dedi_server_playlist);
 
-			ini.SetLongValue(k_h2config_version_section, "minimum_player_start", H2Config_minimum_player_start);
-			ini.SetLongValue(k_h2config_version_section, "additional_pcr_time", H2Config_additional_pcr_time);
+			CONFIG_SET(&ini, "minimum_player_start", &H2Config_minimum_player_start);
+			CONFIG_SET(&ini, "additional_pcr_time", &H2Config_additional_pcr_time);
 
-			ini.SetBoolValue(k_h2config_version_section, "vip_lock", H2Config_vip_lock);
-			ini.SetBoolValue(k_h2config_version_section, "shuffle_even_teams", H2Config_even_shuffle_teams);
-			ini.SetBoolValue(k_h2config_version_section, "koth_random", H2Config_koth_random);
-			ini.SetBoolValue(k_h2config_version_section, "enable_anti_cheat", g_twizzler_status);
+			CONFIG_SET(&ini, "vip_lock", &H2Config_vip_lock);
+			CONFIG_SET(&ini, "shuffle_even_teams", &H2Config_even_shuffle_teams);
+			CONFIG_SET(&ini, "koth_random", &H2Config_koth_random);
+			CONFIG_SET(&ini, "enable_anti_cheat", &g_twizzler_status);
 
-			ini.SetValue(k_h2config_version_section, "login_identifier", H2Config_login_identifier);
+			CONFIG_SET(&ini, "login_identifier", H2Config_login_identifier);
+			CONFIG_SET(&ini, "login_password", H2Config_login_password);
 
-			ini.SetValue(k_h2config_version_section, "login_password", H2Config_login_password);
-			ini.SetValue(k_h2config_version_section, "stats_auth_key", H2Config_stats_authkey,
+			CONFIG_SET_C(&ini, "stats_auth_key", H2Config_stats_authkey,
 				"# DO NOT CHANGE THIS OR YOUR SERVER WILL NO LONGER TRACK STATS");
-			ini.SetValue(k_h2config_version_section, "teams_enabled_bit_flags", H2Config_team_bit_flags_str, 
+
+			CONFIG_SET_C(&ini, "teams_enabled_bit_flags", H2Config_team_bit_flags_str,
 				"# teams_enabled_bit_flags (Server)"
 				"\n# By default, the game reads team bitflags from the current map."
 				"\n# With this option, you can enable which teams are enabled."
@@ -461,12 +508,12 @@ void SaveH2Config() {
 
 		if (!Memory::IsDedicatedServer()) {
 
-			ini.SetLongValue(k_h2config_version_section, "hotkey_help", H2Config_hotkeyIdHelp, std::string("# " + GetVKeyCodeString(H2Config_hotkeyIdHelp)).c_str());
-			ini.SetLongValue(k_h2config_version_section, "hotkey_align_window", H2Config_hotkeyIdAlignWindow, std::string("# " + GetVKeyCodeString(H2Config_hotkeyIdAlignWindow)).c_str());
-			ini.SetLongValue(k_h2config_version_section, "hotkey_window_mode", H2Config_hotkeyIdWindowMode, std::string("# " + GetVKeyCodeString(H2Config_hotkeyIdWindowMode)).c_str());
-			ini.SetLongValue(k_h2config_version_section, "hotkey_hide_ingame_chat", H2Config_hotkeyIdToggleHideIngameChat, std::string("# " + GetVKeyCodeString(H2Config_hotkeyIdToggleHideIngameChat)).c_str());
-			ini.SetLongValue(k_h2config_version_section, "hotkey_guide", H2Config_hotkeyIdGuide, std::string("# " + GetVKeyCodeString(H2Config_hotkeyIdGuide)).c_str());
-			ini.SetLongValue(k_h2config_version_section, "hotkey_console", H2Config_hotkeyIdConsole, std::string("# " + GetVKeyCodeString(H2Config_hotkeyIdConsole)).c_str());
+			CONFIG_SET_C(&ini, "hotkey_help", H2Config_hotkeyIdHelp, std::string("# " + GetVKeyCodeString(H2Config_hotkeyIdHelp)).c_str());
+			CONFIG_SET_C(&ini, "hotkey_align_window", H2Config_hotkeyIdAlignWindow, std::string("# " + GetVKeyCodeString(H2Config_hotkeyIdAlignWindow)).c_str());
+			CONFIG_SET_C(&ini, "hotkey_window_mode", H2Config_hotkeyIdWindowMode, std::string("# " + GetVKeyCodeString(H2Config_hotkeyIdWindowMode)).c_str());
+			CONFIG_SET_C(&ini, "hotkey_hide_ingame_chat", H2Config_hotkeyIdToggleHideIngameChat, std::string("# " + GetVKeyCodeString(H2Config_hotkeyIdToggleHideIngameChat)).c_str());
+			CONFIG_SET_C(&ini, "hotkey_guide", H2Config_hotkeyIdGuide, std::string("# " + GetVKeyCodeString(H2Config_hotkeyIdGuide)).c_str());
+			CONFIG_SET_C(&ini, "hotkey_console", H2Config_hotkeyIdConsole, std::string("# " + GetVKeyCodeString(H2Config_hotkeyIdConsole)).c_str());
 		}
 
 		ini.SaveFile(fileConfig);
@@ -543,17 +590,17 @@ void ReadH2Config() {
 		}
 		else
 		{
-			GET_CONFIG(&ini, "h2portable", "false", &H2Portable);
-			GET_CONFIG(&ini, "base_port", "2000", &H2Config_base_port);
-			GET_CONFIG(&ini, "upnp", "true", &H2Config_upnp_enable);
-			GET_CONFIG(&ini, "enable_xdelay", "true", &H2Config_xDelay);
+			CONFIG_GET(&ini, "h2portable", "false", &H2Portable);
+			CONFIG_GET(&ini, "base_port", "2000", &H2Config_base_port);
+			CONFIG_GET(&ini, "upnp", "true", &H2Config_upnp_enable);
+			CONFIG_GET(&ini, "enable_xdelay", "true", &H2Config_xDelay);
 
-			GET_CONFIG(&ini, "debug_log", "true", &H2Config_debug_log);
-			GET_CONFIG(&ini, "debug_log_level", "2", &H2Config_debug_log_level);
-			GET_CONFIG(&ini, "debug_log_console", "false", &H2Config_debug_log_console);
+			CONFIG_GET(&ini, "debug_log", "true", &H2Config_debug_log);
+			CONFIG_GET(&ini, "debug_log_level", "2", &H2Config_debug_log_level);
+			CONFIG_GET(&ini, "debug_log_console", "false", &H2Config_debug_log_console);
 
 			const char* ip_wan = nullptr;
-			GET_CONFIG(&ini, "wan_ip", "", &ip_wan);
+			CONFIG_GET(&ini, "wan_ip", "", &ip_wan);
 			if (ip_wan
 				&& strnlen_s(ip_wan, 15) >= 7
 				&& inet_addr(ip_wan) != INADDR_NONE)
@@ -563,7 +610,7 @@ void ReadH2Config() {
 			}
 
 			const char* ip_lan = nullptr;
-			GET_CONFIG(&ini, "lan_ip", "", &ip_lan);
+			CONFIG_GET(&ini, "lan_ip", "", &ip_lan);
 			if (ip_lan
 				&& strnlen_s(ip_lan, 15) >= 7
 				&& inet_addr(ip_lan) != INADDR_NONE)
@@ -576,7 +623,7 @@ void ReadH2Config() {
 			if (!Memory::IsDedicatedServer())
 			{
 				const char* language_code;
-				GET_CONFIG(&ini, "language_code", "-1x0", &language_code);
+				CONFIG_GET(&ini, "language_code", "-1x0", &language_code);
 
 				std::string language_code_str(language_code);
 				if (!language_code_str.empty())
@@ -592,12 +639,12 @@ void ReadH2Config() {
 					}
 				}
 
-				GET_CONFIG(&ini, "language_label_capture", "false", &H2Config_custom_labels_capture_missing);
-				GET_CONFIG(&ini, "skip_intro", "false", &H2Config_skip_intro);
-				GET_CONFIG(&ini, "discord_enable", "true", &H2Config_discord_enable);
-				GET_CONFIG(&ini, "fps_limit", "120", &H2Config_fps_limit);
+				CONFIG_GET(&ini, "language_label_capture", "false", &H2Config_custom_labels_capture_missing);
+				CONFIG_GET(&ini, "skip_intro", "false", &H2Config_skip_intro);
+				CONFIG_GET(&ini, "discord_enable", "true", &H2Config_discord_enable);
+				CONFIG_GET(&ini, "fps_limit", "120", &H2Config_fps_limit);
 
-				GET_CONFIG(&ini, "static_lod_state", "0", &H2Config_static_lod_state);
+				CONFIG_GET(&ini, "static_lod_state", "0", &H2Config_static_lod_state);
 
 				switch(1)
 				{
@@ -613,20 +660,20 @@ void ReadH2Config() {
 						break;
 				}
 				
-				GET_CONFIG(&ini, "shader_lod_max", "false", &H2Config_shader_lod_max);
-				GET_CONFIG(&ini, "light_suppressor", "false", &H2Config_light_suppressor);
-				GET_CONFIG(&ini, "disable_ingame_keyboard", "false", &H2Config_disable_ingame_keyboard);
-				GET_CONFIG(&ini, "hide_ingame_chat", "false", &H2Config_hide_ingame_chat);
+				CONFIG_GET(&ini, "shader_lod_max", "false", &H2Config_shader_lod_max);
+				CONFIG_GET(&ini, "light_suppressor", "false", &H2Config_light_suppressor);
+				CONFIG_GET(&ini, "disable_ingame_keyboard", "false", &H2Config_disable_ingame_keyboard);
+				CONFIG_GET(&ini, "hide_ingame_chat", "false", &H2Config_hide_ingame_chat);
 
-				GET_CONFIG(&ini, "hotkey_help", "0x72", &H2Config_hotkeyIdHelp); // VK_F2
-				GET_CONFIG(&ini, "hotkey_align_window", "0x76", &H2Config_hotkeyIdAlignWindow); // VK_F7
-				GET_CONFIG(&ini, "hotkey_window_mode", "0x77", &H2Config_hotkeyIdWindowMode); // VK_F8
-				GET_CONFIG(&ini, "hotkey_hide_ingame_chat", "0x78", &H2Config_hotkeyIdToggleHideIngameChat); // VK_F9
-				GET_CONFIG(&ini, "hotkey_guide", "0x24", &H2Config_hotkeyIdGuide); // VK_HOME
-				GET_CONFIG(&ini, "hotkey_console", "0x79", &H2Config_hotkeyIdConsole); // VK_F10
+				CONFIG_GET(&ini, "hotkey_help", "0x72", &H2Config_hotkeyIdHelp); // VK_F2
+				CONFIG_GET(&ini, "hotkey_align_window", "0x76", &H2Config_hotkeyIdAlignWindow); // VK_F7
+				CONFIG_GET(&ini, "hotkey_window_mode", "0x77", &H2Config_hotkeyIdWindowMode); // VK_F8
+				CONFIG_GET(&ini, "hotkey_hide_ingame_chat", "0x78", &H2Config_hotkeyIdToggleHideIngameChat); // VK_F9
+				CONFIG_GET(&ini, "hotkey_guide", "0x24", &H2Config_hotkeyIdGuide); // VK_HOME
+				CONFIG_GET(&ini, "hotkey_console", "0x79", &H2Config_hotkeyIdConsole); // VK_F10
 
 				int shadows_override;
-				GET_CONFIG(&ini, "override_shadows", "1", &shadows_override);
+				CONFIG_GET(&ini, "override_shadows", "1", &shadows_override);
 
 				switch(shadows_override)
 				{
@@ -646,7 +693,7 @@ void ReadH2Config() {
 				}
 
 				int water_override;
-				GET_CONFIG(&ini, "override_water", "1", &water_override);
+				CONFIG_GET(&ini, "override_water", "1", &water_override);
 
 				switch(water_override)
 				{
@@ -664,24 +711,24 @@ void ReadH2Config() {
 						H2Config_Override_Water = e_override_texture_resolution::tex_ultra;
 						break;
 				}
-				GET_CONFIG(&ini, "no_events", "false", &H2Config_no_events);
-				GET_CONFIG(&ini, "skeleton_biped", "true", &H2Config_spooky_boy);
+				CONFIG_GET(&ini, "no_events", "false", &H2Config_no_events);
+				CONFIG_GET(&ini, "skeleton_biped", "true", &H2Config_spooky_boy);
 
 #ifndef NDEBUG
 				H2Config_forced_event = ini.GetLongValue(k_h2config_version_section, "forced_event", H2Config_forced_event);
 #endif
 
-				GET_CONFIG(&ini, "force_off_d3d9ex", "false", &H2Config_force_off_d3d9ex);
-				GET_CONFIG(&ini, "force_off_sm3", "false", &H2Config_force_off_sm3);
-				GET_CONFIG(&ini, "use_d3d9on12", "false", &g_rasterizer_dx9on12_enabled);
-				GET_CONFIG(
+				CONFIG_GET(&ini, "force_off_d3d9ex", "false", &H2Config_force_off_d3d9ex);
+				CONFIG_GET(&ini, "force_off_sm3", "false", &H2Config_force_off_sm3);
+				CONFIG_GET(&ini, "use_d3d9on12", "false", &g_rasterizer_dx9on12_enabled);
+				CONFIG_GET(
 					&ini,
 					"disable_amd_or_ati_patches",
 					"false",
 					&g_rasterizer_dx9_driver_globals.disable_amd_or_ati_patches);
 
 
-				GET_CONFIG(&ini, "intel_sky_hack", "false", &H2Config_intel_sky_hack);
+				CONFIG_GET(&ini, "intel_sky_hack", "false", &H2Config_intel_sky_hack);
 				*Memory::GetAddress<bool*>(0x41F6A9) = !H2Config_intel_sky_hack;
 			}
 
@@ -689,41 +736,41 @@ void ReadH2Config() {
 			if (Memory::IsDedicatedServer())
 			{
 				const char* server_name = NULL; 
-				GET_CONFIG(&ini, "server_name", "", &server_name);
+				CONFIG_GET(&ini, "server_name", "", &server_name);
 				if (server_name) {
 					strncpy(H2Config_dedi_server_name, server_name, XUSER_MAX_NAME_LENGTH);
 				}
 
 				const char* server_playlist = NULL;
-				GET_CONFIG(&ini, "server_playlist", "", &server_playlist);
+				CONFIG_GET(&ini, "server_playlist", "", &server_playlist);
 				if (server_playlist) {
 					strncpy(H2Config_dedi_server_playlist, server_playlist, sizeof(H2Config_dedi_server_playlist));
 				}
 
-				GET_CONFIG(&ini, "additional_pcr_time", "25", &H2Config_additional_pcr_time);
+				CONFIG_GET(&ini, "additional_pcr_time", "25", &H2Config_additional_pcr_time);
         
-				GET_CONFIG(&ini, "minimum_player_start", "0", &H2Config_minimum_player_start);
-				GET_CONFIG(&ini, "vip_lock", "false", &H2Config_vip_lock);
-				GET_CONFIG(&ini, "shuffle_even_teams", "false", &H2Config_even_shuffle_teams);
-				GET_CONFIG(&ini, "koth_random", "true", &H2Config_koth_random);
+				CONFIG_GET(&ini, "minimum_player_start", "0", &H2Config_minimum_player_start);
+				CONFIG_GET(&ini, "vip_lock", "false", &H2Config_vip_lock);
+				CONFIG_GET(&ini, "shuffle_even_teams", "false", &H2Config_even_shuffle_teams);
+				CONFIG_GET(&ini, "koth_random", "true", &H2Config_koth_random);
 
-				GET_CONFIG(&ini, "enable_anti_cheat", "true", &g_twizzler_status);
+				CONFIG_GET(&ini, "enable_anti_cheat", "true", &g_twizzler_status);
 				twizzler_set_status(g_twizzler_status);
 
 				const char* login_identifier = NULL;
-				GET_CONFIG(&ini, "login_identifier", "", &login_identifier);
+				CONFIG_GET(&ini, "login_identifier", "", &login_identifier);
 				if (login_identifier) {
 					strncpy(H2Config_login_identifier, login_identifier, sizeof(H2Config_login_identifier));
 				}
 
 				const char* login_password = NULL;
-				GET_CONFIG(&ini, "login_password", "", &login_password);
+				CONFIG_GET(&ini, "login_password", "", &login_password);
 				if (login_password) {
 					strncpy(H2Config_login_password, login_password, sizeof(H2Config_login_password));
 				}
 
 				const char* stats_authkey = NULL;
-				GET_CONFIG(&ini, "stats_auth_key", "", &stats_authkey);
+				CONFIG_GET(&ini, "stats_auth_key", "", &stats_authkey);
 				if (stats_authkey) {
 					strncpy(H2Config_stats_authkey, stats_authkey, sizeof(H2Config_stats_authkey) - 1); // - 1 for the null character
 				}

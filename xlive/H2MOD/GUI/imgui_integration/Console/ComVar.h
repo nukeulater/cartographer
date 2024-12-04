@@ -14,7 +14,7 @@ public:
 	ComVarBase() = default;
 	virtual ~ComVarBase() = default;
 
-	virtual std::string GetValStr()
+	virtual std::string GetValStr() const
 	{
 		return "<unimplemented>";
 	}
@@ -174,20 +174,26 @@ public:
 	}
 
 	template<typename Type = T>
-	std::string AsString(Type* var) const
+	std::string AsString() const
 	{
-		return std::to_string(*var);
+		return std::to_string(*m_var_ptr);
 	}
 
 	template<>
-	std::string AsString<bool>(bool* var) const
+	std::string AsString<bool>() const
 	{
-		return *var ? "true" : "false";
+		return *m_var_ptr ? "true" : "false";
 	}
 
-	std::string GetValStr() override
+	template<>
+	std::string AsString<unsigned short>() const
 	{
-		return AsString(m_var_ptr);
+		return AsString<unsigned int>();
+	}
+
+	std::string GetValStr() const override
+	{
+		return AsString();
 	}
 
 	T GetVal() const
