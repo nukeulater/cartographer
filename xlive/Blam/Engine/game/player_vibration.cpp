@@ -89,11 +89,9 @@ void __cdecl vibration_update(real32 dt)
 				}
 			}
 
-			for (uint32 controller_index = 0; controller_index < NUMBEROF(controller_vibration_states); ++controller_index)
+			for (int16 controller_index = 0; controller_index < NUMBEROF(controller_vibration_states); ++controller_index)
 			{
-				const XINPUT_VIBRATION state = controller_vibration_states[controller_index];
-
-				input_set_gamepad_rumbler_state(controller_index, state.wLeftMotorSpeed, state.wRightMotorSpeed);
+				input_set_gamepad_rumbler_state(controller_index, controller_vibration_states[controller_index].wLeftMotorSpeed, controller_vibration_states[controller_index].wRightMotorSpeed);
 			}
 		}
 	}

@@ -113,7 +113,7 @@ int16 c_model_animation::find_first_key_of_type(const e_frame_event_type event_t
 	return result;
 }
 
-int16 c_model_animation::find_first_sound_event(int32* sound) const
+int16 c_model_animation::find_first_sound_event(int16* sound) const
 {
 	int16 frame = 0;
 	if (this->sound_events.count > 0)
@@ -252,7 +252,7 @@ size_t c_model_animation::get_sound_events_size(void) const
 
 int16 c_model_animation::get_sound_reference_index(void) const
 {
-	int32 sound = NONE;
+	int16 sound = NONE;
 	this->find_first_sound_event(&sound);
 	return sound;
 }

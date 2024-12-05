@@ -111,8 +111,8 @@ void render_splitscreen_line(void)
 	ASSERT(IN_RANGE(player_window_count, 1, 4));
 
 	const s_rasterizer_globals* rasterizer_globals = rasterizer_globals_get();
-	const int32 resolution_x = rasterizer_globals->resolution_x;
-	const int32 resolution_y = rasterizer_globals->resolution_y;
+	const int16 resolution_x = (int16)rasterizer_globals->resolution_x;
+	const int16 resolution_y = (int16)rasterizer_globals->resolution_y;
 
 	// We calculate the size of the line by dividing our resolution by the height the original game ran at
 	const int32 line_size = resolution_y / 480;		

@@ -16,7 +16,7 @@ void hud_draw_on_map_load(void);
 
 datum hud_bitmap_tag_index_get(void);
 
-int32 hud_bitmap_data_index_get(void);
+int16 hud_bitmap_data_index_get(void);
 
 void hud_player_indicators_draw_enabled_set(int32 user_index, bool enabled);
 

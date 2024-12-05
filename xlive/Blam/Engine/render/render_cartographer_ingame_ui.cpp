@@ -105,7 +105,7 @@ void render_cartographer_status_bar(const char *build_text)
 		text_color_console.alpha = .5f;
 	}
 
-	const int32 line_height = get_text_size_from_font_cache(k_status_text_font);
+	const int16 line_height = get_text_size_from_font_cache(k_status_text_font);
 	bool paused_or_in_main_menu = game_is_main_menu || paused_or_in_menus;
 	if (paused_or_in_main_menu)
 	{
@@ -133,7 +133,7 @@ void render_cartographer_git_build_info(void)
 #if defined(GEN_GIT_VER_VERSION_STRING) && defined(CARTOGRAPHER_TEST_BUILD_DRAW_TEXT) 
 	const s_rasterizer_globals* rasterizer_globals = rasterizer_globals_get();
 
-	const int32 line_height = get_text_size_from_font_cache(k_status_text_font);
+	const int16 line_height = get_text_size_from_font_cache(k_status_text_font);
 	real_argb_color text_color_console = *global_real_argb_white;
 	text_color_console.alpha = .55f;
 
@@ -172,7 +172,7 @@ bool render_cartographer_achievement_message(const char *achivement_message)
 	{
 		rectangle2d bounds;
 		wchar_t cheevo_message[256];
-		int32 widget_total_height = get_text_size_from_font_cache(k_cheevo_title_font) + (get_text_size_from_font_cache(k_cheevo_message_font) * 2);
+		const int16 widget_total_height = get_text_size_from_font_cache(k_cheevo_title_font) + (get_text_size_from_font_cache(k_cheevo_message_font) * 2);
 		real_argb_color text_color = *global_real_argb_white;
 		text_color.alpha = (float)(x_cheevo_timer - time_now) / k_cheevo_display_lifetime;
 

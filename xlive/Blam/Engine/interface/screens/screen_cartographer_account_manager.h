@@ -117,7 +117,7 @@ public:
 	virtual void pre_destroy(void) override;
 	virtual void initialize(s_screen_parameters* screen_parameters) override;
 	virtual void post_initialize(void) override;
-	const virtual const void* load_proc(void) const override;
+	virtual const void* load_proc(void) const override;
 };
 // ASSERT_STRUCT_SIZE(c_cartographer_account_manager_menu, 3396);
 
