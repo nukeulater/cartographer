@@ -10,7 +10,6 @@
     <ClCompile Include="Blam\Engine\networking\transport\network_channel.cpp" />
     <ClCompile Include="Blam\Engine\networking\transport\network_observer.cpp" />
     <ClCompile Include="Blam\Engine\Networking\Session\NetworkSession.cpp" />
-    <ClCompile Include="H2MOD\Tags\TagInterface.cpp" />
     <ClCompile Include="H2MOD\Modules\Shell\ServerConsole.cpp" />
     <ClCompile Include="Util\log.cpp" />
     <ClCompile Include="XLive\Cryptography\Rc4.cpp" />
@@ -79,7 +78,6 @@
     <ClCompile Include="Blam\Engine\physics\physics_constants.cpp" />
     <ClCompile Include="Blam\Engine\objects\objects.cpp" />
     <ClCompile Include="H2MOD\EngineHooks\EngineHooks.cpp" />
-    <ClCompile Include="H2MOD\Modules\KantTesting\KantTesting.cpp" />
     <ClCompile Include="H2MOD\Modules\GamePhysics\Patches\MeleeFix.cpp" />
     <ClCompile Include="Blam\Engine\physics\character_physics_mode_melee.cpp" />
     <ClCompile Include="H2MOD\Modules\GamePhysics\Patches\ProjectileFix.cpp" />
@@ -99,7 +97,6 @@
     <ClCompile Include="3rdparty\imgui\backends\imgui_impl_dx9.cpp" />
     <ClCompile Include="3rdparty\imgui\backends\imgui_impl_win32.cpp" />
     <ClCompile Include="3rdparty\imgui\imgui.cpp" />
-    <ClCompile Include="3rdparty\imgui\imgui_demo.cpp" />
     <ClCompile Include="3rdparty\imgui\imgui_draw.cpp" />
     <ClCompile Include="3rdparty\imgui\imgui_tables.cpp" />
     <ClCompile Include="3rdparty\imgui\imgui_widgets.cpp" />
@@ -547,7 +544,6 @@
     <ClInclude Include="Blam\Engine\networking\transport\network_observer.h" />
     <ClInclude Include="Blam\Engine\Networking\Session\NetworkSession.h" />
     <ClInclude Include="H2MOD\Modules\Shell\ServerConsole.h" />
-    <ClInclude Include="H2MOD\Tags\TagInterface.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Util\SimpleIni.h" />
     <ClInclude Include="XLive\Cryptography\Rc4.h" />
@@ -627,7 +623,6 @@
     <ClInclude Include="Blam\Engine\physics\physics_constants.h" />
     <ClInclude Include="H2MOD\Modules\EventHandler\EventHandler.hpp" />
     <ClInclude Include="H2MOD\EngineHooks\EngineHooks.h" />
-    <ClInclude Include="H2MOD\Modules\KantTesting\KantTesting.h" />
     <ClInclude Include="H2MOD\Modules\GamePhysics\Patches\MeleeFix.h" />
     <ClInclude Include="Blam\Engine\physics\character_physics_mode_melee.h" />
     <ClInclude Include="H2MOD\Modules\GamePhysics\Patches\ProjectileFix.h" />
@@ -1077,7 +1072,6 @@
     <ClInclude Include="Blam\Engine\networking\panorama\panorama_user_history.h" />
     <ClInclude Include="Blam\Engine\networking\panorama\panorama_presence.h" />
     <ClInclude Include="Blam\Engine\game\game_results.h" />
-    <ClInclude Include="Blam\Engine\interface\user_interface_headers.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_cartographer_account_manager.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_cartographer_menus.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_brightness_menu.h" />
@@ -1176,6 +1170,7 @@
     <ClInclude Include="Blam\Engine\objects\crates.h" />
     <ClInclude Include="Blam\Engine\sound\sound_classes.h" />
     <ClInclude Include="Blam\Engine\devices\device_controls.h" />
+    <ClInclude Include="Blam\Engine\interface\screens\screen_cartographer_account_manager_strings.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />
