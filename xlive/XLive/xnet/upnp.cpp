@@ -21,8 +21,7 @@ Utils::UPnPResult ModuleUPnP::UPnPForwardPort(bool tcp, int externalport, int in
 	if (upnpDiscoverError != UPNPDISCOVER_SUCCESS || upnpDevice == nullptr)
 		return Utils::UPnPResult(Utils::UPnPErrorType::DiscoveryError, upnpDiscoverError);
 
-	int ret = UPNP_GetValidIGD(upnpDevice, &urls, &data,
-		lanaddr, sizeof(lanaddr));
+	int ret = UPNP_GetValidIGD(upnpDevice, &urls, &data, lanaddr, sizeof(lanaddr), NULL, 0);
 
 	if (ret != Utils::UPNP_IGD_VALID_CONNECTED)
 		return Utils::UPnPResult(Utils::UPnPErrorType::IGDError, ret);
