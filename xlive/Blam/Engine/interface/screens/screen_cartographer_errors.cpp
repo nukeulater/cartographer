@@ -157,11 +157,12 @@ void c_cartographer_error_menu::pre_destroy()
 	switch (m_error_id)
 	{
 	case _cartographer_error_id_invalid_login_token:
-		if (c_cartographer_account_manager_menu::accountingGoBackToList && c_cartographer_account_manager_menu::IsAccountingActiveHandle()) {
+		if (c_cartographer_account_manager_menu::g_accounting_go_back_to_list && c_cartographer_account_manager_menu::is_accounting_active_handle()) 
+		{
 			c_cartographer_account_manager_menu::load_for_account_add_context();
-			c_cartographer_account_manager_menu::accountingGoBackToList = true;
+			c_cartographer_account_manager_menu::g_accounting_go_back_to_list = true;
 		}
-		c_cartographer_account_manager_menu::UpdateAccountingActiveHandle(false);
+		c_cartographer_account_manager_menu::update_accounting_active_handle(false);
 		break;
 	case _cartpgrapher_error_id_none:
 	default:

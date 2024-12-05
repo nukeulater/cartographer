@@ -161,5 +161,5 @@ ASSERT_STRUCT_SIZE(c_screen_virtual_keyboard, 0x3B80);
 
 /* public code */
 
-void* ui_load_virtual_keyboard(wchar_t* out_keyboard_text, uint32 out_keyboard_text_lenght, e_vkbd_context_type keyboard_type);
+void* ui_load_virtual_keyboard(wchar_t* out_keyboard_text, uint32 out_keyboard_text_length, e_vkbd_context_type keyboard_type);
 void ui_set_virtual_keyboard_in_use(bool state);

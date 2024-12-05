@@ -3,21 +3,23 @@
 #include "interface/user_interface_widget_list_item.h"
 #include "interface/user_interface_widget_window.h"
 
-/* macro defines */
+/* constants */
 
 #define k_no_of_visible_items_for_cartographer_account_manager_list 4
+#define k_cartographer_account_email_and_password_max_length 128
 
 /* enums */
 
-enum e_cartographer_account_manager_screen_type
+enum e_cartographer_account_manager_screen_type : int8
 {
-	_cartographer_account_manager_screen_type_none = NONE,
 	_cartographer_account_manager_screen_type_list,
 	_cartographer_account_manager_screen_type_list_remove_account,
 	_cartographer_account_manager_screen_type_create_account,
-	_cartographer_account_manager_screen_type_add_account, 
-	 
-	_carrographer_account_manager_screen_type_end
+	_cartographer_account_manager_screen_type_add_account,
+	
+	k_cartographer_account_manager_screen_type_count,
+
+	_cartographer_account_manager_screen_type_none = NONE,
 };
 
 /* classes */
@@ -41,15 +43,15 @@ private:
 		struct
 		{
 			wchar_t user_name[XUSER_NAME_SIZE];
-			wchar_t email[128];
-			wchar_t password[128];
+			wchar_t email[k_cartographer_account_email_and_password_max_length];
+			wchar_t password[k_cartographer_account_email_and_password_max_length];
 		} m_account_create;
 
 		struct
 		{
 			bool remember_me;
-			wchar_t email_or_username[128];
-			wchar_t password[128];
+			wchar_t email_or_username[k_cartographer_account_email_and_password_max_length];
+			wchar_t password[k_cartographer_account_email_and_password_max_length];
 		} m_account_add;
 	};
 	// button handler callback
@@ -65,17 +67,17 @@ public:
 
 	c_cartographer_account_manager_edit_list(uint16 _flags, int32 _button_count, int32 _default_selected_button, e_cartographer_account_manager_screen_type _screen_type);
 
-	bool account_removal_mode() const
+	bool account_removal_mode(void) const
 	{
 		return m_cartographer_screen_type == _cartographer_account_manager_screen_type_list_remove_account;
 	}
 
 	// c_cartographer_account_manager_edit_list virtual functions
 
-	virtual ~c_cartographer_account_manager_edit_list() = default;
-	virtual void pre_destroy() override;
-	virtual c_list_item_widget* get_list_items() override;
-	virtual int32 get_list_items_count() override;
+	virtual ~c_cartographer_account_manager_edit_list(void) = default;
+	virtual void pre_destroy(void) override;
+	virtual c_list_item_widget* get_list_items(void) override;
+	virtual int32 get_list_items_count(void) override;
 	virtual void update_list_items(c_list_item_widget* item, int32 skin_index) override;
 
 };
@@ -89,32 +91,36 @@ private:
 	c_cartographer_account_manager_edit_list m_account_edit_list;
 	e_cartographer_account_manager_screen_type m_cartographer_screen_type;
 
+
 public:
+	static bool g_accounting_go_back_to_list;
+	static int32 g_accounting_active_handle_count;
+
 	c_cartographer_account_manager_menu(e_user_interface_channel_type _ui_channel, e_user_interface_render_window _window_index, uint16 _flags, e_cartographer_account_manager_screen_type _screen_type, int32 _button_count, int32 _selected_button);
 	
-	static bool accountingGoBackToList;
-	static int accountingActiveHandleCount;
-	static bool IsAccountingActiveHandle();
-	static void UpdateAccountingActiveHandle(bool active);
+	static bool is_accounting_active_handle(void);
+	static void update_accounting_active_handle(bool active);
 	static void set_menu_open_context(e_cartographer_account_manager_screen_type screen_type);
 
 	static void* __cdecl load(s_screen_parameters* a1);
 	static void* __cdecl load_default_context(s_screen_parameters* a1);
-	static c_cartographer_account_manager_menu* load_for_account_create_context();
-	static c_cartographer_account_manager_menu* load_for_account_add_context();
-	static c_cartographer_account_manager_menu* load_for_account_list_context();
-	static c_cartographer_account_manager_menu* load_for_account_remove_from_list_context();
+	static c_cartographer_account_manager_menu* load_for_account_create_context(void);
+	static c_cartographer_account_manager_menu* load_for_account_add_context(void);
+	static c_cartographer_account_manager_menu* load_for_account_list_context(void);
+	static c_cartographer_account_manager_menu* load_for_account_remove_from_list_context(void);
 
 
 
 	// c_cartographer_account_manager_menu virtual functions
 
-	virtual ~c_cartographer_account_manager_menu() = default;
-	virtual void pre_destroy() override;
+	virtual ~c_cartographer_account_manager_menu(void) = default;
+	virtual void pre_destroy(void) override;
 	virtual void initialize(s_screen_parameters* screen_parameters) override;
-	virtual void post_initialize() override;
-	virtual void* load_proc() override;
+	virtual void post_initialize(void) override;
+	virtual void* load_proc(void) override;
 };
 // ASSERT_STRUCT_SIZE(c_cartographer_account_manager_menu, 3396);
 
-void cartographer_account_manager_open_list();
+/* prototypes */
+
+void cartographer_account_manager_open_list(void);
