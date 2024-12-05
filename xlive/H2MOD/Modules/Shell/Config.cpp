@@ -595,7 +595,7 @@ void ReadH2Config() {
 			CONFIG_GET(&ini, "upnp", "true", &H2Config_upnp_enable);
 			CONFIG_GET(&ini, "enable_xdelay", "true", &H2Config_xDelay);
 
-			CONFIG_GET(&ini, "debug_log", "true", &H2Config_debug_log);
+			CONFIG_GET(&ini, "debug_log", "false", &H2Config_debug_log);
 			CONFIG_GET(&ini, "debug_log_level", "2", &H2Config_debug_log_level);
 			CONFIG_GET(&ini, "debug_log_console", "false", &H2Config_debug_log_console);
 
