@@ -63,7 +63,7 @@ public:
 	virtual void pre_destroy() override;
 	virtual bool handle_event(s_event_record* event) override;
 	virtual void initialize(s_screen_parameters* screen_parameters) override;
-	virtual void* load_proc() override;
+	virtual const void* load_proc(void) const override;
 
 private:
 };

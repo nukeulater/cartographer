@@ -43,6 +43,6 @@ public:
 	virtual void update() override;
 	virtual bool handle_event(s_event_record* event) override;
 	virtual void initialize(s_screen_parameters* parameters) override;
-	virtual void* load_proc() override;
+	virtual const void* load_proc(void) const override;
 };
 ASSERT_STRUCT_SIZE(c_screen_xbox_live_task_progress_dialog, 0xA70);

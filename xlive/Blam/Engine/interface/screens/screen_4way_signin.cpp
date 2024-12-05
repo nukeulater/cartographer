@@ -377,7 +377,7 @@ void c_screen_4way_signin::initialize(s_screen_parameters* parameters)
 	user_interface_squad_clear_match_playlist();
 }
 
-void* c_screen_4way_signin::load_proc()
+const void* c_screen_4way_signin::load_proc(void) const
 {
 	switch (this->m_call_context)
 	{
@@ -403,7 +403,7 @@ void* c_screen_4way_signin::load_proc()
 	default:
 		DISPLAY_ASSERT("unreachable");
 	}
-	return nullptr;
+	return NULL;
 }
 
 bool __cdecl user_interface_mainmenu_sign_out_controller_callback(e_controller_index controller_index)

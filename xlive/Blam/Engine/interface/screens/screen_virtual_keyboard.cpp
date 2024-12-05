@@ -145,7 +145,7 @@ void c_screen_virtual_keyboard::initialize(s_screen_parameters* parameters)
 	update_custom_labels(old_context);
 }
 
-void* c_screen_virtual_keyboard::load_proc()
+const void* c_screen_virtual_keyboard::load_proc(void) const
 {
 	return &c_screen_virtual_keyboard::load;
 }

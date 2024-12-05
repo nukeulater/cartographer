@@ -358,7 +358,7 @@ void c_screen_settings::post_initialize_button_keys()
 }
 
 
-void* c_screen_settings::load_proc()
+const void* c_screen_settings::load_proc(void) const
 {
 	return &c_screen_settings::load;
 }

@@ -2,7 +2,7 @@
 
 // miscellaneous cartographer menus
 
-#include "interface/user_interface_widget.h"
+#include "interface/user_interface.h"
 #include "interface/user_interface_widget_list.h"
 #include "interface/user_interface_widget_list_item.h"
 #include "interface/user_interface_widget_window.h"
@@ -61,7 +61,7 @@ public:
 
 	virtual ~c_cartographer_guide_menu() = default;
 	virtual void initialize(s_screen_parameters* screen_parameters) override;
-	virtual void* load_proc() override;
+	virtual const void* load_proc(void) const override;
 };
 
 
@@ -96,7 +96,7 @@ public:
 	// c_cartographer_credits_menu virtual functions
 
 	virtual ~c_cartographer_credits_menu() = default;
-	virtual void* load_proc() override;
+	virtual const void* load_proc(void) const override;
 	virtual void initialize(s_screen_parameters* screen_parameters) override;
 };
 
@@ -141,7 +141,7 @@ public:
 
 	virtual ~c_cartographer_update_menu() = default;
 	virtual void update() override;
-	virtual void* load_proc() override;
+	virtual const void* load_proc(void) const override;
 	virtual void initialize(s_screen_parameters* screen_parameters) override;
 };
 
@@ -178,7 +178,7 @@ public:
 	// c_cartographer_update_notice_menu virtual functions.
 
 	virtual ~c_cartographer_update_notice_menu() = default;
-	virtual void* load_proc() override;
+	virtual const void* load_proc(void) const override;
 	virtual void initialize(s_screen_parameters* screen_parameters) override;
 };
 

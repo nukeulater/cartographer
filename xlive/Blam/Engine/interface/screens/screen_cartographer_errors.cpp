@@ -220,7 +220,7 @@ void c_cartographer_error_menu::initialize(s_screen_parameters* screen_parameter
 	}
 }
 
-void* c_cartographer_error_menu::load_proc()
+const void* c_cartographer_error_menu::load_proc(void) const
 {
 	return c_cartographer_error_menu::load;
 }

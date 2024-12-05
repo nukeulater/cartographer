@@ -309,7 +309,7 @@ void c_cartographer_guide_menu::initialize(s_screen_parameters* screen_parameter
 	}
 }
 
-void* c_cartographer_guide_menu::load_proc()
+const void* c_cartographer_guide_menu::load_proc(void) const
 {
 	return c_cartographer_guide_menu::load;
 }
@@ -383,7 +383,7 @@ void* c_cartographer_credits_menu::load(s_screen_parameters* parameters)
 	return credits_menu;
 }
 
-void* c_cartographer_credits_menu::load_proc()
+const void* c_cartographer_credits_menu::load_proc(void) const
 {
 	return c_cartographer_credits_menu::load;
 }
@@ -564,7 +564,7 @@ void c_cartographer_update_menu::update()
 	c_screen_with_menu::update();
 }
 
-void* c_cartographer_update_menu::load_proc()
+const void* c_cartographer_update_menu::load_proc(void) const
 {
 	return c_cartographer_update_menu::load;
 }
@@ -679,7 +679,7 @@ c_cartographer_update_notice_menu::c_cartographer_update_notice_menu(e_user_inte
 {
 }
 
-void* c_cartographer_update_notice_menu::load_proc()
+const void* c_cartographer_update_notice_menu::load_proc(void) const
 {
 	return c_cartographer_update_notice_menu::load;
 }

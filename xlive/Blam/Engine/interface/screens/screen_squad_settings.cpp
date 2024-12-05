@@ -687,7 +687,7 @@ void* c_screen_squad_settings::load(s_screen_parameters* parameters)
 }
 
 
-void* c_screen_squad_settings::load_proc()
+const void* c_screen_squad_settings::load_proc(void) const
 {
 	return &c_screen_squad_settings::load;
 }

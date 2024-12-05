@@ -78,7 +78,7 @@ void c_screen_xbox_live_task_progress_dialog::initialize(s_screen_parameters* pa
 	this->setup_children();
 }
 
-void* c_screen_xbox_live_task_progress_dialog::load_proc()
+const void* c_screen_xbox_live_task_progress_dialog::load_proc(void) const
 {
 	return &c_screen_xbox_live_task_progress_dialog::load;
 }

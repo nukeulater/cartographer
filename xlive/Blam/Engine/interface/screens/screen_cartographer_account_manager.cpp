@@ -602,7 +602,7 @@ void c_cartographer_account_manager_menu::post_initialize(void)
 	return c_screen_with_menu::post_initialize();
 }
 
-void* c_cartographer_account_manager_menu::load_proc(void)
+const void* c_cartographer_account_manager_menu::load_proc(void) const
 {
 	return c_cartographer_account_manager_menu::load_default_context;
 }
