@@ -1,5 +1,4 @@
 #include "stdafx.h"
-
 #include "imgui_handler.h"
 
 #include "game/player_control.h"
@@ -17,10 +16,11 @@ const char* k_advanced_settings_window_name = "advanced_settings";
 const char* k_weapon_offsets_window_name = "Weapon Offsets";
 const char* k_motd_window_name = "motd";
 const char* k_debug_overlay_window_name = "debug_overlay";
+const char* k_message_box_window_name = "messagebox";
 
 namespace ImGuiHandler
 {
-	std::vector<s_imgui_window> imgui_windows;
+	s_imgui_window imgui_windows[6];
 	PDIRECT3DTEXTURE9			g_patch_notes_texture = NULL;
 
 	namespace {
@@ -50,7 +50,7 @@ namespace ImGuiHandler
 			return true;
 		for (auto& window : imgui_windows)
 		{
-			if (window.doRender)
+			if (window.should_render)
 				return true;
 		}
 		return false;
@@ -86,9 +86,9 @@ namespace ImGuiHandler
 		ShowNetworkStatsOverlay(&g_network_stats_overlay);
 		for (auto& window : imgui_windows)
 		{
-			if (window.doRender)
+			if (window.should_render)
 			{
-				window.renderFunc(&window.doRender);
+				window.renderFunc(&window.should_render);
 			}
 		}
 
@@ -105,8 +105,8 @@ namespace ImGuiHandler
 		{
 			if (window.name == name)
 			{
-				window.doRender = !window.doRender;
-				if (window.doRender)
+				window.should_render = !window.should_render;
+				if (window.should_render)
 				{
 					if (window.openFunc != nullptr)
 						window.openFunc();
@@ -119,7 +119,7 @@ namespace ImGuiHandler
 			}
 
 			// check if we still need to block the input of the game
-			if (window.doRender && !window.NoImInput())
+			if (window.should_render && !window.NoImInput())
 			{
 				keep_game_input_blocked = true;
 			}
@@ -131,14 +131,17 @@ namespace ImGuiHandler
 		player_control_disable_local_camera(keep_game_input_blocked);
 	}
 
-	bool IsWindowActive(const std::string& name)
+	bool IsWindowActive(const char* name)
 	{
-		if (name == "net_metrics" && g_network_stats_overlay)
+		if (strncmp(name, "net_metrics", 16) == 0 && g_network_stats_overlay)
 			return true;
-		for (auto& window : imgui_windows)
+
+		for (s_imgui_window& window : imgui_windows)
 		{
-			if (window.name == name)
-				return window.doRender;
+			if (strncmp(window.name, name, 256) == 0)
+			{
+				return window.should_render;
+			}
 		}
 		return false;
 	}
@@ -160,12 +163,12 @@ namespace ImGuiHandler
 		ImGui_ImplDX9_Init(pDevice);
 		p_d3d_device = pDevice;
 
-		imgui_windows.emplace_back("Weapon Offsets", false, WeaponOffsets::Render, WeaponOffsets::Open, WeaponOffsets::Close);
-		imgui_windows.emplace_back(k_motd_window_name, false, ImMOTD::Render, ImMOTD::Open, ImMOTD::Close);
-		imgui_windows.emplace_back(k_debug_overlay_window_name, false, ImDebugOverlay::Render, ImDebugOverlay::Open, ImDebugOverlay::Close);
-		imgui_windows.emplace_back(ImMessageBox::windowName, false, ImMessageBox::Render, ImMessageBox::Open, ImMessageBox::Close);
-		imgui_windows.emplace_back(k_advanced_settings_window_name, false, ImAdvancedSettings::Render, ImAdvancedSettings::Open, ImAdvancedSettings::Close);
-		imgui_windows.emplace_back(k_cartographer_console_window_name, false, CartographerConsole::Render, CartographerConsole::Open, CartographerConsole::Close);
+		imgui_windows[0] = { "Weapon Offsets", false, WeaponOffsets::Render, WeaponOffsets::Open, WeaponOffsets::Close };
+		imgui_windows[1] = { k_motd_window_name, false, ImMOTD::Render, ImMOTD::Open, ImMOTD::Close };
+		imgui_windows[2] = { k_debug_overlay_window_name, false, ImDebugOverlay::Render, ImDebugOverlay::Open, ImDebugOverlay::Close };
+		imgui_windows[3] = { k_message_box_window_name, false, ImMessageBox::Render, ImMessageBox::Open, ImMessageBox::Close };
+		imgui_windows[4] = { k_advanced_settings_window_name, false, ImAdvancedSettings::Render, ImAdvancedSettings::Open, ImAdvancedSettings::Close };
+		imgui_windows[5] = { k_cartographer_console_window_name, false, CartographerConsole::Render, CartographerConsole::Open, CartographerConsole::Close };
 
 		atexit([]() {
 			ImGui_ImplDX9_Shutdown();

@@ -105,7 +105,7 @@ void load_special_event()
 		{
 			*Memory::GetAddress<byte*>(0x46DCF1) = 1;
 			ImGuiHandler::ImMessageBox::SetMessage("Error: Cartographer Shared map content is missing. Try updating your game from the mainmenu.\r\n\r\nBy going to Cartographer > Update.\r\n\r\nIf that doesn't work reach out to us in #help on discord.");
-			ImGuiHandler::ToggleWindow(ImGuiHandler::ImMessageBox::windowName);
+			ImGuiHandler::ToggleWindow(k_message_box_window_name);
 		}
 	}
 }

@@ -7,6 +7,7 @@ extern const char* k_advanced_settings_window_name;
 extern const char* k_weapon_offsets_window_name;
 extern const char* k_motd_window_name;
 extern const char* k_debug_overlay_window_name;
+extern const char* k_message_box_window_name;
 
 namespace ImGuiHandler
 {
@@ -26,22 +27,12 @@ namespace ImGuiHandler
 
 	struct s_imgui_window
 	{
-		std::string name;
-		bool doRender;
+		const char* name;
+		bool should_render;
 		void(__cdecl* renderFunc)(bool*);
 		void(__cdecl* openFunc)();
 		void(__cdecl* closeFunc)();
 		ImWWindowHandlerFlags flags;
-
-		s_imgui_window(const std::string& _name, bool _doRender, void(__cdecl* _renderFunc)(bool*), void(__cdecl* _openFunc)(), void(__cdecl* _closeFunc)(), ImWWindowHandlerFlags _flags = 0)
-		{
-			name = _name;
-			doRender = _doRender;
-			renderFunc = _renderFunc;
-			openFunc = _openFunc;
-			closeFunc = _closeFunc;
-			flags = _flags;
-		}
 
 		bool NoImInput() const
 		{
@@ -60,7 +51,7 @@ namespace ImGuiHandler
 	void SetGameInputState(bool enable);
 	bool CanDrawImgui();
 	void DrawImgui();
-	bool IsWindowActive(const std::string& name);
+	bool IsWindowActive(const char* name);
 	void ToggleWindow(const std::string& name);
 	void Initalize(LPDIRECT3DDEVICE9 pDevice, HWND hWnd);
 	float WidthPercentage(float percent);
@@ -70,7 +61,6 @@ namespace ImGuiHandler
 	void ReleaseTextures();
 	e_imgui_aspect_ratio GetAspectRatio(const real_point2d* display_size);
 	namespace ImMOTD {
-		bool DownloadMOTD(const std::wstring& motd_path, e_imgui_aspect_ratio ratio);
 		void Render(bool* p_open);
 		void Open();
 		void Close();
@@ -96,8 +86,6 @@ namespace ImGuiHandler
 		void SetMessage(std::string message);
 		void Open();
 		void Close();
-
-		extern std::string windowName;
 	}
 	namespace WeaponOffsets
 	{

@@ -4,15 +4,12 @@
 #include "imgui_handler.h"
 
 #include "game/game.h"
-#include "H2MOD/Modules/Input/PlayerControl.h"
 
 
 namespace ImGuiHandler
 {
 	namespace ImMessageBox
 	{
-		std::string windowName = "messagebox";
-
 		namespace
 		{
 			std::string message;
@@ -39,7 +36,7 @@ namespace ImGuiHandler
 				ImGui::SetCursorPosY(190);
 				if (ImGui::Button("Ok", ImVec2(610, 50)))
 				{
-					ImGuiHandler::ToggleWindow(ImGuiHandler::ImMessageBox::windowName);
+					ImGuiHandler::ToggleWindow(k_message_box_window_name);
 				}
 			}
 			// Pop style var

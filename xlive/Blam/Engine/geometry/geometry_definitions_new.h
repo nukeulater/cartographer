@@ -204,7 +204,7 @@ struct geometry_point_data
 {
     tag_block<geometry_point> raw_points;
     data_reference runtime_point_data;    // Data size: 1048544
-    tag_block<geometry_rigid_point_group> rigidPointGroups;
+    tag_block<geometry_rigid_point_group> rigid_point_groups;
     tag_block<uint16> vertex_point_indices;
 };
 ASSERT_STRUCT_SIZE(geometry_point_data, 32);
