@@ -44,7 +44,7 @@ void c_screen_press_start_introduction::sub_60EBC2(int32 a1)
 	INVOKE_TYPE(0x23F011, 0x0, void(__thiscall*)(c_screen_press_start_introduction*, int32), this, a1);
 }
 
-void* c_screen_press_start_introduction::load_proc()
+const void* c_screen_press_start_introduction::load_proc(void) const
 {
 	return &c_screen_press_start_introduction::load;
 }

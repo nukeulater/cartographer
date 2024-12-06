@@ -171,13 +171,14 @@ void __cdecl rasterizer_set_render_target_internal_hook_set_viewport(IDirect3DSu
     // NOTE: *ONLY* use this function for entire screen surfaces (e.g the backbuffer, a render target)
 
 	rasterizer_dx9_set_render_target_internal(target, z_stencil, a3);
-	D3DVIEWPORT9 vp = {
-		global_camera->viewport_bounds.left,
-		global_camera->viewport_bounds.top,
-		rectangle2d_width(&global_camera->viewport_bounds),
-		rectangle2d_height(&global_camera->viewport_bounds),
-        0.0f,
-        1.0f
+	D3DVIEWPORT9 vp =
+    {
+		(DWORD)global_camera->viewport_bounds.left,
+        (DWORD)global_camera->viewport_bounds.top,
+        (DWORD)rectangle2d_width(&global_camera->viewport_bounds),
+        (DWORD)rectangle2d_height(&global_camera->viewport_bounds),
+        0.f,
+        1.f
 	};
 	// set the viewport, after setting the main render target
 	// to note that the viewport will always gets reset when a new render target is set
@@ -528,10 +529,10 @@ void __cdecl rasterizer_dx9_set_target(e_rasterizer_target rasterizer_target, in
             else
             {
                 viewport_scale = 1.0;
-                viewport.X = global_window_parameters->camera.viewport_bounds.left * viewport_scale;
-                viewport.Y = global_window_parameters->camera.viewport_bounds.top * viewport_scale;
-                viewport.Width = viewport_width * viewport_scale;
-                viewport.Height = viewport_height * viewport_scale;
+                viewport.X = (DWORD)(global_window_parameters->camera.viewport_bounds.left * viewport_scale);
+                viewport.Y = (DWORD)(global_window_parameters->camera.viewport_bounds.top * viewport_scale);
+                viewport.Width = (DWORD)(viewport_width * viewport_scale);
+                viewport.Height = (DWORD)(viewport_height * viewport_scale);
             }
         }
         // By default set the viewport as the desc params

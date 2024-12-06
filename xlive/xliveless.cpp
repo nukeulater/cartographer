@@ -134,18 +134,18 @@ LONG WINAPI XLivePBufferAllocate (DWORD size, FakePBuffer **pBuffer)
 	//initialize fake buffer
 	*pBuffer = (FakePBuffer*)HeapAlloc(hHeap,HEAP_ZERO_MEMORY,sizeof(FakePBuffer));
 
-	(*pBuffer)->dwSize = size;
-	(*pBuffer)->id = CreateMutex(NULL,NULL,NULL);
-	(*pBuffer)->magic = 0xDEADC0DE;
-
-	//initialize real buffer inside fake buffer
-	(*pBuffer)->pbData = (PBYTE)HeapAlloc(hHeap,HEAP_ZERO_MEMORY,size);
-
 	if(!*pBuffer)
 	{
 		LOG_ERROR_XLIVE("XLivePBufferAllocate() unable to allocate {} bytes", size);
 		return E_OUTOFMEMORY;
 	}
+
+	(*pBuffer)->dwSize = size;
+	(*pBuffer)->id = CreateMutex(NULL, NULL, NULL);
+	(*pBuffer)->magic = 0xDEADC0DE;
+
+	//initialize real buffer inside fake buffer
+	(*pBuffer)->pbData = (PBYTE)HeapAlloc(hHeap, HEAP_ZERO_MEMORY, size);
 
 	return 0;
 }
@@ -342,7 +342,7 @@ DWORD WINAPI XStringVerify( DWORD dwFlags, const CHAR *szLocale, DWORD dwNumStri
 
 	if( pResults )
 	{
-		pResults->wNumStrings = dwNumStrings;
+		pResults->wNumStrings = (WORD)dwNumStrings;
 		pResults->pStringResult = (HRESULT *) ((BYTE *) pResults + sizeof(STRING_VERIFY_RESPONSE));
 
 

@@ -1,6 +1,9 @@
 #pragma once
 
-#include "interface/user_interface_headers.h"
+#include "interface/user_interface_widget.h"
+#include "interface/user_interface_widget_list.h"
+#include "interface/user_interface_widget_list_item.h"
+#include "interface/user_interface_widget_window.h"
 
 class c_brightness_level_edit_list : public c_list_widget
 {
@@ -257,9 +260,9 @@ public:
 		INVOKE_VFPTR_FN(_get_vfptr_table, 37, void(class_type::**)(s_screen_state*), state);
 	}
 
-	virtual void* load_proc() override
+	virtual const void* load_proc(void) const override
 	{
-		return INVOKE_VFPTR_FN(_get_vfptr_table, 38, void*(class_type::**)());
+		return INVOKE_VFPTR_FN(_get_vfptr_table, 38, const void*(class_type::**)() const);
 	}
 
 	virtual bool overlay_effect_is_disabled() override
@@ -279,9 +282,9 @@ public:
 private:
 	// reserved name
 	template<typename T>
-	static T _get_vfptr_table(DWORD idx)
+	static const T _get_vfptr_table(DWORD idx)
 	{
-		return reinterpret_cast<T>(&Memory::GetAddress<void**>(0x4D7ABC)[idx]);
+		return reinterpret_cast<const T>(&Memory::GetAddress<const void**>(0x4D7ABC)[idx]);
 	}
 };
 

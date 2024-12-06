@@ -3,7 +3,6 @@
 
 #include "hud.h"
 #include "user_interface_controller.h"
-#include "rasterizer/rasterizer_globals.h"
 #include "render/render.h"
 
 datum __cdecl user_interface_get_widget_tag_index_from_screen_id(e_user_interface_screen_id screen_id)

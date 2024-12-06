@@ -61,6 +61,6 @@ public:
 
 	virtual ~c_screen_settings() = default;
 	virtual void post_initialize_button_keys() override;
-	virtual void* load_proc() override;
+	virtual const void* load_proc(void) const override;
 };
 ASSERT_STRUCT_SIZE(c_screen_settings, 0xEC8);

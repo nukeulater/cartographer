@@ -440,7 +440,7 @@ public:
 	virtual void sub_60EBC2(int32 a1);
 	virtual void* sub_60EC5C(s_screen_state* state);
 	virtual void sub_60ECC9(s_screen_state* state);
-	virtual void* load_proc() = 0;
+	virtual const void* load_proc(void) const = 0;
 	virtual bool overlay_effect_is_disabled();
 	virtual void set_favourites_bitmap_visible(bool show_icon);
 

@@ -102,10 +102,10 @@ e_rasterizer_target rasterizer_dx9_sun_glow_draw(datum tag_index, real_point3d* 
             real32 viewport_middle_y = (real32)(viewport_height / 2);
 
             RECT rect;
-            rect.left = viewport_left + (viewport_width * sun_surface_quad.x0 / 2.0f + viewport_middle_x);
-            rect.top = viewport_bottom - (viewport_height * sun_surface_quad.y1 / 2.0f + viewport_middle_y);
-            rect.right = viewport_left + (viewport_width * sun_surface_quad.x1 / 2.0f + viewport_middle_x);
-            rect.bottom = viewport_bottom - (viewport_height * sun_surface_quad.y0 / 2.0f + viewport_middle_y);
+            rect.left = (LONG)(viewport_left + (viewport_width * sun_surface_quad.x0 / 2.0f + viewport_middle_x));
+            rect.top = (LONG)(viewport_bottom - (viewport_height * sun_surface_quad.y1 / 2.0f + viewport_middle_y));
+            rect.right = (LONG)(viewport_left + (viewport_width * sun_surface_quad.x1 / 2.0f + viewport_middle_x));
+            rect.bottom = (LONG)(viewport_bottom - (viewport_height * sun_surface_quad.y0 / 2.0f + viewport_middle_y));
 
             // Make sure we limit the rect to within the bounds of the viewport
             // Without this the StretchRect call to copy to the sun target will fail
@@ -363,10 +363,10 @@ void rasterizer_dx9_sun_glow_copy_source(const RECT* rect, e_rasterizer_target t
         real_rectangle2d rectangle;
         if (rect)
         {
-            rectangle.x0 = rect->left;
-            rectangle.x1 = rect->right;
-            rectangle.y0 = rect->top;
-            rectangle.y1 = rect->bottom;
+            rectangle.x0 = (real32)rect->left;
+            rectangle.x1 = (real32)rect->right;
+            rectangle.y0 = (real32)rect->top;
+            rectangle.y1 = (real32)rect->bottom;
             p_rect = &rectangle;
         }
 

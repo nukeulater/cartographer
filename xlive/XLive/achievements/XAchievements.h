@@ -1,5 +1,5 @@
 #pragma once
-extern int achievementCount;
+extern DWORD achievementCount;
 extern HANDLE g_dwFakeAchievementContent;
 
 #define XACHIEVEMENT_TYPE_COMPLETION            1

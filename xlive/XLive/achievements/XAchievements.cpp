@@ -4,9 +4,9 @@
 
 #include "H2MOD/Modules/Achievements/Achievements.h"
 
-int achievementCount = 0;
-int achievementEnumeratorFlags = 0;
-int achievementEnumeratorIndex = 0;
+DWORD achievementCount = 0;
+DWORD achievementEnumeratorFlags = 0;
+DWORD achievementEnumeratorIndex = 0;
 
 extern void Check_Overlapped(PXOVERLAPPED pOverlapped);
 HANDLE g_dwFakeAchievementContent = INVALID_HANDLE_VALUE;

@@ -1,12 +1,15 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "screen_cartographer_account_manager.h"
 
-#include "main/game_preferences.h"
-#include "memory/data.h"
-#include "interface/screens/screen_xbox_live_task_progress_dialog.h"
+#include "screen_cartographer_account_manager_strings.h"
 
 #include "screen_cartographer_errors.h"
 #include "screen_virtual_keyboard.h"
+
+#include "main/game_preferences.h"
+#include "memory/data.h"
+#include "interface/user_interface_memory.h"
+#include "interface/screens/screen_xbox_live_task_progress_dialog.h"
 
 #include "H2MOD/GUI/ImGui_Integration/ImGui_Handler.h"
 
@@ -17,10 +20,6 @@
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Utils/Utils.h"
-
-/* macro defines */
-
-#define k_cartographer_account_manager_list_name "cartographer account manager list"
 
 /* enums */
 
@@ -85,12 +84,24 @@ enum e_cartographer_screen_type_account_add_string_table
 	_screen_type_account_add_button_placeholder_username_text = k_screen_type_account_add_button_text_index,
 	_screen_type_account_add_button_placeholder_password_text,
 	_screen_type_account_add_button_remember_me_text,
-	_screen_type_account_add_button_dont_remember_me_text,
-	// same index, + 1 when parsed
-	// ### TODO FIXME improve the system
-	_screen_type_account_add_button_login_text = _screen_type_account_add_button_dont_remember_me_text,
+	_screen_type_account_add_button_login_text,
 
-	k_screen_type_account_add_unknown_label
+	k_cartographer_screen_type_account_add_string_table_count
+};
+
+/* structures */
+
+struct s_cartographer_account_create_data
+{
+	char user_name[XUSER_NAME_SIZE];
+	char email[128];
+	char password[128];
+};
+
+struct s_cartographer_account_login_data
+{
+	char email_or_username[128];
+	char password[128];
 };
 
 /* global externs */
@@ -98,30 +109,53 @@ enum e_cartographer_screen_type_account_add_string_table
 extern bool g_force_cartographer_update;
 extern void* ui_load_cartographer_update_notice_menu();
 
-/* forward declarations */
+/* constants */
 
-void* ui_load_cartographer_invalid_login_token();
+const char* k_cartographer_account_manager_list_name = "cartographer account manager list";
+
+const wchar_t** k_screen_label_table_eng[k_cartographer_account_manager_screen_type_count] =
+{
+	k_screen_type_list_table_eng,
+	NULL,
+	k_screen_type_list_create_account_eng,
+	k_screen_type_list_add_account_eng
+};
+
+const wchar_t*** k_screen_label_table[k_language_count] =
+{
+	k_screen_label_table_eng,
+	k_screen_label_table_eng,
+	k_screen_label_table_eng,
+	k_screen_label_table_eng,
+	k_screen_label_table_eng,
+	k_screen_label_table_eng,
+	k_screen_label_table_eng,
+	k_screen_label_table_eng,
+	k_screen_label_table_eng
+};
+
+/* prototypes */
+
+void* ui_load_cartographer_invalid_login_token(void);
 void xbox_live_task_progress_callback(c_screen_xbox_live_task_progress_dialog* dialog);
 DWORD WINAPI thread_account_login_proc_cb(LPVOID lParam);
 static DWORD WINAPI thread_account_create_proc_cb(LPVOID lParam);
+static const wchar_t* get_cartographer_account_manager_label(e_cartographer_account_manager_screen_type screen_type, int32 label_id);
 
+/*
+Censors the password string entered if it's not the default password label and returns the pointer to the string.
+If password is the default label then return the pointer to password
+*/
+static const wchar_t* cartographer_account_manager_set_password_label(const wchar_t* password, wchar_t* password_censored_buffer);
 
-/* global constants */
+/* globals */
 
 static bool g_account_manager_remove_mode;
-bool c_cartographer_account_manager_menu::accountingGoBackToList = false;
-int c_cartographer_account_manager_menu::accountingActiveHandleCount = 0;
+bool c_cartographer_account_manager_menu::g_accounting_go_back_to_list = false;
+int32 c_cartographer_account_manager_menu::g_accounting_active_handle_count = 0;
 
-struct {
-	char email_or_username[128];
-	char password[128];
-} g_account_add_login_data;
-
-struct {
-	char user_name[XUSER_NAME_SIZE];
-	char email[128];
-	char password[128];
-} g_account_create_data;
+s_cartographer_account_login_data g_account_add_login_data;
+s_cartographer_account_create_data g_account_create_data;
 
 e_cartographer_account_manager_screen_type g_open_cartographer_account_manager_context = _cartographer_account_manager_screen_type_none;
 
@@ -129,55 +163,7 @@ int g_account_manager_master_login_code;
 HANDLE g_account_manager_login_thread_handle = NULL;
 HANDLE g_account_manager_thread_handle = NULL;
 
-
-static void get_cartographer_account_manager_label(e_cartographer_account_manager_screen_type screen_type, int32 label_id, wchar_t** out_label)
-{
-	wchar_t** label_table[k_language_count][_carrographer_account_manager_screen_type_end] = {};
-
-	static wchar_t* screen_type_list_add_account_eng[] =
-	{
-		L"Add account",
-		L"Enter your account's Username\r\n[or Email] and Password to Login.",
-		L"[Username]",
-		L"[Password]",
-		L"-Remember me",
-		L"-Don't remember me",
-		L"Login",
-		L"<unnamed>"
-		L"<unknown label>",
-	};
-
-	static wchar_t* screen_type_list_table_eng[] =
-	{
-		L"Online Accounts",
-		L"Select an Account to Sign in to or use options to create/add/remove them.",
-		L">Play Offline",
-		L">Create Account",
-		L">Add Account",
-		L"-Remove Account",
-		L"-Cancel Remove",
-		L"<unknown label>"
-	};
-
-	static wchar_t* screen_type_list_create_account_eng[] =
-	{
-		L"Create Account",
-		L"Enter a username, email and password for your new account.",
-		L"[Username]",
-		L"[Email]",
-		L"[Password]",
-		L"Create Account",
-		L"<unknown label>"
-	};
-
-	label_table[_language_english][_cartographer_account_manager_screen_type_list] = screen_type_list_table_eng;
-	label_table[_language_english][_cartographer_account_manager_screen_type_create_account] = screen_type_list_create_account_eng;
-	label_table[_language_english][_cartographer_account_manager_screen_type_add_account] = screen_type_list_add_account_eng;
-
-	// ### TODO FIXME localization
-	*out_label = label_table[_language_english][screen_type][label_id];
-}
-
+/* public code */
 
 c_cartographer_account_manager_edit_list::c_cartographer_account_manager_edit_list(uint16 _flags, int32 _button_count, int32 _default_selected_button, e_cartographer_account_manager_screen_type _screen_type) :
 	c_list_widget(_flags),
@@ -197,6 +183,7 @@ c_cartographer_account_manager_edit_list::c_cartographer_account_manager_edit_li
 
 	linker_type2.link(&this->m_slot_2);
 
+	const wchar_t* placeholder_username, *placeholder_email, *placeholder_password;
 	switch (m_cartographer_screen_type)
 	{
 	case _cartographer_account_manager_screen_type_none:
@@ -207,10 +194,9 @@ c_cartographer_account_manager_edit_list::c_cartographer_account_manager_edit_li
 	case _cartographer_account_manager_screen_type_create_account:
 		csmemset(&m_account_create, 0, sizeof(m_account_create));
 
-		wchar_t* placeholder_username, * placeholder_email, * placeholder_password;
-		get_cartographer_account_manager_label(m_cartographer_screen_type, _screen_type_account_create_button_placeholder_username_text, &placeholder_username);
-		get_cartographer_account_manager_label(m_cartographer_screen_type, _screen_type_account_create_button_placeholder_email_text, &placeholder_email);
-		get_cartographer_account_manager_label(m_cartographer_screen_type, _screen_type_account_create_button_placeholder_password_text, &placeholder_password);
+		placeholder_username = get_cartographer_account_manager_label(m_cartographer_screen_type, _screen_type_account_create_button_placeholder_username_text);
+		placeholder_email = get_cartographer_account_manager_label(m_cartographer_screen_type, _screen_type_account_create_button_placeholder_email_text);
+		placeholder_password = get_cartographer_account_manager_label(m_cartographer_screen_type, _screen_type_account_create_button_placeholder_password_text);
 		wcsncpy(m_account_create.user_name, placeholder_username, XUSER_NAME_SIZE);
 		wcsncpy(m_account_create.email, placeholder_email, ARRAYSIZE(m_account_create.email));
 		wcsncpy(m_account_create.password, placeholder_password, ARRAYSIZE(m_account_create.password));
@@ -218,18 +204,17 @@ c_cartographer_account_manager_edit_list::c_cartographer_account_manager_edit_li
 	case _cartographer_account_manager_screen_type_add_account:
 		csmemset(&m_account_add, 0, sizeof(m_account_add));
 
-		get_cartographer_account_manager_label(m_cartographer_screen_type, _screen_type_account_add_button_placeholder_username_text, &placeholder_username);
-		get_cartographer_account_manager_label(m_cartographer_screen_type, _screen_type_account_add_button_placeholder_password_text, &placeholder_password);
+		placeholder_username = get_cartographer_account_manager_label(m_cartographer_screen_type, _screen_type_account_add_button_placeholder_username_text);
+		placeholder_password = get_cartographer_account_manager_label(m_cartographer_screen_type, _screen_type_account_add_button_placeholder_password_text);
 		wcsncpy(m_account_add.email_or_username, placeholder_username, ARRAYSIZE(m_account_add.email_or_username));
 		wcsncpy(m_account_add.password, placeholder_password, ARRAYSIZE(m_account_add.password));
 		break;
-	case _carrographer_account_manager_screen_type_end:
 	default:
 		break;
 	}
 }
 
-void c_cartographer_account_manager_edit_list::pre_destroy()
+void c_cartographer_account_manager_edit_list::pre_destroy(void)
 {
 	switch (m_cartographer_screen_type)
 	{
@@ -242,19 +227,17 @@ void c_cartographer_account_manager_edit_list::pre_destroy()
 	case _cartographer_account_manager_screen_type_add_account:
 		csmemset(&m_account_add, 0, sizeof(m_account_add));
 		break;
-	case _cartographer_account_manager_screen_type_none:
-	case _carrographer_account_manager_screen_type_end:
 	default:
 		break;
 	}
 }
 
-c_list_item_widget* c_cartographer_account_manager_edit_list::get_list_items()
+c_list_item_widget* c_cartographer_account_manager_edit_list::get_list_items(void)
 {
 	return m_list_item_widgets;
 }
 
-int32 c_cartographer_account_manager_edit_list::get_list_items_count()
+int32 c_cartographer_account_manager_edit_list::get_list_items_count(void)
 {
 	return NUMBEROF(m_list_item_widgets);
 }
@@ -272,8 +255,12 @@ void c_cartographer_account_manager_edit_list::update_list_items(c_list_item_wid
 	if (text_widget)
 	{
 		int32 button_count_allocated = m_list_data->datum_max_elements;
-		wchar_t* button_label = nullptr;
+		const wchar_t* button_label = nullptr;
+
+		// + 1 for the unicode character (nullptr included in original string size)
+		wchar_t remember_me_text[NUMBEROF(k_remember_me_string_eng) + 1];
 		wchar_t username_wide[XUSER_NAME_SIZE];
+		wchar_t password_censored_buffer_wide[k_cartographer_account_email_and_password_max_length];
 
 		switch (m_cartographer_screen_type)
 		{
@@ -296,7 +283,7 @@ void c_cartographer_account_manager_edit_list::update_list_items(c_list_item_wid
 						label_index += 1;
 					}
 
-					get_cartographer_account_manager_label(_cartographer_account_manager_screen_type_list, k_screen_type_account_list_button_text_index + label_index, &button_label);
+					button_label = get_cartographer_account_manager_label(_cartographer_account_manager_screen_type_list, k_screen_type_account_list_button_text_index + label_index);
 				}
 				else
 				{
@@ -307,15 +294,15 @@ void c_cartographer_account_manager_edit_list::update_list_items(c_list_item_wid
 					}
 					else
 					{
-						get_cartographer_account_manager_label(_cartographer_account_manager_screen_type_list, _screen_type_account_list_button_unnamed_account, &button_label);
+						button_label = get_cartographer_account_manager_label(_cartographer_account_manager_screen_type_list, _screen_type_account_list_button_unnamed_account);
 					}
 				}
 			}
 			else
 			{
 				// just 3 buttons, play offline, create account and add
-				int32 label_index = 3 - (button_count_allocated - list_item_index);
-				get_cartographer_account_manager_label(_cartographer_account_manager_screen_type_list, k_screen_type_account_list_button_text_index + label_index, &button_label);
+				const int32 label_index = 3 - (button_count_allocated - list_item_index);
+				button_label = get_cartographer_account_manager_label(_cartographer_account_manager_screen_type_list, k_screen_type_account_list_button_text_index + label_index);
 			}
 		}
 		break;
@@ -329,10 +316,10 @@ void c_cartographer_account_manager_edit_list::update_list_items(c_list_item_wid
 				button_label = m_account_create.email;
 				break;
 			case _screen_type_account_create_button_placeholder_password_text:
-				button_label = m_account_create.password;
+				button_label = cartographer_account_manager_set_password_label(m_account_create.password, password_censored_buffer_wide);
 				break;
 			default:
-				get_cartographer_account_manager_label(m_cartographer_screen_type, k_screen_type_account_create_button_text_index + list_item_index, &button_label);
+				button_label = get_cartographer_account_manager_label(m_cartographer_screen_type, k_screen_type_account_create_button_text_index + list_item_index);
 				break;
 			}
 			break;
@@ -343,18 +330,18 @@ void c_cartographer_account_manager_edit_list::update_list_items(c_list_item_wid
 				button_label = m_account_add.email_or_username;
 				break;
 			case _screen_type_account_add_button_placeholder_password_text:
-				button_label = m_account_add.password;
+				button_label = cartographer_account_manager_set_password_label(m_account_add.password, password_censored_buffer_wide);
 				break;
 			case _screen_type_account_add_button_remember_me_text:
-				get_cartographer_account_manager_label(m_cartographer_screen_type, k_screen_type_account_add_button_text_index + list_item_index + (m_account_add.remember_me ? 0 : 1), &button_label);
+				button_label = get_cartographer_account_manager_label(m_cartographer_screen_type, k_screen_type_account_add_button_text_index + list_item_index);
+				usnzprintf(remember_me_text, NUMBEROF(remember_me_text), button_label, m_account_add.remember_me ? L'☑' : L'☐');
+				button_label = remember_me_text;
 				break;
 			case _screen_type_account_add_button_login_text:
-				get_cartographer_account_manager_label(m_cartographer_screen_type, k_screen_type_account_add_button_text_index + list_item_index + 1, &button_label);
+				button_label = get_cartographer_account_manager_label(m_cartographer_screen_type, k_screen_type_account_add_button_text_index + list_item_index);
 				break;
 			}
 			break;
-		case _cartographer_account_manager_screen_type_none:
-		case _carrographer_account_manager_screen_type_end:
 		default:
 			break;
 		}
@@ -378,8 +365,6 @@ void c_cartographer_account_manager_edit_list::handle_item_pressed_event(s_event
 	case _cartographer_account_manager_screen_type_add_account:
 		handle_item_pressed_event_for_add_account(pevent, pitem_index);
 		break;
-
-	case _carrographer_account_manager_screen_type_end:
 	default:
 		break;
 	}
@@ -412,8 +397,8 @@ void c_cartographer_account_manager_edit_list::handle_item_pressed_event_for_add
 	{
 		if (g_account_manager_login_thread_handle == NULL) {
 
-			c_cartographer_account_manager_menu::accountingGoBackToList = false;
-			c_cartographer_account_manager_menu::UpdateAccountingActiveHandle(true);
+			c_cartographer_account_manager_menu::g_accounting_go_back_to_list = false;
+			c_cartographer_account_manager_menu::update_accounting_active_handle(true);
 			snprintf(g_account_add_login_data.email_or_username, ARRAYSIZE(g_account_add_login_data.email_or_username), "%S", m_account_add.email_or_username);
 			snprintf(g_account_add_login_data.password, ARRAYSIZE(g_account_add_login_data.password), "%S", m_account_add.password);
 			g_account_manager_login_thread_handle = CreateThread(NULL, 0, thread_account_login_proc_cb, (LPVOID)NONE, 0, NULL);
@@ -426,7 +411,7 @@ void c_cartographer_account_manager_edit_list::handle_item_pressed_event_for_add
 
 void c_cartographer_account_manager_edit_list::handle_item_pressed_event_for_listed_accounts(s_event_record* event_record, int32* a3)
 {
-	int button_id = DATUM_INDEX_TO_ABSOLUTE_INDEX(*a3);
+	const int32 button_id = DATUM_INDEX_TO_ABSOLUTE_INDEX(*a3);
 
 	e_user_interface_render_window	parent_render_window = this->get_parent_render_window();
 	e_user_interface_channel_type	parent_screen_ui_channel = this->get_parent_channel();
@@ -465,15 +450,16 @@ void c_cartographer_account_manager_edit_list::handle_item_pressed_event_for_lis
 		}
 		else if (g_account_manager_login_thread_handle == NULL)
 		{
-			c_cartographer_account_manager_menu::accountingGoBackToList = false;
-			c_cartographer_account_manager_menu::UpdateAccountingActiveHandle(true);
+			c_cartographer_account_manager_menu::g_accounting_go_back_to_list = false;
+			c_cartographer_account_manager_menu::update_accounting_active_handle(true);
 			g_account_manager_login_thread_handle = CreateThread(NULL, 0, thread_account_login_proc_cb, (LPVOID)button_id, 0, NULL);
 			c_screen_xbox_live_task_progress_dialog::add_task(xbox_live_task_progress_callback);
 			user_interface_back_out_from_channel(parent_screen_ui_channel, parent_render_window);
 		}
 	}
+	// play offline button
 	else if (button_id == H2AccountCount)
-	{ // play offline button
+	{
 		BYTE abEnet[6];
 		BYTE abOnline[20];
 		XNetRandom(abEnet, sizeof(abEnet));
@@ -490,12 +476,13 @@ void c_cartographer_account_manager_edit_list::handle_item_pressed_event_for_lis
 			user_interface_back_out_from_channel(parent_screen_ui_channel, parent_render_window);
 		}
 	}
+	return;
 }
 
 
 void c_cartographer_account_manager_edit_list::handle_item_pressed_event_for_create_account(s_event_record* event_record, int32* a3)
 {
-	int button_id = DATUM_INDEX_TO_ABSOLUTE_INDEX(*a3);
+	const int32 button_id = DATUM_INDEX_TO_ABSOLUTE_INDEX(*a3);
 
 	e_user_interface_render_window	parent_render_window = this->get_parent_render_window();
 	e_user_interface_channel_type	parent_screen_ui_channel = this->get_parent_channel();
@@ -516,8 +503,8 @@ void c_cartographer_account_manager_edit_list::handle_item_pressed_event_for_cre
 	{
 		if (g_account_manager_thread_handle == NULL)
 		{
-			c_cartographer_account_manager_menu::accountingGoBackToList = false;
-			c_cartographer_account_manager_menu::UpdateAccountingActiveHandle(true);
+			c_cartographer_account_manager_menu::g_accounting_go_back_to_list = false;
+			c_cartographer_account_manager_menu::update_accounting_active_handle(true);
 
 			snprintf(g_account_create_data.user_name, ARRAYSIZE(g_account_create_data.user_name), "%S", m_account_create.user_name);
 			snprintf(g_account_create_data.email, ARRAYSIZE(g_account_create_data.email), "%S", m_account_create.email);
@@ -530,7 +517,6 @@ void c_cartographer_account_manager_edit_list::handle_item_pressed_event_for_cre
 			g_account_manager_thread_handle = CreateThread(NULL, 0, thread_account_create_proc_cb, (LPVOID)0, 0, NULL);
 		}
 	}
-
 	return;
 }
 
@@ -539,6 +525,7 @@ c_cartographer_account_manager_menu::c_cartographer_account_manager_menu(e_user_
 	m_account_edit_list(_flags, _button_count, _selected_button, _screen_type)
 {
 	m_cartographer_screen_type = _screen_type;
+	return;
 }
 
 void c_cartographer_account_manager_menu::pre_destroy()
@@ -549,26 +536,26 @@ void c_cartographer_account_manager_menu::pre_destroy()
 	case _cartographer_account_manager_screen_type_list_remove_account:
 		break;
 	case _cartographer_account_manager_screen_type_create_account:
-		if (c_cartographer_account_manager_menu::accountingGoBackToList
-			&& c_cartographer_account_manager_menu::IsAccountingActiveHandle())
+		if (c_cartographer_account_manager_menu::g_accounting_go_back_to_list
+			&& c_cartographer_account_manager_menu::is_accounting_active_handle())
 		{
-			c_cartographer_account_manager_menu::accountingGoBackToList = false;
+			c_cartographer_account_manager_menu::g_accounting_go_back_to_list = false;
 		}
 		break;
 
 	case _cartographer_account_manager_screen_type_add_account:
-		if (c_cartographer_account_manager_menu::accountingGoBackToList
-			&& c_cartographer_account_manager_menu::IsAccountingActiveHandle())
+		if (c_cartographer_account_manager_menu::g_accounting_go_back_to_list
+			&& c_cartographer_account_manager_menu::is_accounting_active_handle())
 		{
-			c_cartographer_account_manager_menu::accountingGoBackToList = false;
+			c_cartographer_account_manager_menu::g_accounting_go_back_to_list = false;
 		}
 		break;
-
-	case _carrographer_account_manager_screen_type_end:
 	default:
 		break;
 	}
-	UpdateAccountingActiveHandle(false);
+	
+	update_accounting_active_handle(false);
+	return;
 }
 
 // c_screen_with_menu specific interface
@@ -576,26 +563,24 @@ void c_cartographer_account_manager_menu::initialize(s_screen_parameters* screen
 {
 	c_screen_with_menu::initialize(screen_parameters);
 
-	wchar_t* header_text = nullptr;
-	wchar_t* subheader_text = nullptr;
+	const wchar_t* header_text = NULL;
+	const wchar_t* subheader_text = NULL;
 
 	switch (m_cartographer_screen_type)
 	{
 	case _cartographer_account_manager_screen_type_list:
 	case _cartographer_account_manager_screen_type_list_remove_account:
-		get_cartographer_account_manager_label(_cartographer_account_manager_screen_type_list, _screen_type_account_list_header_text, &header_text);
-		get_cartographer_account_manager_label(_cartographer_account_manager_screen_type_list, _screen_type_account_list_subheader_text, &subheader_text);
+		header_text = get_cartographer_account_manager_label(_cartographer_account_manager_screen_type_list, _screen_type_account_list_header_text);
+		subheader_text = get_cartographer_account_manager_label(_cartographer_account_manager_screen_type_list, _screen_type_account_list_subheader_text);
 		break;
 	case _cartographer_account_manager_screen_type_create_account:
-		get_cartographer_account_manager_label(m_cartographer_screen_type, _screen_type_account_create_header_text, &header_text);
-		get_cartographer_account_manager_label(m_cartographer_screen_type, _screen_type_account_create_subheader_text, &subheader_text);
+		header_text = get_cartographer_account_manager_label(m_cartographer_screen_type, _screen_type_account_create_header_text);
+		subheader_text = get_cartographer_account_manager_label(m_cartographer_screen_type, _screen_type_account_create_subheader_text);
 		break;
 	case _cartographer_account_manager_screen_type_add_account:
-		get_cartographer_account_manager_label(m_cartographer_screen_type, _screen_type_account_add_header_text, &header_text);
-		get_cartographer_account_manager_label(m_cartographer_screen_type, _screen_type_account_add_subheader_text, &subheader_text);
+		header_text = get_cartographer_account_manager_label(m_cartographer_screen_type, _screen_type_account_add_header_text);
+		subheader_text = get_cartographer_account_manager_label(m_cartographer_screen_type, _screen_type_account_add_subheader_text);
 		break;
-	case _cartographer_account_manager_screen_type_none:
-	case _carrographer_account_manager_screen_type_end:
 	default:
 		break;
 	}
@@ -608,30 +593,33 @@ void c_cartographer_account_manager_menu::initialize(s_screen_parameters* screen
 	{
 		subheader_text_widget->set_text(subheader_text);
 	}
+	return;
 }
 
-void c_cartographer_account_manager_menu::post_initialize()
+void c_cartographer_account_manager_menu::post_initialize(void)
 {
 	m_account_edit_list.set_focused_item_index(m_account_edit_list.m_default_focused_item != NONE ? m_account_edit_list.m_default_focused_item : 0);
 	return c_screen_with_menu::post_initialize();
 }
 
-void* c_cartographer_account_manager_menu::load_proc()
+const void* c_cartographer_account_manager_menu::load_proc(void) const
 {
 	return c_cartographer_account_manager_menu::load_default_context;
 }
 
 
-bool c_cartographer_account_manager_menu::IsAccountingActiveHandle() {
-	return accountingActiveHandleCount > 0;
+bool c_cartographer_account_manager_menu::is_accounting_active_handle(void)
+{
+	return c_cartographer_account_manager_menu::g_accounting_active_handle_count > 0;
 }
 
-void c_cartographer_account_manager_menu::UpdateAccountingActiveHandle(bool active) {
-	accountingActiveHandleCount += active ? 1 : -1;
-	addDebugText("Accounting active: %d", accountingActiveHandleCount);
-	if (accountingActiveHandleCount <= 0) {
+void c_cartographer_account_manager_menu::update_accounting_active_handle(bool active) {
+	c_cartographer_account_manager_menu::g_accounting_active_handle_count += active ? 1 : -1;
+	addDebugText("Accounting active: %d", c_cartographer_account_manager_menu::g_accounting_active_handle_count);
+	if (c_cartographer_account_manager_menu::g_accounting_active_handle_count <= 0) {
 		SaveH2Accounts();
 	}
+	return;
 }
 
 void c_cartographer_account_manager_menu::set_menu_open_context(e_cartographer_account_manager_screen_type screen_type)
@@ -650,7 +638,7 @@ void* __cdecl c_cartographer_account_manager_menu::load(s_screen_parameters* par
 	int32 button_count = 0;
 	int32 selected_button_index = 0;
 
-	c_cartographer_account_manager_menu::UpdateAccountingActiveHandle(true);
+	c_cartographer_account_manager_menu::update_accounting_active_handle(true);
 	switch (g_open_cartographer_account_manager_context)
 	{
 	case _cartographer_account_manager_screen_type_list:
@@ -664,15 +652,13 @@ void* __cdecl c_cartographer_account_manager_menu::load(s_screen_parameters* par
 	case _cartographer_account_manager_screen_type_create_account:
 		button_count = 4;
 		selected_button_index = 0;
-		c_cartographer_account_manager_menu::accountingGoBackToList = true;
+		c_cartographer_account_manager_menu::g_accounting_go_back_to_list = true;
 		break;
 	case _cartographer_account_manager_screen_type_add_account:
 		button_count = 4;
 		selected_button_index = 0;
-		c_cartographer_account_manager_menu::accountingGoBackToList = true;
+		c_cartographer_account_manager_menu::g_accounting_go_back_to_list = true;
 		break;
-	case _carrographer_account_manager_screen_type_end:
-	case _cartographer_account_manager_screen_type_none:
 	default:
 		break;
 	}
@@ -719,10 +705,29 @@ c_cartographer_account_manager_menu* c_cartographer_account_manager_menu::load_f
 	return (c_cartographer_account_manager_menu*)ui_custom_cartographer_load_menu(c_cartographer_account_manager_menu::load);
 }
 
-void* ui_load_cartographer_invalid_login_token()
+void cartographer_account_manager_open_list(void)
 {
-	c_cartographer_account_manager_menu::accountingGoBackToList = true;
-	c_cartographer_account_manager_menu::UpdateAccountingActiveHandle(true);
+	const bool is_accounting_active_handle = c_cartographer_account_manager_menu::is_accounting_active_handle();
+	if (!is_accounting_active_handle && ReadH2Accounts())
+	{
+		c_cartographer_account_manager_menu::load_for_account_list_context();
+	}
+	else
+	{
+		if (!is_accounting_active_handle)
+		{
+			c_cartographer_error_menu::load_by_error_id(_cartographer_error_id_login_account_already_in_use);
+		}
+	}
+	return;
+}
+
+/* private code */
+
+void* ui_load_cartographer_invalid_login_token(void)
+{
+	c_cartographer_account_manager_menu::g_accounting_go_back_to_list = true;
+	c_cartographer_account_manager_menu::update_accounting_active_handle(true);
 	return c_cartographer_error_menu::load_by_error_id(_cartographer_error_id_invalid_login_token);
 }
 
@@ -841,7 +846,7 @@ DWORD WINAPI thread_account_login_proc_cb(LPVOID lParam)
 		}
 	}
 
-	c_cartographer_account_manager_menu::UpdateAccountingActiveHandle(false);
+	c_cartographer_account_manager_menu::update_accounting_active_handle(false);
 
 	g_account_manager_login_thread_handle = NULL;
 	return 0;
@@ -862,20 +867,36 @@ static DWORD WINAPI thread_account_create_proc_cb(LPVOID lParam)
 		SecureZeroMemory(g_account_create_data.password, sizeof(g_account_create_data.password));
 	}
 
-	c_cartographer_account_manager_menu::UpdateAccountingActiveHandle(false);
+	c_cartographer_account_manager_menu::update_accounting_active_handle(false);
 
 	g_account_manager_thread_handle = NULL;
 	return 0;
 }
 
-void cartographer_account_manager_open_list() {
-	if (!c_cartographer_account_manager_menu::IsAccountingActiveHandle() && ReadH2Accounts()) {
-		c_cartographer_account_manager_menu::load_for_account_list_context();
-	}
-	else {
-		if (!c_cartographer_account_manager_menu::IsAccountingActiveHandle())
-			c_cartographer_error_menu::load_by_error_id(_cartographer_error_id_login_account_already_in_use);
-	}
+static const wchar_t* get_cartographer_account_manager_label(e_cartographer_account_manager_screen_type screen_type, int32 label_id)
+{
+	const e_language language = get_current_language();
+	return k_screen_label_table[language][screen_type][label_id];
 }
 
+static const wchar_t* cartographer_account_manager_set_password_label(const wchar_t* password, wchar_t* password_censored_buffer)
+{
+	const wchar_t* default_password_label = get_cartographer_account_manager_label(_cartographer_account_manager_screen_type_create_account, _screen_type_account_create_button_placeholder_password_text);
+	const size_t default_password_label_length = ustrnlen(default_password_label, k_cartographer_account_email_and_password_max_length);
 
+	// Check if the password passed is the default password level (k_password_string)
+	const bool is_not_default_password_label = ustrncmp(password, default_password_label, default_password_label_length) != 0;
+	if (is_not_default_password_label)
+	{
+		// Populate password_censored_buffer with the '*' character for each character entered
+		const size_t length = ustrnlen(password, k_cartographer_account_email_and_password_max_length);
+		size_t i = 0;
+
+		for (; i < length; ++i)
+		{
+			password_censored_buffer[i] = L'*';
+		}
+		password_censored_buffer[i] = L'\0';
+	}
+	return is_not_default_password_label ? password_censored_buffer : password;
+}

@@ -797,9 +797,9 @@ datum hud_bitmap_tag_index_get(void)
 	return *Memory::GetAddress<datum*>(0x976678);
 }
 
-int32 hud_bitmap_data_index_get(void)
+int16 hud_bitmap_data_index_get(void)
 {
-	return *Memory::GetAddress<int32*>(0x97667C);
+	return *Memory::GetAddress<int16*>(0x97667C);
 }
 
 void hud_player_indicators_draw_enabled_set(int32 user_index, bool enabled)

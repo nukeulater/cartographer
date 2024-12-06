@@ -2,6 +2,7 @@
 #include "user_interface_guide.h"
 #include "screens/screen_cartographer_account_manager.h"
 
+/* public code */
 
 c_user_interface_guide_state_manager* user_interface_guide_state_manager_get(void)
 {
@@ -13,4 +14,5 @@ void c_user_interface_guide_state_manager::add_user_signin_task(bool sign_to_liv
 	//INVOKE_TYPE(0xDD7550, 0x0, int(__thiscall*)(c_user_interface_guide_state_manager*, bool, void*), this, sign_to_live, signin_callback);
 	this->m_callback_task = signin_callback;
 	cartographer_account_manager_open_list();
+	return;
 }

@@ -129,7 +129,7 @@ bool __cdecl screenshot_render(window_bound* window)
 		if (!movie_globals->in_progress || movie_should_continue())
 		{
 			const window_bound window_copy = *window;
-			const int32 tile_count = 1 << screenshot_globals->tile_count_jittered;
+			const int16 tile_count = 1 << screenshot_globals->tile_count_jittered;
 			screenshot_globals->taking_screenshot = true;
 
 			int32 horizontal_tiles;

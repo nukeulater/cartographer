@@ -335,7 +335,7 @@ class c_model_animation
 public:
     bool animation_is_world_relative(void) const;
     int16 find_first_key_of_type(const e_frame_event_type event_type) const;
-    int16 find_first_sound_event(int32* sound) const;
+    int16 find_first_sound_event(int16* sound) const;
     int16 find_next_key_of_type(const e_frame_event_type event_type, const int32 frame) const;
     e_animation_type get_animation_type(void) const;
     real32 get_authored_duration(void) const;

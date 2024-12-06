@@ -1,5 +1,7 @@
 #pragma once
-#include "interface/user_interface_headers.h"
+#include "interface/user_interface_widget_button.h"
+#include "interface/user_interface_widget_window.h"
+
 #include "saved_games/saved_game_files.h"
 
 /* macro defines */
@@ -153,11 +155,11 @@ public:
 	virtual void render_widget(rectangle2d* viewport_bounds) override;
 	virtual bool handle_event(s_event_record* event) override;
 	virtual void initialize(s_screen_parameters* parameters) override;
-	virtual void* load_proc() override;
+	virtual const void* load_proc(void) const override;
 };
 ASSERT_STRUCT_SIZE(c_screen_virtual_keyboard, 0x3B80);
 
 /* public code */
 
-void* ui_load_virtual_keyboard(wchar_t* out_keyboard_text, uint32 out_keyboard_text_lenght, e_vkbd_context_type keyboard_type);
+void* ui_load_virtual_keyboard(wchar_t* out_keyboard_text, uint32 out_keyboard_text_length, e_vkbd_context_type keyboard_type);
 void ui_set_virtual_keyboard_in_use(bool state);

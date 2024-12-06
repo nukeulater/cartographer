@@ -32,7 +32,7 @@
 
 const char* k_button_items[] = { "Dpad Up","Dpad Down","Dpad Left","Dpad Right","Start","Back","Left Thumb","Right Thumb","Left Bumper","Right Bumper","A","B","X","Y" };
 const char* k_action_items[] = { "Dpad Up","Dpad Down","Dpad Left","Dpad Right","Start","Back","Crouch","Zoom","Flashlight","Switch Grenades","Jump","Melee","Reload","Switch Weapons" };
-const uint32 k_button_values[k_number_of_xinput_buttons] =
+const uint16 k_button_values[k_number_of_xinput_buttons] =
 { 
 	XINPUT_GAMEPAD_DPAD_UP, 
 	XINPUT_GAMEPAD_DPAD_DOWN, 
@@ -93,17 +93,17 @@ namespace ImGuiHandler {
 				if (current_cartographer_profile->controller_deadzone_type == _controller_deadzone_type_axial 
 					|| current_cartographer_profile->controller_deadzone_type == _controller_deadzone_type_combined) 
 				{
-					int X_Axis = current_cartographer_profile->deadzone_axial.x;
-					int Y_Axis = current_cartographer_profile->deadzone_axial.y;
+					real32 x_axis = current_cartographer_profile->deadzone_axial.x;
+					real32 y_axis = current_cartographer_profile->deadzone_axial.y;
 					ImVec2 Y_TopLeft(
 						Center.x - 100,
-						Center.y - Y_Axis);
+						Center.y - y_axis);
 					ImVec2 Y_BottomRight(
 						Center.x + 100,
-						Center.y + Y_Axis);
+						Center.y + y_axis);
 					draw_list->AddRectFilled(Y_TopLeft, Y_BottomRight, ImColor(20, 20, 20, 125));
-					ImVec2 X_TopLeft(Center.x - X_Axis, Center.y - 100);
-					ImVec2 X_BottomRight(Center.x + X_Axis, Center.y + 100);
+					ImVec2 X_TopLeft(Center.x - x_axis, Center.y - 100);
+					ImVec2 X_BottomRight(Center.x + x_axis, Center.y + 100);
 					draw_list->AddRectFilled(X_TopLeft, X_BottomRight, ImColor(20, 20, 20, 125));
 				}
 				if (current_cartographer_profile->controller_deadzone_type == _controller_deadzone_type_radial 
@@ -124,10 +124,10 @@ namespace ImGuiHandler {
 					if (abs(state->thumb_right.y) <= THUMBSTICK_PERCENTAGE_TO_POINT(current_cartographer_profile->deadzone_axial.y))
 						axial_invalid++;
 					bool radial_invalid = false;
-					unsigned int ar = pow((short)THUMBSTICK_PERCENTAGE_TO_POINT(current_cartographer_profile->deadzone_radial), 2);
-					unsigned int arx = pow(state->thumb_right.x, 2);
-					unsigned int ary = pow(state->thumb_right.y, 2);
-					unsigned int rh = arx + ary;
+					uint32 ar = (uint32)pow((short)THUMBSTICK_PERCENTAGE_TO_POINT(current_cartographer_profile->deadzone_radial), 2);
+					uint32 arx = (uint32)pow(state->thumb_right.x, 2);
+					uint32 ary = (uint32)pow(state->thumb_right.y, 2);
+					uint32 rh = arx + ary;
 					if (rh <= ar)
 					{
 						radial_invalid = true;
@@ -219,7 +219,7 @@ namespace ImGuiHandler {
 					ImGui::PushItemWidth(WidthPercentage(10));
 					ImGui::InputFloat("##Crosshair2", &current_cartographer_profile->crosshair_offset, 0, 110, "%.3f"); ImGui::SameLine();
 					if (ImGui::IsItemEdited()) {
-						current_cartographer_profile->crosshair_offset = PIN(current_cartographer_profile->crosshair_offset, 0, 0.5);
+						current_cartographer_profile->crosshair_offset = PIN(current_cartographer_profile->crosshair_offset, 0.f, 0.5f);
 					}
 					ImGui::PushItemWidth(WidthPercentage(10));
 					if (ImGui::Button(advanced_settings_get_string(_advanced_string_reset, "Crosshair3"), b2_size))

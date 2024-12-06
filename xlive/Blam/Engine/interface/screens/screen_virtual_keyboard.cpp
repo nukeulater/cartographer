@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "screen_virtual_keyboard.h"
+
+#include "interface/user_interface_memory.h"
 #include "main/game_preferences.h"
 
 /* macro defines */
@@ -143,7 +145,7 @@ void c_screen_virtual_keyboard::initialize(s_screen_parameters* parameters)
 	update_custom_labels(old_context);
 }
 
-void* c_screen_virtual_keyboard::load_proc()
+const void* c_screen_virtual_keyboard::load_proc(void) const
 {
 	return &c_screen_virtual_keyboard::load;
 }
@@ -190,7 +192,7 @@ void* c_screen_virtual_keyboard::load(s_screen_parameters* parameters)
 	return virtual_keyboard_menu;
 }
 
-void* ui_load_virtual_keyboard(wchar_t* out_keyboard_text, uint32 out_keyboard_text_lenght, e_vkbd_context_type keyboard_type)
+void* ui_load_virtual_keyboard(wchar_t* out_keyboard_text, uint32 out_keyboard_text_length, e_vkbd_context_type keyboard_type)
 {
 	s_screen_parameters virtual_keyboard_params;
 	virtual_keyboard_params.m_context = nullptr;
@@ -198,7 +200,7 @@ void* ui_load_virtual_keyboard(wchar_t* out_keyboard_text, uint32 out_keyboard_t
 	c_screen_virtual_keyboard* virtual_keyboard = (c_screen_virtual_keyboard*)virtual_keyboard_params.ui_screen_load_proc_exec();
 
 	virtual_keyboard->set_context(keyboard_type);
-	virtual_keyboard->set_input_string_buffer(out_keyboard_text, out_keyboard_text_lenght);
+	virtual_keyboard->set_input_string_buffer(out_keyboard_text, out_keyboard_text_length);
 
 	return virtual_keyboard;
 }

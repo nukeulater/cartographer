@@ -1,7 +1,11 @@
 #include "stdafx.h"
 
-#include "interface/user_interface_headers.h"
+#include "user_interface.h"
+#include "user_interface_controller.h"
+#include "user_interface_memory.h"
 #include "user_interface_widget.h"
+#include "user_interface_widget_text.h"
+#include "user_interface_widget_window.h"
 
 c_user_interface_widget::c_user_interface_widget(e_user_interface_widget_type widget_type, uint16 user_flags)
 {
@@ -48,7 +52,7 @@ void c_user_interface_widget::initialize_animation(s_animation_transform* animat
 
 /* public methods */
 
-e_controller_index c_user_interface_widget::get_any_responding_controller()
+e_controller_index c_user_interface_widget::get_any_responding_controller() const
 {
 	if (TEST_FLAG(m_controllers_mask, _controller_index_0))
 		return _controller_index_0;
@@ -62,32 +66,32 @@ e_controller_index c_user_interface_widget::get_any_responding_controller()
 	return k_no_controller;
 }
 
-int16 c_user_interface_widget::get_animation_type()
+int16 c_user_interface_widget::get_animation_type() const
 {
 	return this->m_animation_index;
 }
 
-e_user_interface_widget_type c_user_interface_widget::get_type()
+e_user_interface_widget_type c_user_interface_widget::get_type() const
 {
 	return this->m_widget_type;
 }
 
-c_user_interface_widget* c_user_interface_widget::get_next()
+c_user_interface_widget* c_user_interface_widget::get_next() const
 {
 	return this->next_widget;
 }
 
-c_user_interface_widget* c_user_interface_widget::get_previous()
+c_user_interface_widget* c_user_interface_widget::get_previous() const
 {
 	return this->previous_widget;
 }
 
-c_user_interface_widget* c_user_interface_widget::get_parent()
+c_user_interface_widget* c_user_interface_widget::get_parent() const
 {
 	return this->parent_widget;
 }
 
-c_user_interface_widget* c_user_interface_widget::get_children()
+c_user_interface_widget* c_user_interface_widget::get_children() const
 {
 	return this->m_child_widget;
 }
@@ -151,7 +155,7 @@ void c_user_interface_widget::add_new_child(c_user_interface_widget* child)
 	INVOKE_TYPE(0x21208E, 0x0, void(__thiscall*)(c_user_interface_widget*, c_user_interface_widget*), this, child);
 }
 
-void c_user_interface_widget::get_bounds(rectangle2d* bounds)
+void c_user_interface_widget::get_bounds(rectangle2d* bounds) const
 {
 	if (bounds)
 	{
@@ -170,7 +174,7 @@ void c_user_interface_widget::set_bounds(rectangle2d* bounds)
 
 void c_user_interface_widget::set_controller_mask(uint32 user_mask)
 {
-	this->m_controllers_mask = user_mask;
+	this->m_controllers_mask = (int16)user_mask;
 }
 
 void c_user_interface_widget::set_controller_mask_recursive(uint32 user_mask)
