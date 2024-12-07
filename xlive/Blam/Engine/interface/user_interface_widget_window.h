@@ -7,14 +7,14 @@
 /* macro defines */
 
 
-#define K_HEADER_TEXT_BLOCK_INDEX 0
-#define K_BUTTON_KEY_TEXT_BLOCK_INDEX 1
-#define K_SUB_HEADER_TEXT_BLOCK_INDEX 2
-#define K_MINIMUM_NUMBER_OF_DEFAULT_SCREEN_TEXTS 2
-#define K_MAXIMUM_NUMBER_OF_BUTTON_KEYS 4
+#define k_header_text_block_index 0
+#define k_button_key_text_block_index 1
+#define k_sub_header_text_block_index 2
+#define k_minimum_number_of_default_screen_texts 2
+#define k_maximum_number_of_button_keys 4
 
 #define TEXT_BLOCK_INDEX_TO_WIDGET_INDEX(block_idx) \
-			((block_idx) + K_MINIMUM_NUMBER_OF_DEFAULT_SCREEN_TEXTS)
+			((block_idx) + k_minimum_number_of_default_screen_texts)
 
 /* enums */
 

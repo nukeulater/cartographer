@@ -45,6 +45,7 @@ private:
 			wchar_t user_name[XUSER_NAME_SIZE];
 			wchar_t email[k_cartographer_account_email_and_password_max_length];
 			wchar_t password[k_cartographer_account_email_and_password_max_length];
+			wchar_t password_confirmation[k_cartographer_account_email_and_password_max_length];
 		} m_account_create;
 
 		struct
@@ -108,8 +109,6 @@ public:
 	static c_cartographer_account_manager_menu* load_for_account_add_context(void);
 	static c_cartographer_account_manager_menu* load_for_account_list_context(void);
 	static c_cartographer_account_manager_menu* load_for_account_remove_from_list_context(void);
-
-
 
 	// c_cartographer_account_manager_menu virtual functions
 

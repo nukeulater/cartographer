@@ -86,6 +86,10 @@ const s_cartographer_error_globals k_cartographer_error_globals[k_language_count
 			L"The Username you have entered is already in use!"
 		},
 		{
+			L"Password mismatch!",
+			L"Password confirmation does not match the actual password!"
+		},
+		{
 			L"BANNED Email Provider!",
 			L"The Email Address you have entered is using a domain name that has been banned! We do not allow disposable email addresses! If this is a mistake please contact an admin."
 		},
@@ -127,9 +131,21 @@ void c_cartographer_error_menu::get_error_label(e_cartographer_error_id error_id
 
 void* c_cartographer_error_menu::load_by_error_id(e_cartographer_error_id error_id) {
 
-	c_cartographer_error_menu* error_menu = (c_cartographer_error_menu*)ui_custom_cartographer_load_menu(c_cartographer_error_menu::load, 1);
-	error_menu->m_error_id = error_id;
+	s_screen_parameters params;
+	c_cartographer_error_menu* error_menu = NULL;
 
+	params.m_flags = 0;
+	params.m_window_index = _window_4;
+	params.m_context = NULL;
+	params.user_flags = user_interface_controller_get_signed_in_controllers_mask() | FLAG(k_windows_device_controller_index);
+	params.m_channel_type = _user_interface_channel_type_game_error;
+	params.m_screen_state.field_0 = NONE;
+	params.m_screen_state.m_last_focused_item_order = NONE;
+	params.m_screen_state.m_last_focused_item_index = NONE;
+	params.m_load_function = c_cartographer_error_menu::load;
+	error_menu = (c_cartographer_error_menu*)params.m_load_function(&params);
+
+	error_menu->m_error_id = error_id;
 	return error_menu;
 }
 
@@ -147,7 +163,7 @@ void* c_cartographer_error_menu::load(s_screen_parameters* parameters)
 
 
 c_cartographer_error_menu::c_cartographer_error_menu(e_user_interface_channel_type _ui_channel, e_user_interface_render_window _window_index, uint16 _flags) :
-	c_screen_widget(_screen_error_dialog_ok_cancel, _ui_channel, _window_index, _flags)
+	c_screen_widget(_screen_error_dialog_ok, _ui_channel, _window_index, _flags)
 {
 	m_error_id = _cartpgrapher_error_id_none;
 }
@@ -172,20 +188,22 @@ void c_cartographer_error_menu::pre_destroy()
 
 bool c_cartographer_error_menu::handle_event(s_event_record* event)
 {
-	if (event->type == _user_interface_event_type_gamepad_button_pressed)
+	bool result = false;
+	// ### TODO FIXME this is handled only if the cursor is above the button
+	if (event->type == _user_interface_event_type_keyboard_button_pressed
+		|| event->type == _user_interface_event_type_gamepad_button_pressed
+		|| event->type == _user_interface_event_type_mouse_button_left_click)
 	{
-		if (event->component == _user_interface_controller_component_button_a
-			|| event->component == _user_interface_controller_component_button_b
-			|| event->component == _user_interface_controller_component_button_start
-			|| event->component == _user_interface_controller_component_button_back)
+		if (event->component == _user_interface_keyboard_component_button_letter_a
+			|| event->component == _user_interface_controller_component_button_a)
 		{
-			e_user_interface_render_window	parent_render_window = this->get_parent_render_window();
-			e_user_interface_channel_type	parent_screen_ui_channel = this->get_parent_channel();
-
-			user_interface_back_out_from_channel(parent_screen_ui_channel, parent_render_window);
+			start_widget_animation(3);
+			result = true;
 		}
 	}
-	return c_screen_widget::handle_event(event);;
+
+	//return c_screen_widget::handle_event(event);
+	return result;
 }
 
 void c_cartographer_error_menu::initialize(s_screen_parameters* screen_parameters)
@@ -193,7 +211,6 @@ void c_cartographer_error_menu::initialize(s_screen_parameters* screen_parameter
 	s_interface_expected_screen_layout layout;
 	csmemset(&layout, 0, sizeof(layout));
 	layout.panes_count = 1;
-
 
 	datum widget_tag_datum = user_interface_get_widget_tag_index_from_screen_id(this->m_screen_id);
 	if (widget_tag_datum != NONE)
@@ -213,7 +230,7 @@ void c_cartographer_error_menu::initialize(s_screen_parameters* screen_parameter
 	}
 
 	m_header_text.set_text(header_text);
-	c_text_widget* subheader_text_widget = try_find_text_widget(K_SUB_HEADER_TEXT_BLOCK_INDEX);
+	c_text_widget* subheader_text_widget = try_find_text_widget(k_sub_header_text_block_index);
 	if (subheader_text_widget)
 	{
 		subheader_text_widget->set_text(subheader_text);
