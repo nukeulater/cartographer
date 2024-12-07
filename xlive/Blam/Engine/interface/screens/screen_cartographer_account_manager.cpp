@@ -98,7 +98,7 @@ struct s_cartographer_account_create_data
 	char user_name[XUSER_NAME_SIZE];
 	char email[128];
 	char password[128];
-	bool creation_success;
+	e_cartographer_error_id server_error_code;
 };
 
 struct s_cartographer_account_login_data
@@ -495,16 +495,12 @@ void __cdecl create_account_xbox_task(c_screen_xbox_live_task_progress_dialog* d
 	if (g_account_manager_thread_handle == NULL)
 	{
 		dialog->close_task();
+		c_cartographer_error_menu::load_by_error_id(g_account_create_data.server_error_code);
 
-		if (g_account_create_data.creation_success)
-		{
-			SecureZeroMemory(g_account_create_data.user_name, sizeof(g_account_create_data.user_name));
-			SecureZeroMemory(g_account_create_data.email, sizeof(g_account_create_data.email));
-			SecureZeroMemory(g_account_create_data.password, sizeof(g_account_create_data.password));
-			g_account_create_data.creation_success = false;
-
-			c_cartographer_error_menu::load_by_error_id(_cartographer_error_id_account_create_verification_email_sent);
-		}
+		SecureZeroMemory(g_account_create_data.user_name, sizeof(g_account_create_data.user_name));
+		SecureZeroMemory(g_account_create_data.email, sizeof(g_account_create_data.email));
+		SecureZeroMemory(g_account_create_data.password, sizeof(g_account_create_data.password));
+		memset(&g_account_create_data, 0, sizeof(g_account_create_data));
 	}
 }
 
@@ -899,9 +895,8 @@ static DWORD WINAPI thread_account_create_proc_cb(LPVOID lParam)
 	Sleep(200L);
 
 	//submit account creation.
-	if (HandleGuiAccountCreate(g_account_create_data.user_name, g_account_create_data.email, g_account_create_data.password))
+	if (HandleGuiAccountCreate(g_account_create_data.user_name, g_account_create_data.email, g_account_create_data.password, &g_account_create_data.server_error_code))
 	{
-		g_account_create_data.creation_success = true;
 	}
 
 	c_cartographer_account_manager_menu::update_accounting_active_handle(false);
