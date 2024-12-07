@@ -189,7 +189,6 @@ void c_cartographer_error_menu::pre_destroy()
 bool c_cartographer_error_menu::handle_event(s_event_record* event)
 {
 	bool result = false;
-	// ### TODO FIXME this is handled only if the cursor is above the button
 	if (event->type == _user_interface_event_type_keyboard_button_pressed
 		|| event->type == _user_interface_event_type_gamepad_button_pressed
 		|| event->type == _user_interface_event_type_mouse_button_left_click)
