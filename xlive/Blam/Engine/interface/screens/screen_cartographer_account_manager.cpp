@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "screen_cartographer_account_manager.h"
 
 #include "screen_cartographer_account_manager_strings.h"
@@ -923,7 +923,11 @@ static const wchar_t* cartographer_account_manager_set_password_label(const wcha
 		const size_t default_password_label_length = wcslen(default_password_labels[i]);
 
 		// Check if the password passed is the default password level (k_password_string)
-		is_default_password_label |= ustrncmp(password, default_password_labels[i], default_password_label_length) == 0;
+		is_default_password_label = ustrncmp(password, default_password_labels[i], default_password_label_length) == 0;
+		if (is_default_password_label)
+		{
+			break;
+		}
 	}
 
 	if (!is_default_password_label)
