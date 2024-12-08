@@ -12,7 +12,6 @@ c_screen_widget::c_screen_widget(e_user_interface_screen_id menu_id, e_user_inte
 	//INVOKE_TYPE(0x2106A2, 0x0, void(__thiscall*)(c_screen_widget*, e_user_interface_screen_id, e_user_interface_channel_type, e_user_interface_render_window, int16),
 	//	this, menu_id, channel_type, window_index, user_flags);
 
-
 	this->m_channel_type = channel_type;
 	//this->interface_widget_vtable = &c_screen_widget::`vftable';
 	this->m_screen_id = menu_id;
@@ -25,9 +24,9 @@ c_screen_widget::c_screen_widget(e_user_interface_screen_id menu_id, e_user_inte
 	this->m_disable_overlay_effect = false;
 	this->field_9FD = false;
 
-	//h2v writes screen_id to some global variable ,
-	//probably a leftover stuff from gfwl
-	WriteValue<e_user_interface_screen_id>(Memory::GetAddress(0x9758D8), menu_id);
+	// h2v writes screen_id to some global variable,
+	// probably some leftover stuff from gfwl
+	*Memory::GetAddress<e_user_interface_screen_id*>(0x9758D8) = menu_id;
 
 	this->m_widget_type = _widget_type_screen;
 	this->field_6D = true;
@@ -51,12 +50,12 @@ const e_user_interface_screen_id c_screen_widget::get_id()
 
 c_text_widget* c_screen_widget::get_screen_header_text()
 {
-	return try_find_text_widget(K_HEADER_TEXT_BLOCK_INDEX);
+	return try_find_text_widget(k_header_text_block_index);
 }
 
 c_text_widget* c_screen_widget::get_screen_button_key_text()
 {
-	return try_find_text_widget(K_BUTTON_KEY_TEXT_BLOCK_INDEX);
+	return try_find_text_widget(k_button_key_text_block_index);
 }
 
 // only use this when you are sure the screen texts start from 2
@@ -231,7 +230,7 @@ c_screen_with_menu::c_screen_with_menu(e_user_interface_screen_id menu_id, e_use
 // verify before using this , not all widgets have a subheader
 c_text_widget* c_screen_with_menu::get_screen_subheader_text()
 {
-	return try_find_text_widget(K_SUB_HEADER_TEXT_BLOCK_INDEX);
+	return try_find_text_widget(k_sub_header_text_block_index);
 }
 
 

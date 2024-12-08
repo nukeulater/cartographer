@@ -6,8 +6,6 @@
 #include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
 #include "H2MOD/Utils/Utils.h"
 
-#include "interface/screens/screen_cartographer_errors.h"
-
 #define ERROR_CODE_INVALID_PARAM -1
 #define ERROR_CODE_INVALID_EMAIL -2
 #define ERROR_CODE_INVALID_USERNAME -3
@@ -68,7 +66,7 @@ static int InterpretMasterCreate(char* response_content) {
 }
 
 
-bool HandleGuiAccountCreate(char* username, char* email, char* password) {
+bool HandleGuiAccountCreate(char* username, char* email, char* password, e_cartographer_error_id* out_account_create_cartographer_error_id) {
 	bool result = false;
 	char* rtn_result = 0;
 
@@ -89,7 +87,6 @@ bool HandleGuiAccountCreate(char* username, char* email, char* password) {
 	TEST_N_DEF(LC4);
 #endif
 	
-
 	if (rtn_code == 0) {
 		rtn_code = InterpretMasterCreate(rtn_result);
 		if (rtn_code > 0) {
@@ -99,36 +96,39 @@ bool HandleGuiAccountCreate(char* username, char* email, char* password) {
 	}
 	if (rtn_code <= 0) {
 		addDebugText("ERROR Account Create: %d", rtn_code);
-		if (rtn_code == 0 || rtn_code == ERROR_CODE_CURL_SOCKET_FAILED || rtn_code == ERROR_CODE_CURL_HANDLE || rtn_code == ERROR_CODE_CURL_EASY_PERF
+		// ### TODO FIXME move this handling trash out of here
+		if (rtn_code == 0 
+			|| rtn_code == ERROR_CODE_CURL_SOCKET_FAILED 
+			|| rtn_code == ERROR_CODE_CURL_HANDLE 
+			|| rtn_code == ERROR_CODE_CURL_EASY_PERF
 			|| rtn_code == ERROR_CODE_INVALID_PARAM) {
-			//internal error
-			c_cartographer_error_menu::load_by_error_id(_cartographer_error_id_internal_error);
+			*out_account_create_cartographer_error_id = _cartographer_error_id_internal_error;
 		}
 		else if (rtn_code == ERROR_CODE_INVALID_EMAIL) {
-			c_cartographer_error_menu::load_by_error_id(_cartographer_error_id_account_create_invalid_email);
+			*out_account_create_cartographer_error_id = _cartographer_error_id_account_create_invalid_email;
 		}
 		else if (rtn_code == ERROR_CODE_INVALID_USERNAME) {
-			c_cartographer_error_menu::load_by_error_id(_cartographer_error_id_account_create_invalid_username);
+			*out_account_create_cartographer_error_id = _cartographer_error_id_account_create_invalid_username;
 		}
 		else if (rtn_code == ERROR_CODE_INVALID_PASSWORD) {
-			c_cartographer_error_menu::load_by_error_id(_cartographer_error_id_account_create_invalid_password);
+			*out_account_create_cartographer_error_id = _cartographer_error_id_account_create_invalid_password;
 		}
 		else if (rtn_code == ERROR_CODE_TAKEN_EMAIL) {
-			c_cartographer_error_menu::load_by_error_id(_cartographer_error_id_account_create_email_already_used);
+			*out_account_create_cartographer_error_id = _cartographer_error_id_account_create_email_already_used;
 		}
 		else if (rtn_code == ERROR_CODE_TAKEN_USERNAME) {
-			c_cartographer_error_menu::load_by_error_id(_cartographer_error_id_account_create_username_taken);
+			*out_account_create_cartographer_error_id = _cartographer_error_id_account_create_username_taken;
 		}
 		else if (rtn_code == ERROR_CODE_BANNED_EMAIL_DOMAIN) {
-			c_cartographer_error_menu::load_by_error_id(_cartographer_error_id_account_create_blacklisted_email_provider);
+			*out_account_create_cartographer_error_id = _cartographer_error_id_account_create_blacklisted_email_provider;
 		}
 		else {
 			//unknown error!
-			c_cartographer_error_menu::load_by_error_id(_cartographer_error_id_unknown_unhandled_error);
+			*out_account_create_cartographer_error_id = _cartographer_error_id_unknown_unhandled_error;
 		}
 	}
 	else {
-
+		*out_account_create_cartographer_error_id = _cartographer_error_id_account_create_success;
 	}
 	return result;
 }

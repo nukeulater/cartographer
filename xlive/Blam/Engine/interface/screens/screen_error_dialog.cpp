@@ -4,9 +4,9 @@
 #include "interface/user_interface_controller.h"
 
 
-typedef void(__cdecl* ok_cancle_dialog_t)(e_user_interface_channel_type channel_type, e_ui_error_types error_type, e_user_interface_render_window window_index, uint16 user_flags, void* ok_callback, void* fallback, int a7, int a8);
-ok_cancle_dialog_t p_ok_cancle_dialog;
-void __cdecl ok_cancle_dialog_show_hook(e_user_interface_channel_type channel_type, e_ui_error_types error_type, e_user_interface_render_window window_index, uint16 user_flags, void* ok_callback, void* fallback, int a7, int a8)
+typedef void(__cdecl* ok_cancel_dialog_t)(e_user_interface_channel_type channel_type, e_ui_error_types error_type, e_user_interface_render_window window_index, uint16 user_flags, void* ok_callback, void* fallback, int a7, int a8);
+ok_cancel_dialog_t p_ok_cancel_dialog;
+void __cdecl ok_cancel_dialog_show_hook(e_user_interface_channel_type channel_type, e_ui_error_types error_type, e_user_interface_render_window window_index, uint16 user_flags, void* ok_callback, void* fallback, int a7, int a8)
 {
 	//ALL_USERS_MASK
 	if ((user_flags & 0xFF) == (uint8)NONE)
@@ -39,14 +39,17 @@ void __cdecl ok_cancle_dialog_show_hook(e_user_interface_channel_type channel_ty
 			break;
 		}
 	}
-	p_ok_cancle_dialog(channel_type, error_type, window_index, user_flags, ok_callback, fallback, a7, a8);
+	p_ok_cancel_dialog(channel_type, error_type, window_index, user_flags, ok_callback, fallback, a7, a8);
 }
 
 
 
 void* c_screen_error_dialog_ok::load_for_active_users(s_screen_parameters* parameters)
 {
-	parameters->user_flags = user_interface_controller_get_signed_in_controllers_mask();
+	if ((parameters->user_flags & 0xFF) == (uint8)NONE)
+	{
+		parameters->user_flags = user_interface_controller_get_signed_in_controllers_mask() | FLAG(k_windows_device_controller_index);
+	}
 	return INVOKE(0x20E032, 0x0, c_screen_error_dialog_ok::load_for_active_users, parameters);
 }
 
@@ -57,5 +60,5 @@ void c_screen_error_dialog_ok::apply_patches()
 
 void c_screen_error_dialog_ok_cancel::apply_patches()
 {
-	DETOUR_ATTACH(p_ok_cancle_dialog, Memory::GetAddress<ok_cancle_dialog_t>(0x20E243), ok_cancle_dialog_show_hook);	
+	DETOUR_ATTACH(p_ok_cancel_dialog, Memory::GetAddress<ok_cancel_dialog_t>(0x20E243), ok_cancel_dialog_show_hook);	
 }

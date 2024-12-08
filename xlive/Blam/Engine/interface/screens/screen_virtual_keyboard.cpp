@@ -6,7 +6,7 @@
 
 /* macro defines */
 
-#define K_VIRTUAL_KEYBOARD_DESCRIPTION_TEXT_BLOCK_INDEX 3
+#define k_virtual_keyboard_description_text_block_index 3
 
 /* structures */
 
@@ -160,7 +160,7 @@ void c_screen_virtual_keyboard::update_custom_labels(e_vkbd_context_type context
 		get_keyboard_labels(context, &header_text, &subheader_text);
 
 		m_header_text.set_text(header_text);
-		c_text_widget* subheader_text_widget = try_find_text_widget(K_VIRTUAL_KEYBOARD_DESCRIPTION_TEXT_BLOCK_INDEX);
+		c_text_widget* subheader_text_widget = try_find_text_widget(k_virtual_keyboard_description_text_block_index);
 		if (subheader_text_widget)
 		{
 			subheader_text_widget->set_text(subheader_text);

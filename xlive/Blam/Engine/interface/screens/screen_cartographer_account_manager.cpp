@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "screen_cartographer_account_manager.h"
 
 #include "screen_cartographer_account_manager_strings.h"
@@ -45,6 +45,7 @@ enum e_cartographer_account_create_list_items : uint16
 	_item_cartographer_account_create_username = 0,
 	_item_cartographer_account_create_email,
 	_item_cartographer_account_create_password,
+	_item_cartographer_account_create_confirm_password,
 	_item_cartographer_account_create_process,
 
 	k_total_no_of_cartographer_account_create_list_items,
@@ -60,6 +61,7 @@ enum e_cartographer_screen_type_account_create_string_table
 	_screen_type_account_create_button_placeholder_username_text = k_screen_type_account_list_button_text_index,
 	_screen_type_account_create_button_placeholder_email_text,
 	_screen_type_account_create_button_placeholder_password_text,
+	_screen_type_account_create_button_placeholder_confirm_password_text,
 	_screen_type_account_create_button_create_account,
 
 	k_screen_type_account_create_unknown_text
@@ -96,6 +98,7 @@ struct s_cartographer_account_create_data
 	char user_name[XUSER_NAME_SIZE];
 	char email[128];
 	char password[128];
+	e_cartographer_error_id server_error_code;
 };
 
 struct s_cartographer_account_login_data
@@ -137,7 +140,7 @@ const wchar_t*** k_screen_label_table[k_language_count] =
 /* prototypes */
 
 void* ui_load_cartographer_invalid_login_token(void);
-void xbox_live_task_progress_callback(c_screen_xbox_live_task_progress_dialog* dialog);
+void sign_in_xbox_task_progress_cb(c_screen_xbox_live_task_progress_dialog* dialog);
 DWORD WINAPI thread_account_login_proc_cb(LPVOID lParam);
 static DWORD WINAPI thread_account_create_proc_cb(LPVOID lParam);
 static const wchar_t* get_cartographer_account_manager_label(e_cartographer_account_manager_screen_type screen_type, int32 label_id);
@@ -183,7 +186,7 @@ c_cartographer_account_manager_edit_list::c_cartographer_account_manager_edit_li
 
 	linker_type2.link(&this->m_slot_2);
 
-	const wchar_t* placeholder_username, *placeholder_email, *placeholder_password;
+	const wchar_t* placeholder_username, *placeholder_email, *placeholder_password, *placeholder_confirm_password;
 	switch (m_cartographer_screen_type)
 	{
 	case _cartographer_account_manager_screen_type_none:
@@ -197,9 +200,11 @@ c_cartographer_account_manager_edit_list::c_cartographer_account_manager_edit_li
 		placeholder_username = get_cartographer_account_manager_label(m_cartographer_screen_type, _screen_type_account_create_button_placeholder_username_text);
 		placeholder_email = get_cartographer_account_manager_label(m_cartographer_screen_type, _screen_type_account_create_button_placeholder_email_text);
 		placeholder_password = get_cartographer_account_manager_label(m_cartographer_screen_type, _screen_type_account_create_button_placeholder_password_text);
+		placeholder_confirm_password = get_cartographer_account_manager_label(m_cartographer_screen_type, _screen_type_account_create_button_placeholder_confirm_password_text);
 		wcsncpy(m_account_create.user_name, placeholder_username, XUSER_NAME_SIZE);
 		wcsncpy(m_account_create.email, placeholder_email, ARRAYSIZE(m_account_create.email));
 		wcsncpy(m_account_create.password, placeholder_password, ARRAYSIZE(m_account_create.password));
+		wcsncpy(m_account_create.password_confirmation, placeholder_confirm_password, ARRAYSIZE(m_account_create.password_confirmation));
 		break;
 	case _cartographer_account_manager_screen_type_add_account:
 		csmemset(&m_account_add, 0, sizeof(m_account_add));
@@ -318,6 +323,9 @@ void c_cartographer_account_manager_edit_list::update_list_items(c_list_item_wid
 			case _screen_type_account_create_button_placeholder_password_text:
 				button_label = cartographer_account_manager_set_password_label(m_account_create.password, password_censored_buffer_wide);
 				break;
+			case _screen_type_account_create_button_placeholder_confirm_password_text:
+				button_label = cartographer_account_manager_set_password_label(m_account_create.password_confirmation, password_censored_buffer_wide);
+				break;
 			default:
 				button_label = get_cartographer_account_manager_label(m_cartographer_screen_type, k_screen_type_account_create_button_text_index + list_item_index);
 				break;
@@ -401,9 +409,10 @@ void c_cartographer_account_manager_edit_list::handle_item_pressed_event_for_add
 			c_cartographer_account_manager_menu::update_accounting_active_handle(true);
 			snprintf(g_account_add_login_data.email_or_username, ARRAYSIZE(g_account_add_login_data.email_or_username), "%S", m_account_add.email_or_username);
 			snprintf(g_account_add_login_data.password, ARRAYSIZE(g_account_add_login_data.password), "%S", m_account_add.password);
-			g_account_manager_login_thread_handle = CreateThread(NULL, 0, thread_account_login_proc_cb, (LPVOID)NONE, 0, NULL);
 
-			c_screen_xbox_live_task_progress_dialog::add_task(xbox_live_task_progress_callback);
+			g_account_manager_login_thread_handle = CreateThread(NULL, 0, thread_account_login_proc_cb, (LPVOID)NONE, 0, NULL);
+			c_screen_xbox_live_task_progress_dialog::add_task(sign_in_xbox_task_progress_cb);
+
 			user_interface_back_out_from_channel(parent_screen_ui_channel, parent_render_window);
 		}
 	}
@@ -452,8 +461,10 @@ void c_cartographer_account_manager_edit_list::handle_item_pressed_event_for_lis
 		{
 			c_cartographer_account_manager_menu::g_accounting_go_back_to_list = false;
 			c_cartographer_account_manager_menu::update_accounting_active_handle(true);
+			
 			g_account_manager_login_thread_handle = CreateThread(NULL, 0, thread_account_login_proc_cb, (LPVOID)button_id, 0, NULL);
-			c_screen_xbox_live_task_progress_dialog::add_task(xbox_live_task_progress_callback);
+			c_screen_xbox_live_task_progress_dialog::add_task(sign_in_xbox_task_progress_cb);
+			
 			user_interface_back_out_from_channel(parent_screen_ui_channel, parent_render_window);
 		}
 	}
@@ -480,6 +491,22 @@ void c_cartographer_account_manager_edit_list::handle_item_pressed_event_for_lis
 }
 
 
+void __cdecl create_account_xbox_task_progress_cb(c_screen_xbox_live_task_progress_dialog* dialog)
+{
+	dialog->set_display_text_raw(L"Processing account creation request, please wait...");
+
+	if (g_account_manager_thread_handle == NULL)
+	{
+		dialog->close_task();
+		c_cartographer_error_menu::load_by_error_id(g_account_create_data.server_error_code);
+
+		SecureZeroMemory(g_account_create_data.user_name, sizeof(g_account_create_data.user_name));
+		SecureZeroMemory(g_account_create_data.email, sizeof(g_account_create_data.email));
+		SecureZeroMemory(g_account_create_data.password, sizeof(g_account_create_data.password));
+		memset(&g_account_create_data, 0, sizeof(g_account_create_data));
+	}
+}
+
 void c_cartographer_account_manager_edit_list::handle_item_pressed_event_for_create_account(s_event_record* event_record, int32* a3)
 {
 	const int32 button_id = DATUM_INDEX_TO_ABSOLUTE_INDEX(*a3);
@@ -489,7 +516,7 @@ void c_cartographer_account_manager_edit_list::handle_item_pressed_event_for_cre
 
 	if (button_id == _item_cartographer_account_create_username)
 	{
-		ui_load_virtual_keyboard(m_account_create.user_name, ARRAYSIZE(m_account_create.user_name) /* Wide string buffer size */, _vkbd_custom_context_username);
+		ui_load_virtual_keyboard(m_account_create.user_name, /* wide characters count */ ARRAYSIZE(m_account_create.user_name), _vkbd_custom_context_username);
 	}
 	else if (button_id == _item_cartographer_account_create_email)
 	{
@@ -499,9 +526,17 @@ void c_cartographer_account_manager_edit_list::handle_item_pressed_event_for_cre
 	{
 		ui_load_virtual_keyboard(m_account_create.password, ARRAYSIZE(m_account_create.password), _vkbd_custom_context_password);
 	}
+	else if (button_id == _item_cartographer_account_create_confirm_password)
+	{
+		ui_load_virtual_keyboard(m_account_create.password_confirmation, ARRAYSIZE(m_account_create.password_confirmation), _vkbd_custom_context_password);
+	}
 	else if (button_id == _item_cartographer_account_create_process)
 	{
-		if (g_account_manager_thread_handle == NULL)
+		if (ustrncmp(m_account_create.password, m_account_create.password_confirmation, k_cartographer_account_email_and_password_max_length) != 0)
+		{
+			c_cartographer_error_menu::load_by_error_id(_cartographer_error_id_account_create_password_confirmation_mismatch);
+		}
+		else if (g_account_manager_thread_handle == NULL)
 		{
 			c_cartographer_account_manager_menu::g_accounting_go_back_to_list = false;
 			c_cartographer_account_manager_menu::update_accounting_active_handle(true);
@@ -510,11 +545,14 @@ void c_cartographer_account_manager_edit_list::handle_item_pressed_event_for_cre
 			snprintf(g_account_create_data.email, ARRAYSIZE(g_account_create_data.email), "%S", m_account_create.email);
 			snprintf(g_account_create_data.password, ARRAYSIZE(g_account_create_data.password), "%S", m_account_create.password);
 
-			g_account_manager_login_thread_handle = CreateThread(NULL, 0, thread_account_login_proc_cb, (LPVOID)NONE, 0, NULL);
+			SecureZeroMemory(m_account_create.user_name, sizeof(m_account_create.user_name));
+			SecureZeroMemory(m_account_create.email, sizeof(m_account_create.email));
+			SecureZeroMemory(m_account_create.password, sizeof(m_account_create.password));
+			SecureZeroMemory(m_account_create.password_confirmation, sizeof(m_account_create.password_confirmation));
 
 			user_interface_back_out_from_channel(parent_screen_ui_channel, parent_render_window);
-			c_cartographer_error_menu::load_by_error_id(_cartographer_error_id_account_create_processing_account_notice);
 			g_account_manager_thread_handle = CreateThread(NULL, 0, thread_account_create_proc_cb, (LPVOID)0, 0, NULL);
+			c_screen_xbox_live_task_progress_dialog::add_task(create_account_xbox_task_progress_cb);
 		}
 	}
 	return;
@@ -539,6 +577,7 @@ void c_cartographer_account_manager_menu::pre_destroy()
 		if (c_cartographer_account_manager_menu::g_accounting_go_back_to_list
 			&& c_cartographer_account_manager_menu::is_accounting_active_handle())
 		{
+			load_for_account_list_context();
 			c_cartographer_account_manager_menu::g_accounting_go_back_to_list = false;
 		}
 		break;
@@ -547,6 +586,7 @@ void c_cartographer_account_manager_menu::pre_destroy()
 		if (c_cartographer_account_manager_menu::g_accounting_go_back_to_list
 			&& c_cartographer_account_manager_menu::is_accounting_active_handle())
 		{
+			load_for_account_list_context();
 			c_cartographer_account_manager_menu::g_accounting_go_back_to_list = false;
 		}
 		break;
@@ -650,7 +690,7 @@ void* __cdecl c_cartographer_account_manager_menu::load(s_screen_parameters* par
 		selected_button_index = 0;
 		break;
 	case _cartographer_account_manager_screen_type_create_account:
-		button_count = 4;
+		button_count = 5;
 		selected_button_index = 0;
 		c_cartographer_account_manager_menu::g_accounting_go_back_to_list = true;
 		break;
@@ -732,7 +772,7 @@ void* ui_load_cartographer_invalid_login_token(void)
 }
 
 
-void xbox_live_task_progress_callback(c_screen_xbox_live_task_progress_dialog* dialog)
+void sign_in_xbox_task_progress_cb(c_screen_xbox_live_task_progress_dialog* dialog)
 {
 	dialog->set_display_text_raw(L"Signing into Project Cartographer, please wait...");
 
@@ -858,13 +898,8 @@ static DWORD WINAPI thread_account_create_proc_cb(LPVOID lParam)
 	Sleep(200L);
 
 	//submit account creation.
-	if (HandleGuiAccountCreate(g_account_create_data.user_name, g_account_create_data.email, g_account_create_data.password))
+	if (HandleGuiAccountCreate(g_account_create_data.user_name, g_account_create_data.email, g_account_create_data.password, &g_account_create_data.server_error_code))
 	{
-		c_cartographer_error_menu::load_by_error_id(_cartographer_error_id_account_create_verification_email_sent);
-
-		SecureZeroMemory(g_account_create_data.user_name, sizeof(g_account_create_data.user_name));
-		SecureZeroMemory(g_account_create_data.email, sizeof(g_account_create_data.email));
-		SecureZeroMemory(g_account_create_data.password, sizeof(g_account_create_data.password));
 	}
 
 	c_cartographer_account_manager_menu::update_accounting_active_handle(false);
@@ -879,24 +914,37 @@ static const wchar_t* get_cartographer_account_manager_label(e_cartographer_acco
 	return k_screen_label_table[language][screen_type][label_id];
 }
 
-static const wchar_t* cartographer_account_manager_set_password_label(const wchar_t* password, wchar_t* password_censored_buffer)
+static const wchar_t* cartographer_account_manager_set_password_label(const wchar_t* password, wchar_t* password_censored_text)
 {
-	const wchar_t* default_password_label = get_cartographer_account_manager_label(_cartographer_account_manager_screen_type_create_account, _screen_type_account_create_button_placeholder_password_text);
-	const size_t default_password_label_length = ustrnlen(default_password_label, k_cartographer_account_email_and_password_max_length);
+	const wchar_t* default_password_labels[2];
+	default_password_labels[0] = get_cartographer_account_manager_label(_cartographer_account_manager_screen_type_create_account, _screen_type_account_create_button_placeholder_password_text);
+	default_password_labels[1] = get_cartographer_account_manager_label(_cartographer_account_manager_screen_type_create_account, _screen_type_account_create_button_placeholder_confirm_password_text);
 
-	// Check if the password passed is the default password level (k_password_string)
-	const bool is_not_default_password_label = ustrncmp(password, default_password_label, default_password_label_length) != 0;
-	if (is_not_default_password_label)
+	bool is_default_password_label = false;
+	for (int32 i = 0; i < ARRAYSIZE(default_password_labels); i++)
 	{
-		// Populate password_censored_buffer with the '*' character for each character entered
-		const size_t length = ustrnlen(password, k_cartographer_account_email_and_password_max_length);
-		size_t i = 0;
+		const size_t default_password_label_length = wcslen(default_password_labels[i]);
 
+		// Check if the password passed is the default password level (k_password_string)
+		is_default_password_label = ustrncmp(password, default_password_labels[i], default_password_label_length) == 0;
+		if (is_default_password_label)
+		{
+			break;
+		}
+	}
+
+	if (!is_default_password_label)
+	{
+		// Populate password_censored_text with the '*' character for each character entered
+		const size_t length = ustrnlen(password, k_cartographer_account_email_and_password_max_length);
+
+		size_t i = 0;
 		for (; i < length; ++i)
 		{
-			password_censored_buffer[i] = L'*';
+			password_censored_text[i] = L'*';
 		}
-		password_censored_buffer[i] = L'\0';
+		password_censored_text[i] = L'\0';
 	}
-	return is_not_default_password_label ? password_censored_buffer : password;
+
+	return is_default_password_label ? password : password_censored_text;
 }

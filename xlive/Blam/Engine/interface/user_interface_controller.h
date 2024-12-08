@@ -49,54 +49,54 @@ enum e_user_interface_controller_component : uint32
 	_user_interface_keyboard_component_button_pause_break = 0x13,
 	_user_interface_keyboard_component_button_capslock = 0x14,
 	_user_interface_keyboard_component_button_escape = 0x1B,
-	_user_interface_keyboard_component_buton_space = 0x20,
-	_user_interface_keyboard_component_buton_page_up = 0x21,
-	_user_interface_keyboard_component_buton_page_down = 0x22,
-	_user_interface_keyboard_component_buton_end = 0x23,
+	_user_interface_keyboard_component_button_space = 0x20,
+	_user_interface_keyboard_component_button_page_up = 0x21,
+	_user_interface_keyboard_component_button_page_down = 0x22,
+	_user_interface_keyboard_component_button_end = 0x23,
 
-	_user_interface_keyboard_component_buton_left = 0x25,
-	_user_interface_keyboard_component_buton_up = 0x26,
-	_user_interface_keyboard_component_buton_right = 0x27,
-	_user_interface_keyboard_component_buton_down = 0x28,
+	_user_interface_keyboard_component_button_left = 0x25,
+	_user_interface_keyboard_component_button_up = 0x26,
+	_user_interface_keyboard_component_button_right = 0x27,
+	_user_interface_keyboard_component_button_down = 0x28,
 	_user_interface_keyboard_component_button_insert = 0x2D,
 	_user_interface_keyboard_component_button_delete = 0x2E,
 
 
-	_user_interface_keyboard_component_buton_numeric_zero = 0x30,
-	_user_interface_keyboard_component_buton_numeric_two = 0x32,
+	_user_interface_keyboard_component_button_numeric_zero = 0x30,
+	_user_interface_keyboard_component_button_numeric_two = 0x32,
 	// ....so on
-	_user_interface_keyboard_component_buton_numeric_nine = 0x39,
+	_user_interface_keyboard_component_button_numeric_nine = 0x39,
 
 
-	_user_interface_keyboard_component_buton_letter_a = 0x41,
-	_user_interface_keyboard_component_buton_letter_b = 0x42,
+	_user_interface_keyboard_component_button_letter_a = 0x41,
+	_user_interface_keyboard_component_button_letter_b = 0x42,
 	// ....so on
-	_user_interface_keyboard_component_buton_letter_z = 0x5A,
+	_user_interface_keyboard_component_button_letter_z = 0x5A,
 
 
-	_user_interface_keyboard_component_buton_f1 = 0x70,
-	_user_interface_keyboard_component_buton_f2 = 0x71,
+	_user_interface_keyboard_component_button_f1 = 0x70,
+	_user_interface_keyboard_component_button_f2 = 0x71,
 	// ....so on
-	_user_interface_keyboard_component_buton_f12 = 0x7B,
+	_user_interface_keyboard_component_button_f12 = 0x7B,
 
 
 
 	// ....special keys
-	_user_interface_keyboard_component_buton_numlock = 0x90,
-	_user_interface_keyboard_component_buton_left_shift = 0xA0,
-	_user_interface_keyboard_component_buton_right_shift = 0xA1,
-	_user_interface_keyboard_component_buton_left_control = 0xA2,
-	_user_interface_keyboard_component_buton_right_control = 0xA3,
-	_user_interface_keyboard_component_buton_left_alt = 0xA4,
-	_user_interface_keyboard_component_buton_right_alt = 0xA5,
-	_user_interface_keyboard_component_buton_tilde = 0x107,
-	_user_interface_keyboard_component_buton_minus = 0x108,
-	_user_interface_keyboard_component_buton_comma = 0x10E,
-	_user_interface_keyboard_component_buton_period = 0x10E,
-	_user_interface_keyboard_component_buton_backslash = 0x110,
-	_user_interface_keyboard_component_buton_equals = 0x112,
-	_user_interface_keyboard_component_buton_multiple = 0x115,
-	_user_interface_keyboard_component_buton_numeric_one = 0x117,
+	_user_interface_keyboard_component_button_numlock = 0x90,
+	_user_interface_keyboard_component_button_left_shift = 0xA0,
+	_user_interface_keyboard_component_button_right_shift = 0xA1,
+	_user_interface_keyboard_component_button_left_control = 0xA2,
+	_user_interface_keyboard_component_button_right_control = 0xA3,
+	_user_interface_keyboard_component_button_left_alt = 0xA4,
+	_user_interface_keyboard_component_button_right_alt = 0xA5,
+	_user_interface_keyboard_component_button_tilde = 0x107,
+	_user_interface_keyboard_component_button_minus = 0x108,
+	_user_interface_keyboard_component_button_comma = 0x10E,
+	_user_interface_keyboard_component_button_period = 0x10E,
+	_user_interface_keyboard_component_button_backslash = 0x110,
+	_user_interface_keyboard_component_button_equals = 0x112,
+	_user_interface_keyboard_component_button_multiple = 0x115,
+	_user_interface_keyboard_component_button_numeric_one = 0x117,
 };
 
 

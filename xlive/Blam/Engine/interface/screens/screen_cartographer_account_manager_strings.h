@@ -4,6 +4,7 @@
 
 const wchar_t k_username_string_eng[] = L"[Username]";
 const wchar_t k_password_string_eng[] = L"[Password]";
+const wchar_t k_password_confirm_string_eng[] = L"[Confirm Password]";
 const wchar_t k_remember_me_string_eng[] = L"%c Remember me";
 
 const wchar_t* k_screen_type_list_add_account_eng[] =
@@ -37,6 +38,7 @@ static const wchar_t* k_screen_type_list_create_account_eng[] =
 	k_username_string_eng,
 	L"[Email]",
 	k_password_string_eng,
+	k_password_confirm_string_eng,
 	L"Create Account",
 	L"<unknown label>"
 };
