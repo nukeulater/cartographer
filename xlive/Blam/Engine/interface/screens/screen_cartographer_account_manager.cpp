@@ -140,7 +140,7 @@ const wchar_t*** k_screen_label_table[k_language_count] =
 /* prototypes */
 
 void* ui_load_cartographer_invalid_login_token(void);
-void xbox_live_task_progress_callback(c_screen_xbox_live_task_progress_dialog* dialog);
+void sign_in_xbox_task_progress_cb(c_screen_xbox_live_task_progress_dialog* dialog);
 DWORD WINAPI thread_account_login_proc_cb(LPVOID lParam);
 static DWORD WINAPI thread_account_create_proc_cb(LPVOID lParam);
 static const wchar_t* get_cartographer_account_manager_label(e_cartographer_account_manager_screen_type screen_type, int32 label_id);
@@ -409,9 +409,10 @@ void c_cartographer_account_manager_edit_list::handle_item_pressed_event_for_add
 			c_cartographer_account_manager_menu::update_accounting_active_handle(true);
 			snprintf(g_account_add_login_data.email_or_username, ARRAYSIZE(g_account_add_login_data.email_or_username), "%S", m_account_add.email_or_username);
 			snprintf(g_account_add_login_data.password, ARRAYSIZE(g_account_add_login_data.password), "%S", m_account_add.password);
-			g_account_manager_login_thread_handle = CreateThread(NULL, 0, thread_account_login_proc_cb, (LPVOID)NONE, 0, NULL);
 
-			c_screen_xbox_live_task_progress_dialog::add_task(xbox_live_task_progress_callback);
+			g_account_manager_login_thread_handle = CreateThread(NULL, 0, thread_account_login_proc_cb, (LPVOID)NONE, 0, NULL);
+			c_screen_xbox_live_task_progress_dialog::add_task(sign_in_xbox_task_progress_cb);
+
 			user_interface_back_out_from_channel(parent_screen_ui_channel, parent_render_window);
 		}
 	}
@@ -460,8 +461,10 @@ void c_cartographer_account_manager_edit_list::handle_item_pressed_event_for_lis
 		{
 			c_cartographer_account_manager_menu::g_accounting_go_back_to_list = false;
 			c_cartographer_account_manager_menu::update_accounting_active_handle(true);
+			
 			g_account_manager_login_thread_handle = CreateThread(NULL, 0, thread_account_login_proc_cb, (LPVOID)button_id, 0, NULL);
-			c_screen_xbox_live_task_progress_dialog::add_task(xbox_live_task_progress_callback);
+			c_screen_xbox_live_task_progress_dialog::add_task(sign_in_xbox_task_progress_cb);
+			
 			user_interface_back_out_from_channel(parent_screen_ui_channel, parent_render_window);
 		}
 	}
@@ -488,7 +491,7 @@ void c_cartographer_account_manager_edit_list::handle_item_pressed_event_for_lis
 }
 
 
-void __cdecl create_account_xbox_task(c_screen_xbox_live_task_progress_dialog* dialog)
+void __cdecl create_account_xbox_task_progress_cb(c_screen_xbox_live_task_progress_dialog* dialog)
 {
 	dialog->set_display_text_raw(L"Processing account creation request, please wait...");
 
@@ -548,8 +551,8 @@ void c_cartographer_account_manager_edit_list::handle_item_pressed_event_for_cre
 			SecureZeroMemory(m_account_create.password_confirmation, sizeof(m_account_create.password_confirmation));
 
 			user_interface_back_out_from_channel(parent_screen_ui_channel, parent_render_window);
-			c_screen_xbox_live_task_progress_dialog::add_task(create_account_xbox_task);
 			g_account_manager_thread_handle = CreateThread(NULL, 0, thread_account_create_proc_cb, (LPVOID)0, 0, NULL);
+			c_screen_xbox_live_task_progress_dialog::add_task(create_account_xbox_task_progress_cb);
 		}
 	}
 	return;
@@ -769,7 +772,7 @@ void* ui_load_cartographer_invalid_login_token(void)
 }
 
 
-void xbox_live_task_progress_callback(c_screen_xbox_live_task_progress_dialog* dialog)
+void sign_in_xbox_task_progress_cb(c_screen_xbox_live_task_progress_dialog* dialog)
 {
 	dialog->set_display_text_raw(L"Signing into Project Cartographer, please wait...");
 
