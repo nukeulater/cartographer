@@ -1,10 +1,12 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "screen_main_menu.h"
+
 #include "screen_4way_signin.h"
 #include "screen_settings.h"
 #include "screen_campaign_options_dialog.h"
+
 #include "game/preferences.h"
-#include "interface/user_interface_memory.h"
+
 #include "interface/user_interface_controller.h"
 #include "interface/user_interface_globals.h"
 #include "interface/user_interface_memory.h"
@@ -16,11 +18,6 @@
 #include "Networking/panorama/panorama_friends.h"
 #include "tag_files/global_string_ids.h"
 #include "shell/shell.h"
-
-
-/* macro defines */
-
-#define k_main_menu_list_name "main menu list"
 
 /* enums */
 
@@ -52,7 +49,23 @@ enum e_main_menu_list_skin_texts
 	k_number_of_main_menu_list_skin_texts
 };
 
-/* forward declarations*/
+/* constants */
+
+const char* k_main_menu_list_name = "main menu list";
+const wchar_t* k_online_button_text[k_language_count] =
+{
+	L"ONLINE",
+	L"オンライン",
+	L"ONLINE",
+	L"EN LÍNEA"
+	L"EN LIGNE",
+	L"IN LINEA",
+	L"온라인",
+	L"在线的",
+	L"ONLINE"
+};
+
+/* prototypes */
 
 bool __cdecl screen_show_campaign_options_without_achievement(e_controller_index controller_index);
 bool __cdecl screen_show_screen_4way_signin_splitscreen_offline(e_controller_index controller_index);
@@ -132,6 +145,7 @@ void c_main_menu_list::update_list_items(c_list_item_widget* item, int32 skin_in
 	c_text_widget* item_text = item->try_find_text_widget(_main_menu_list_skin_text_main);
 	item->set_item_transitioning();
 
+	const e_language language = get_current_language();
 	if (item_text)
 	{
 		switch (DATUM_INDEX_TO_ABSOLUTE_INDEX(item->get_last_data_index()))
@@ -140,7 +154,9 @@ void c_main_menu_list::update_list_items(c_list_item_widget* item, int32 skin_in
 			item_text->set_text_from_string_id(_string_id_campaign);
 			break;
 		case _item_xbox_live:
-			item_text->set_text_from_string_id(_string_id_xbox_live);
+			// TODO: if we ever do a map recompile grab the text from the stringid again
+			//item_text->set_text_from_string_id(_string_id_xbox_live);
+			item_text->set_text(k_online_button_text[language]);
 			break;
 		case _item_splitscreen:
 			item_text->set_text_from_string_id(_string_id_splitscreen);
@@ -158,9 +174,9 @@ void c_main_menu_list::update_list_items(c_list_item_widget* item, int32 skin_in
 			item_text->set_text_from_string_id(_string_id_invalid);
 		}
 
-
 		item_text->set_visible(true);
 	}
+	return;
 }
 
 void c_main_menu_list::handle_item_pressed_event(s_event_record** pevent, datum* pitem_index)

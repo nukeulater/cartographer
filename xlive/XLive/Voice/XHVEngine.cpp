@@ -10,13 +10,13 @@ HRESULT WINAPI XHVCreateEngine(PXHV_INIT_PARAMS pParams, PHANDLE phWorkerThread,
 
 	if (pParams->bCustomVADProvided)
 	{
-		LOG_TRACE(voice_log, "XHVCreateEngine() - bCustomVADProvided set");
+		//LOG_TRACE(voice_log, "XHVCreateEngine() - bCustomVADProvided set");
 	}
 
 	if (ppEngine)
 	{
 		*ppEngine = new XHVENGINE;
-		LOG_TRACE(voice_log, "XHVCreateEngine() - created engine");
+		//LOG_TRACE(voice_log, "XHVCreateEngine() - created engine");
 
 		return S_OK;
 	}

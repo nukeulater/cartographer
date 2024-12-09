@@ -3,11 +3,9 @@
 #include "Birthday.h"
 #include "../SpecialEventHelpers.h"
 
-#include "items/weapon_definitions.h"
-#include "game/game_globals.h"
-#include "shaders/shader_definitions.h"
 #include "cache/cache_files.h"
 #include "tag_files/tag_loader/tag_injection.h"
+#include "tag_files/tag_groups.h"
 
 void birthday_event_map_load()
 {
@@ -37,7 +35,7 @@ void birthday_event_map_load()
 			datum hlmt_elite_datum = tag_loaded(_tag_group_model, "objects\\characters\\elite\\elite_mp");
 			if (hlmt_elite_datum != NONE)
 			{
-				add_hat_and_beard_to_model(hlmt_elite_datum, hat_datum, true, NONE);
+				add_hat_and_beard_to_model(hlmt_elite_datum, hat_datum, NONE, true);
 			}
 
 			replace_fp_and_3p_models_from_weapon(ball_weapon_datum, fp_bday_cake_datum, bday_cake_datum);

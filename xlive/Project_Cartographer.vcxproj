@@ -880,7 +880,6 @@
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\Console\CommandHandler.cpp" />
     <ClCompile Include="H2MOD\GUI\imgui_integration\Console\ComVar.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\Console\ImGui_ConsoleImpl.cpp" />
-    <ClCompile Include="H2MOD\GUI\ImGui_Integration\DebugOverlay.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\ImGui_CartographerStyle.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\ImGui_Handler.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\ImGui_NetworkStatsOverlay.cpp" />
@@ -908,7 +907,6 @@
     <ClCompile Include="Blam\Engine\networking\transport\network_channel.cpp" />
     <ClCompile Include="Blam\Engine\networking\transport\network_observer.cpp" />
     <ClCompile Include="Blam\Engine\Networking\Session\NetworkSession.cpp" />
-    <ClCompile Include="H2MOD\Modules\ObserverMode\ObserverMode.cpp" />
     <ClCompile Include="H2MOD\Modules\PlaylistLoader\PlaylistLoader.cpp" />
     <ClCompile Include="H2MOD\Modules\RenderHooks\RenderHooks.cpp" />
     <ClCompile Include="H2MOD\Modules\Shell\H2MODShell.cpp" />
@@ -1344,7 +1342,6 @@
     <ClInclude Include="Blam\Engine\networking\transport\network_channel.h" />
     <ClInclude Include="Blam\Engine\networking\transport\network_observer.h" />
     <ClInclude Include="Blam\Engine\Networking\Session\NetworkSession.h" />
-    <ClInclude Include="H2MOD\Modules\ObserverMode\ObserverMode.h" />
     <ClInclude Include="H2MOD\Modules\PlaylistLoader\PlaylistLoader.h" />
     <ClInclude Include="H2MOD\Modules\RenderHooks\RenderHooks.h" />
     <ClInclude Include="H2MOD\Modules\Shell\ServerConsole.h" />

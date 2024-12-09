@@ -2,6 +2,7 @@
 #include "KeyboardInput.h"
 
 #include "input/controllers.h"
+#include "rasterizer/dx9/rasterizer_dx9_main.h"
 
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/GUI/XLiveRendering.h"
@@ -103,7 +104,10 @@ void hotkeyFuncAlignWindow() {
 	if (Memory::IsDedicatedServer()) {
 		return;
 	}
-	if (!g_pD3DDevice9 || !H2hWnd) {
+
+	IDirect3DDevice9Ex* device = rasterizer_dx9_device_get_interface();
+
+	if (!device || !H2hWnd) {
 		return;
 	}
 	HMONITOR monitor = MonitorFromWindow(H2hWnd, MONITOR_DEFAULTTONEAREST);
@@ -115,7 +119,7 @@ void hotkeyFuncAlignWindow() {
 	int interval_width = monitor_width / 2;
 	int interval_height = monitor_height / 2;
 	D3DVIEWPORT9 pViewport;
-	g_pD3DDevice9->GetViewport(&pViewport);
+	device->GetViewport(&pViewport);
 	int width = interval_width * round(pViewport.Width / (double)interval_width);
 	int height = interval_height * round(pViewport.Height / (double)interval_height);
 	RECT gameWindowRect;
@@ -134,7 +138,9 @@ void hotkeyFuncWindowMode() {
 	if (Memory::IsDedicatedServer()) {
 		return;
 	}
-	if (!g_pD3DDevice9 || !H2hWnd) {
+
+	IDirect3DDevice9Ex* device = rasterizer_dx9_device_get_interface();
+	if (!device || !H2hWnd) {
 		return;
 	}
 	/*wchar_t title[255];
@@ -149,7 +155,7 @@ void hotkeyFuncWindowMode() {
 		RECT rectScreen;
 		GetWindowRect(H2hWnd, &rectScreen);
 		D3DVIEWPORT9 pViewport;
-		g_pD3DDevice9->GetViewport(&pViewport);
+		device->GetViewport(&pViewport);
 		int width = pViewport.Width;
 		int height = pViewport.Height;
 		long borderPadX = 0;
@@ -193,9 +199,6 @@ void hotkeyFuncGuide() {
 	ImGuiHandler::ToggleWindow(k_advanced_settings_window_name);
 }
 
-void hotkeyFuncDebug() {
-	ImGuiHandler::ToggleWindow(k_debug_overlay_window_name);
-}
 void hotkeyFuncConsole() {
 	ImGuiHandler::ToggleWindow(k_cartographer_console_window_name);
 }

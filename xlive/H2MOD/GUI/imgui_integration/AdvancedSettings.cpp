@@ -17,13 +17,10 @@
 #include "saved_games/cartographer_player_profile.h"
 
 #include "H2MOD.h"
-#include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
 
 #ifndef NDEBUG
-#include "H2MOD/Modules/DirectorHooks/DirectorHooks.h"
-#include "H2MOD/Modules/ObserverMode/ObserverMode.h"
 #include "H2MOD/Modules/RenderHooks/RenderHooks.h"
 #include "H2MOD/Utils/Utils.h"
 #endif
@@ -124,9 +121,12 @@ namespace ImGuiHandler {
 					if (abs(state->thumb_right.y) <= THUMBSTICK_PERCENTAGE_TO_POINT(current_cartographer_profile->deadzone_axial.y))
 						axial_invalid++;
 					bool radial_invalid = false;
-					uint32 ar = (uint32)pow((short)THUMBSTICK_PERCENTAGE_TO_POINT(current_cartographer_profile->deadzone_radial), 2);
-					uint32 arx = (uint32)pow(state->thumb_right.x, 2);
-					uint32 ary = (uint32)pow(state->thumb_right.y, 2);
+
+					uint32 ar = (int16)THUMBSTICK_PERCENTAGE_TO_POINT(current_cartographer_profile->deadzone_radial);
+					ar *= ar;
+
+					uint32 arx = state->thumb_right.x * state->thumb_right.x;
+					uint32 ary = state->thumb_right.y * state->thumb_right.y;
 					uint32 rh = arx + ary;
 					if (rh <= ar)
 					{
@@ -254,7 +254,7 @@ namespace ImGuiHandler {
 						//Ingame Change Display
 						if (ImGui::Button(advanced_settings_get_string(_advanced_string_weaponoffsets, "WeaponOffsets"), b3_size))
 						{
-							ImGuiHandler::ToggleWindow("Weapon Offsets");
+							ImGuiHandler::ToggleWindow(k_weapon_offsets_window_name);
 						}
 
 						ImGui::Columns(2, NULL, false);
@@ -902,7 +902,7 @@ namespace ImGuiHandler {
 					if (ImGui::Combo("##Language_Selection", (int*)&g_language, lang_items, k_language_count))
 					{
 						H2Config_language.code_main = (g_language == 8 ? -1 : g_language);
-						setCustomLanguage(H2Config_language.code_main, H2Config_language.code_variant);
+						//setCustomLanguage(H2Config_language.code_main, H2Config_language.code_variant);
 					}
 					ImGui::PopItemWidth();
 
@@ -961,50 +961,14 @@ namespace ImGuiHandler {
 					if (ImGui::CollapsingHeader("Dev Testing"))
 					{
 						s_rasterizer_globals* rasterizer_globals = rasterizer_globals_get();
+						char integer_string[16];
 
 						ImGui::Indent();
-						if (ImGui::CollapsingHeader("Director Mode"))
-						{
-							if (ImGui::Button("Set Observer Team"))
-							{
-								WriteValue(Memory::GetAddress(0x51A6B4), 255);
-							}
-							if (ImGui::Button("Game"))
-							{
-								DirectorHooks::SetDirectorMode(DirectorHooks::e_game);
-								ObserverMode::SwitchObserverMode(ObserverMode::observer_none);
-							}
-							if (ImGui::Button("Editor"))
-							{
-								ObserverMode::SwitchObserverMode(ObserverMode::observer_freecam);
-							}
-							ImGui::SameLine();
-							if (ImGui::Button("Editor Follow"))
-							{
-								ObserverMode::NextPlayer();
-								ObserverMode::SwitchObserverMode(ObserverMode::observer_followcam);
-							}
-							ImGui::SameLine();
-							if (ImGui::Button("Editor First Person"))
-							{
-								ObserverMode::NextPlayer();
-								ObserverMode::SwitchObserverMode(ObserverMode::observer_firstperson);
-							}
-							if (ImGui::Button("Player"))
-							{
-								DirectorHooks::SetDirectorMode(DirectorHooks::e_game);
-								ObserverMode::SwitchObserverMode(ObserverMode::observer_none);
-							}
-							if (ImGui::Button("N"))
-							{
-								ObserverMode::NextPlayer();
-							}
-						}
 						if (ImGui::CollapsingHeader("Raster Layers")) {
 							ImGui::Columns(4, NULL, false);
 							for (auto i = 0; i < 25; i++)
 							{
-								if (ImGui::Checkbox(IntToString<int>(i).c_str(), &ras_layer_overrides[i]))
+								if (ImGui::Checkbox(itoa(i, integer_string, 10), &ras_layer_overrides[i]))
 								{
 									rasterizer_globals->reset_screen = true;
 								}
@@ -1017,7 +981,7 @@ namespace ImGuiHandler {
 							ImGui::Columns(4, NULL, false);
 							for (auto i = 0; i < 24; i++)
 							{
-								ImGui::Checkbox(IntToString<int>(i).c_str(), &geo_render_overrides[i]);
+								ImGui::Checkbox(itoa(i, integer_string, 10), &geo_render_overrides[i]);
 								ImGui::NextColumn();
 							}
 							ImGui::Columns(1);

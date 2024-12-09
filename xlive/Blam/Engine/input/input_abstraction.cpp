@@ -2,12 +2,10 @@
 
 #include "input_abstraction.h"
 
-#include "game/game_time.h"
 #include "game/players.h"
 #include "saved_games/cartographer_player_profile.h"
 
 #include "H2MOD/GUI/imgui_integration/imgui_handler.h"
-#include "H2MOD/Modules/Shell/Config.h"
 
 /* globals */
 

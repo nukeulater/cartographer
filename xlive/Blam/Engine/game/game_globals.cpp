@@ -187,7 +187,6 @@ static void game_globals_prepare_lmao_representation(s_game_globals_custom_repre
 		s_model_definition* mode_chief_mp = (s_model_definition*)tag_get_fast(mode_chief_mp_datum);
 		s_model_variant* base_variant = mode_chief_mp->variants[0];
 		s_model_variant* new_variant = (s_model_variant*)tag_injection_extend_block(&mode_chief_mp->variants, mode_chief_mp->variants.type_size(), 1);
-		//MetaExtender::add_tag_block2<s_model_variant>((unsigned long)std::addressof(mode_chief_mp->variants));
 		new_variant->name = 0xABABABA;
 		new_variant->dialogue.group = base_variant->dialogue.group;
 		new_variant->dialogue.index = base_variant->dialogue.index;
