@@ -1,8 +1,10 @@
 #include "stdafx.h"
-
 #include "XLiveRendering.h"
+
 #include "imgui.h"
+
 #include "backends/imgui_impl_dx9.h"
+#include "rasterizer/dx9/rasterizer_dx9_main.h"
 
 #include "H2MOD/GUI/ImGui_Integration/ImGui_Handler.h"
 #include "H2MOD/Modules/Accounts/AccountLogin.h"
@@ -17,7 +19,6 @@ bool displayXyz = false;
 bool doDrawIMGUI = false;
 
 HWND H2hWnd;
-LPDIRECT3DDEVICE9 g_pD3DDevice9;
 D3DPRESENT_PARAMETERS g_d3dPresentParameters;
 
 IDirect3DTexture9* Primitive = NULL;
@@ -30,19 +31,16 @@ const char CompileTime[] = __TIME__;
 int verticalRes = 0;
 int horizontalRes = 0;
 
-void XLiveRendering::InitializeD3D9(LPDIRECT3DDEVICE9 pD3D9Device, D3DPRESENT_PARAMETERS* presentParameters)
+void XLiveRendering::InitializeD3D9(D3DPRESENT_PARAMETERS* presentParameters)
 {
-	g_pD3DDevice9 = pD3D9Device;
-	// increase the Ref count
-	g_pD3DDevice9->AddRef();
 	memcpy(&g_d3dPresentParameters, presentParameters, sizeof(D3DPRESENT_PARAMETERS));
 
-	ImGuiHandler::Initalize(g_pD3DDevice9, presentParameters->hDeviceWindow);
+	ImGuiHandler::Initalize(presentParameters->hDeviceWindow);
 }
 
 void XLiveRendering::D3D9ReleaseResources()
 {
-	ImGuiHandler::ReleaseTextures();
+	ImGuiHandler::release_motd_texture();
 	ImGui_ImplDX9_InvalidateDeviceObjects();
 }
 
@@ -54,7 +52,7 @@ int WINAPI XLiveInitializeEx(XLIVE_INITIALIZE_INFO* pXii, DWORD dwVersion)
 	initialize_instance();
 
 	if (pXii->pD3D) {
-		XLiveRendering::InitializeD3D9((LPDIRECT3DDEVICE9)pXii->pD3D, (D3DPRESENT_PARAMETERS*)pXii->pD3DPP);
+		XLiveRendering::InitializeD3D9((D3DPRESENT_PARAMETERS*)pXii->pD3DPP);
 
 		snprintf(g_cartographer_build_text, NUMBEROF(g_cartographer_build_text), "Project Cartographer (v%s) - Build Time: %s %s", DLL_VERSION_STR, CompileDate, CompileTime);
 	}
@@ -78,20 +76,12 @@ int WINAPI XLiveUninitialize()
 	
 	XLiveRendering::D3D9ReleaseResources();
 
-	if (g_pD3DDevice9)
-	{
-		g_pD3DDevice9->Release();
-		g_pD3DDevice9 = NULL;
-	}
-
 	return 0;
 }
 
 // #5005: XLiveOnCreateDevice
 int WINAPI XLiveOnCreateDevice(IUnknown* pD3D, VOID* vD3DPP)
-{
-	g_pD3DDevice9 = (LPDIRECT3DDEVICE9)pD3D;
-	
+{	
 	//pPresent = (HRESULT(WINAPI*)(LPDIRECT3DDEVICE9 pDevice, const RECT *pSourceRect, const RECT *pDestRect, HWND hDestWindowOverride, const RGNDATA* pDirtyRegion)) *(DWORD_PTR*)(pDevice+17);
 	//VirtualProtect((LPVOID)(pDevice + 17), sizeof(DWORD_PTR), PAGE_EXECUTE_READWRITE, &dwPresent);
 	//*(DWORD_PTR*)(pDevice + 17) = (DWORD_PTR)hkPresent;
@@ -108,7 +98,7 @@ int WINAPI XLiveOnResetDevice(D3DPRESENT_PARAMETERS* pD3DPP)
 	//Have to invalidate ImGUI on device reset, otherwise it hangs the device in a reset loop.
 	//https://github.com/ocornut/imgui/issues/1464#issuecomment-347469716
 
-	ImGuiHandler::ReleaseTextures();
+	ImGuiHandler::release_motd_texture();
 	ImGui_ImplDX9_InvalidateDeviceObjects();
 	//LOG_TRACE_XLIVE("XLiveOnResetDevice");
 	return 0;
@@ -117,7 +107,7 @@ int WINAPI XLiveOnResetDevice(D3DPRESENT_PARAMETERS* pD3DPP)
 // #5006 XLiveOnDestroyDevice
 HRESULT WINAPI XLiveOnDestroyDevice()
 {
-	ImGuiHandler::ReleaseTextures();
+	ImGuiHandler::release_motd_texture();
 	ImGui_ImplDX9_InvalidateDeviceObjects();
 	XLiveRendering::D3D9ReleaseResources();
 	
@@ -169,11 +159,13 @@ HRESULT WINAPI XLiveRender()
 	static std::mutex renderMtx;
 	std::lock_guard lg(renderMtx);
 
-	if (!g_pD3DDevice9) {
+	IDirect3DDevice9Ex* device = rasterizer_dx9_device_get_interface();
+
+	if (!device) {
 		return E_UNEXPECTED;
 	}
 
-	if (FAILED(g_pD3DDevice9->TestCooperativeLevel())) {
+	if (FAILED(device->TestCooperativeLevel())) {
 		return E_UNEXPECTED;
 	}
 

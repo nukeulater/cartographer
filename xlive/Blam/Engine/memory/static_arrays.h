@@ -202,7 +202,11 @@ public:
 	}
 
 protected:
-	uint32 m_flags[k_maximum_bit_count / LONG_BITS];
+	/* 
+	We do : "+ (k_maximum_bit_count % LONG_BITS > 0)" so we can make sure we have enough space
+	when m_flags is not perfectly divisible by LONG_BITS. It adds an extra element if the condition is true
+	*/
+	uint32 m_flags[k_maximum_bit_count / LONG_BITS + (k_maximum_bit_count % LONG_BITS > 0)];
 };
 
 template<size_t k_maximum_bit_count>

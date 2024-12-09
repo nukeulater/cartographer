@@ -2,6 +2,7 @@
 #include "imgui_handler.h"
 
 #include "game/player_control.h"
+#include "rasterizer/dx9/rasterizer_dx9_main.h"
 
 #include "imgui.h"
 #include "backends/imgui_impl_dx9.h"
@@ -18,9 +19,19 @@ const char* k_motd_window_name = "motd";
 const char* k_debug_overlay_window_name = "debug_overlay";
 const char* k_message_box_window_name = "messagebox";
 
+c_static_flags_no_init<k_imgui_window_type_count> g_imgui_window_should_render = {};
+
 namespace ImGuiHandler
 {
-	s_imgui_window imgui_windows[6];
+	const s_imgui_window imgui_windows[k_imgui_window_type_count] =
+	{
+		{ k_weapon_offsets_window_name, WeaponOffsets::Render, WeaponOffsets::Open, WeaponOffsets::Close },
+		{ k_motd_window_name, ImMOTD::Render, ImMOTD::Open, ImMOTD::Close },
+		{ k_message_box_window_name, ImMessageBox::Render, ImMessageBox::Open, ImMessageBox::Close },
+		{ k_advanced_settings_window_name, ImAdvancedSettings::Render, ImAdvancedSettings::Open, ImAdvancedSettings::Close },
+		{ k_cartographer_console_window_name, CartographerConsole::Render, CartographerConsole::Open, CartographerConsole::Close }
+	};
+
 	PDIRECT3DTEXTURE9			g_patch_notes_texture = NULL;
 
 	namespace {
@@ -29,8 +40,6 @@ namespace ImGuiHandler
 		// need to update ImGui state at least one more tick
 		// otherwise the enter key gets stuck when ImGui input is disabled, breaking the console
 		bool					last_frame_update = true;
-
-		LPDIRECT3DDEVICE9		p_d3d_device = nullptr;
 	}
 
 	bool						g_network_stats_overlay = false;
@@ -48,10 +57,13 @@ namespace ImGuiHandler
 		// TODO add these to some container
 		if (g_network_stats_overlay)
 			return true;
-		for (auto& window : imgui_windows)
+
+		for (int8 i = 0; i < k_imgui_window_type_count; ++i)
 		{
-			if (window.should_render)
+			if (g_imgui_window_should_render.test(i))
+			{
 				return true;
+			}
 		}
 		return false;
 	}
@@ -75,7 +87,7 @@ namespace ImGuiHandler
 			io.ClearInputKeys();
 			io.ClearMouseInput();
 			io.ClearInputCharacters();
-			ReleaseTextures();
+			release_motd_texture();
 			last_frame_update = false;
 		}
 
@@ -84,11 +96,12 @@ namespace ImGuiHandler
 		ImGui::NewFrame();
 
 		ShowNetworkStatsOverlay(&g_network_stats_overlay);
-		for (auto& window : imgui_windows)
+		for (int8 i = 0; i < k_imgui_window_type_count; ++i)
 		{
-			if (window.should_render)
+			bool should_render = g_imgui_window_should_render.test(i);
+			if (should_render)
 			{
-				window.renderFunc(&window.should_render);
+				imgui_windows[i].renderFunc(&should_render);
 			}
 		}
 
@@ -97,29 +110,30 @@ namespace ImGuiHandler
 		ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
 	}
 
-	void ToggleWindow(const std::string& name)
+	void ToggleWindow(const char* name)
 	{
 		bool keep_game_input_blocked = false;
 
-		for (auto& window : imgui_windows)
+		for (int8 i = 0; i < k_imgui_window_type_count; ++i)
 		{
-			if (window.name == name)
+			const s_imgui_window* window = &imgui_windows[i];
+			if (strncmp(window->name, name, 256) == 0)
 			{
-				window.should_render = !window.should_render;
-				if (window.should_render)
+				// Toggle render
+				g_imgui_window_should_render.set(i, !g_imgui_window_should_render.test(i));
+				
+				if (g_imgui_window_should_render.test(i))
 				{
-					if (window.openFunc != nullptr)
-						window.openFunc();
+					window->openFunc();
 				}
 				else
 				{
-					if (window.closeFunc != nullptr)
-						window.closeFunc();
+					window->closeFunc();
 				}
 			}
 
 			// check if we still need to block the input of the game
-			if (window.should_render && !window.NoImInput())
+			if (g_imgui_window_should_render.test(i) && !window->NoImInput())
 			{
 				keep_game_input_blocked = true;
 			}
@@ -136,17 +150,17 @@ namespace ImGuiHandler
 		if (strncmp(name, "net_metrics", 16) == 0 && g_network_stats_overlay)
 			return true;
 
-		for (s_imgui_window& window : imgui_windows)
+		for (int8 i = 0; i < k_imgui_window_type_count; ++i)
 		{
-			if (strncmp(window.name, name, 256) == 0)
+			if (strncmp(imgui_windows[i].name, name, 256) == 0)
 			{
-				return window.should_render;
+				return g_imgui_window_should_render.test(i);
 			}
 		}
 		return false;
 	}
 
-	void Initalize(LPDIRECT3DDEVICE9 pDevice, HWND hWnd)
+	void Initalize(HWND hWnd)
 	{
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
@@ -160,21 +174,13 @@ namespace ImGuiHandler
 		fontConfig.SizePixels = 13.0f * 1.5f;
 		ImFont* font1 = io.Fonts->AddFontDefault(&fontConfig);
 
-		ImGui_ImplDX9_Init(pDevice);
-		p_d3d_device = pDevice;
-
-		imgui_windows[0] = { "Weapon Offsets", false, WeaponOffsets::Render, WeaponOffsets::Open, WeaponOffsets::Close };
-		imgui_windows[1] = { k_motd_window_name, false, ImMOTD::Render, ImMOTD::Open, ImMOTD::Close };
-		imgui_windows[2] = { k_debug_overlay_window_name, false, ImDebugOverlay::Render, ImDebugOverlay::Open, ImDebugOverlay::Close };
-		imgui_windows[3] = { k_message_box_window_name, false, ImMessageBox::Render, ImMessageBox::Open, ImMessageBox::Close };
-		imgui_windows[4] = { k_advanced_settings_window_name, false, ImAdvancedSettings::Render, ImAdvancedSettings::Open, ImAdvancedSettings::Close };
-		imgui_windows[5] = { k_cartographer_console_window_name, false, CartographerConsole::Render, CartographerConsole::Open, CartographerConsole::Close };
+		ImGui_ImplDX9_Init(rasterizer_dx9_device_get_interface());
 
 		atexit([]() {
 			ImGui_ImplDX9_Shutdown();
 			ImGui_ImplWin32_Shutdown();
 			ImGui::DestroyContext();
-			});
+		});
 	}
 	float WidthPercentage(float percent)
 	{
@@ -197,7 +203,7 @@ namespace ImGuiHandler
 		D3DXIMAGE_INFO imgInfo;
 		PDIRECT3DTEXTURE9 texture = nullptr;
 		//HRESULT hr = D3DXCreateTextureFromFileA(g_pDevice, filename, &texture);
-		HRESULT hr = D3DXCreateTextureFromFileEx(p_d3d_device, filename, D3DX_DEFAULT_NONPOW2, D3DX_DEFAULT_NONPOW2, D3DX_FROM_FILE, 0,
+		const HRESULT hr = D3DXCreateTextureFromFileEx(rasterizer_dx9_device_get_interface(), filename, D3DX_DEFAULT_NONPOW2, D3DX_DEFAULT_NONPOW2, D3DX_FROM_FILE, 0,
 			D3DFMT_FROM_FILE, D3DPOOL_DEFAULT, D3DX_FILTER_NONE, D3DX_FILTER_NONE, 0, &imgInfo, NULL, &texture);
 
 		if (hr != S_OK)
@@ -236,10 +242,14 @@ namespace ImGuiHandler
 		}
 	}
 
-	void ReleaseTextures()
+	void release_motd_texture(void)
 	{
-		if (g_patch_notes_texture) g_patch_notes_texture->Release();
-		g_patch_notes_texture = nullptr;
+		if (g_patch_notes_texture)
+		{
+			g_patch_notes_texture->Release();
+			g_patch_notes_texture = NULL;
+		}
+		return;
 	}
 
 	e_imgui_aspect_ratio GetAspectRatio(const real_point2d* display_size)

@@ -59,7 +59,6 @@
 #include "render/render_lod_new.h"
 #include "render/render_weather.h"
 #include "saved_games/game_state_procs.h"
-#include "shell/shell.h"
 #include "shell/shell_windows.h"
 #include "simulation/simulation.h"
 #include "simulation/simulation_players.h"
@@ -76,7 +75,6 @@
 #include "H2MOD/GUI/ImGui_Integration/Console/CommandCollection.h"
 #include "H2MOD/GUI/ImGui_Integration/ImGui_Handler.h"
 #include "H2MOD/Modules/Accounts/AccountLogin.h"
-#include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
 #include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
 #include "H2MOD/Modules/DirectorHooks/DirectorHooks.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
@@ -88,9 +86,6 @@
 #include "H2MOD/Modules/MainMenu/Ranks.h"
 #include "H2MOD/Modules/MapManager/MapManager.h"
 #include "H2MOD/Modules/MainLoopPatches/RunLoop/RunLoop.h"
-#ifndef NDEBUG
-#include "H2MOD/Modules/ObserverMode/ObserverMode.h"
-#endif
 #include "camera/editor_camera.h"
 #include "camera/first_person_camera.h"
 #include "camera/following_camera.h"
@@ -1153,7 +1148,6 @@ void H2MOD::Initialize()
 	// Apply patches
 	game_apply_pre_winmain_patches();
 
-	custom_language_initialize();
 	main_loop_apply_patches();
 
 	if (!Memory::IsDedicatedServer())
@@ -1169,9 +1163,6 @@ void H2MOD::Initialize()
 		RenderHooks::Initialize();
 		DirectorHooks::Initialize();
 		ImGuiHandler::WeaponOffsets::Initialize();
-#ifndef NDEBUG
-		ObserverMode::Initialize();
-#endif
 		TEST_N_DEF(PC3);
 	}
 	else
