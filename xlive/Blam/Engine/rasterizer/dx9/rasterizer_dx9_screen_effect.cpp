@@ -40,8 +40,6 @@ void __cdecl rasterizer_dx9_render_crossfade(real32 lower, real32 upper);
 
 void rasterizer_dx9_screen_effect_apply_patches(void)
 {
-	PatchCall(Memory::GetAddress(0x191BB1), rasterizer_dx9_postprocess_scene);
-
 	// fix bloom in splitscreen
 	// to note that for some reason bloom is disabled by design (both in H2v and H2x) in splitscreen mode
 	// possibly because of the additional rendering/processing overhead

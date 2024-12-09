@@ -3,7 +3,6 @@
 
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
-#include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
 #include "H2MOD/Utils/Utils.h"
 
 #define ERROR_CODE_INVALID_PARAM -1

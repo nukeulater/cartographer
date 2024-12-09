@@ -14,8 +14,8 @@ s_interpolation_data* g_target_interpolation_frame_data = NULL;
 real32 g_interpolator_delta = 0.0f;
 bool g_update_in_progress = false;
 bool interpolation_enabled = false;
-c_static_flags<k_maximum_objects_per_map> g_interpolator_object_updated;
-c_static_flags<k_maximum_objects_per_map> g_interpolator_object_interpolation_updated;
+c_static_flags_no_init<k_maximum_objects_per_map> g_interpolator_object_updated;
+c_static_flags_no_init<k_maximum_objects_per_map> g_interpolator_object_interpolation_updated;
 
 void halo_interpolator_initialize()
 {
