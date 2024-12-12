@@ -15,7 +15,6 @@
 extern void initialize_instance();
 extern LRESULT IMGUI_IMPL_API ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-bool displayXyz = false;
 bool doDrawIMGUI = false;
 
 HWND H2hWnd;

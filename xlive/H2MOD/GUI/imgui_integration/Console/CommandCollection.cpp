@@ -37,10 +37,6 @@ ComVarFromPtr(network_stats_overlay_var_cmd, bool, &ImGuiHandler::g_network_stat
 ComVarFromPtr(og_frame_limiter_var_cmd, bool, &g_main_game_time_frame_limiter_enabled,
 	"var_og_frame_limiter", "enabled/disable original h2 frame limiter", 1, 1, CommandCollection::BoolVarHandlerCmd);
 
-extern bool displayXyz;
-ComVarFromPtr(display_xyz_var_cmd, bool, &displayXyz,
-	"var_display_xyz", "enable/disable players's xyz, 1 parameter(s): <bool>", 1, 1, CommandCollection::DisplayXyzCmd);
-
 extern real32 g_rumble_factor;
 ComVarFromPtr(rumble_var_cmd, real32, &g_rumble_factor,
 	"var_rumble_scale", "change controller vibration strength (0.0 to 1.0), 1 parameter(s): <float>", 1, 1, CommandCollection::RumbleScaleCmd);
@@ -60,7 +56,6 @@ void CommandCollection::InitializeCommands()
 
 	InsertCommand(new ConsoleCommand(network_stats_overlay_var_cmd));
 	InsertCommand(new ConsoleCommand(og_frame_limiter_var_cmd));
-	InsertCommand(new ConsoleCommand(display_xyz_var_cmd));
 	InsertCommand(new ConsoleCommand(rumble_var_cmd));
 	InsertCommand(new ConsoleCommand(debug_render_horizontal_splitscreen));
 	InsertCommand(new ConsoleCommand("help", "outputs all commands, 0 - 1 parameter(s): <string>(optional): command name", 0, 1, CommandCollection::HelpCmd));
@@ -168,20 +163,6 @@ int CommandCollection::BoolVarHandlerCmd(const std::vector<std::string>& tokens,
 		outputCb(StringFlag_None, "	%s", exception.c_str());
 	}
 	return 0;
-}
-
-int CommandCollection::DisplayXyzCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
-{
-	TextOutputCb* outputCb = ctx.outputCb;
-
-	if (game_is_multiplayer()
-		&& !NetworkSession::LocalPeerIsSessionHost())
-	{
-		outputCb(StringFlag_None, "# only host can see xyz for now...");
-		return 0;
-	}
-
-	return BoolVarHandlerCmd(tokens, ctx);
 }
 
 int CommandCollection::RumbleScaleCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)

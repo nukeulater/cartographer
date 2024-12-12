@@ -15,7 +15,6 @@ namespace CommandCollection
 	void InitializeCommands();
 
 	// commands
-	int DisplayXyzCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
 	int RumbleScaleCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
 	int NetworkMetricsCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
 	int SetD3D9ExStateCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
