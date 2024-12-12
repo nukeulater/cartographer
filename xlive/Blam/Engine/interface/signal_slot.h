@@ -1,7 +1,4 @@
 #pragma once
-#include "cseries/cseries.h"
-
-/* macro defines*/
 
 /* forward declarations */
 
@@ -78,7 +75,7 @@ public:
 template <class X = c_list_widget, typename Y = s_event_record*, typename type = int16>
 class c_slot2 : public _slot2<Y, type>
 {
-	typedef void(X::* handler_t)(Y, type*);
+	typedef void(X::* handler_t)(Y*, type*);
 
 	X* m_class_ptr;
 	handler_t m_handler;
@@ -94,7 +91,7 @@ public:
 		m_class_ptr = _class;
 		m_handler = handler;
 	}
-	virtual void event_handler(Y event, type* id)
+	virtual void event_handler(Y* event, type* id)
 	{
 		return INVOKE_CLASS_FN(m_class_ptr, m_handler) (event, id);
 	}

@@ -9,7 +9,7 @@ class c_screen_press_start_introduction : protected c_screen_widget
 protected:
 	c_button_widget m_start_button;
 	int32 m_creation_time;
-	c_slot2<c_screen_press_start_introduction, s_event_record**, datum> m_slot;
+	c_slot2<c_screen_press_start_introduction, s_event_record*, datum> m_slot;
 	bool m_has_input_saved;
 	char gap[3];
 	s_event_record m_saved_input;
