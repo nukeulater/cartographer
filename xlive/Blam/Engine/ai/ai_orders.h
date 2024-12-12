@@ -4,9 +4,6 @@
 #include "ai_scenario_definitions.h"
 #include "zone.h"
 
-
-#include "cseries/cseries_strings.h"
-
 enum e_order_flags : int
 {
     order_flag_locked = FLAG(0),
@@ -67,13 +64,13 @@ struct order_ending_definition
 struct orders_definition
 {
 	/* filt */
-	static_string32 name;
+	char name[32];
 	short style;            // Block Index: style_palette_block
 	short pad;
     e_order_flags flags;
     e_force_combat_status force_combat_status;
     short pad1;
-    static_string32 entry_script;
+    char entry_script[32];
     short pad2;
     short follow_squad;      // Block Index: squads_block
     float follow_radius;
@@ -131,7 +128,7 @@ struct order_completion_condition_definition
     float x;
     short trigger_volume;    // Block Index: scenario_trigger_volume_block
     short pad;
-    static_string32 exit_condition_script;
+    char exit_condition_script[32];
     short exit_condition_script_index;
     short pad1;
     e_order_completion_condition_flags flags;
@@ -142,7 +139,7 @@ ASSERT_STRUCT_SIZE(order_completion_condition_definition, 56);
 struct triggers_block
 {
     /* filt */
-    static_string32 name;
+    char name[32];
     e_trigger_flags trigger_flags;
     e_combination_rule combination_rule;
     short pad;

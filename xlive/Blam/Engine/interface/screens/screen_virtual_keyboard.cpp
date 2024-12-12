@@ -76,7 +76,7 @@ c_screen_virtual_keyboard::c_screen_virtual_keyboard(e_user_interface_channel_ty
 	m_context = _vkbd_context_invalid;
 	m_saved_game_file_type = _saved_game_file_type_invalid;
 
-	csmemset(m_buffer.get_buffer(), L'\0', m_buffer.max_length());
+	csmemset(m_buffer, L'\0', sizeof(m_buffer));
 	m_textbox_output = 0;
 	m_textbox_message = 0;
 	m_buffer_length = 0;

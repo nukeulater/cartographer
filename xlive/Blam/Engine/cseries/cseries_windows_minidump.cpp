@@ -21,10 +21,10 @@
 bool should_include_module_code_seg(const wchar_t* path);
 
 // Get timestamp and create a string to append to archive name
-void dump_timestamp_get(c_static_wchar_string64* timestamp);
+void dump_timestamp_get(c_static_wchar_string<64>* timestamp);
 
 // Initialize paths for file dumps
-void create_reports_path(c_static_wchar_string260* dump_path, c_static_wchar_string260* minidump_file_path);
+void create_reports_path(c_static_wchar_string<MAX_PATH>* dump_path, c_static_wchar_string<MAX_PATH>* minidump_file_path);
 
 // Create crash archive and add crash files to it
 void crash_archive_create_and_populate(const char* zip_file_path);
@@ -48,7 +48,7 @@ bool should_include_module_code_seg(const wchar_t* path)
 	return result;
 }
 
-void dump_timestamp_get(c_static_wchar_string64* timestamp)
+void dump_timestamp_get(c_static_wchar_string<64>* timestamp)
 {
 	time_t timer = time(NULL);
 	tm* tm_info = localtime(&timer);
@@ -56,7 +56,7 @@ void dump_timestamp_get(c_static_wchar_string64* timestamp)
 	return;
 }
 
-void create_reports_path(c_static_wchar_string260* dump_path, c_static_wchar_string260* minidump_file_path)
+void create_reports_path(c_static_wchar_string<MAX_PATH>* dump_path, c_static_wchar_string<MAX_PATH>* minidump_file_path)
 {
 	dump_path->set(k_initial_dump_path_wide);			// Create the folder initially in the C:\Temp folder and then move to our own folder
 	CreateDirectoryW(dump_path->get_string(), NULL);	// Make sure Temp exists
@@ -65,7 +65,7 @@ void create_reports_path(c_static_wchar_string260* dump_path, c_static_wchar_str
 	CreateDirectoryW(dump_path->get_string(), NULL);	// Make sure our specific report path exists
 
 	// Make sure the reports path that will have our text files exists
-	c_static_wchar_string260 reports_path;
+	c_static_wchar_string<MAX_PATH> reports_path;
 	reports_path.set(dump_path->get_string());
 	reports_path.append(k_reports_path);
 	CreateDirectoryW(reports_path.get_string(), NULL);
@@ -119,10 +119,10 @@ void crash_archive_create_and_populate(const char* zip_file_path)
 	return;
 }
 
-void crash_archive_move_to_crash_report_folder(const char* initial_zip_file_path, c_static_wchar_string260* archive_path)
+void crash_archive_move_to_crash_report_folder(const char* initial_zip_file_path, c_static_wchar_string<MAX_PATH>* archive_path)
 {
 	// get timestamp
-	c_static_wchar_string64 timestamp;
+	c_static_wchar_string<64> timestamp;
 	dump_timestamp_get(&timestamp);
 
 	// Construct reports path
@@ -146,7 +146,7 @@ void crash_archive_move_to_crash_report_folder(const char* initial_zip_file_path
 // Create zip report_file and populate it with files we've created
 void crash_archive_add_dump_file(zipFile zip_file)
 {
-	c_static_string260 minidump_path;
+	c_static_string<MAX_PATH> minidump_path;
 	minidump_path.set(k_initial_dump_path);
 	minidump_path.append(k_minidump_folder_name);
 	minidump_path.append(k_crash_minidump_file_name);
@@ -173,7 +173,7 @@ void crash_archive_add_crash_report_files(zipFile zip_file)
 		s_file_reference report_file;
 		file_reference_create_from_path(&report_file, utf8_path, 0);
 
-		c_static_wchar_string260 path_in_archive;
+		c_static_wchar_string<MAX_PATH> path_in_archive;
 		path_in_archive.set(k_reports_path);
 		path_in_archive.append(k_report_text_file_names[i]);
 
@@ -189,9 +189,9 @@ void crash_archive_add_crash_report_files(zipFile zip_file)
 	return;
 }
 
-void write_crash_dump_files(_EXCEPTION_POINTERS* ExceptionInfo, c_static_wchar_string260* report_path, c_static_wchar_string260* archive_path)
+void write_crash_dump_files(_EXCEPTION_POINTERS* ExceptionInfo, c_static_wchar_string<MAX_PATH>* report_path, c_static_wchar_string<MAX_PATH>* archive_path)
 {
-	c_static_wchar_string260 minidump_path;
+	c_static_wchar_string<MAX_PATH> minidump_path;
 	create_reports_path(report_path, &minidump_path);
 
 	HANDLE dump_file = CreateFileW(minidump_path.get_string(),
@@ -244,7 +244,7 @@ void write_crash_dump_files(_EXCEPTION_POINTERS* ExceptionInfo, c_static_wchar_s
 
 	crash_info_text_files_create(report_path->get_string(), &minidump_info);
 
-	c_static_string260 initial_zip_file_path;
+	c_static_string<MAX_PATH> initial_zip_file_path;
 	initial_zip_file_path.set(k_initial_dump_path);
 	initial_zip_file_path.append(k_crash_file_archive);
 

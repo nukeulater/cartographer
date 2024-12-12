@@ -51,14 +51,14 @@ namespace MapSlots
 	{
 		//lots copied over from Tag Loader, using this function to grab the Level data in the scenario tag
 		//And using that to construct a new s_multiplayer_levels_block and grab the bitmap datum for tag loading
-		c_static_wchar_string260 game_path;
+		c_static_wchar_string<MAX_PATH> game_path;
 		game_path.set(GetExeDirectoryWide().c_str());
 
 		LOG_TRACE_GAME("[Map Slots]: Startup - Caching map data");
 
 		for (uint32 i = 0; i < k_default_map_to_add_count; ++i)
 		{
-			c_static_wchar_string260 map_location;
+			c_static_wchar_string<MAX_PATH> map_location;
 			map_location.set(game_path.get_string());
 			map_location.append(L"\\maps\\");
 			map_location.append(k_default_maps_to_add[i]);

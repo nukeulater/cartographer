@@ -11,8 +11,8 @@ LPTOP_LEVEL_EXCEPTION_FILTER pfn_SecondaryExceptionFilter = NULL;
 
 LONG WINAPI debug_unhandled_exception_cb(_In_ struct _EXCEPTION_POINTERS* exception_info)
 {
-	c_static_wchar_string260 reports_path;
-	c_static_wchar_string260 zip_file_path;
+	c_static_wchar_string<MAX_PATH> reports_path;
+	c_static_wchar_string<MAX_PATH> zip_file_path;
 	write_crash_dump_files(exception_info, &reports_path, &zip_file_path);
 
 	// don't attempt to display a GUI error box if running on a server.

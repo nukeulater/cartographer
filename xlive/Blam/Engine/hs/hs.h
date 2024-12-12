@@ -1,7 +1,6 @@
 #pragma once
 #include "tag_files/tag_reference.h"
 
-#include "cseries/cseries_strings.h"
 #include "tag_files/data_reference.h"
 
 #define k_maximum_hs_globals_per_scenario 256
@@ -87,7 +86,7 @@ enum e_hs_type : WORD
 // max count: k_maximum_hs_globals_per_scenario 256
 struct hs_global_internal
 {
-	static_string32 name;
+	char name[32];
 	e_hs_type type;
 	short pad;
 	datum initialization_expression_index;
@@ -104,7 +103,7 @@ ASSERT_STRUCT_SIZE(hs_tag_reference, 8);
 // max count: k_maximum_hs_source_files_per_scenario 8
 struct hs_source_file
 {
-	 static_string32 name;
+	 char name[32];
 	 data_reference source;		// DataSize: 262144
 };
 ASSERT_STRUCT_SIZE(hs_tag_reference, 8);

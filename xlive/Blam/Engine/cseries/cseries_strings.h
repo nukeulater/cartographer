@@ -68,18 +68,6 @@ private:
 	wchar_t text[string_length];
 };
 
-typedef c_static_string<32>  static_string32;
-typedef c_static_string<64>  c_static_string64;
-typedef c_static_string<128> static_string128;
-typedef c_static_string<256> static_string256;
-typedef c_static_string<260> c_static_string260;
-typedef c_static_string<512> static_string512;
-typedef c_static_wchar_string<32>  c_static_wchar_string32;
-typedef c_static_wchar_string<64>  c_static_wchar_string64;
-typedef c_static_wchar_string<128> c_static_wchar_string128;
-typedef c_static_wchar_string<256> c_static_wchar_string256;
-typedef c_static_wchar_string<260> c_static_wchar_string260;
-
 template<size_t T>
 inline const char* c_static_string<T>::get_string(void) const
 {

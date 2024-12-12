@@ -64,7 +64,7 @@ struct s_campaign_runtime_level_definition
 {
     int32 campaign_id;
     int32 map_id;
-    static_string256 path;
+    char path[256];
 };
 ASSERT_STRUCT_SIZE(s_campaign_runtime_level_definition, 264);
 

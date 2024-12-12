@@ -434,8 +434,8 @@ public:
 	virtual int32 sub_60F081(s_event_record* a2);
 	virtual e_user_interface_controller_component get_component_from_button_key(int32 special_widget_index);
 	virtual bool sub_40AD53(int32 a2);
-	virtual e_user_interface_channel_type  get_channel();
-	virtual e_user_interface_render_window  get_render_window();
+	virtual e_user_interface_channel_type get_channel();
+	virtual e_user_interface_render_window get_render_window();
 	virtual int32 sub_60EB92(int32 a2);
 	virtual void sub_60EBC2(int32 a1);
 	virtual void* sub_60EC5C(s_screen_state* state);

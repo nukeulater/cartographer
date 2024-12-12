@@ -137,7 +137,7 @@ void crash_window_message_create(const wchar_t* reports_path, const wchar_t* arc
 size_t crash_report_get_text_total_size(const wchar_t* reports_path)
 {
     size_t string_length = 0;
-    c_static_wchar_string260 file_path;
+    c_static_wchar_string<MAX_PATH> file_path;
 
     for (size_t i = 0; i < k_report_text_file_type_count; i++)
     {
@@ -175,7 +175,7 @@ size_t crash_report_get_text_total_size(const wchar_t* reports_path)
 
 void crash_window_set_text(const wchar_t* reports_path, wchar_t* crash_message)
 {
-    c_static_wchar_string260 file_path;
+    c_static_wchar_string<MAX_PATH> file_path;
 
     for (size_t report_file_index = 0; report_file_index < k_report_text_file_type_count; report_file_index++)
     {

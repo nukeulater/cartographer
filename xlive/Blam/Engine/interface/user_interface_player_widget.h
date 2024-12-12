@@ -1,7 +1,9 @@
 #pragma once
 #include "user_interface_group_widget.h"
 #include "user_interface_screen_widget_definition.h"
+
 #include "game/game_allegiance.h"
+#include "game/players.h"
 
 /* classes */
 
@@ -25,7 +27,7 @@ class c_player_widget_representation
 private:
 	uint32 m_flags;
 	wchar_t* m_player_configuration_name;
-	c_static_wchar_string32 m_player_custom_name;
+	wchar_t m_player_custom_name[32];
 	s_player_profile_traits m_appearance;
 	string_id m_team_name;
 	e_game_team m_player_team;

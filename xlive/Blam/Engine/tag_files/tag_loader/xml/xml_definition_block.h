@@ -9,7 +9,7 @@ class c_xml_definition_block
 	tinyxml2::XMLElement* m_element;
 	uint32 m_offset;
 	uint32 m_size;
-	c_static_string64 m_name;
+	c_static_string<64> m_name;
 
 
 	uint32 m_tag_reference_count;
@@ -28,10 +28,10 @@ class c_xml_definition_block
 	c_xml_definition_block* m_tag_blocks;
 
 #if TAG_INJECTION_DEBUG
-	c_static_string64* m_tag_reference_names;
-	c_static_string64* m_classless_tag_reference_names;
-	c_static_string64* m_data_reference_names;
-	c_static_string64* m_tag_block_names;
+	c_static_string<64>* m_tag_reference_names;
+	c_static_string<64>* m_classless_tag_reference_names;
+	c_static_string<64>* m_data_reference_names;
+	c_static_string<64>* m_tag_block_names;
 #endif
 
 
@@ -66,10 +66,10 @@ public:
 	c_xml_definition_block* get_tag_block(uint32 index) const;
 
 #if TAG_INJECTION_DEBUG
-	c_static_string64* get_tag_reference_name(uint32 index) const;
-	c_static_string64* get_classless_tag_reference_name(uint32 index) const;
-	c_static_string64* get_data_reference_name(uint32 index) const;
-	c_static_string64* get_tag_block_name(uint32 index) const;
+	c_static_string<64>* get_tag_reference_name(uint32 index) const;
+	c_static_string<64>* get_classless_tag_reference_name(uint32 index) const;
+	c_static_string<64>* get_data_reference_name(uint32 index) const;
+	c_static_string<64>* get_tag_block_name(uint32 index) const;
 #endif
 
 };

@@ -9,7 +9,7 @@
 
 struct s_loaded_module_info
 {
-    c_static_wchar_string260 module_path;
+    c_static_wchar_string<MAX_PATH> module_path;
     HMODULE module_handle;
 };
 

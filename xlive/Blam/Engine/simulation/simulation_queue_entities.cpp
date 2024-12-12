@@ -249,7 +249,7 @@ void dump_entity_unit_creation_to_file(
 	if (type == _simulation_entity_type_unit)
 	{
 		FILE* fp;
-		c_static_wchar_string256 path;
+		c_static_wchar_string<MAX_PATH> path;
 
 		extern wchar_t* H2AppDataLocal;
 		path.set(H2AppDataLocal);

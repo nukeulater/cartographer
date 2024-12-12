@@ -45,14 +45,8 @@ protected:
 	int32 m_intro_delay_milliseconds;
 	uint16 m_tabbing_count;
 	uint8 gap_7E[2];
-	real32 m_up_arrows_position_x0;
-	real32 m_up_arrows_position_x1;
-	real32 m_up_arrows_position_y0;
-	real32 m_up_arrows_position_y1;
-	real32 m_down_arrows_position_x0;
-	real32 m_down_arrows_position_x1;
-	real32 m_down_arrows_position_y0;
-	real32 m_down_arrows_position_y1;
+	real_rectangle2d m_up_arrow_position;
+	real_rectangle2d m_down_arrow_position;
 	bool m_up_arrow_drawn;
 	bool m_down_arrow_drawn;
 	bool field_A2;
