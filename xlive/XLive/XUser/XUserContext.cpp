@@ -11,6 +11,16 @@
 #include "H2MOD/Modules/Shell/H2MODShell.h"
 #include "XLive/xbox/xbox.h"
 
+enum e_context_id : uint32
+{
+	_context_id_variant = 2,
+	_context_id_difficulty = 3,
+	_context_id_map = 5,
+	_context_id_presence = X_CONTEXT_PRESENCE,
+	_context_id_game_type = X_CONTEXT_GAME_TYPE,
+	_context_id_game_mode = X_CONTEXT_GAME_MODE
+};
+
 struct s_context_campaign_map_info
 {
 	int32 map_id;
@@ -35,17 +45,6 @@ s_context_campaign_map_info g_context_campaign_map_info[] = {
 	805, "The Great Journey"
 };
 
-enum e_context_id : uint32
-{
-	_context_id_variant = 2,
-	_context_id_difficulty = 3,
-	_context_id_map = 5,
-	_context_id_presence = X_CONTEXT_PRESENCE,
-	_context_id_game_type = X_CONTEXT_GAME_TYPE,
-	_context_id_game_mode = X_CONTEXT_GAME_MODE
-};
-
-extern void Check_Overlapped(PXOVERLAPPED pOverlapped);
 extern XSESSION_LOCAL_DETAILS sessionDetails;
 
 // 5289: XUserGetContext
