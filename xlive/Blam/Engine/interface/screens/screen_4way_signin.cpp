@@ -20,6 +20,7 @@
 #include "interface/user_interface_utilities.h"
 #include "Networking/online/online_account_xbox.h"
 #include "tag_files/global_string_ids.h"
+#include "text/unicode.h"
 
 /* enums */
 
@@ -833,14 +834,14 @@ void add_button_key_split_input(c_text_widget* button_key_text)
 {
 	ASSERT(button_key_text);
 
-	c_static_wchar_string<512> temp, old;
-	old.set(button_key_text->get_interface()->get_raw_string());
+	wchar_t temp[512], old[512];
+	ustrncpy(old, button_key_text->get_interface()->get_raw_string(), NUMBEROF(old));
 
 	const wchar_t* split_text = !input_windows_has_split_device_active() ? L"%c ADD SPLIT " : L"%c REMOVE SPLIT ";
-	usnzprintf(temp.get_buffer(), temp.max_length(), split_text, _private_use_character_x_button);
+	usnzprintf(temp, NUMBEROF(temp), split_text, _private_use_character_x_button);
 
-	button_key_text->set_text(temp.get_string());
-	button_key_text->append_text(old.get_string());
+	button_key_text->set_text(temp);
+	button_key_text->append_text(old);
 }
 
 void modify_controller_bitmap_for_split(c_bitmap_widget* signin_bitmap, c_text_widget* join_text)

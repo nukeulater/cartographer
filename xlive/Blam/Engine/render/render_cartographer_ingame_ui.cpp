@@ -215,7 +215,7 @@ void render_cartographer_update_message(const char* update_text, int64 update_si
 	{
 		wchar_t update_message_buffer[256];
 		wchar_t* last_line = update_message_buffer;
-		c_static_wchar_string128 lines[16];
+		c_static_wchar_string<128> lines[16];
 		int32 line_count = 0;
 		int32 update_message_length = 0;
 
@@ -246,8 +246,8 @@ void render_cartographer_update_message(const char* update_text, int64 update_si
 	if (update_size_bytes > 0)
 	{
 		wchar_t update_message_buffer[256];
-		real32 percent_complate = 100.f * ((real32)update_downloaded_bytes / update_size_bytes);
-		swprintf_s(update_message_buffer, NUMBEROF(update_message_buffer), L"(progress: %.2f%%)", percent_complate);
+		real32 percent_complete = 100.f * ((real32)update_downloaded_bytes / update_size_bytes);
+		swprintf_s(update_message_buffer, NUMBEROF(update_message_buffer), L"(progress: %.2f%%)", percent_complete);
 		rasterizer_draw_unicode_string(&bounds, update_message_buffer);
 	}
 

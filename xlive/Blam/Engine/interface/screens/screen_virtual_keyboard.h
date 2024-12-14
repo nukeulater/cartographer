@@ -119,7 +119,7 @@ class c_screen_virtual_keyboard : protected c_screen_widget
 protected:
 	e_vkbd_context_type m_context;
 	e_saved_game_file_type m_saved_game_file_type;
-	c_static_wchar_string256 m_buffer;
+	wchar_t m_buffer[256];
 	wchar_t* m_textbox_output;
 	wchar_t* m_textbox_message;
 	uint16 m_buffer_length;

@@ -64,8 +64,6 @@
     <ClCompile Include="Util\Memory.cpp" />
     <ClCompile Include="H2MOD\Modules\HaloScript\HaloScript.cpp" />
     <ClCompile Include="Blam\Engine\game\game_time.cpp" />
-    <ClCompile Include="H2MOD\Modules\ObserverMode\ObserverMode.cpp" />
-    <ClCompile Include="H2MOD\GUI\ImGui_Integration\DebugOverlay.cpp" />
     <ClCompile Include="H2MOD\Modules\DirectorHooks\DirectorHooks.cpp" />
     <ClCompile Include="H2MOD\Modules\MainMenu\MapSlots.cpp" />
     <ClCompile Include="H2MOD\Modules\SpecialEvents\SpecialEvents.cpp" />
@@ -604,7 +602,6 @@
     <ClInclude Include="H2MOD\Modules\RenderHooks\RenderHooks.h" />
     <ClInclude Include="Util\Memory.h" />
     <ClInclude Include="H2MOD\Modules\HaloScript\HaloScript.h" />
-    <ClInclude Include="H2MOD\Modules\ObserverMode\ObserverMode.h" />
     <ClInclude Include="H2MOD\Modules\DirectorHooks\DirectorHooks.h" />
     <ClInclude Include="Blam\Engine\objects\damage.h" />
     <ClInclude Include="H2MOD\Modules\MainMenu\MapSlots.h" />

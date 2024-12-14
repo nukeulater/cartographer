@@ -1,20 +1,24 @@
 #pragma once
-#include "cseries/cseries_strings.h"
 
+/* constants */
 
 #define MAXIMUM_EDITOR_COMMENTS 65536
 
-enum e_comment_type : int
+/* enums */
+
+enum e_comment_type : int32
 {
-    comment_type_generic = 0
+    _comment_type_generic = 0
 };
+
+/* structures */
 
 // max count: MAXIMUM_EDITOR_COMMENTS 65536
 struct editor_comment_definition
 {
     real_point3d position;
     e_comment_type type;
-    static_string32 name;
-    static_string256 comment;
+    char name[32];
+    char comment[256];
 };
 ASSERT_STRUCT_SIZE(editor_comment_definition, 304);

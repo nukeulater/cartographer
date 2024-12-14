@@ -1,5 +1,4 @@
 #pragma once
-#include "cseries/cseries_strings.h"
 #include "math/color_math.h"
 #include "tag_files/string_id.h"
 #include "tag_files/tag_block.h"
@@ -631,14 +630,14 @@ enum e_ui_model_scene_reference_flags : int
 #define k_maximum_lights_per_ui_scene 8
 struct s_ui_light_reference
 {
-    static_string32 name;
+    char name[32];
 };
 ASSERT_STRUCT_SIZE(s_ui_light_reference, 32);
 
 #define k_maximum_objects_per_ui_scene 32
 struct s_ui_object_reference
 {
-    static_string32 name;
+    char name[32];
 };
 ASSERT_STRUCT_SIZE(s_ui_object_reference, 32);
 
@@ -676,7 +675,7 @@ ASSERT_STRUCT_SIZE(s_ui_model_scene_reference, 76);
 struct s_text_value_pair_block_UNUSED
 {
     // Explaination("OBSOLETE", "this is all obsolete")
-    static_string32 name;
+    char name[32];
     tag_block<s_text_value_pair_reference_UNUSED> text_value_pairs;
 };
 ASSERT_STRUCT_SIZE(s_text_value_pair_block_UNUSED, 40);

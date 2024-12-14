@@ -15,7 +15,7 @@ protected:
 
 public:
 	c_list_item_widget();
-	datum get_last_data_index();
+	datum get_last_data_index(void) const;
 	void set_item_transitioning();
 
 	

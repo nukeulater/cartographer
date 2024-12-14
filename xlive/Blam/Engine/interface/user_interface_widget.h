@@ -1,6 +1,7 @@
 #pragma once
 #include "user_interface.h"
 
+#include "input/controllers.h"
 #include "math/color_math.h"
 #include "tag_files/tag_reference.h"
 
@@ -134,7 +135,7 @@ public:
 	virtual int32 initialize_child_animations(s_animation_transform* a2);
 	virtual int32 get_intro_delay();
 	virtual void* get_unprojected_bounds(rectangle2d* unprojected_bounds);
-	virtual void sub_612A7C(c_user_interface_widget* a2);
+	virtual void sub_612A7C(c_user_interface_widget* child);
 	virtual c_user_interface_widget* sub_612ABC();
 	virtual c_user_interface_widget* sub_612BCA();
 	virtual bool handle_event(s_event_record* event);

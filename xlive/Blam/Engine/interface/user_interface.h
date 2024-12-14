@@ -1,5 +1,4 @@
 #pragma once
-#include "saved_games/player_profile.h"
 
 /* enums */
 
@@ -365,14 +364,11 @@ struct s_screen_parameters
 ASSERT_STRUCT_SIZE(s_screen_parameters, 0x20);
 
 
-/* public methods */
+/* prototypes */
 
-
-void __cdecl render_menu_user_interface(int32 controller_index, e_user_interface_render_window render_window, rectangle2d* out_rect2d);
-
-const bool __cdecl user_interface_automation_is_active();
-uint32 __cdecl user_interface_milliseconds();
-bool __cdecl user_interface_error_display_allowed();
+bool __cdecl user_interface_automation_is_active(void);
+uint32 __cdecl user_interface_milliseconds(void);
+bool __cdecl user_interface_error_display_allowed(void);
 bool __cdecl user_interface_has_responding_controller(int32 user_index);
 bool __cdecl user_interface_channel_is_busy(e_user_interface_channel_type channel_type);
 bool __cdecl user_interface_back_out_from_channel_by_id(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, e_user_interface_screen_id id);
@@ -386,3 +382,8 @@ void __cdecl user_interface_error_display_ok_cancel_dialog_with_ok_callback(e_us
 void __cdecl user_interface_back_out_from_channel(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index);
 void __cdecl user_interface_enter_game_shell(int32 context);
 
+void __cdecl render_menu_user_interface(int32 controller_index, e_user_interface_render_window render_window, rectangle2d* out_rect2d);
+
+void __cdecl user_interface_return_to_mainmenu(bool a1);
+
+uint32 user_interface_set_context_presence(e_context_presence game_mode);
