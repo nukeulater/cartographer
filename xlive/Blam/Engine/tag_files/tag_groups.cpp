@@ -174,7 +174,7 @@ uint32 tag_group_get_as_index(tag_group group)
 	    case _tag_group_wind: return 118;
 	    case _tag_group_weapon_hud_interface: return 119;
 	    default:
-	    case _tag_group_none: return -1;
+	    case _tag_group_none: return NONE;
     }
 }
 

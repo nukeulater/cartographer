@@ -90,9 +90,9 @@ void christmas_event_map_load(void)
 		weat_block->weather_system.group.group = _tag_group_weather_system;
 		weat_block->weather_system.index = snow_datum;
 
-		for (auto& cluster : bsp_definition->clusters)
+		for (size_t i = 0; i < bsp_definition->clusters.count; ++i)
 		{
-			cluster.weather_index = (short)bsp_definition->weather_palette.count - 1;
+			bsp_definition->clusters[i]->weather_index = (int16)bsp_definition->weather_palette.count - 1;
 		}
 
 		// Change sword model to candy cane
@@ -103,15 +103,18 @@ void christmas_event_map_load(void)
 
 		sword_model->render_model.index = candy_cane_datum;
 
-		for (auto& first_person : sword_weapon->weapon.player_interface.first_person)
-			first_person.model.index = candy_cane_datum;
-
-		for (auto& attachment : sword_weapon->object.attachments)
+		for (size_t i = 0; i < sword_weapon->weapon.player_interface.first_person.count; ++i)
 		{
-			attachment.type.index = NONE;
-			attachment.type.group = { (e_tag_group)NONE };
-			attachment.marker = 0;
-			attachment.primary_scale = 0;
+			sword_weapon->weapon.player_interface.first_person[i]->model.index = candy_cane_datum;
+		}
+
+		for (size_t i = 0; i < sword_weapon->object.attachments.count; ++i)
+		{
+			object_attachment_definition* attachment = sword_weapon->object.attachments[i];
+			attachment->type.index = NONE;
+			attachment->type.group.group = _tag_group_none;
+			attachment->marker = 0;
+			attachment->primary_scale = 0;
 		}
 
 		// Change ghost to reindeer

@@ -36,7 +36,7 @@ c_particle_system_definition* c_particle_sprite_definition_interface::get_attach
 
 effect_location_definition* c_particle_sprite_definition_interface::get_particle_definition_locations()
 {
-	return this->particle_definition->locations.begin();
+	return this->particle_definition->locations[0];
 }
 
 size_t c_particle_sprite_definition_interface::get_particle_definition_locations_size()

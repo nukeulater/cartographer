@@ -18,67 +18,67 @@ void initialize_runtime_sound_gestalt_definition_primary_only(const s_sound_cach
 
 	global_sound_gestalt->playbacks_size = shared_gestalt->playbacks.count;
 	if (global_sound_gestalt->playbacks_size)
-		global_sound_gestalt->playbacks = shared_gestalt->playbacks.begin();
+		global_sound_gestalt->playbacks = shared_gestalt->playbacks[0];
 	else
 		global_sound_gestalt->playbacks = nullptr;
 
 	global_sound_gestalt->scales_size = shared_gestalt->scales.count;
 	if (global_sound_gestalt->scales_size)
-		global_sound_gestalt->scales = shared_gestalt->scales.begin();
+		global_sound_gestalt->scales = shared_gestalt->scales[0];
 	else
 		global_sound_gestalt->scales = nullptr;
 
 	global_sound_gestalt->import_names_size = shared_gestalt->import_names.count;
 	if (global_sound_gestalt->import_names_size)
-		global_sound_gestalt->import_names = shared_gestalt->import_names.begin();
+		global_sound_gestalt->import_names = shared_gestalt->import_names[0];
 	else
 		global_sound_gestalt->import_names = nullptr;
 
 	global_sound_gestalt->pitch_range_parameters_size = shared_gestalt->pitch_range_parameters.count;
 	if (global_sound_gestalt->pitch_range_parameters_size)
-		global_sound_gestalt->pitch_range_parameters = shared_gestalt->pitch_range_parameters.begin();
+		global_sound_gestalt->pitch_range_parameters = shared_gestalt->pitch_range_parameters[0];
 	else
 		global_sound_gestalt->pitch_range_parameters = nullptr;
 
 	global_sound_gestalt->pitch_ranges_size = shared_gestalt->pitch_ranges.count;
 	if (global_sound_gestalt->pitch_ranges_size)
-		global_sound_gestalt->pitch_ranges = shared_gestalt->pitch_ranges.begin();
+		global_sound_gestalt->pitch_ranges = shared_gestalt->pitch_ranges[0];
 	else
 		global_sound_gestalt->pitch_ranges = nullptr;
 
 	global_sound_gestalt->permutations_size = shared_gestalt->permutations.count;
 	if (global_sound_gestalt->permutations_size)
-		global_sound_gestalt->permutations = shared_gestalt->permutations.begin();
+		global_sound_gestalt->permutations = shared_gestalt->permutations[0];
 	else
 		global_sound_gestalt->permutations = nullptr;
 
 	global_sound_gestalt->custom_playbacks_size = shared_gestalt->custom_playbacks.count;
 	if (global_sound_gestalt->custom_playbacks_size)
-		global_sound_gestalt->custom_playbacks = shared_gestalt->custom_playbacks.begin();
+		global_sound_gestalt->custom_playbacks = shared_gestalt->custom_playbacks[0];
 	else
 		global_sound_gestalt->custom_playbacks = nullptr;
 
 	global_sound_gestalt->runtime_permutation_flags_size = shared_gestalt->runtime_permutation_flags.count;
 	if (global_sound_gestalt->runtime_permutation_flags_size)
-		global_sound_gestalt->runtime_permutation_flags = shared_gestalt->runtime_permutation_flags.begin();
+		global_sound_gestalt->runtime_permutation_flags = shared_gestalt->runtime_permutation_flags[0];
 	else
 		global_sound_gestalt->runtime_permutation_flags = nullptr;
 
 	global_sound_gestalt->chunks_size = shared_gestalt->chunks.count;
 	if (global_sound_gestalt->chunks_size)
-		global_sound_gestalt->chunks = shared_gestalt->chunks.begin();
+		global_sound_gestalt->chunks = shared_gestalt->chunks[0];
 	else
 		global_sound_gestalt->chunks = nullptr;
 
 	global_sound_gestalt->promotions_size = shared_gestalt->promotions.count;
 	if (global_sound_gestalt->promotions_size)
-		global_sound_gestalt->promotions = shared_gestalt->promotions.begin();
+		global_sound_gestalt->promotions = shared_gestalt->promotions[0];
 	else
 		global_sound_gestalt->promotions = nullptr;
 
 	global_sound_gestalt->extra_info_size = shared_gestalt->extra_info.count;
 	if (global_sound_gestalt->extra_info_size)
-		global_sound_gestalt->extra_info = shared_gestalt->extra_info.begin();
+		global_sound_gestalt->extra_info = shared_gestalt->extra_info[0];
 	else
 		global_sound_gestalt->extra_info = nullptr;
 

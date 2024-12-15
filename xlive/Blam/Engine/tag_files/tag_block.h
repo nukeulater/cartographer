@@ -1,5 +1,5 @@
 #pragma once
-#include "cache/cache_files.h"
+#include "tag_groups.h"
 
 // ### TODO Rename to c_tag_block and refactor
 
@@ -17,40 +17,10 @@ struct tag_block
 	{
 		return sizeof(T);
 	}
-	T* begin() const
-	{
-		if (this->data != NONE)
-		{
-			uint8* tag_data_table = (uint8*)cache_get_tag_data();
-#ifdef DEBUG
-			if (LOG_CHECK(tag_data_table))
-#endif
-				return reinterpret_cast<T*>(tag_data_table + this->data);
-		}
-		return nullptr;
-	}
 
-	T* end() const
+	BLAM_MATH_INL T* operator[](int32 index) const
 	{
-		static_assert(std::is_void<T>::value == false, "You need to set the tag block type to use this function");
-		if (this->begin())
-			return &this->begin()[this->count];
-		else
-			return nullptr;
-	}
-
-	T* operator[](int32 index) const
-	{
-		static_assert(std::is_void<T>::value == false, "You need to set the tag block type to use this function");
-		if (index == NONE)
-			return NULL;
-		if (index >= this->count)
-			return NULL;
-		if (this->begin()) {
-			T* data_array = this->begin();
-			return &data_array[index];
-		}
-		return NULL;
+		return (T*)tag_block_get_element_with_size((s_tag_block*)this, index, sizeof(T));
 	}
 };
 ASSERT_STRUCT_SIZE(tag_block<>, 8);
