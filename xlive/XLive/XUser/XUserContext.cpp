@@ -27,7 +27,7 @@ struct s_context_campaign_map_info
 	char map_name[32];
 };
 
-s_context_campaign_map_info g_context_campaign_map_info[] = {
+const s_context_campaign_map_info k_context_campaign_map_info[] = {
 	1, "The Heretic",
 	101, "Armory",
 	105, "Cairo Station",
@@ -75,11 +75,11 @@ void context_update_map_info_campaign(uint32 map_id, const utf8* scenario_name)
 {
 	// Get map name
 	const char* map_name = NULL;
-	for (uint32 i = 0; i < NUMBEROF(g_context_campaign_map_info); ++i)
+	for (uint32 i = 0; i < NUMBEROF(k_context_campaign_map_info); ++i)
 	{
-		if (g_context_campaign_map_info[i].map_id == map_id)
+		if (k_context_campaign_map_info[i].map_id == map_id)
 		{
-			map_name = g_context_campaign_map_info[i].map_name;
+			map_name = k_context_campaign_map_info[i].map_name;
 			break;
 		}
 	}
