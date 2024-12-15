@@ -2,7 +2,7 @@ EXPORTS
 	XWSAStartup								@1	
 	XWSACleanup								@2	
 	XSocketCreate							@3	
-	XSocketClose								@4	
+	XSocketClose							@4	
 	XSocketShutdown							@5	
 	XSocketIOCTLSocket						@6	
 	XSocketSetSockOpt						@7	
@@ -14,26 +14,26 @@ EXPORTS
 	XSocketListen							@13	
 	XSocketAccept							@14	
 	XSocketSelect							@15	
-	XSocketWSAGetOverlappedResult					@16	
-	XSocketWSACancelOverlappedIO					@17	
+	XSocketWSAGetOverlappedResult			@16	
+	XSocketWSACancelOverlappedIO			@17	
 	XSocketRecv								@18	
-	XSocketWSARecv								@19 
+	XSocketWSARecv							@19 
 	XSocketRecvFrom							@20	
-	XSocketWSARecvFrom							@21	
+	XSocketWSARecvFrom						@21	
 	XSocketSend								@22	
-	XSocketWSASend								@23	
+	XSocketWSASend							@23	
 	XSocketSendTo							@24	
-	XSocketWSASendTo								@25	
+	XSocketWSASendTo						@25	
 	XSocketInet_Addr						@26	
-	XSocketWSAGetLastError						@27	
-	XSocketWSASetLastError						@28	
-	XSocketWSACreateEvent							@29	
-	XSocketWSACloseEvent							@30	
-	XSocketWSASetEvent							@31	
-	XSocketWSAResetEvent							@32	
-	XSocketWSAWaitForMultipleEvents				@33	
-	XSocketWSAFDIsSet							@34	
-	XSocketWSAEventSelect							@35	
+	XSocketWSAGetLastError					@27	
+	XSocketWSASetLastError					@28	
+	XSocketWSACreateEvent					@29	
+	XSocketWSACloseEvent					@30	
+	XSocketWSASetEvent						@31	
+	XSocketWSAResetEvent					@32	
+	XSocketWSAWaitForMultipleEvents			@33	
+	XSocketWSAFDIsSet						@34	
+	XSocketWSAEventSelect					@35	
 	XSocketHTONL							@37	
 	XSocketNTOHS							@38	
 	XSocketNTOHL							@39	
