@@ -97,7 +97,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <DisableSpecificWarnings>
       </DisableSpecificWarnings>
-      <ExceptionHandling>Async</ExceptionHandling>
+      <ExceptionHandling>false</ExceptionHandling>
       <OmitFramePointers>true</OmitFramePointers>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <MinimalRebuild>false</MinimalRebuild>
@@ -171,7 +171,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <ExceptionHandling>Async</ExceptionHandling>
+      <ExceptionHandling>false</ExceptionHandling>
       <DisableSpecificWarnings>
       </DisableSpecificWarnings>
       <ForcedIncludeFiles>
