@@ -39,6 +39,7 @@ bool __cdecl user_interface_controller_verify_reconnection_failed(c_screen_widge
 void __cdecl user_interface_controller_process_events(uint32 elapsed_time)
 {
 	INVOKE(0x207750, 0x0, user_interface_controller_process_events, elapsed_time);
+	return;
 }
 
 

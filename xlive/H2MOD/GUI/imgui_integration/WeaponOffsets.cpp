@@ -160,7 +160,7 @@ namespace ImGuiHandler {
 const char* weapon_offsets_get_string(e_weapon_offsets_string string, const char* id)
 {
 	const e_language language = get_current_language();
-	const char* result = g_weapon_offsets_string_table[language][string];
+	const char* result = k_weapon_offsets_string_table[language][string];
 
 	if (id != NULL)
 	{

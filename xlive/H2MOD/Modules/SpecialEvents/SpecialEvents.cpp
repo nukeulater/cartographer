@@ -13,6 +13,10 @@
 #include "H2MOD/Modules/Shell/Config.h"
 #include "tag_files/tag_loader/tag_injection.h"
 
+const char k_cartographer_shared_missing_message[] =
+	"Error: Cartographer Shared map content is missing. Try updating your game from the mainmenu.\r\n\r\n"
+	"By going to Cartographer > Update.\r\n\r\n"
+	"If that doesn't work reach out to us in #help on discord.";
 
 // Enables event if the current date and time line up with an event time
 e_special_event_type get_current_special_event()
@@ -104,7 +108,7 @@ void load_special_event()
 		if (!NetworkSession::LocalPeerIsSessionHost())
 		{
 			*Memory::GetAddress<byte*>(0x46DCF1) = 1;
-			ImGuiHandler::ImMessageBox::SetMessage("Error: Cartographer Shared map content is missing. Try updating your game from the mainmenu.\r\n\r\nBy going to Cartographer > Update.\r\n\r\nIf that doesn't work reach out to us in #help on discord.");
+			ImGuiHandler::ImMessageBox::SetMessage(k_cartographer_shared_missing_message);
 			ImGuiHandler::ToggleWindow(k_message_box_window_name);
 		}
 	}

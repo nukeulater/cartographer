@@ -5,7 +5,7 @@ extern std::string empty;
 
 // useful macros
 #define ComVarFromPtr(_var_name, _var_type, _var_ptr, _command_name, _description, _min_parameter_count, _max_parameter_count, _callback) \
-ComVar<_var_type> _var_name##__LINE__(_var_ptr); \
+const ComVar<_var_type> _var_name##__LINE__(_var_ptr); \
 ConsoleCommand _var_name((ComVarBase*)&_var_name##__LINE__, _command_name, _description, _min_parameter_count, _max_parameter_count, _callback);
 
 class ComVarBase

@@ -13,7 +13,7 @@
 bool firstPlayerSpawn;
 bool player_is_picking_up_skull = false;
 
-const wchar_t* headhunterSoundTable[k_language_count][e_graverobber_sounds::_graverobber_end]
+const wchar_t *const headhunterSoundTable[k_language_count][e_graverobber_sounds::_graverobber_end]
 {
 	{SND_HEADHUNTER_EN, SND_SKULL_SCORED_EN},
 	{SND_HEADHUNTER_JP, SND_SKULL_SCORED_JP},

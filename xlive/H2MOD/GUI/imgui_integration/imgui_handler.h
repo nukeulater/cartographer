@@ -46,10 +46,10 @@ namespace ImGuiHandler
 	struct s_imgui_window
 	{
 		const char* name;
-		void(__cdecl* renderFunc)(bool*);
-		void(__cdecl* openFunc)();
-		void(__cdecl* closeFunc)();
-		ImWWindowHandlerFlags flags;
+		void(__cdecl *const renderFunc)(bool*);
+		void(__cdecl *const openFunc)();
+		void(__cdecl *const closeFunc)();
+		const ImWWindowHandlerFlags flags;
 
 		bool NoImInput() const
 		{
@@ -94,7 +94,7 @@ namespace ImGuiHandler
 	namespace ImMessageBox
 	{
 		void Render(bool* p_open);
-		void SetMessage(std::string message);
+		void SetMessage(const char* message);
 		void Open();
 		void Close();
 	}

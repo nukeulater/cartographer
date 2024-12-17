@@ -39,7 +39,7 @@ enum e_weapon_offsets_string
 
 /* globals */
 
-const char* g_weapon_offsets_string_table_english[k_weapon_offsets_string_count]
+const char *const k_weapon_offsets_string_table_english[k_weapon_offsets_string_count]
 {
 	"        Weapon Offsets",
 	"Weapon",
@@ -65,7 +65,7 @@ const char* g_weapon_offsets_string_table_english[k_weapon_offsets_string_count]
 	"Reset"
 };
 
-const char* g_weapon_offsets_string_table_spanish[k_weapon_offsets_string_count]
+const char *const k_weapon_offsets_string_table_spanish[k_weapon_offsets_string_count]
 {
 	u8"        Compensaciones de armas",
 	u8"Arma",
@@ -92,15 +92,15 @@ const char* g_weapon_offsets_string_table_spanish[k_weapon_offsets_string_count]
 };
 
 // TODO: finish localization
-const char** g_weapon_offsets_string_table[k_language_count] =
+const char *const *const k_weapon_offsets_string_table[k_language_count] =
 {
-	g_weapon_offsets_string_table_english,
-	g_weapon_offsets_string_table_english,
-	g_weapon_offsets_string_table_english,
-	g_weapon_offsets_string_table_english,
-	g_weapon_offsets_string_table_spanish,
-	g_weapon_offsets_string_table_english,
-	g_weapon_offsets_string_table_english,
-	g_weapon_offsets_string_table_english,
-	g_weapon_offsets_string_table_english
+	k_weapon_offsets_string_table_english,
+	k_weapon_offsets_string_table_english,
+	k_weapon_offsets_string_table_english,
+	k_weapon_offsets_string_table_english,
+	k_weapon_offsets_string_table_spanish,
+	k_weapon_offsets_string_table_english,
+	k_weapon_offsets_string_table_english,
+	k_weapon_offsets_string_table_english,
+	k_weapon_offsets_string_table_english
 };

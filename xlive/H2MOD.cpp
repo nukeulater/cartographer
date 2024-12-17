@@ -741,7 +741,7 @@ void H2MOD::RegisterEvents()
 	}
 }
 
-static real32 seconds_trigger_hold = 1.0f / 30.0f; // 0.033333333 seconds takes 2 60hz seconds
+static const real32 seconds_trigger_hold = 1.0f / 30.0f; // 0.033333333 seconds takes 2 60hz seconds
 
 __declspec(naked) void object_function_value_adjust_primary_firing()
 {

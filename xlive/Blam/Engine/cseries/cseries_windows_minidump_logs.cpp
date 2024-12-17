@@ -12,7 +12,7 @@
 /* constants */
 
 #define k_crash_message_header_break L"=============================================\n"
-const wchar_t* k_report_text_file_names[k_report_text_file_type_count] = { L"exception_info.txt", L"cpu_info.txt", L"game_options.txt", L"game_globals.txt", L"rasterizer.txt"};
+const wchar_t *const k_report_text_file_names[k_report_text_file_type_count] = { L"exception_info.txt", L"cpu_info.txt", L"game_options.txt", L"game_globals.txt", L"rasterizer.txt"};
 
 // globals
 
