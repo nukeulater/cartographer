@@ -37,26 +37,6 @@ namespace ImGuiHandler
 		patch_notes
 	};
 
-	typedef int ImWWindowHandlerFlags;
-	enum ImWWindowHandlerFlags_
-	{
-		_ImWindow_no_input = 1 << 0,
-	};
-
-	struct s_imgui_window
-	{
-		const char* name;
-		void(__cdecl *const renderFunc)(bool*);
-		void(__cdecl *const openFunc)();
-		void(__cdecl *const closeFunc)();
-		const ImWWindowHandlerFlags flags;
-
-		bool NoImInput() const
-		{
-			return (flags & _ImWindow_no_input) != 0;
-		}
-	};
-
 	enum e_imgui_aspect_ratio : byte
 	{
 		four_three,

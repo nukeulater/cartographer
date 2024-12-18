@@ -23,13 +23,27 @@ c_static_flags_no_init<k_imgui_window_type_count> g_imgui_window_should_render =
 
 namespace ImGuiHandler
 {
+	enum e_im_window_handler_flags
+	{
+		_im_window_no_input_bit = 0,
+	};
+
+	struct s_imgui_window
+	{
+		const char *const name;
+		void(*const renderFunc)(bool*);
+		void(*const openFunc)(void);
+		void(*const closeFunc)(void);
+		const e_im_window_handler_flags flags;
+	};
+
 	const s_imgui_window imgui_windows[k_imgui_window_type_count] =
 	{
-		{ k_weapon_offsets_window_name, WeaponOffsets::Render, WeaponOffsets::Open, WeaponOffsets::Close },
-		{ k_motd_window_name, ImMOTD::Render, ImMOTD::Open, ImMOTD::Close },
-		{ k_message_box_window_name, ImMessageBox::Render, ImMessageBox::Open, ImMessageBox::Close },
-		{ k_advanced_settings_window_name, ImAdvancedSettings::Render, ImAdvancedSettings::Open, ImAdvancedSettings::Close },
-		{ k_cartographer_console_window_name, CartographerConsole::Render, CartographerConsole::Open, CartographerConsole::Close }
+		{ k_weapon_offsets_window_name, WeaponOffsets::Render, WeaponOffsets::Open, WeaponOffsets::Close, (e_im_window_handler_flags)0},
+		{ k_motd_window_name, ImMOTD::Render, ImMOTD::Open, ImMOTD::Close, (e_im_window_handler_flags)0},
+		{ k_message_box_window_name, ImMessageBox::Render, ImMessageBox::Open, ImMessageBox::Close, (e_im_window_handler_flags)0},
+		{ k_advanced_settings_window_name, ImAdvancedSettings::Render, ImAdvancedSettings::Open, ImAdvancedSettings::Close, (e_im_window_handler_flags)0},
+		{ k_cartographer_console_window_name, CartographerConsole::Render, CartographerConsole::Open, CartographerConsole::Close, (e_im_window_handler_flags)0 }
 	};
 
 	PDIRECT3DTEXTURE9			g_patch_notes_texture = NULL;
@@ -103,7 +117,8 @@ namespace ImGuiHandler
 			bool should_render = g_imgui_window_should_render.test(i);
 			if (should_render)
 			{
-				imgui_windows[i].renderFunc(&should_render);
+				const s_imgui_window *const window = &imgui_windows[i];
+				window->renderFunc(&should_render);
 			}
 		}
 
@@ -118,7 +133,7 @@ namespace ImGuiHandler
 
 		for (int8 i = 0; i < k_imgui_window_type_count; ++i)
 		{
-			const s_imgui_window* window = &imgui_windows[i];
+			const s_imgui_window *const window = &imgui_windows[i];
 			if (strncmp(window->name, name, 256) == 0)
 			{
 				// Toggle render
@@ -135,7 +150,7 @@ namespace ImGuiHandler
 			}
 
 			// check if we still need to block the input of the game
-			if (g_imgui_window_should_render.test(i) && !window->NoImInput())
+			if (g_imgui_window_should_render.test(i) && !TEST_BIT(window->flags, _im_window_no_input_bit))
 			{
 				keep_game_input_blocked = true;
 			}
@@ -154,7 +169,8 @@ namespace ImGuiHandler
 
 		for (int8 i = 0; i < k_imgui_window_type_count; ++i)
 		{
-			if (strncmp(imgui_windows[i].name, name, 256) == 0)
+			const s_imgui_window *const window = &imgui_windows[i];
+			if (strncmp(window->name, name, 256) == 0)
 			{
 				return g_imgui_window_should_render.test(i);
 			}
