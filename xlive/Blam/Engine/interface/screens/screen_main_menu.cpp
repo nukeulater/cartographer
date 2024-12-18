@@ -6,13 +6,13 @@
 #include "screen_campaign_options_dialog.h"
 
 #include "game/preferences.h"
-
 #include "interface/user_interface_controller.h"
 #include "interface/user_interface_globals.h"
 #include "interface/user_interface_memory.h"
 #include "interface/user_interface_widget_text.h"
 #include "interface/user_interface_guide.h"
 #include "interface/user_interface_utilities.h"
+#include "main/game_preferences.h"
 #include "Networking/online/online_account_xbox.h"
 #include "Networking/transport/transport.h"
 #include "Networking/panorama/panorama_friends.h"

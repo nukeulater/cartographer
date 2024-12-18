@@ -101,8 +101,6 @@
 #include "interface/user_interface_utilities.h"
 #include "saved_games/cartographer_player_profile.h"
 
-std::unique_ptr<H2MOD> h2mod(std::make_unique<H2MOD>());
-
 bool H2XFirerateEnabled = false;
 bool g_xbox_tickrate_enabled = false;
 
@@ -288,7 +286,7 @@ void H2MOD::custom_sound_play(const wchar_t* soundName, int delay)
 {
 	auto playSound = [=]()
 	{
-		//std::unique_lock<std::mutex> lck(h2mod->sound_mutex);
+		//std::unique_lock<std::mutex> lck(H2MOD::sound_mutex);
 		std::chrono::high_resolution_clock::time_point timePoint = std::chrono::high_resolution_clock::now() + std::chrono::milliseconds(delay);
 
 		LOG_TRACE_GAME(L"[H2MOD-SoundQueue] - attempting to play sound {0} - delaying {1} miliseconds first", soundName, delay);
@@ -396,7 +394,7 @@ bool __cdecl OnMapLoad(s_game_options* options)
 	}
 
 	// reset everything
-	h2mod->toggle_ai_multiplayer(false);
+	H2MOD::toggle_ai_multiplayer(false);
 	toggle_xbox_tickrate(options, false);
 
 	// reset custom gametypes state
@@ -450,7 +448,7 @@ bool __cdecl OnMapLoad(s_game_options* options)
 				ProjectileFix::ApplyProjectileVelocity();
 			}
 
-			h2mod->toggle_ai_multiplayer(true);
+			H2MOD::toggle_ai_multiplayer(true);
 			if (get_game_life_cycle() == _life_cycle_in_game)
 			{
 				// send server map checksums to client

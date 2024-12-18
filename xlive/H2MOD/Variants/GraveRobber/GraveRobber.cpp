@@ -34,7 +34,7 @@ void GraveRobber::TriggerSound(e_graverobber_sounds sound, int sleep)
 	if (headhunterSoundTable[language_id][sound] != nullptr)
 	{
 		LOG_TRACE_GAME(L"[h2mod-graverobber] Triggering sound {}", headhunterSoundTable[language_id][sound]);
-		h2mod->custom_sound_play(headhunterSoundTable[language_id][sound], sleep);
+		H2MOD::custom_sound_play(headhunterSoundTable[language_id][sound], sleep);
 	}
 }
 
@@ -114,7 +114,7 @@ void GraveRobber::PickupSkull(datum player_datum, datum skull_datum)
 
 void GraveRobber::InitializeClient()
 {
-	h2mod->disable_score_announcer_sounds(FLAG(_sound_type_slayer) | ALL_SOUNDS_NO_SLAYER);
+	H2MOD::disable_score_announcer_sounds(FLAG(_sound_type_slayer) | ALL_SOUNDS_NO_SLAYER);
 	firstPlayerSpawn = true;
 }
 

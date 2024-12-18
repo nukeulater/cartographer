@@ -24,13 +24,10 @@ public:
 	static void RefreshTogglexDelay();
 
 	static void player_position_increase_client_position_margin_of_error(bool enable);
-	int get_player_index_from_unit_datum_index(datum unit_datum_index);
-	void set_unit_speed_patch(bool hackit);
-	void disable_score_announcer_sounds(int sound);
-	void custom_sound_play(const wchar_t* soundName, int delay);
+	static int get_player_index_from_unit_datum_index(datum unit_datum_index);
+	static void set_unit_speed_patch(bool hackit);
+	static void disable_score_announcer_sounds(int sound);
+	static void custom_sound_play(const wchar_t* soundName, int delay);
 
-	void toggle_ai_multiplayer(bool toggle);
-	bool drawTeamIndicators = true;
+	static void toggle_ai_multiplayer(bool toggle);
 };
-
-extern std::unique_ptr<H2MOD> h2mod;

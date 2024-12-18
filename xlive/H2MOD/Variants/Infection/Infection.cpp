@@ -114,14 +114,14 @@ void Infection::triggerSound(e_infection_sounds sound, int sleep)
 	if (infectionSoundTable[language_id][sound] != nullptr)
 	{
 		LOG_TRACE_GAME(L"[h2mod-infection] Triggering sound {}", infectionSoundTable[language_id][sound]);
-		h2mod->custom_sound_play(infectionSoundTable[language_id][sound], sleep);
+		H2MOD::custom_sound_play(infectionSoundTable[language_id][sound], sleep);
 	}
 }
 
 void Infection::InitClient()
 {
 	LOG_TRACE_GAME("[h2mod-infection] Disabling slayer sounds");
-	h2mod->disable_score_announcer_sounds(FLAG(_sound_type_slayer) | ALL_SOUNDS_NO_SLAYER);
+	H2MOD::disable_score_announcer_sounds(FLAG(_sound_type_slayer) | ALL_SOUNDS_NO_SLAYER);
 
 	for (int16 i = 0; i < k_number_of_users; i++)
 		infectedPlayed[i] = false;
@@ -157,7 +157,7 @@ void Infection::setZombiePlayerStatus(uint64 identifier)
 void Infection::InitHost() {
 	LOG_TRACE_GAME("[h2mod-infection] Host init setting unit speed patch");
 	//Applying SpeedCheck fix
-	h2mod->set_unit_speed_patch(true);
+	H2MOD::set_unit_speed_patch(true);
 
 	LOG_TRACE_GAME("[h2mod-infection] Host init resetting zombie player data status");
 	Infection::resetZombiePlayerStatus();
@@ -351,7 +351,7 @@ void Infection::Dispose()
 
 	Infection::resetWeaponInteractionAndEmblems();
 	if (!game_is_predicted()) {
-		h2mod->set_unit_speed_patch(false);
+		H2MOD::set_unit_speed_patch(false);
 	}
 
 	return;

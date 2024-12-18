@@ -14,8 +14,6 @@
 /* globals */
 
 bool g_should_draw_hud_override = true;
-std::vector<datum> crosshair_bitmap_datums;				// Store all the crosshair bitmap datums
-std::vector<point2d> crosshair_original_bitmap_sizes;	// We use point2d struct to store the original resolutions (x as width and y as height)
 
 /* prototypes */
 

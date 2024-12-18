@@ -408,10 +408,11 @@ void c_screen_settings::apply_patches_on_map_load()
 	tag_injection_extend_block(&main_widget_tag->panes, main_widget_tag->panes.type_size(), k_number_of_addition_panes_for_settings_screen);
 	//copy data from about_pane
 	csmemcpy(main_widget_tag->panes[_settings_pane_guide], main_widget_tag->panes[_settings_pane_about], sizeof(s_window_pane_reference));
-	//updating the new number of visible items in each pane
-	for (s_window_pane_reference& pane : main_widget_tag->panes)
+	
+	// updating the new number of visible items in each pane
+	for (size_t i = 0; i < main_widget_tag->panes.count; ++i)
 	{
-		pane.list_block[0]->num_visible_items = k_no_of_visible_items_for_settings;
+		main_widget_tag->panes[i]->list_block[0]->num_visible_items = k_no_of_visible_items_for_settings;
 	}
 
 	tag_injection_set_active_map(L"mainmenu_bitmaps");
