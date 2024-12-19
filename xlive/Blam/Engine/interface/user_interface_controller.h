@@ -174,10 +174,14 @@ struct s_user_interface_controller_globals
 };
 ASSERT_STRUCT_SIZE(s_user_interface_controller_globals, 19000);
 
+/* prototypes */
+
+void user_interface_controller_apply_patches(void);
+
 s_user_interface_controller_globals* user_interface_controller_globals_get(void);
 
-void __cdecl user_interface_controller_initialize();
-void __cdecl user_interface_controller_update();
+void __cdecl user_interface_controller_initialize(void);
+void __cdecl user_interface_controller_update(void);
 bool __cdecl user_interface_controller_is_player_profile_valid(e_controller_index controller_index);
 e_controller_index __cdecl user_interface_controller_get_next_valid_index(e_controller_index controller_index);
 uint32 __cdecl user_interface_controller_get_user_index(e_controller_index controller_index);
@@ -193,7 +197,7 @@ void __cdecl user_interface_controller_set_user_handicap_level(e_controller_inde
 void __cdecl user_interface_controller_set_griefer(e_controller_index controller_index, bool griefing);
 wchar_t* __cdecl user_interface_controller_get_player_profile_name(e_controller_index controller_index);
 
-uint32 __cdecl user_interface_controller_get_signed_in_controller_count();
+uint32 __cdecl user_interface_controller_get_signed_in_controller_count(void);
 uint16 __cdecl user_interface_controller_get_signed_in_controllers_mask(void);
 uint32 __cdecl user_interface_controller_get_last_level_played(e_controller_index controller_index);
 uint32 __cdecl user_interface_controller_get_highest_campaign_level_in_signed_in_controllers();
@@ -215,4 +219,3 @@ bool __cdecl user_interface_controller_has_xbox_live(e_controller_index controll
 void __cdecl user_interface_controller_xbox_live_account_set_signed_in(e_controller_index controller_index, bool active);
 void __cdecl user_interface_controller_update_player_name(e_controller_index controller_index);
 
-void user_interface_controller_apply_patches();
