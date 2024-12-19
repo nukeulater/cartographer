@@ -64,7 +64,7 @@ ASSERT_STRUCT_SIZE(s_saved_game_cartographer_player_profile_v2, 80);
 // These properties control the currently used version of the cartographer profile in the project.
 typedef s_saved_game_cartographer_player_profile_v2 s_saved_game_cartographer_player_profile;
 
-constexpr e_saved_game_cartographer_player_profile_version g_cartographer_profile_version = _saved_game_cartographer_player_profile_version_2;
+constexpr e_saved_game_cartographer_player_profile_version k_cartographer_profile_version = _saved_game_cartographer_player_profile_version_2;
 
 struct s_cartographer_profile_run_time
 {
