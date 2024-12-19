@@ -20,30 +20,34 @@
 
 /* prototypes */
 
-bool __cdecl user_inteface_controller_has_removed_screen_active();
-void __cdecl user_interface_controller_update_disconnect();
-void __cdecl user_interface_controller_removed_handler();
-void __cdecl user_interface_controller_boot_to_dash_check();
+static bool __cdecl user_interface_controller_verify_reconnection(void);
+static bool __cdecl user_interface_controller_verify_reconnection_failed(c_screen_widget* error_screen);
+static void user_interface_controller_process_events(uint32 elapsed_time);
+static bool user_inteface_controller_has_removed_screen_active(void);
+static void user_interface_controller_update_disconnect(void);
+static void user_interface_controller_removed_handler(void);
+static void user_interface_controller_boot_to_dash_check(void);
 
 /* private code */
 
-bool user_interface_controller_verify_reconnection()
+static bool __cdecl user_interface_controller_verify_reconnection(void)
 {
 	return INVOKE(0x20841E, 0x0, user_interface_controller_verify_reconnection);
 }
 
-bool __cdecl user_interface_controller_verify_reconnection_failed(c_screen_widget* error_screen)
+static bool __cdecl user_interface_controller_verify_reconnection_failed(c_screen_widget* error_screen)
 {
 	return INVOKE(0x208485, 0x0, user_interface_controller_verify_reconnection_failed, error_screen);
 }
-void __cdecl user_interface_controller_process_events(uint32 elapsed_time)
+
+static void __cdecl user_interface_controller_process_events(uint32 elapsed_time)
 {
 	INVOKE(0x207750, 0x0, user_interface_controller_process_events, elapsed_time);
 	return;
 }
 
 
-bool __cdecl user_inteface_controller_has_removed_screen_active()
+static bool user_inteface_controller_has_removed_screen_active(void)
 {
 	//h2v only checked for _ui_error_controller_removed
 	if (user_interface_error_screen_is_active(_user_interface_channel_type_hardware_error, _window_4, _ui_error_controller_removed)
@@ -58,7 +62,7 @@ bool __cdecl user_inteface_controller_has_removed_screen_active()
 	return false;
 }
 
-void __cdecl user_interface_controller_update_disconnect()
+static void user_interface_controller_update_disconnect(void)
 {
 	//redone to fix infinite controller disconnection error bug
 
@@ -116,7 +120,7 @@ void __cdecl user_interface_controller_update_disconnect()
 	}
 }
 
-void __cdecl user_interface_controller_removed_handler()
+static void user_interface_controller_removed_handler(void)
 {
 	//INVOKE(0x208738, 0x0, user_interface_controller_removed_handler);
 	// redone to display proper error msgs
@@ -157,7 +161,7 @@ void __cdecl user_interface_controller_removed_handler()
 			user_interface_controller_verify_reconnection,
 			user_interface_controller_verify_reconnection_failed);
 
-		scenario* scnr = get_global_scenario();
+		const scenario* scnr = get_global_scenario();
 
 		if (scnr && scnr->type == scenario_type_singleplayer && !game_time_get_paused())
 		{
@@ -167,7 +171,7 @@ void __cdecl user_interface_controller_removed_handler()
 	}
 }
 
-void __cdecl user_interface_controller_boot_to_dash_check()
+static void user_interface_controller_boot_to_dash_check(void)
 {
 	//basically ALT (SYSKEYDOWN) needs to be held earlier than F4
 	if ((input_windows_key_frames_down(VK_F4) == 1
@@ -251,6 +255,8 @@ void __cdecl user_interface_controller_update()
 	}
 	user_interface_controller_boot_to_dash_check();
 }
+
+/* public code */
 
 bool __cdecl user_interface_controller_is_player_profile_valid(e_controller_index controller_index)
 {
