@@ -2,7 +2,7 @@
 #include "Infection.h"
 
 #include "game/game.h"
-#include "game/game_engine.h"
+#include "game/game_engine_util.h"
 #include "game/game_time.h"
 #include "interface/user_interface_controller.h"
 #include "items/item_collection_definition.h"

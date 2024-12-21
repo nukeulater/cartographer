@@ -51,8 +51,8 @@ enum e_vertex_shader_platform : int16
 
 class c_vertex_shader_classification
 {
-private:
-	IDirect3DVertexShader9* runtime_pointer;
+public:
+	IDirect3DVertexShader9* m_handle;
 
 	/****************************************
 	* definition_name: compiled_shader_block
@@ -76,7 +76,7 @@ class c_vertex_shader_definition
 {
 	static const uint32 k_vertex_shader_classification_count = 12;
 
-private:
+public:
 	e_vertex_shader_platform m_platform;
 	int16 pad;
 	tag_block<c_vertex_shader_classification> m_geometry_classifications;
