@@ -158,10 +158,10 @@ struct s_simulation_player_netdebug_data
 {
 	int32 field_0;
 	int32 field_4;
-	int16 rtt_msec;
-	int16 pck_rate;
-	int16 throughput;
-	int16 pck_loss;
+	int16 client_rtt_msec;
+	int16 client_packet_rate;
+	int16 client_throughput;
+	int16 client_packet_loss;
 };
 ASSERT_STRUCT_SIZE(s_simulation_player_netdebug_data, 16);
 

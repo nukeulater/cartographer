@@ -116,7 +116,7 @@ struct alignas(8) s_observer_channel
 	int8 field_6B9;
 	int8 field_6BA;
 	int32 field_6BC;
-	int32 total_bits_received;
+	int32 field_6C0;
 	int32 field_6C4;
 	int32 net_rtt;
 	int32 field_6CC;

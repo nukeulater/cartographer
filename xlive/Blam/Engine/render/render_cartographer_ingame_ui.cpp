@@ -280,10 +280,10 @@ void render_netdebug_text(void)
 				{
 					s_observer_channel* observer_channel = &session->p_network_observer->observer_channels[channel_index];
 
-					netdebug_data->rtt_msec = observer_channel->net_rtt;
-					netdebug_data->pck_rate = observer_channel->net_rate_managed_stream * 10.f;
-					netdebug_data->throughput = (observer_channel->throughput_bps * 10.f) / 1024.f;
-					netdebug_data->pck_loss = observer_channel->field_440.average_values_in_window() * 100.f;
+					netdebug_data->client_rtt_msec = observer_channel->net_rtt;
+					netdebug_data->client_packet_rate = observer_channel->net_rate_managed_stream * 10.f;
+					netdebug_data->client_throughput = (observer_channel->throughput_bps * 10.f) / 1024.f;
+					netdebug_data->client_packet_loss = observer_channel->field_440.average_values_in_window() * 100.f;
 
 					// NOT UPDATED IN REAL-TIME
 					//for (int32 i = 0; i < k_number_of_users; i++)
@@ -305,18 +305,18 @@ void render_netdebug_text(void)
 			
 			rasterizer_get_frame_bounds(&bounds);
 			bounds.top = (8 * rasterizer_globals->ui_scale);
-			bounds.left = bounds.right - (1050 * rasterizer_globals->ui_scale);
+			bounds.left = bounds.right - (1070 * rasterizer_globals->ui_scale);
 			bounds.bottom = bounds.top + line_height;
 
 			real_argb_color text_color_console = *global_real_argb_white;
 			text_color_console.alpha *= (65.f / 100.f);
 
 			swprintf_s(netdebug_text, ARRAYSIZE(netdebug_text),
-				L"[rtt: %d msec, pck rate: %.3f, throughput: %.3f bps, loss: %d %%]",
-				netdebug_data->rtt_msec,
-				(real32)netdebug_data->pck_rate / 10.f,
-				((real32)netdebug_data->throughput / 10.f) * 1024.f,
-				netdebug_data->pck_loss
+				L"[up^ rtt: %d msec, pck rate: %.3f, throughput: %.3f bps, loss: %d %%]",
+				netdebug_data->client_rtt_msec,
+				(real32)netdebug_data->client_packet_rate / 10.f,
+				((real32)netdebug_data->client_throughput / 10.f) * 1024.f,
+				netdebug_data->client_packet_loss
 			);
 
 			draw_string_reset();
