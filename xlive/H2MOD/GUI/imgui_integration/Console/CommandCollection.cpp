@@ -12,6 +12,7 @@
 #include "main/main_screenshot.h"
 #include "networking/Session/NetworkSession.h"
 #include "networking/NetworkMessageTypeCollection.h"
+#include "render/render_cartographer_ingame_ui.h"
 #include "objects/objects.h"
 #include "simulation/game_interface/simulation_game_action.h"
 #include "text/unicode.h"
@@ -31,18 +32,18 @@ std::map<std::string, unsigned int> objectIds;
 
 const char command_error_bad_arg[] = "# exception catch (bad arg): ";
 
-ComVarFromPtr(network_stats_overlay_var_cmd, bool, &ImGuiHandler::g_network_stats_overlay,
-	"var_net_metrics", "enable/disable useful net metrics, 1 parameter(s)", 1, 1, CommandCollection::NetworkMetricsCmd);
+ComVarFromPtr(network_stats_overlay_var_cmd, int, &ImGuiHandler::g_network_stats_overlay,
+	"var_net_metrics", "displays various network parameters, 1 parameter(s): <int>(1 - basic debug info, 2 - complete debug)", 0, 1, CommandCollection::NetworkMetricsCmd);
 
 ComVarFromPtr(og_frame_limiter_var_cmd, bool, &g_main_game_time_frame_limiter_enabled,
-	"var_og_frame_limiter", "enabled/disable original h2 frame limiter", 1, 1, CommandCollection::BoolVarHandlerCmd);
+	"var_og_frame_limiter", "enabled/disable original h2 frame limiter", 0, 1, CommandCollection::BoolVarHandlerCmd);
 
 extern real32 g_rumble_factor;
 ComVarFromPtr(rumble_var_cmd, real32, &g_rumble_factor,
 	"var_rumble_scale", "change controller vibration strength (0.0 to 1.0), 1 parameter(s): <float>", 1, 1, CommandCollection::RumbleScaleCmd);
 
 ComVarFromPtr(debug_render_horizontal_splitscreen, bool, &g_debug_render_horizontal_splitscreen,
-	"debug_render_horizontal_splitscreen", "force horizontal spliscreen split", 1, 1, CommandCollection::BoolVarHandlerCmd);
+	"var_debug_render_horizontal_splitscreen", "force horizontal spliscreen split", 0, 1, CommandCollection::BoolVarHandlerCmd);
 
 // don't forget to add '_cmd' after the name, 
 // if you add a variable command created using `DECL_ComVarCommandPtr` macro
@@ -156,6 +157,13 @@ int CommandCollection::BoolVarHandlerCmd(const std::vector<std::string>& tokens,
 		return 0;
 	}
 
+	if (tokens.size() - 1 < 1)
+	{
+		booleanCmdVar->SetVal(!booleanCmdVar->GetVal());
+		outputCb(StringFlag_None, "%s", booleanCmdVar->AsString().c_str());
+		return 0;
+	}
+
 	std::string exception;
 	if (!booleanCmdVar->SetFromStr(tokens[1], exception))
 	{
@@ -187,13 +195,40 @@ int CommandCollection::RumbleScaleCmd(const std::vector<std::string>& tokens, Co
 int CommandCollection::NetworkMetricsCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
 	TextOutputCb* outputCb = ctx.outputCb;
+	int32 network_debug_display_type;
+	std::string exception;
 
 	if (Memory::IsDedicatedServer()) {
 		outputCb(StringFlag_None, "# command unavailable on dedicated servers");
 		return 0;
 	}
 
-	return BoolVarHandlerCmd(tokens, ctx);
+	if (tokens.size() - 1 < 1)
+	{
+		ImGuiHandler::g_network_stats_overlay = !ImGuiHandler::g_network_stats_overlay;
+		return 0;
+	}
+	else if (!ComVar(&network_debug_display_type).SetFromStr(tokens[1], 0, exception))
+	{
+		outputCb(StringFlag_None, command_error_bad_arg);
+		outputCb(StringFlag_None, "	%s", exception.c_str());
+	}
+	else
+	{
+		switch (network_debug_display_type)
+		{
+		case _network_stats_display_basic:
+		case _network_stats_display_complete:
+			ImGuiHandler::g_network_stats_overlay = network_debug_display_type;
+			break;
+		case _network_stats_display_none:
+		default:
+			ImGuiHandler::g_network_stats_overlay = _network_stats_display_none;
+			break;
+		}
+	}
+
+	return 0;
 }
 
 int CommandCollection::SetD3D9ExStateCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)

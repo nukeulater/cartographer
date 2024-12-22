@@ -3,8 +3,6 @@
 #include "network_observer.h"
 #include "network_channel.h"
 
-
-
 s_network_observer_configuration* g_network_configuration;
 
 #if defined(LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS) 
@@ -212,10 +210,10 @@ bool __thiscall c_network_observer::channel_should_send_packet_hook(
 	typedef bool(__thiscall* channel_should_send_packet_t)(c_network_observer*, int32, bool, bool, int32, int32*, int32*, int32*, int32*, int32, uint8*);
 	auto p_channel_should_send_packet = Memory::GetAddressRelative<channel_should_send_packet_t>(0x5BEE8D, 0x5B8D67);
 
-	int32 observer_index = -1;
+	int32 observer_index = NONE;
 	for (int32 i = 0; i < 16; i++)
 	{
-		if (this->observer_channels[i].state != s_observer_channel::e_observer_channel_state::_channel_state_none
+		if (this->observer_channels[i].state != _observer_channel_state_none
 			&& this->observer_channels[i].channel_index == network_channel_index)
 		{
 			observer_index = i;
@@ -223,7 +221,7 @@ bool __thiscall c_network_observer::channel_should_send_packet_hook(
 		}
 	}
 
-	if (observer_index == -1)
+	if (observer_index == NONE)
 		return false;
 
 	s_network_channel* network_channel = s_network_channel::get(network_channel_index);

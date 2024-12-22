@@ -448,6 +448,7 @@
     <ClCompile Include="Blam\Engine\interface\screens\screen_campaign_options_dialog.cpp" />
     <ClCompile Include="Blam\Engine\input\input_process.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_error_dialog.cpp" />
+    <ClCompile Include="Blam\Engine\networking\network_statistics.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
@@ -1168,6 +1169,7 @@
     <ClInclude Include="Blam\Engine\sound\sound_classes.h" />
     <ClInclude Include="Blam\Engine\devices\device_controls.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_cartographer_account_manager_strings.h" />
+    <ClInclude Include="Blam\Engine\networking\network_statistics.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

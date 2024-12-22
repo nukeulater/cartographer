@@ -146,13 +146,24 @@ private:
 struct s_game_engine_global_player_info
 {
 	bool valid;
-	byte pad_1[3];
+	uint8 pad_1[3];
 	real_point3d point;
 	short field_10;
 	short field_12;
-	byte field_14[4];
+	uint8 field_14[4];
 };
 ASSERT_STRUCT_SIZE(s_game_engine_global_player_info, 24);
+
+struct s_simulation_player_neddebug_data
+{
+	int32 field_0;
+	int32 field_4;
+	int16 rtt_msec;
+	int16 pck_rate;
+	int16 throughput;
+	int16 pck_loss;
+};
+ASSERT_STRUCT_SIZE(s_simulation_player_neddebug_data, 16);
 
 struct s_game_engine_globals
 {
@@ -178,7 +189,8 @@ struct s_game_engine_globals
 	c_game_statborg game_statborg;
 	s_game_engine_global_player_info player_info[k_maximum_players];
 	uint32 ticks;
-	uint8 gap71C[1320];
+	s_simulation_player_neddebug_data netdebug_data[k_maximum_players];
+	uint8 gap81C[1064];
 	int32 field_C44;
 	uint8 gap_C48[12];
 	int32 game_engine_index;
@@ -248,6 +260,8 @@ ASSERT_STRUCT_SIZE(s_multiplayer_event_response_definition, 0xA8);
 c_game_engine* current_game_engine();
 
 s_game_engine_globals* game_engine_globals_get(void);
+
+s_simulation_player_neddebug_data* game_engine_get_netdebug_data(datum player_index);
 
 bool __cdecl game_engine_get_change_colors(s_player_profile* player_profile, e_game_team team_index, real_rgb_color* change_colors);
 

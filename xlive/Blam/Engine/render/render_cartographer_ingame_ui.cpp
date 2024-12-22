@@ -4,14 +4,17 @@
 #include "cartographer/twizzler/twizzler.h"
 #include "cseries/cseries_strings.h"
 #include "game/game.h"
+#include "game/game_engine.h"
 #include "rasterizer/rasterizer_globals.h"
 #include "rasterizer/rasterizer_text.h"
 #include "rasterizer/dx9/rasterizer_dx9.h"
 #include "shell/shell_windows.h"
+#include "networking/network_statistics.h"
 #include "text/draw_string.h"
 #include "text/font_cache.h"
 #include "text/unicode.h"
 
+#include "H2MOD/GUI/imgui_integration/imgui_handler.h"
 #include "H2MOD/Modules/Accounts/AccountLogin.h"
 #include "H2MOD/Modules/Achievements/Achievements.h"
 #include "H2MOD/GUI/XLiveRendering.h"
@@ -34,6 +37,7 @@ enum
 	k_update_status_font = 5,
 	k_cheevo_title_font = 10,
 	k_cheevo_message_font = 1,
+	k_netdebug_text_font = 0,
 	k_cheevo_display_lifetime = (5 * k_shell_time_msec_denominator),
 };
 
@@ -43,6 +47,9 @@ static void render_cartographer_status_bar(const char* build_text);
 static void render_cartographer_git_build_info(void);
 static bool render_cartographer_achievement_message(const char* achivement_message);
 static void render_cartographer_update_message(const char* update_text, int64 update_size_bytes, int64 update_downloaded_bytes);
+static void render_netdebug_text(void);
+
+/* globals */
 
 /* public code */
 
@@ -78,6 +85,7 @@ void render_cartographer_ingame_ui(void)
 		}
 	}
 	render_cartographer_git_build_info();
+	render_netdebug_text();
 	rasterizer_dx9_perf_event_end("render cartographer ingame ui");
 
 	return;
@@ -252,4 +260,70 @@ void render_cartographer_update_message(const char* update_text, int64 update_si
 	}
 
 	return;
+}
+
+void render_netdebug_text(void)
+{
+	if (ImGuiHandler::g_network_stats_overlay != _network_stats_display_none)
+	{
+		c_network_session* session;
+		if (NetworkSession::GetActiveNetworkSession(&session))
+		{
+			s_simulation_player_neddebug_data netdebug_data_default{};
+			s_simulation_player_neddebug_data* netdebug_data = &netdebug_data_default;
+			if (!session->local_state_session_host())
+			{
+				s_membership_peer* membership_peer = session->get_peer_membership(session->get_local_peer_index());
+
+				int32 channel_index = session->observer_channels[session->get_session_host_peer_index()].observer_index;
+				if (channel_index != NONE)
+				{
+					s_observer_channel* observer_channel = &session->p_network_observer->observer_channels[channel_index];
+
+					netdebug_data->rtt_msec = observer_channel->net_rtt;
+					netdebug_data->pck_rate = observer_channel->net_rate_managed_stream * 10.f;
+					netdebug_data->throughput = (observer_channel->throughput_bps * 10.f) / 1024.f;
+					netdebug_data->pck_loss = observer_channel->field_440.average_values_in_window() * 100.f;
+
+					// NOT UPDATED IN REAL-TIME
+					//for (int32 i = 0; i < k_number_of_users; i++)
+					//{
+					//	if (membership_peer->local_players_indexes[i] != NONE)
+					//	{
+					//		//netdebug_data = game_engine_get_netdebug_data(membership_peer->local_players_indexes[i]);
+					//		break;
+					//	}
+					//}
+				}
+			}
+
+			const s_rasterizer_globals* rasterizer_globals = rasterizer_globals_get();
+			const int16 line_height = get_text_size_from_font_cache(k_netdebug_text_font);
+
+			rectangle2d bounds;
+			wchar_t netdebug_text[512];
+			
+			rasterizer_get_frame_bounds(&bounds);
+			bounds.top = (8 * rasterizer_globals->ui_scale);
+			bounds.left = bounds.right - (1050 * rasterizer_globals->ui_scale);
+			bounds.bottom = bounds.top + line_height;
+
+			real_argb_color text_color_console = *global_real_argb_white;
+			text_color_console.alpha *= (65.f / 100.f);
+
+			swprintf_s(netdebug_text, ARRAYSIZE(netdebug_text),
+				L"[rtt: %d msec, pck rate: %.3f, throughput: %.3f bps, loss: %d %%]",
+				netdebug_data->rtt_msec,
+				(real32)netdebug_data->pck_rate / 10.f,
+				((real32)netdebug_data->throughput / 10.f) * 1024.f,
+				netdebug_data->pck_loss
+			);
+
+			draw_string_reset();
+			draw_string_set_draw_mode(k_netdebug_text_font, 0, 0, 0, &text_color_console, global_real_argb_black, false);
+
+			draw_string_set_format(0, 0, 0, false);
+			rasterizer_draw_unicode_string(&bounds, netdebug_text);
+		}
+	}
 }

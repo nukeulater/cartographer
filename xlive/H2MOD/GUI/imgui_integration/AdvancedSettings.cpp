@@ -968,7 +968,7 @@ namespace ImGuiHandler {
 							ImGui::Columns(4, NULL, false);
 							for (auto i = 0; i < 25; i++)
 							{
-								if (ImGui::Checkbox(itoa(i, integer_string, 10), &ras_layer_overrides[i]))
+								if (ImGui::Checkbox(_itoa(i, integer_string, 10), &ras_layer_overrides[i]))
 								{
 									rasterizer_globals->reset_screen = true;
 								}
@@ -981,7 +981,7 @@ namespace ImGuiHandler {
 							ImGui::Columns(4, NULL, false);
 							for (auto i = 0; i < 24; i++)
 							{
-								ImGui::Checkbox(itoa(i, integer_string, 10), &geo_render_overrides[i]);
+								ImGui::Checkbox(_itoa(i, integer_string, 10), &geo_render_overrides[i]);
 								ImGui::NextColumn();
 							}
 							ImGui::Columns(1);

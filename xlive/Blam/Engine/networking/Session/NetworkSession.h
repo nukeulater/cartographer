@@ -1,4 +1,5 @@
 #pragma once
+
 #include "game/players.h"
 #include "input/controllers.h"
 #include "networking/Transport/transport.h"
@@ -381,6 +382,11 @@ struct c_network_session
 	int32 get_local_peer_index() const
 	{
 		return local_peer_index;
+	}
+
+	int32 get_session_host_peer_index() const
+	{
+		return session_host_peer_index;
 	}
 
 	bool peer_index_local_peer(int32 peer_index) const
