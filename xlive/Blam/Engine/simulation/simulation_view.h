@@ -48,7 +48,7 @@ struct c_simulation_view
 	DWORD field_30;
 	signed int field_34;
 	unsigned int field_38;
-	unsigned int m_channel_index;
+	int32 m_channel_index;
 	unsigned int field_40;
 	void* field_44;
 	signed int field_48;

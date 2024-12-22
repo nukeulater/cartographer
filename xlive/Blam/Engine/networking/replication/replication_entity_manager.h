@@ -26,7 +26,7 @@ public:
 
 private: 
 	c_replication_entity_manager_client* m_client;
-	c_replication_entity_manager_view* m_views[16];
+	c_replication_entity_manager_view* m_views[k_maximum_players];
 	uint32 m_view_mask;
 	s_replication_entity_manager_data m_entity_data[k_simulation_entity_database_maximum_entities];
 	int32 m_field_2048;

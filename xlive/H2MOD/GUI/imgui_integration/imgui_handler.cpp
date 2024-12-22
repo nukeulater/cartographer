@@ -42,7 +42,7 @@ namespace ImGuiHandler
 		bool					last_frame_update = true;
 	}
 
-	bool						g_network_stats_overlay = false;
+	int						g_network_stats_overlay = _network_stats_display_none;
 
 	bool ImGuiShouldHandleInput()
 	{
@@ -55,7 +55,7 @@ namespace ImGuiHandler
 	bool CanDrawImgui()
 	{
 		// TODO add these to some container
-		if (g_network_stats_overlay)
+		if (g_network_stats_overlay == _network_stats_display_complete)
 			return true;
 
 		for (int8 i = 0; i < k_imgui_window_type_count; ++i)
@@ -95,7 +95,9 @@ namespace ImGuiHandler
 		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();
 
-		ShowNetworkStatsOverlay(&g_network_stats_overlay);
+		static bool display_network_stats = false;
+		display_network_stats = g_network_stats_overlay == _network_stats_display_complete;
+		ShowNetworkStatsOverlay(&display_network_stats);
 		for (int8 i = 0; i < k_imgui_window_type_count; ++i)
 		{
 			bool should_render = g_imgui_window_should_render.test(i);

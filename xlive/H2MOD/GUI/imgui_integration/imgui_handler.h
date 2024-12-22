@@ -11,6 +11,13 @@ extern const char* k_message_box_window_name;
 
 /* enums */
 
+enum e_network_stats_display_type : int32
+{
+	_network_stats_display_none,
+	_network_stats_display_basic,
+	_network_stats_display_complete,
+};
+
 enum e_imgui_window_type
 {
 	_imgui_window_weapon_offsets = 0,
@@ -23,7 +30,7 @@ enum e_imgui_window_type
 
 namespace ImGuiHandler
 {
-	extern bool g_network_stats_overlay;
+	extern int g_network_stats_overlay;
 
 	enum s_imgui_images
 	{

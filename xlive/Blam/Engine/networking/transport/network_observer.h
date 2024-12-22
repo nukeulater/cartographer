@@ -6,6 +6,8 @@
 #include "transport.h"
 #include "transport_qos.h"
 
+#include "networking/network_statistics.h"
+
 // enables/disables LIVE netcode, so we can use the LIVE serverlist
 // true  - LIVE network protocol enabled
 // false - System Link network protocol enabled
@@ -20,6 +22,8 @@
 #	endif
 #endif
 #endif
+
+#define k_network_channel_count (16)
 
 // network heap size
 #define k_network_preferences_size 108
@@ -40,16 +44,16 @@
 
 struct s_network_observer_configuration;
 
+enum e_observer_channel_state : int32
+{
+	_observer_channel_state_none = 0,
+	_observer_channel_state_pending_transport_layer = 3, // waiting for xnet connection to be established
+	_observer_channel_state_pending_game_layer = 4, // xnet layer connected, waiting for game to establish
+	_observer_channel_state_connected = 7
+};
+
 struct alignas(8) s_observer_channel
 {
-	enum e_observer_channel_state : int32
-	{
-		_channel_state_none = 0,
-		_channel_state_pending_transport_layer = 3, // waiting for xnet connection to be established
-		_channel_state_pending_game_layer = 4, // xnet layer connected, waiting for game to establish
-		_channel_state_connected = 7
-	};
-
 	int32 state;
 	int32 field_4;
 	uint8 observer_flags;
@@ -74,22 +78,15 @@ struct alignas(8) s_observer_channel
 	int32 field_98;
 	int32 field_9C;
 	uint8 gap_A0[8];
-	int32 field_A8;
-	uint8 gap_AC[212];
-	int32 field_180;
-	uint8 gap_184[268];
-	int32 field_290;
-	uint8 gap_294[156];
-	int32 field_330;
-	uint8 gap_334[52];
-	int32 field_368;
-	uint8 gap_36C[212];
-	int32 field_440;
-	uint8 gap_444[236];
-	int32 field_530;
-	uint8 gap_534[28];
-	int32 field_550;
-	uint8 gap_554[268];
+	c_network_time_statistics field_A8;
+	uint8 gap_17C[4];
+	c_network_window_statistics field_180;
+	c_network_time_statistics field_290;
+	uint8 gap_364[4];
+	c_network_time_statistics field_368;
+	uint8 gap_43C[4];
+	c_network_window_statistics field_440;
+	c_network_window_statistics field_550;
 	int32 field_660;
 	int32 field_664;
 	int32 field_668;
@@ -119,9 +116,9 @@ struct alignas(8) s_observer_channel
 	int8 field_6B9;
 	int8 field_6BA;
 	int32 field_6BC;
-	int32 total_bits_received;
+	int32 field_6C0;
 	int32 field_6C4;
-	int32 field_6C8;
+	int32 net_rtt;
 	int32 field_6CC;
 	int32 field_6D0;
 	int32 field_6D4;
@@ -149,7 +146,7 @@ struct alignas(8) s_observer_channel
 	int8 field_726;
 	int8 field_727;
 	int32 field_728;
-	int32 field_72C;
+	int32 throughput_bps;
 	int32 field_730;
 	int32 field_734;
 	LONGLONG field_738;
@@ -176,7 +173,7 @@ public:
 	uint8 gap_68[12];
 	int32 field_74;
 	uint8 gap_78[8];
-	s_observer_channel observer_channels[16];
+	s_observer_channel observer_channels[k_network_channel_count];
 	bool network_observer_enabled;
 	int8 field_7481;
 	int32 field_7484;
