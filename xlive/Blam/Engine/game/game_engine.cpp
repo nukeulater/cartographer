@@ -16,7 +16,7 @@ s_game_engine_globals* game_engine_globals_get(void)
 	return *Memory::GetAddress<s_game_engine_globals**>(0x4BF8F8, 0x4EA028);
 }
 
-s_simulation_player_neddebug_data* game_engine_get_netdebug_data(datum player_index)
+s_simulation_player_netdebug_data* game_engine_get_netdebug_data(datum player_index)
 {
 	return &game_engine_globals_get()->netdebug_data[DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index)];
 }

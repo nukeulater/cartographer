@@ -269,8 +269,8 @@ void render_netdebug_text(void)
 		c_network_session* session;
 		if (NetworkSession::GetActiveNetworkSession(&session))
 		{
-			s_simulation_player_neddebug_data netdebug_data_default{};
-			s_simulation_player_neddebug_data* netdebug_data = &netdebug_data_default;
+			s_simulation_player_netdebug_data netdebug_data_default{};
+			s_simulation_player_netdebug_data* netdebug_data = &netdebug_data_default;
 			if (!session->local_state_session_host())
 			{
 				s_membership_peer* membership_peer = session->get_peer_membership(session->get_local_peer_index());
