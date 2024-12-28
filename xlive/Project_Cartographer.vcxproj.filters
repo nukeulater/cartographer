@@ -82,7 +82,7 @@
     <ClCompile Include="Blam\Engine\game\game_globals.cpp" />
     <ClCompile Include="Blam\Engine\game\game_engine.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\ImGui_CartographerStyle.cpp" />
-    <ClCompile Include="H2MOD\Modules\MapManager\CustomMapDataCache\CustomMapDataCache.cpp" />
+    <ClCompile Include="Blam\Engine\main\map_repository.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\ImGui_NetworkStatsOverlay.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_cartographer_errors.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\Console\CommandHandler.cpp" />
@@ -648,7 +648,7 @@
     <ClInclude Include="3rdparty\directx\include\d3dx9shape.h" />
     <ClInclude Include="3rdparty\directx\include\d3dx9tex.h" />
     <ClInclude Include="3rdparty\directx\include\d3dx9xof.h" />
-    <ClInclude Include="H2MOD\Modules\MapManager\CustomMapDataCache\CustomMapDataCache.h" />
+    <ClInclude Include="Blam\Engine\main\map_repository.h" />
     <ClInclude Include="H2MOD\GUI\ImGui_Integration\ImGui_NetworkStatsOverlay.h" />
     <ClInclude Include="CartographerDllConf.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_cartographer_errors.h" />

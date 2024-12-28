@@ -1,7 +1,6 @@
 #include "stdafx.h"
 
 #include "MapManager.h"
-#include "CustomMapDataCache/CustomMapDataCache.h"
 
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
@@ -9,7 +8,7 @@
 #include "networking/NetworkMessageTypeCollection.h"
 #include "networking/logic/life_cycle_manager.h"
 
-#include "networking/logic/life_cycle_manager.h"
+#include "main/map_repository.h"
 #include "main/game_preferences.h"
 
 std::unique_ptr<MapManager> mapManager(std::make_unique<MapManager>());

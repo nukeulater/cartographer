@@ -1,11 +1,9 @@
 #pragma once
 
-#include "../MapManager.h"
+#define k_max_map_name_size 32
+#define k_map_file_path_size (255 + 1)
 
-#define MAX_MAP_NAME_SIZE 32
-#define MAX_MAP_FILE_PATH_SIZE (255 + 1)
-
-#define SHA256_HASH_SIZE 32
+#define k_sha256_hash_size 32
 
 #define k_maximum_number_of_custom_multiplayer_maps_default 50u
 
@@ -14,7 +12,7 @@
 //#define NEW_MAP_BITMAP_PREVIEW_LIMIT VANILLA_MAP_BITMAP_PREVIEW_LIMIT
 #define k_maximum_number_of_custom_multiplayer_maps_new 1000u
 
-#define MAX_BITMAP_PREVIEW_MAX_BUFFER_SIZE 524288u
+#define k_bitmap_preview_buffer_size 524288u
 
 static const int custom_map_cache_signature = 'mpch';
 #define k_custom_map_data_cache_header_version (1)
@@ -27,22 +25,22 @@ enum e_directory_id
 
 struct s_custom_map_id
 {
-	wchar_t map_name[MAX_MAP_NAME_SIZE];
-	BYTE map_sha256_hash[SHA256_HASH_SIZE];
+	wchar_t map_name[k_max_map_name_size];
+	BYTE map_sha256_hash[k_sha256_hash_size];
 };
-static_assert(sizeof(s_custom_map_id) == SHA256_HASH_SIZE + sizeof(wchar_t) * MAX_MAP_NAME_SIZE);
+static_assert(sizeof(s_custom_map_id) == k_sha256_hash_size + sizeof(wchar_t) * k_max_map_name_size);
 
 #pragma pack(push, 4)
 struct s_custom_map_entry
 {
-	BYTE map_sha256_hash[SHA256_HASH_SIZE];
-	wchar_t map_name[MAX_MAP_NAME_SIZE]; // actually the name displayed
+	BYTE map_sha256_hash[k_sha256_hash_size];
+	wchar_t map_name[k_max_map_name_size]; // actually the name displayed
 	wchar_t field_60[9][128];
 	// one header might have the compressed thumbnail, and the other the uncompressed one
 	uint8* preview_bitmap_header[2]; 
 	BYTE gap_968[16];
 	LONGLONG preview_bitmap_id; // used for bitmap cache file
-	wchar_t file_path[MAX_MAP_FILE_PATH_SIZE];
+	wchar_t file_path[k_map_file_path_size];
 	FILETIME file_time;
 	bool entry_marked_for_deletion; // marks entry for deletion
 	BYTE field_B88[7];
@@ -95,7 +93,7 @@ public:
 		s_custom_map_entry custom_map_entries[k_maximum_number_of_custom_multiplayer_maps_default];
 	};
 
-	uint16 m_loaded_count;
+	uint16 m_map_count;
 	BYTE gap_24232[6];
 	s_custom_map_entry_linked_list* m_list_of_maps_to_insert_to_cache; // un-cached maps to be added
 	wchar_t m_custom_maps_folder_path[MAX_PATH];

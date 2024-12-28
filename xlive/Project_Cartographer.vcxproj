@@ -892,7 +892,7 @@
     <ClCompile Include="Blam\Engine\interface\screens\screen_cartographer_errors.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_virtual_keyboard.cpp" />
     <ClCompile Include="H2MOD\Modules\GamePhysics\Patches\ProjectileFix.cpp" />
-    <ClCompile Include="H2MOD\Modules\MapManager\CustomMapDataCache\CustomMapDataCache.cpp" />
+    <ClCompile Include="Blam\Engine\main\map_repository.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomVariantSettings\CustomVariantSettings.cpp" />
     <ClCompile Include="H2MOD\Modules\DirectorHooks\DirectorHooks.cpp" />
     <ClCompile Include="H2MOD\Modules\EventHandler\EventHandler.cpp" />
@@ -1327,7 +1327,7 @@
     <ClInclude Include="Blam\Engine\interface\screens\screen_cartographer_errors.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_virtual_keyboard.h" />
     <ClInclude Include="H2MOD\Modules\GamePhysics\Patches\ProjectileFix.h" />
-    <ClInclude Include="H2MOD\Modules\MapManager\CustomMapDataCache\CustomMapDataCache.h" />
+    <ClInclude Include="Blam\Engine\main\map_repository.h" />
     <ClInclude Include="H2MOD\Modules\CustomVariantSettings\CustomVariantSettings.h" />
     <ClInclude Include="H2MOD\Modules\DirectorHooks\DirectorHooks.h" />
     <ClInclude Include="H2MOD\Modules\EventHandler\EventHandler.hpp" />

@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "CustomMapDataCache.h"
+#include "map_repository.h"
 
 #include "cache/cache_files.h"
 #include "interface/signal_slot.h"
@@ -88,7 +88,7 @@ void __thiscall c_custom_map_manager::mark_all_cached_maps_for_deletion()
 		return;
 	}
 
-	for (uint16 i = 0; i < m_loaded_count; i++)
+	for (uint16 i = 0; i < m_map_count; i++)
 		m_new_custom_map_entry_list_buffer[i].entry_marked_for_deletion = true;
 
 	LeaveCriticalSection(m_lock);
@@ -99,9 +99,9 @@ bool __thiscall c_custom_map_manager::remove_marked_for_deletion()
 	EnterCriticalSection(m_lock);
 
 	bool maps_removed = false;
-	uint16 map_count_before_remove = m_loaded_count;
+	uint16 map_count_before_remove = m_map_count;
 
-	for (uint16 i = 0; i < m_loaded_count; )
+	for (uint16 i = 0; i < m_map_count; )
 	{
 		if (m_new_custom_map_entry_list_buffer[i].entry_marked_for_deletion)
 		{
@@ -113,7 +113,7 @@ bool __thiscall c_custom_map_manager::remove_marked_for_deletion()
 		}
 	}
 
-	maps_removed = map_count_before_remove > m_loaded_count;
+	maps_removed = map_count_before_remove > m_map_count;
 
 	LeaveCriticalSection(m_lock);
 
@@ -294,7 +294,7 @@ void __thiscall c_custom_map_manager::save_custom_map_data()
 	s_custom_map_file_cache_header* custom_map_data_to_save = m_custom_map_file_data_cache;
 
 	custom_map_data_to_save->signature = custom_map_cache_signature;
-	custom_map_data_to_save->entry_count = m_loaded_count;
+	custom_map_data_to_save->entry_count = m_map_count;
 	custom_map_data_to_save->index_of_last_previewed_bitmap = m_index_of_last_previewed_bitmap;
 
 	if (get_directory_path_from_id(e_directory_id::_custom_map_data_dir, L"\0", path_wide, true))
@@ -361,7 +361,7 @@ void __thiscall c_custom_map_manager::load_custom_map_data_cache()
 		delete[] m_custom_map_file_data_cache;
 
 	this->m_custom_map_file_data_cache		= custom_map_cache_file_header;
-	this->m_loaded_count					= custom_map_cache_file_header->entry_count;
+	this->m_map_count					= custom_map_cache_file_header->entry_count;
 	this->m_new_custom_map_entry_list_buffer	
 		= get_custom_map_entry_list_from_header(custom_map_cache_file_header);
 
@@ -381,7 +381,7 @@ void __thiscall c_custom_map_manager::start_custom_map_sync()
 uint32 __thiscall c_custom_map_manager::get_custom_map_list_ids(s_custom_map_id* out_ids, uint32 out_ids_count)
 {
 	EnterCriticalSection(m_lock);
-	for (uint16 i = 0; i < m_loaded_count; i++)
+	for (uint16 i = 0; i < m_map_count; i++)
 	{
 		m_new_custom_map_entry_list_buffer[i].entry_marked_for_deletion = false;
 		if (out_ids != nullptr
@@ -389,13 +389,13 @@ uint32 __thiscall c_custom_map_manager::get_custom_map_list_ids(s_custom_map_id*
 		{
 			if (i < out_ids_count)
 			{
-				memcpy(out_ids[i].map_sha256_hash, m_new_custom_map_entry_list_buffer[i].map_sha256_hash, SHA256_HASH_SIZE);
-				wcsncpy(out_ids[i].map_name, m_new_custom_map_entry_list_buffer[i].map_name, MAX_MAP_NAME_SIZE);
+				memcpy(out_ids[i].map_sha256_hash, m_new_custom_map_entry_list_buffer[i].map_sha256_hash, k_sha256_hash_size);
+				wcsncpy(out_ids[i].map_name, m_new_custom_map_entry_list_buffer[i].map_name, k_max_map_name_size);
 			}
 		}
 	}
 
-	uint32 map_count = this->m_loaded_count;
+	uint32 map_count = this->m_map_count;
 	LeaveCriticalSection(m_lock);
 
 	return map_count;
@@ -408,9 +408,9 @@ uint32 __thiscall c_custom_map_manager::get_custom_map_list_ids_by_map_name(cons
 	uint32 matching_count_found = 0;
 
 	// used by dedicated server
-	for (uint16 i = 0; i < m_loaded_count; i++)
+	for (uint16 i = 0; i < m_map_count; i++)
 	{
-		if (!_wcsnicmp(m_new_custom_map_entry_list_buffer[i].map_name, map_name, MAX_MAP_NAME_SIZE))
+		if (!_wcsnicmp(m_new_custom_map_entry_list_buffer[i].map_name, map_name, k_max_map_name_size))
 		{
 			m_new_custom_map_entry_list_buffer[i].entry_marked_for_deletion = false;
 			if (out_ids != nullptr
@@ -418,8 +418,8 @@ uint32 __thiscall c_custom_map_manager::get_custom_map_list_ids_by_map_name(cons
 			{
 				if (matching_count_found < out_ids_count)
 				{
-					memcpy(out_ids[matching_count_found].map_sha256_hash, m_new_custom_map_entry_list_buffer[i].map_sha256_hash, SHA256_HASH_SIZE);
-					wcsncpy(out_ids[matching_count_found].map_name, m_new_custom_map_entry_list_buffer[i].map_name, MAX_MAP_NAME_SIZE);
+					memcpy(out_ids[matching_count_found].map_sha256_hash, m_new_custom_map_entry_list_buffer[i].map_sha256_hash, k_sha256_hash_size);
+					wcsncpy(out_ids[matching_count_found].map_name, m_new_custom_map_entry_list_buffer[i].map_name, k_max_map_name_size);
 				}
 			}
 
@@ -448,9 +448,9 @@ uint32 __thiscall c_custom_map_manager::find_matching_entries_by_file_path(const
 
 	uint32 matching_count_found = 0;
 
-	for (uint16 i = 0; i < m_loaded_count; i++)
+	for (uint16 i = 0; i < m_map_count; i++)
 	{
-		if (!_wcsnicmp(m_new_custom_map_entry_list_buffer[i].file_path, file_path, MAX_MAP_FILE_PATH_SIZE))
+		if (!_wcsnicmp(m_new_custom_map_entry_list_buffer[i].file_path, file_path, k_map_file_path_size))
 		{
 			m_new_custom_map_entry_list_buffer[i].entry_marked_for_deletion = false;
 			if (out_custom_map_entries)
@@ -480,9 +480,9 @@ uint32 __thiscall c_custom_map_manager::find_matching_entries_by_sha256_hash(con
 
 	uint32 matching_count_found = 0;
 
-	for (uint16 i = 0; i < m_loaded_count; i++)
+	for (uint16 i = 0; i < m_map_count; i++)
 	{
-		if (!memcmp(m_new_custom_map_entry_list_buffer[i].map_sha256_hash, hash, SHA256_HASH_SIZE))
+		if (!memcmp(m_new_custom_map_entry_list_buffer[i].map_sha256_hash, hash, k_sha256_hash_size))
 		{
 			m_new_custom_map_entry_list_buffer[i].entry_marked_for_deletion = false;
 			if (out_custom_map_entries)
@@ -512,9 +512,9 @@ uint32 __thiscall c_custom_map_manager::find_matching_entries_by_map_name_and_ha
 
 	uint32 matching_count_found = 0;
 
-	for (uint16 i = 0; i < m_loaded_count; i++)
+	for (uint16 i = 0; i < m_map_count; i++)
 	{
-		if (!memcmp(m_new_custom_map_entry_list_buffer[i].map_sha256_hash, sha256_hash, SHA256_HASH_SIZE) && !_wcsnicmp(m_new_custom_map_entry_list_buffer[i].map_name, map_name, MAX_MAP_NAME_SIZE))
+		if (!memcmp(m_new_custom_map_entry_list_buffer[i].map_sha256_hash, sha256_hash, k_sha256_hash_size) && !_wcsnicmp(m_new_custom_map_entry_list_buffer[i].map_name, map_name, k_max_map_name_size))
 		{
 			m_new_custom_map_entry_list_buffer[i].entry_marked_for_deletion = false;
 			if (out_custom_map_entries)
@@ -544,9 +544,9 @@ uint32 __thiscall c_custom_map_manager::find_matching_entries_by_map_name(const 
 
 	uint32 matching_count_found = 0;
 
-	for (uint16 i = 0; i < m_loaded_count; i++)
+	for (uint16 i = 0; i < m_map_count; i++)
 	{
-		if (!_wcsnicmp(m_new_custom_map_entry_list_buffer[i].map_name, map_name, MAX_MAP_NAME_SIZE))
+		if (!_wcsnicmp(m_new_custom_map_entry_list_buffer[i].map_name, map_name, k_max_map_name_size))
 		{
 			m_new_custom_map_entry_list_buffer[i].entry_marked_for_deletion = false;
 			if (out_custom_map_entries)
@@ -600,7 +600,7 @@ void __thiscall c_custom_map_manager::remove_entry_by_index(uint16 idx)
 {
 	// check if the element to be deleted is the last one
 	// if so just memset to 0
-	if (idx == m_loaded_count - 1)
+	if (idx == m_map_count - 1)
 	{
 		memset(&m_new_custom_map_entry_list_buffer[idx], 0, sizeof(s_custom_map_entry));
 	}
@@ -610,10 +610,10 @@ void __thiscall c_custom_map_manager::remove_entry_by_index(uint16 idx)
 		// TODO: consider replacing this implementation with a linked list
 		// this might get very expensive
 		// but it shouldn't execute too many times
-		memmove(&m_new_custom_map_entry_list_buffer[idx], &m_new_custom_map_entry_list_buffer[idx + 1], (m_loaded_count - 1 - idx) * sizeof(s_custom_map_entry));
+		memmove(&m_new_custom_map_entry_list_buffer[idx], &m_new_custom_map_entry_list_buffer[idx + 1], (m_map_count - 1 - idx) * sizeof(s_custom_map_entry));
 	}
 
-	m_loaded_count--;
+	m_map_count--;
 }
 
 bool __thiscall c_custom_map_manager::remove_entries_matching_file_path(const s_custom_map_entry* entry)
@@ -621,9 +621,9 @@ bool __thiscall c_custom_map_manager::remove_entries_matching_file_path(const s_
 	EnterCriticalSection(m_lock);
 
 	bool removed = false;
-	for (uint16 i = 0; i < m_loaded_count; )
+	for (uint16 i = 0; i < m_map_count; )
 	{
-		if (!_wcsnicmp(m_new_custom_map_entry_list_buffer[i].file_path, entry->file_path, MAX_MAP_FILE_PATH_SIZE))
+		if (!_wcsnicmp(m_new_custom_map_entry_list_buffer[i].file_path, entry->file_path, k_map_file_path_size))
 		{
 			removed = true;
 			remove_entry_by_index(i);
@@ -643,10 +643,10 @@ bool __thiscall c_custom_map_manager::remove_duplicates_by_map_name_and_hash(con
 	EnterCriticalSection(m_lock);
 
 	bool removed = false;
-	for (uint16 i = 0; i < m_loaded_count; i++)
+	for (uint16 i = 0; i < m_map_count; i++)
 	{
-		if (!memcmp(m_new_custom_map_entry_list_buffer[i].map_sha256_hash, entry->map_sha256_hash, SHA256_HASH_SIZE) 
-			&& !_wcsnicmp(m_new_custom_map_entry_list_buffer[i].map_name, entry->map_name, MAX_MAP_NAME_SIZE))
+		if (!memcmp(m_new_custom_map_entry_list_buffer[i].map_sha256_hash, entry->map_sha256_hash, k_sha256_hash_size) 
+			&& !_wcsnicmp(m_new_custom_map_entry_list_buffer[i].map_name, entry->map_name, k_max_map_name_size))
 		{
 			//LOG_TRACE_GAME(L"{} - removed: {} from cache matching cached entry: map name: {} map path: {}",
 				//__FUNCTIONW__, entry->file_path, new_custom_map_entries_buffer[i].map_name, new_custom_map_entries_buffer[i].file_path);
@@ -665,7 +665,7 @@ bool __thiscall c_custom_map_manager::delete_single_entry(const s_custom_map_ent
 
 	bool removed = false;
 
-	for (uint16 i = 0; i < m_loaded_count; i++)
+	for (uint16 i = 0; i < m_map_count; i++)
 	{
 		if (!memcmp(&m_new_custom_map_entry_list_buffer[i], entry, sizeof(s_custom_map_entry)))
 		{
@@ -685,9 +685,9 @@ bool __thiscall c_custom_map_manager::add_entry(const s_custom_map_entry* entry)
 
 	bool success = true;
 
-	if (m_loaded_count < k_maximum_number_of_custom_multiplayer_maps_new && validate_entry_data(entry, 1) && !entry_is_duplicate(entry))
+	if (m_map_count < k_maximum_number_of_custom_multiplayer_maps_new && validate_entry_data(entry, 1) && !entry_is_duplicate(entry))
 	{
-		memcpy(&m_new_custom_map_entry_list_buffer[m_loaded_count++], entry, sizeof(s_custom_map_entry));
+		memcpy(&m_new_custom_map_entry_list_buffer[m_map_count++], entry, sizeof(s_custom_map_entry));
 	}
 	else
 	{
@@ -749,7 +749,7 @@ bool __cdecl validate_and_read_custom_map_data(s_custom_map_entry* custom_map_en
 		LOG_TRACE_FUNCW(L"\"{}\" has bad scenario type", file_name);
 		return false;
 	}
-	if (strnlen_s(header.name, MAX_MAP_NAME_SIZE) >= 32 || strnlen_s(header.version_string, 32) >= 32)
+	if (strnlen_s(header.name, k_max_map_name_size) >= 32 || strnlen_s(header.version_string, 32) >= 32)
 	{
 		LOG_TRACE_FUNCW(L"\"{}\" has invalid version or name string", file_name);
 		return false;
@@ -797,7 +797,7 @@ bool __thiscall c_custom_map_manager::add_custom_map_entry_by_map_file_path(cons
 	s_custom_map_entry custom_map_new_entry;
 	ZeroMemory(&custom_map_new_entry, sizeof(s_custom_map_entry));
 
-	wcscpy_s(custom_map_new_entry.file_path, MAX_MAP_FILE_PATH_SIZE, file_path);
+	wcscpy_s(custom_map_new_entry.file_path, k_map_file_path_size, file_path);
 
 	bool map_loaded = false;
 	if (validate_and_read_custom_map_data(&custom_map_new_entry)) {
@@ -813,7 +813,7 @@ bool __thiscall c_custom_map_manager::add_custom_map_entry_by_map_file_path(cons
 void __thiscall c_custom_map_manager::initialize()
 {
 	m_index_of_last_previewed_bitmap = 0;
-	m_loaded_count = 0;
+	m_map_count = 0;
 	m_lock = new CRITICAL_SECTION;
 	InitializeCriticalSection(m_lock);
 }
