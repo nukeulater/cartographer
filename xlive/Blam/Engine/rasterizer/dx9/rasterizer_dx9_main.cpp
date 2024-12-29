@@ -16,7 +16,6 @@
 #include "rasterizer_dx9_targets.h"
 #include "rasterizer_dx9_text.h"
 #include "rasterizer_dx9_vertex_buffers.h"
-#include "rasterizer_dx9_vertex_shaders.h"
 #include "rasterizer_dx9_widgets.h"
 
 #include "bitmaps/bitmaps.h"
@@ -881,6 +880,10 @@ bool __cdecl rasterizer_dx9_initialize(void)
     return result;
 }
 
+bool __cdecl rasterizer_dx9_vertex_shaders_initialize(void)
+{
+    return INVOKE(0x285061, 0x0, rasterizer_dx9_vertex_shaders_initialize);
+}
 
 bool __cdecl rasterizer_dx9_render_scene_start(const s_render_scene_parameters* parameters) 
 {
