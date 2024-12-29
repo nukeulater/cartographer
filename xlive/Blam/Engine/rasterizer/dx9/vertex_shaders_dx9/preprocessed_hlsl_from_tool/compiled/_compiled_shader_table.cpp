@@ -1,0 +1,6698 @@
+#include "stdafx.h" 
+#include "_compiled_shader_table.h" 
+ 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/convolution_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/debug_screenspace_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/debug_tangentspace_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/debug_tangentspace_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/debug_tangentspace_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/debug_tangentspace_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/debug_tangentspace_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/debug_tangentspace_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/debug_tangentspace_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/debug_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/decal_hardcoded_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/decal_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/decorator_decal_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/decorator_parallel.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/decorator_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/decorator_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/decorator_screen.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/decorator_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/decorator_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/decorator_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/decorator_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/decorator_sprite_parallel.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/decorator_sprite_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/decorator_sprite_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/decorator_sprite_screen.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/decorator_sprite_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/decorator_sprite_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/decorator_sprite_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/decorator_sprite_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/decorator_sprite_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/decorator_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/effect_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/filter_copy_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/flag_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/flag_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/flag_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/flag_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/flag_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/flag_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/flag_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/fog_patchy_stencil_modulate_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/fog_patchy_stencil_modulate_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/fog_patchy_stencil_modulate_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/fog_patchy_stencil_modulate_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/fog_patchy_stencil_modulate_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/fog_patchy_stencil_modulate_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/fog_patchy_stencil_modulate_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/fog_planar_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/fog_planar_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/fog_planar_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/fog_planar_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/fog_planar_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/fog_planar_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/fog_planar_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/hologram_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/hologram_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/hologram_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/hologram_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/hologram_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/hologram_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/hologram_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lens_flare_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_no_specular_gel_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_no_specular_gel_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_no_specular_gel_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_no_specular_gel_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_no_specular_gel_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_no_specular_gel_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_no_specular_gel_tex_detail_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_no_specular_gel_tex_detail_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_no_specular_gel_tex_detail_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_no_specular_gel_tex_detail_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_no_specular_gel_tex_detail_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_no_specular_gel_tex_detail_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_no_specular_gel_tex_detail_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_no_specular_gel_tex_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_no_specular_gel_tex_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_no_specular_gel_tex_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_no_specular_gel_tex_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_no_specular_gel_tex_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_no_specular_gel_tex_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_no_specular_gel_tex_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_no_specular_gel_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_no_specular_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_no_specular_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_no_specular_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_no_specular_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_no_specular_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_no_specular_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_no_specular_tex_detail_blend_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_no_specular_tex_detail_blend_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_no_specular_tex_detail_blend_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_no_specular_tex_detail_blend_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_no_specular_tex_detail_blend_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_no_specular_tex_detail_blend_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_no_specular_tex_detail_blend_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_no_specular_tex_detail_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_no_specular_tex_detail_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_no_specular_tex_detail_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_no_specular_tex_detail_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_no_specular_tex_detail_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_no_specular_tex_detail_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_no_specular_tex_detail_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_no_specular_tex_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_no_specular_tex_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_no_specular_tex_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_no_specular_tex_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_no_specular_tex_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_no_specular_tex_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_no_specular_tex_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_no_specular_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_tex_detail_blend_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_tex_detail_blend_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_tex_detail_blend_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_tex_detail_blend_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_tex_detail_blend_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_tex_detail_blend_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_tex_detail_blend_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_tex_detail_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_tex_detail_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_tex_detail_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_tex_detail_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_tex_detail_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_tex_detail_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_tex_detail_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_tex_first_person_change_color_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_tex_first_person_change_color_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_tex_first_person_change_color_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_tex_first_person_change_color_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_tex_first_person_change_color_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_tex_first_person_change_color_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_tex_first_person_change_color_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_tex_first_person_detail_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_tex_first_person_detail_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_tex_first_person_detail_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_tex_first_person_detail_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_tex_first_person_detail_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_tex_first_person_detail_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_tex_first_person_detail_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_tex_first_person_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_tex_first_person_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_tex_first_person_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_tex_first_person_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_tex_first_person_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_tex_first_person_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_tex_first_person_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_tex_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_tex_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_tex_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_tex_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_tex_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_tex_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_tex_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_frustum_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_sphere_diffuse_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_sphere_diffuse_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_sphere_diffuse_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_sphere_diffuse_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_sphere_diffuse_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_sphere_diffuse_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_sphere_diffuse_tex_detail_blend_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_sphere_diffuse_tex_detail_blend_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_sphere_diffuse_tex_detail_blend_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_sphere_diffuse_tex_detail_blend_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_sphere_diffuse_tex_detail_blend_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_sphere_diffuse_tex_detail_blend_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_sphere_diffuse_tex_detail_blend_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_sphere_diffuse_tex_detail_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_sphere_diffuse_tex_detail_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_sphere_diffuse_tex_detail_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_sphere_diffuse_tex_detail_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_sphere_diffuse_tex_detail_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_sphere_diffuse_tex_detail_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_sphere_diffuse_tex_detail_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_sphere_diffuse_tex_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_sphere_diffuse_tex_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_sphere_diffuse_tex_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_sphere_diffuse_tex_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_sphere_diffuse_tex_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_sphere_diffuse_tex_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_sphere_diffuse_tex_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightaccum_sphere_diffuse_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_crates_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_crates_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_crates_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_crates_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_crates_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_crates_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_crates_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_env_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_env_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_env_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_env_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_env_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_env_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_env_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_change_color_default_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_change_color_default_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_change_color_default_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_change_color_default_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_change_color_default_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_change_color_default_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_change_color_default_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_change_color_env_no_spec_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_change_color_env_no_spec_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_change_color_env_no_spec_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_change_color_env_no_spec_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_change_color_env_no_spec_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_change_color_env_no_spec_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_change_color_env_no_spec_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_change_color_env_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_change_color_env_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_change_color_env_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_change_color_env_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_change_color_env_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_change_color_env_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_change_color_env_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_change_color_no_spec_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_change_color_no_spec_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_change_color_no_spec_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_change_color_no_spec_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_change_color_no_spec_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_change_color_no_spec_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_change_color_no_spec_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_change_color_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_change_color_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_change_color_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_change_color_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_change_color_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_change_color_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_change_color_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_detail_blend_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_detail_blend_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_detail_blend_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_detail_blend_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_detail_blend_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_detail_blend_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_detail_blend_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_detail_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_detail_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_detail_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_detail_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_detail_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_detail_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_detail_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_env_no_spec_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_env_no_spec_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_env_no_spec_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_env_no_spec_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_env_no_spec_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_env_no_spec_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_env_no_spec_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_env_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_env_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_env_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_env_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_env_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_env_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_env_stencil_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_env_stencil_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_env_stencil_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_env_stencil_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_env_stencil_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_env_stencil_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_env_stencil_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_env_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_mark_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_mark_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_mark_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_mark_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_mark_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_mark_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_mark_stencil_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_mark_stencil_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_mark_stencil_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_mark_stencil_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_mark_stencil_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_mark_stencil_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_mark_stencil_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_mark_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_no_spec_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_no_spec_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_no_spec_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_no_spec_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_no_spec_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_no_spec_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_no_spec_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_stencil_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_stencil_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_stencil_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_stencil_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_stencil_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_stencil_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_stencil_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_tex_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_dynamic_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_env_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_env_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_env_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_env_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_env_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_env_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_env_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_tex_detail_blend_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_tex_detail_blend_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_tex_detail_blend_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_tex_detail_blend_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_tex_detail_blend_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_tex_detail_blend_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_tex_detail_blend_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_tex_detail_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_tex_detail_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_tex_detail_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_tex_detail_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_tex_detail_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_tex_detail_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_tex_detail_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_tex_env_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_tex_env_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_tex_env_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_tex_env_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_tex_env_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_tex_env_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_tex_env_stencil_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_tex_env_stencil_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_tex_env_stencil_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_tex_env_stencil_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_tex_env_stencil_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_tex_env_stencil_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_tex_env_stencil_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_tex_env_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_tex_mark_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_tex_mark_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_tex_mark_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_tex_mark_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_tex_mark_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_tex_mark_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_tex_mark_stencil_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_tex_mark_stencil_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_tex_mark_stencil_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_tex_mark_stencil_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_tex_mark_stencil_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_tex_mark_stencil_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_tex_mark_stencil_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_tex_mark_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_tex_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_tex_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_tex_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_tex_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_tex_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_tex_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_tex_stencil_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_tex_stencil_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_tex_stencil_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_tex_stencil_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_tex_stencil_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_tex_stencil_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_tex_stencil_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_tex_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_perpixel_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_env_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_env_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_env_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_env_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_env_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_env_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_env_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_tex_detail_blend_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_tex_detail_blend_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_tex_detail_blend_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_tex_detail_blend_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_tex_detail_blend_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_tex_detail_blend_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_tex_detail_blend_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_tex_detail_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_tex_detail_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_tex_detail_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_tex_detail_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_tex_detail_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_tex_detail_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_tex_detail_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_tex_env_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_tex_env_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_tex_env_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_tex_env_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_tex_env_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_tex_env_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_tex_env_stencil_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_tex_env_stencil_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_tex_env_stencil_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_tex_env_stencil_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_tex_env_stencil_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_tex_env_stencil_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_tex_env_stencil_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_tex_env_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_tex_mark_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_tex_mark_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_tex_mark_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_tex_mark_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_tex_mark_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_tex_mark_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_tex_mark_stencil_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_tex_mark_stencil_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_tex_mark_stencil_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_tex_mark_stencil_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_tex_mark_stencil_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_tex_mark_stencil_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_tex_mark_stencil_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_tex_mark_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_tex_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_tex_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_tex_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_tex_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_tex_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_tex_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_tex_stencil_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_tex_stencil_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_tex_stencil_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_tex_stencil_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_tex_stencil_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_tex_stencil_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_tex_stencil_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_tex_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/lightmap_pervertex_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/particle_diffuse_quad_parallel.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/particle_diffuse_quad_perpendicular.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/particle_diffuse_quad_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/particle_diffuse_quad_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/particle_diffuse_quad_screen.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/particle_diffuse_quad_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/particle_diffuse_quad_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/particle_diffuse_quad_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/particle_diffuse_quad_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/particle_diffuse_quad_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/particle_distortion_horizontal.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/particle_distortion_parallel.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/particle_distortion_perpendicular.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/particle_distortion_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/particle_distortion_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/particle_distortion_screen.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/particle_distortion_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/particle_distortion_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/particle_distortion_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/particle_distortion_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/particle_distortion_vertical.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/particle_distortion_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/particle_horizontal.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/particle_model_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/particle_model_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/particle_parallel.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/particle_perpendicular.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/particle_plasma_horizontal.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/particle_plasma_parallel.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/particle_plasma_perpendicular.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/particle_plasma_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/particle_plasma_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/particle_plasma_screen.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/particle_plasma_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/particle_plasma_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/particle_plasma_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/particle_plasma_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/particle_plasma_vertical.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/particle_plasma_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/particle_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/particle_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/particle_screen.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/particle_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/particle_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/particle_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/particle_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/particle_vertical.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/particle_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/prt_lightmap_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/prt_lightmap_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/prt_lightmap_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/prt_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/prt_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/prt_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/screen2_old_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/screen_0_stage_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/screen_1_stage_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/screen_2_stage_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/screen_3_stage_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/screen_4_stage_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/screen_5_stage_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/screen_6_stage_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/screen_7_stage_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/screen_hud_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/screen_old_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/screen_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/screen_xform_4_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/screen_xform_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/shadow_buffer_application_1tap_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/shadow_buffer_application_1tap_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/shadow_buffer_application_1tap_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/shadow_buffer_application_1tap_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/shadow_buffer_application_1tap_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/shadow_buffer_application_1tap_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/shadow_buffer_application_1tap_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/shadow_buffer_application_3tap_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/shadow_buffer_application_3tap_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/shadow_buffer_application_3tap_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/shadow_buffer_application_3tap_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/shadow_buffer_application_3tap_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/shadow_buffer_application_3tap_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/shadow_buffer_application_3tap_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/shadow_buffer_application_cinematic_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/shadow_buffer_application_cinematic_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/shadow_buffer_application_cinematic_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/shadow_buffer_application_cinematic_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/shadow_buffer_application_cinematic_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/shadow_buffer_application_cinematic_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/shadow_buffer_application_cinematic_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/shadow_buffer_application_lightmap_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/shadow_buffer_application_lightmap_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/shadow_buffer_application_lightmap_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/shadow_buffer_application_lightmap_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/shadow_buffer_application_lightmap_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/shadow_buffer_application_lightmap_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/shadow_buffer_application_lightmap_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/shadow_buffer_generation_cinematic_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/shadow_buffer_generation_cinematic_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/shadow_buffer_generation_cinematic_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/shadow_buffer_generation_cinematic_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/shadow_buffer_generation_cinematic_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/shadow_buffer_generation_cinematic_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/shadow_buffer_generation_cinematic_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/shadow_buffer_generation_lightmap_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/shadow_buffer_generation_lightmap_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/shadow_buffer_generation_lightmap_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/shadow_buffer_generation_lightmap_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/shadow_buffer_generation_lightmap_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/shadow_buffer_generation_lightmap_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/shadow_buffer_generation_lightmap_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/shadow_buffer_generation_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/shadow_buffer_generation_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/shadow_buffer_generation_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/shadow_buffer_generation_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/shadow_buffer_generation_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/shadow_buffer_generation_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/shadow_buffer_generation_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/sh_dynamic_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/sh_dynamic_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/sh_dynamic_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/sh_dynamic_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/sh_dynamic_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/sh_dynamic_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/sh_dynamic_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/stencil_emissive_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/stencil_emissive_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/stencil_emissive_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/stencil_emissive_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/stencil_emissive_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/stencil_emissive_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/stencil_emissive_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/stencil_env_bumped_tangentspace_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/stencil_env_bumped_tangentspace_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/stencil_env_bumped_tangentspace_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/stencil_env_bumped_tangentspace_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/stencil_env_bumped_tangentspace_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/stencil_env_bumped_tangentspace_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/stencil_env_bumped_tangentspace_transparent_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/stencil_env_bumped_tangentspace_transparent_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/stencil_env_bumped_tangentspace_transparent_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/stencil_env_bumped_tangentspace_transparent_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/stencil_env_bumped_tangentspace_transparent_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/stencil_env_bumped_tangentspace_transparent_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/stencil_env_bumped_tangentspace_transparent_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/stencil_env_bumped_tangentspace_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/stencil_env_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/stencil_env_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/stencil_env_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/stencil_env_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/stencil_env_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/stencil_env_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/stencil_env_super_fast_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/stencil_env_super_fast_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/stencil_env_super_fast_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/stencil_env_super_fast_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/stencil_env_super_fast_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/stencil_env_super_fast_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/stencil_env_super_fast_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/stencil_env_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/stencil_light_specular_tangentspace_sphere_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/stencil_light_specular_tangentspace_sphere_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/stencil_light_specular_tangentspace_sphere_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/stencil_light_specular_tangentspace_sphere_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/stencil_light_specular_tangentspace_sphere_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/stencil_light_specular_tangentspace_sphere_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/stencil_light_specular_tangentspace_sphere_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/stencil_texture_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/stencil_texture_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/stencil_texture_secondary_detail_full_xform_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/stencil_texture_secondary_detail_full_xform_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/stencil_texture_secondary_detail_full_xform_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/stencil_texture_secondary_detail_full_xform_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/stencil_texture_secondary_detail_full_xform_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/stencil_texture_secondary_detail_full_xform_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/stencil_texture_secondary_detail_full_xform_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/stencil_texture_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/stencil_texture_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/stencil_texture_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/stencil_texture_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/stencil_texture_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/tangent_space_vectors_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/tangent_space_vectors_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/tangent_space_vectors_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/tangent_space_vectors_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/tangent_space_vectors_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/tangent_space_vectors_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/tangent_space_vectors_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/texture_camera_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/texture_camera_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/texture_camera_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/texture_camera_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/texture_camera_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/texture_camera_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/texture_camera_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_active_camo_dxdy_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_active_camo_dxdy_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_active_camo_dxdy_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_active_camo_dxdy_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_active_camo_dxdy_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_active_camo_dxdy_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_active_camo_dxdy_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_active_camo_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_active_camo_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_active_camo_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_active_camo_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_active_camo_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_active_camo_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_active_camo_viewer_normal_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_active_camo_viewer_normal_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_active_camo_viewer_normal_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_active_camo_viewer_normal_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_active_camo_viewer_normal_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_active_camo_viewer_normal_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_active_camo_viewer_normal_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_active_camo_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_crazy_vectors_bumped_env_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_crazy_vectors_bumped_env_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_crazy_vectors_bumped_env_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_crazy_vectors_bumped_env_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_crazy_vectors_bumped_env_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_crazy_vectors_bumped_env_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_crazy_vectors_bumped_env_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_crazy_vectors_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_crazy_vectors_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_crazy_vectors_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_crazy_vectors_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_crazy_vectors_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_crazy_vectors_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_crazy_vectors_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_generic_default_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_generic_default_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_generic_default_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_generic_default_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_generic_default_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_generic_default_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_generic_default_sky_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_generic_default_sky_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_generic_default_sky_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_generic_default_sky_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_generic_default_sky_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_generic_default_sky_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_generic_default_sky_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_generic_default_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_generic_offset_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_generic_offset_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_generic_offset_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_generic_offset_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_generic_offset_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_generic_offset_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_generic_offset_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_generic_reflection_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_generic_reflection_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_generic_reflection_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_generic_reflection_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_generic_reflection_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_generic_reflection_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_generic_reflection_sky_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_generic_reflection_sky_rigid_boned.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_generic_reflection_sky_skinned_1_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_generic_reflection_sky_skinned_2_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_generic_reflection_sky_skinned_3_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_generic_reflection_sky_skinned_4_bone.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_generic_reflection_sky_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_generic_reflection_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/transparent_simple_world_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/water_edge_blend_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/water_pool_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/water_pool_static_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/water_pool_static_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/water_pool_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/water_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/water_static_rigid.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/water_static_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/water_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/weather_particle_world.h" 
+#include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/weather_plate_world.h" 
+ 
+const DWORD *const k_convolution_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_convolution_world_vs_2_0,  
+}; 
+ 
+const int16 k_convolution_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_convolution_world_vs_2_0),  
+}; 
+ 
+const DWORD *const k_convolution_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_convolution_world_vs_3_0,  
+}; 
+ 
+const int16 k_convolution_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_convolution_world_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_convolution_bytecode[2] 
+{ 
+	k_convolution_bytecode_vs_2_0, 
+	k_convolution_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_convolution_bytecode_size[2] 
+{ 
+	k_convolution_bytecode_vs_2_0_size, 
+	k_convolution_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_debug_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_debug_world_vs_2_0,  
+}; 
+ 
+const int16 k_debug_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_debug_world_vs_2_0),  
+}; 
+ 
+const DWORD *const k_debug_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_debug_world_vs_3_0,  
+}; 
+ 
+const int16 k_debug_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_debug_world_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_debug_bytecode[2] 
+{ 
+	k_debug_bytecode_vs_2_0, 
+	k_debug_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_debug_bytecode_size[2] 
+{ 
+	k_debug_bytecode_vs_2_0_size, 
+	k_debug_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_debug_screenspace_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_debug_screenspace_world_vs_2_0,  
+}; 
+ 
+const int16 k_debug_screenspace_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_debug_screenspace_world_vs_2_0),  
+}; 
+ 
+const DWORD *const k_debug_screenspace_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_debug_screenspace_world_vs_3_0,  
+}; 
+ 
+const int16 k_debug_screenspace_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_debug_screenspace_world_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_debug_screenspace_bytecode[2] 
+{ 
+	k_debug_screenspace_bytecode_vs_2_0, 
+	k_debug_screenspace_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_debug_screenspace_bytecode_size[2] 
+{ 
+	k_debug_screenspace_bytecode_vs_2_0_size, 
+	k_debug_screenspace_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_decal_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_decal_world_vs_2_0,  
+}; 
+ 
+const int16 k_decal_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_decal_world_vs_2_0),  
+}; 
+ 
+const DWORD *const k_decal_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_decal_world_vs_3_0,  
+}; 
+ 
+const int16 k_decal_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_decal_world_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_decal_bytecode[2] 
+{ 
+	k_decal_bytecode_vs_2_0, 
+	k_decal_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_decal_bytecode_size[2] 
+{ 
+	k_decal_bytecode_vs_2_0_size, 
+	k_decal_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_decal_hardcoded_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_decal_hardcoded_world_vs_2_0,  
+}; 
+ 
+const int16 k_decal_hardcoded_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_decal_hardcoded_world_vs_2_0),  
+}; 
+ 
+const DWORD *const k_decal_hardcoded_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_decal_hardcoded_world_vs_3_0,  
+}; 
+ 
+const int16 k_decal_hardcoded_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_decal_hardcoded_world_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_decal_hardcoded_bytecode[2] 
+{ 
+	k_decal_hardcoded_bytecode_vs_2_0, 
+	k_decal_hardcoded_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_decal_hardcoded_bytecode_size[2] 
+{ 
+	k_decal_hardcoded_bytecode_vs_2_0_size, 
+	k_decal_hardcoded_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_decorator_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_decorator_world_vs_2_0,  
+	(DWORD*)k_decorator_rigid_vs_2_0,  
+	NULL,  
+	NULL,  
+	NULL,  
+	NULL,  
+	NULL,  
+	(DWORD*)k_decorator_screen_vs_2_0,  
+	(DWORD*)k_decorator_parallel_vs_2_0,  
+}; 
+ 
+const int16 k_decorator_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_decorator_world_vs_2_0),  
+	sizeof(k_decorator_rigid_vs_2_0),  
+	0,  
+	0,  
+	0,  
+	0,  
+	0,  
+	sizeof(k_decorator_screen_vs_2_0),  
+	sizeof(k_decorator_parallel_vs_2_0),  
+}; 
+ 
+const DWORD *const k_decorator_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_decorator_world_vs_3_0,  
+	(DWORD*)k_decorator_rigid_vs_3_0,  
+	NULL,  
+	NULL,  
+	NULL,  
+	NULL,  
+	NULL,  
+	(DWORD*)k_decorator_screen_vs_3_0,  
+	(DWORD*)k_decorator_parallel_vs_3_0,  
+}; 
+ 
+const int16 k_decorator_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_decorator_world_vs_3_0),  
+	sizeof(k_decorator_rigid_vs_3_0),  
+	0,  
+	0,  
+	0,  
+	0,  
+	0,  
+	sizeof(k_decorator_screen_vs_3_0),  
+	sizeof(k_decorator_parallel_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_decorator_bytecode[2] 
+{ 
+	k_decorator_bytecode_vs_2_0, 
+	k_decorator_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_decorator_bytecode_size[2] 
+{ 
+	k_decorator_bytecode_vs_2_0_size, 
+	k_decorator_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_decorator_decal_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_decorator_decal_world_vs_2_0,  
+}; 
+ 
+const int16 k_decorator_decal_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_decorator_decal_world_vs_2_0),  
+}; 
+ 
+const DWORD *const k_decorator_decal_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_decorator_decal_world_vs_3_0,  
+}; 
+ 
+const int16 k_decorator_decal_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_decorator_decal_world_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_decorator_decal_bytecode[2] 
+{ 
+	k_decorator_decal_bytecode_vs_2_0, 
+	k_decorator_decal_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_decorator_decal_bytecode_size[2] 
+{ 
+	k_decorator_decal_bytecode_vs_2_0_size, 
+	k_decorator_decal_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_effect_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_effect_world_vs_2_0,  
+}; 
+ 
+const int16 k_effect_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_effect_world_vs_2_0),  
+}; 
+ 
+const DWORD *const k_effect_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_effect_world_vs_3_0,  
+}; 
+ 
+const int16 k_effect_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_effect_world_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_effect_bytecode[2] 
+{ 
+	k_effect_bytecode_vs_2_0, 
+	k_effect_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_effect_bytecode_size[2] 
+{ 
+	k_effect_bytecode_vs_2_0_size, 
+	k_effect_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_filter_copy_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_filter_copy_world_vs_2_0,  
+}; 
+ 
+const int16 k_filter_copy_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_filter_copy_world_vs_2_0),  
+}; 
+ 
+const DWORD *const k_filter_copy_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_filter_copy_world_vs_3_0,  
+}; 
+ 
+const int16 k_filter_copy_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_filter_copy_world_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_filter_copy_bytecode[2] 
+{ 
+	k_filter_copy_bytecode_vs_2_0, 
+	k_filter_copy_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_filter_copy_bytecode_size[2] 
+{ 
+	k_filter_copy_bytecode_vs_2_0_size, 
+	k_filter_copy_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_fog_patchy_stencil_modulate_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_fog_patchy_stencil_modulate_world_vs_2_0,  
+	(DWORD*)k_fog_patchy_stencil_modulate_rigid_vs_2_0,  
+	(DWORD*)k_fog_patchy_stencil_modulate_rigid_boned_vs_2_0,  
+	(DWORD*)k_fog_patchy_stencil_modulate_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_fog_patchy_stencil_modulate_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_fog_patchy_stencil_modulate_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_fog_patchy_stencil_modulate_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_fog_patchy_stencil_modulate_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_fog_patchy_stencil_modulate_world_vs_2_0),  
+	sizeof(k_fog_patchy_stencil_modulate_rigid_vs_2_0),  
+	sizeof(k_fog_patchy_stencil_modulate_rigid_boned_vs_2_0),  
+	sizeof(k_fog_patchy_stencil_modulate_skinned_1_bone_vs_2_0),  
+	sizeof(k_fog_patchy_stencil_modulate_skinned_2_bone_vs_2_0),  
+	sizeof(k_fog_patchy_stencil_modulate_skinned_3_bone_vs_2_0),  
+	sizeof(k_fog_patchy_stencil_modulate_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_fog_patchy_stencil_modulate_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_fog_patchy_stencil_modulate_world_vs_3_0,  
+	(DWORD*)k_fog_patchy_stencil_modulate_rigid_vs_3_0,  
+	(DWORD*)k_fog_patchy_stencil_modulate_rigid_boned_vs_3_0,  
+	(DWORD*)k_fog_patchy_stencil_modulate_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_fog_patchy_stencil_modulate_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_fog_patchy_stencil_modulate_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_fog_patchy_stencil_modulate_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_fog_patchy_stencil_modulate_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_fog_patchy_stencil_modulate_world_vs_3_0),  
+	sizeof(k_fog_patchy_stencil_modulate_rigid_vs_3_0),  
+	sizeof(k_fog_patchy_stencil_modulate_rigid_boned_vs_3_0),  
+	sizeof(k_fog_patchy_stencil_modulate_skinned_1_bone_vs_3_0),  
+	sizeof(k_fog_patchy_stencil_modulate_skinned_2_bone_vs_3_0),  
+	sizeof(k_fog_patchy_stencil_modulate_skinned_3_bone_vs_3_0),  
+	sizeof(k_fog_patchy_stencil_modulate_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_fog_patchy_stencil_modulate_bytecode[2] 
+{ 
+	k_fog_patchy_stencil_modulate_bytecode_vs_2_0, 
+	k_fog_patchy_stencil_modulate_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_fog_patchy_stencil_modulate_bytecode_size[2] 
+{ 
+	k_fog_patchy_stencil_modulate_bytecode_vs_2_0_size, 
+	k_fog_patchy_stencil_modulate_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_fog_planar_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_fog_planar_world_vs_2_0,  
+	(DWORD*)k_fog_planar_rigid_vs_2_0,  
+	(DWORD*)k_fog_planar_rigid_boned_vs_2_0,  
+	(DWORD*)k_fog_planar_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_fog_planar_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_fog_planar_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_fog_planar_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_fog_planar_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_fog_planar_world_vs_2_0),  
+	sizeof(k_fog_planar_rigid_vs_2_0),  
+	sizeof(k_fog_planar_rigid_boned_vs_2_0),  
+	sizeof(k_fog_planar_skinned_1_bone_vs_2_0),  
+	sizeof(k_fog_planar_skinned_2_bone_vs_2_0),  
+	sizeof(k_fog_planar_skinned_3_bone_vs_2_0),  
+	sizeof(k_fog_planar_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_fog_planar_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_fog_planar_world_vs_3_0,  
+	(DWORD*)k_fog_planar_rigid_vs_3_0,  
+	(DWORD*)k_fog_planar_rigid_boned_vs_3_0,  
+	(DWORD*)k_fog_planar_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_fog_planar_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_fog_planar_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_fog_planar_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_fog_planar_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_fog_planar_world_vs_3_0),  
+	sizeof(k_fog_planar_rigid_vs_3_0),  
+	sizeof(k_fog_planar_rigid_boned_vs_3_0),  
+	sizeof(k_fog_planar_skinned_1_bone_vs_3_0),  
+	sizeof(k_fog_planar_skinned_2_bone_vs_3_0),  
+	sizeof(k_fog_planar_skinned_3_bone_vs_3_0),  
+	sizeof(k_fog_planar_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_fog_planar_bytecode[2] 
+{ 
+	k_fog_planar_bytecode_vs_2_0, 
+	k_fog_planar_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_fog_planar_bytecode_size[2] 
+{ 
+	k_fog_planar_bytecode_vs_2_0_size, 
+	k_fog_planar_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_hologram_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_hologram_world_vs_2_0,  
+	(DWORD*)k_hologram_rigid_vs_2_0,  
+	(DWORD*)k_hologram_rigid_boned_vs_2_0,  
+	(DWORD*)k_hologram_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_hologram_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_hologram_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_hologram_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_hologram_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_hologram_world_vs_2_0),  
+	sizeof(k_hologram_rigid_vs_2_0),  
+	sizeof(k_hologram_rigid_boned_vs_2_0),  
+	sizeof(k_hologram_skinned_1_bone_vs_2_0),  
+	sizeof(k_hologram_skinned_2_bone_vs_2_0),  
+	sizeof(k_hologram_skinned_3_bone_vs_2_0),  
+	sizeof(k_hologram_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_hologram_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_hologram_world_vs_3_0,  
+	(DWORD*)k_hologram_rigid_vs_3_0,  
+	(DWORD*)k_hologram_rigid_boned_vs_3_0,  
+	(DWORD*)k_hologram_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_hologram_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_hologram_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_hologram_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_hologram_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_hologram_world_vs_3_0),  
+	sizeof(k_hologram_rigid_vs_3_0),  
+	sizeof(k_hologram_rigid_boned_vs_3_0),  
+	sizeof(k_hologram_skinned_1_bone_vs_3_0),  
+	sizeof(k_hologram_skinned_2_bone_vs_3_0),  
+	sizeof(k_hologram_skinned_3_bone_vs_3_0),  
+	sizeof(k_hologram_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_hologram_bytecode[2] 
+{ 
+	k_hologram_bytecode_vs_2_0, 
+	k_hologram_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_hologram_bytecode_size[2] 
+{ 
+	k_hologram_bytecode_vs_2_0_size, 
+	k_hologram_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_lens_flare_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_lens_flare_world_vs_2_0,  
+}; 
+ 
+const int16 k_lens_flare_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_lens_flare_world_vs_2_0),  
+}; 
+ 
+const DWORD *const k_lens_flare_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_lens_flare_world_vs_3_0,  
+}; 
+ 
+const int16 k_lens_flare_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_lens_flare_world_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_lens_flare_bytecode[2] 
+{ 
+	k_lens_flare_bytecode_vs_2_0, 
+	k_lens_flare_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_lens_flare_bytecode_size[2] 
+{ 
+	k_lens_flare_bytecode_vs_2_0_size, 
+	k_lens_flare_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_lightaccum_frustum_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_lightaccum_frustum_world_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_rigid_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_rigid_boned_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_lightaccum_frustum_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_lightaccum_frustum_world_vs_2_0),  
+	sizeof(k_lightaccum_frustum_rigid_vs_2_0),  
+	sizeof(k_lightaccum_frustum_rigid_boned_vs_2_0),  
+	sizeof(k_lightaccum_frustum_skinned_1_bone_vs_2_0),  
+	sizeof(k_lightaccum_frustum_skinned_2_bone_vs_2_0),  
+	sizeof(k_lightaccum_frustum_skinned_3_bone_vs_2_0),  
+	sizeof(k_lightaccum_frustum_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_lightaccum_frustum_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_lightaccum_frustum_world_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_rigid_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_rigid_boned_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_lightaccum_frustum_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_lightaccum_frustum_world_vs_3_0),  
+	sizeof(k_lightaccum_frustum_rigid_vs_3_0),  
+	sizeof(k_lightaccum_frustum_rigid_boned_vs_3_0),  
+	sizeof(k_lightaccum_frustum_skinned_1_bone_vs_3_0),  
+	sizeof(k_lightaccum_frustum_skinned_2_bone_vs_3_0),  
+	sizeof(k_lightaccum_frustum_skinned_3_bone_vs_3_0),  
+	sizeof(k_lightaccum_frustum_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_lightaccum_frustum_bytecode[2] 
+{ 
+	k_lightaccum_frustum_bytecode_vs_2_0, 
+	k_lightaccum_frustum_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_lightaccum_frustum_bytecode_size[2] 
+{ 
+	k_lightaccum_frustum_bytecode_vs_2_0_size, 
+	k_lightaccum_frustum_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_lightaccum_frustum_no_specular_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_lightaccum_frustum_no_specular_world_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_rigid_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_rigid_boned_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_lightaccum_frustum_no_specular_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_lightaccum_frustum_no_specular_world_vs_2_0),  
+	sizeof(k_lightaccum_frustum_no_specular_rigid_vs_2_0),  
+	sizeof(k_lightaccum_frustum_no_specular_rigid_boned_vs_2_0),  
+	sizeof(k_lightaccum_frustum_no_specular_skinned_1_bone_vs_2_0),  
+	sizeof(k_lightaccum_frustum_no_specular_skinned_2_bone_vs_2_0),  
+	sizeof(k_lightaccum_frustum_no_specular_skinned_3_bone_vs_2_0),  
+	sizeof(k_lightaccum_frustum_no_specular_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_lightaccum_frustum_no_specular_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_lightaccum_frustum_no_specular_world_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_rigid_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_rigid_boned_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_lightaccum_frustum_no_specular_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_lightaccum_frustum_no_specular_world_vs_3_0),  
+	sizeof(k_lightaccum_frustum_no_specular_rigid_vs_3_0),  
+	sizeof(k_lightaccum_frustum_no_specular_rigid_boned_vs_3_0),  
+	sizeof(k_lightaccum_frustum_no_specular_skinned_1_bone_vs_3_0),  
+	sizeof(k_lightaccum_frustum_no_specular_skinned_2_bone_vs_3_0),  
+	sizeof(k_lightaccum_frustum_no_specular_skinned_3_bone_vs_3_0),  
+	sizeof(k_lightaccum_frustum_no_specular_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_lightaccum_frustum_no_specular_bytecode[2] 
+{ 
+	k_lightaccum_frustum_no_specular_bytecode_vs_2_0, 
+	k_lightaccum_frustum_no_specular_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_lightaccum_frustum_no_specular_bytecode_size[2] 
+{ 
+	k_lightaccum_frustum_no_specular_bytecode_vs_2_0_size, 
+	k_lightaccum_frustum_no_specular_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_lightaccum_frustum_no_specular_gel_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_lightaccum_frustum_no_specular_gel_world_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_gel_rigid_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_gel_rigid_boned_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_gel_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_gel_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_gel_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_gel_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_lightaccum_frustum_no_specular_gel_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_lightaccum_frustum_no_specular_gel_world_vs_2_0),  
+	sizeof(k_lightaccum_frustum_no_specular_gel_rigid_vs_2_0),  
+	sizeof(k_lightaccum_frustum_no_specular_gel_rigid_boned_vs_2_0),  
+	sizeof(k_lightaccum_frustum_no_specular_gel_skinned_1_bone_vs_2_0),  
+	sizeof(k_lightaccum_frustum_no_specular_gel_skinned_2_bone_vs_2_0),  
+	sizeof(k_lightaccum_frustum_no_specular_gel_skinned_3_bone_vs_2_0),  
+	sizeof(k_lightaccum_frustum_no_specular_gel_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_lightaccum_frustum_no_specular_gel_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_lightaccum_frustum_no_specular_gel_world_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_gel_rigid_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_gel_rigid_boned_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_gel_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_gel_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_gel_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_gel_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_lightaccum_frustum_no_specular_gel_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_lightaccum_frustum_no_specular_gel_world_vs_3_0),  
+	sizeof(k_lightaccum_frustum_no_specular_gel_rigid_vs_3_0),  
+	sizeof(k_lightaccum_frustum_no_specular_gel_rigid_boned_vs_3_0),  
+	sizeof(k_lightaccum_frustum_no_specular_gel_skinned_1_bone_vs_3_0),  
+	sizeof(k_lightaccum_frustum_no_specular_gel_skinned_2_bone_vs_3_0),  
+	sizeof(k_lightaccum_frustum_no_specular_gel_skinned_3_bone_vs_3_0),  
+	sizeof(k_lightaccum_frustum_no_specular_gel_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_lightaccum_frustum_no_specular_gel_bytecode[2] 
+{ 
+	k_lightaccum_frustum_no_specular_gel_bytecode_vs_2_0, 
+	k_lightaccum_frustum_no_specular_gel_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_lightaccum_frustum_no_specular_gel_bytecode_size[2] 
+{ 
+	k_lightaccum_frustum_no_specular_gel_bytecode_vs_2_0_size, 
+	k_lightaccum_frustum_no_specular_gel_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_lightaccum_frustum_no_specular_gel_tex_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_lightaccum_frustum_no_specular_gel_tex_world_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_gel_tex_rigid_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_gel_tex_rigid_boned_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_gel_tex_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_gel_tex_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_gel_tex_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_gel_tex_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_lightaccum_frustum_no_specular_gel_tex_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_lightaccum_frustum_no_specular_gel_tex_world_vs_2_0),  
+	sizeof(k_lightaccum_frustum_no_specular_gel_tex_rigid_vs_2_0),  
+	sizeof(k_lightaccum_frustum_no_specular_gel_tex_rigid_boned_vs_2_0),  
+	sizeof(k_lightaccum_frustum_no_specular_gel_tex_skinned_1_bone_vs_2_0),  
+	sizeof(k_lightaccum_frustum_no_specular_gel_tex_skinned_2_bone_vs_2_0),  
+	sizeof(k_lightaccum_frustum_no_specular_gel_tex_skinned_3_bone_vs_2_0),  
+	sizeof(k_lightaccum_frustum_no_specular_gel_tex_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_lightaccum_frustum_no_specular_gel_tex_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_lightaccum_frustum_no_specular_gel_tex_world_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_gel_tex_rigid_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_gel_tex_rigid_boned_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_gel_tex_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_gel_tex_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_gel_tex_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_gel_tex_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_lightaccum_frustum_no_specular_gel_tex_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_lightaccum_frustum_no_specular_gel_tex_world_vs_3_0),  
+	sizeof(k_lightaccum_frustum_no_specular_gel_tex_rigid_vs_3_0),  
+	sizeof(k_lightaccum_frustum_no_specular_gel_tex_rigid_boned_vs_3_0),  
+	sizeof(k_lightaccum_frustum_no_specular_gel_tex_skinned_1_bone_vs_3_0),  
+	sizeof(k_lightaccum_frustum_no_specular_gel_tex_skinned_2_bone_vs_3_0),  
+	sizeof(k_lightaccum_frustum_no_specular_gel_tex_skinned_3_bone_vs_3_0),  
+	sizeof(k_lightaccum_frustum_no_specular_gel_tex_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_lightaccum_frustum_no_specular_gel_tex_bytecode[2] 
+{ 
+	k_lightaccum_frustum_no_specular_gel_tex_bytecode_vs_2_0, 
+	k_lightaccum_frustum_no_specular_gel_tex_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_lightaccum_frustum_no_specular_gel_tex_bytecode_size[2] 
+{ 
+	k_lightaccum_frustum_no_specular_gel_tex_bytecode_vs_2_0_size, 
+	k_lightaccum_frustum_no_specular_gel_tex_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_lightaccum_frustum_no_specular_gel_tex_detail_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_lightaccum_frustum_no_specular_gel_tex_detail_world_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_gel_tex_detail_rigid_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_gel_tex_detail_rigid_boned_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_gel_tex_detail_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_gel_tex_detail_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_gel_tex_detail_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_gel_tex_detail_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_lightaccum_frustum_no_specular_gel_tex_detail_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_lightaccum_frustum_no_specular_gel_tex_detail_world_vs_2_0),  
+	sizeof(k_lightaccum_frustum_no_specular_gel_tex_detail_rigid_vs_2_0),  
+	sizeof(k_lightaccum_frustum_no_specular_gel_tex_detail_rigid_boned_vs_2_0),  
+	sizeof(k_lightaccum_frustum_no_specular_gel_tex_detail_skinned_1_bone_vs_2_0),  
+	sizeof(k_lightaccum_frustum_no_specular_gel_tex_detail_skinned_2_bone_vs_2_0),  
+	sizeof(k_lightaccum_frustum_no_specular_gel_tex_detail_skinned_3_bone_vs_2_0),  
+	sizeof(k_lightaccum_frustum_no_specular_gel_tex_detail_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_lightaccum_frustum_no_specular_gel_tex_detail_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_lightaccum_frustum_no_specular_gel_tex_detail_world_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_gel_tex_detail_rigid_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_gel_tex_detail_rigid_boned_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_gel_tex_detail_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_gel_tex_detail_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_gel_tex_detail_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_gel_tex_detail_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_lightaccum_frustum_no_specular_gel_tex_detail_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_lightaccum_frustum_no_specular_gel_tex_detail_world_vs_3_0),  
+	sizeof(k_lightaccum_frustum_no_specular_gel_tex_detail_rigid_vs_3_0),  
+	sizeof(k_lightaccum_frustum_no_specular_gel_tex_detail_rigid_boned_vs_3_0),  
+	sizeof(k_lightaccum_frustum_no_specular_gel_tex_detail_skinned_1_bone_vs_3_0),  
+	sizeof(k_lightaccum_frustum_no_specular_gel_tex_detail_skinned_2_bone_vs_3_0),  
+	sizeof(k_lightaccum_frustum_no_specular_gel_tex_detail_skinned_3_bone_vs_3_0),  
+	sizeof(k_lightaccum_frustum_no_specular_gel_tex_detail_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_lightaccum_frustum_no_specular_gel_tex_detail_bytecode[2] 
+{ 
+	k_lightaccum_frustum_no_specular_gel_tex_detail_bytecode_vs_2_0, 
+	k_lightaccum_frustum_no_specular_gel_tex_detail_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_lightaccum_frustum_no_specular_gel_tex_detail_bytecode_size[2] 
+{ 
+	k_lightaccum_frustum_no_specular_gel_tex_detail_bytecode_vs_2_0_size, 
+	k_lightaccum_frustum_no_specular_gel_tex_detail_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_lightaccum_frustum_no_specular_tex_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_lightaccum_frustum_no_specular_tex_world_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_tex_rigid_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_tex_rigid_boned_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_tex_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_tex_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_tex_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_tex_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_lightaccum_frustum_no_specular_tex_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_lightaccum_frustum_no_specular_tex_world_vs_2_0),  
+	sizeof(k_lightaccum_frustum_no_specular_tex_rigid_vs_2_0),  
+	sizeof(k_lightaccum_frustum_no_specular_tex_rigid_boned_vs_2_0),  
+	sizeof(k_lightaccum_frustum_no_specular_tex_skinned_1_bone_vs_2_0),  
+	sizeof(k_lightaccum_frustum_no_specular_tex_skinned_2_bone_vs_2_0),  
+	sizeof(k_lightaccum_frustum_no_specular_tex_skinned_3_bone_vs_2_0),  
+	sizeof(k_lightaccum_frustum_no_specular_tex_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_lightaccum_frustum_no_specular_tex_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_lightaccum_frustum_no_specular_tex_world_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_tex_rigid_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_tex_rigid_boned_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_tex_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_tex_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_tex_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_tex_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_lightaccum_frustum_no_specular_tex_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_lightaccum_frustum_no_specular_tex_world_vs_3_0),  
+	sizeof(k_lightaccum_frustum_no_specular_tex_rigid_vs_3_0),  
+	sizeof(k_lightaccum_frustum_no_specular_tex_rigid_boned_vs_3_0),  
+	sizeof(k_lightaccum_frustum_no_specular_tex_skinned_1_bone_vs_3_0),  
+	sizeof(k_lightaccum_frustum_no_specular_tex_skinned_2_bone_vs_3_0),  
+	sizeof(k_lightaccum_frustum_no_specular_tex_skinned_3_bone_vs_3_0),  
+	sizeof(k_lightaccum_frustum_no_specular_tex_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_lightaccum_frustum_no_specular_tex_bytecode[2] 
+{ 
+	k_lightaccum_frustum_no_specular_tex_bytecode_vs_2_0, 
+	k_lightaccum_frustum_no_specular_tex_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_lightaccum_frustum_no_specular_tex_bytecode_size[2] 
+{ 
+	k_lightaccum_frustum_no_specular_tex_bytecode_vs_2_0_size, 
+	k_lightaccum_frustum_no_specular_tex_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_lightaccum_frustum_no_specular_tex_detail_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_lightaccum_frustum_no_specular_tex_detail_world_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_tex_detail_rigid_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_tex_detail_rigid_boned_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_tex_detail_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_tex_detail_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_tex_detail_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_tex_detail_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_lightaccum_frustum_no_specular_tex_detail_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_lightaccum_frustum_no_specular_tex_detail_world_vs_2_0),  
+	sizeof(k_lightaccum_frustum_no_specular_tex_detail_rigid_vs_2_0),  
+	sizeof(k_lightaccum_frustum_no_specular_tex_detail_rigid_boned_vs_2_0),  
+	sizeof(k_lightaccum_frustum_no_specular_tex_detail_skinned_1_bone_vs_2_0),  
+	sizeof(k_lightaccum_frustum_no_specular_tex_detail_skinned_2_bone_vs_2_0),  
+	sizeof(k_lightaccum_frustum_no_specular_tex_detail_skinned_3_bone_vs_2_0),  
+	sizeof(k_lightaccum_frustum_no_specular_tex_detail_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_lightaccum_frustum_no_specular_tex_detail_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_lightaccum_frustum_no_specular_tex_detail_world_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_tex_detail_rigid_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_tex_detail_rigid_boned_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_tex_detail_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_tex_detail_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_tex_detail_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_no_specular_tex_detail_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_lightaccum_frustum_no_specular_tex_detail_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_lightaccum_frustum_no_specular_tex_detail_world_vs_3_0),  
+	sizeof(k_lightaccum_frustum_no_specular_tex_detail_rigid_vs_3_0),  
+	sizeof(k_lightaccum_frustum_no_specular_tex_detail_rigid_boned_vs_3_0),  
+	sizeof(k_lightaccum_frustum_no_specular_tex_detail_skinned_1_bone_vs_3_0),  
+	sizeof(k_lightaccum_frustum_no_specular_tex_detail_skinned_2_bone_vs_3_0),  
+	sizeof(k_lightaccum_frustum_no_specular_tex_detail_skinned_3_bone_vs_3_0),  
+	sizeof(k_lightaccum_frustum_no_specular_tex_detail_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_lightaccum_frustum_no_specular_tex_detail_bytecode[2] 
+{ 
+	k_lightaccum_frustum_no_specular_tex_detail_bytecode_vs_2_0, 
+	k_lightaccum_frustum_no_specular_tex_detail_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_lightaccum_frustum_no_specular_tex_detail_bytecode_size[2] 
+{ 
+	k_lightaccum_frustum_no_specular_tex_detail_bytecode_vs_2_0_size, 
+	k_lightaccum_frustum_no_specular_tex_detail_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_lightaccum_frustum_tex_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_lightaccum_frustum_tex_world_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_tex_rigid_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_tex_rigid_boned_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_tex_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_tex_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_tex_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_tex_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_lightaccum_frustum_tex_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_lightaccum_frustum_tex_world_vs_2_0),  
+	sizeof(k_lightaccum_frustum_tex_rigid_vs_2_0),  
+	sizeof(k_lightaccum_frustum_tex_rigid_boned_vs_2_0),  
+	sizeof(k_lightaccum_frustum_tex_skinned_1_bone_vs_2_0),  
+	sizeof(k_lightaccum_frustum_tex_skinned_2_bone_vs_2_0),  
+	sizeof(k_lightaccum_frustum_tex_skinned_3_bone_vs_2_0),  
+	sizeof(k_lightaccum_frustum_tex_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_lightaccum_frustum_tex_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_lightaccum_frustum_tex_world_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_tex_rigid_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_tex_rigid_boned_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_tex_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_tex_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_tex_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_tex_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_lightaccum_frustum_tex_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_lightaccum_frustum_tex_world_vs_3_0),  
+	sizeof(k_lightaccum_frustum_tex_rigid_vs_3_0),  
+	sizeof(k_lightaccum_frustum_tex_rigid_boned_vs_3_0),  
+	sizeof(k_lightaccum_frustum_tex_skinned_1_bone_vs_3_0),  
+	sizeof(k_lightaccum_frustum_tex_skinned_2_bone_vs_3_0),  
+	sizeof(k_lightaccum_frustum_tex_skinned_3_bone_vs_3_0),  
+	sizeof(k_lightaccum_frustum_tex_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_lightaccum_frustum_tex_bytecode[2] 
+{ 
+	k_lightaccum_frustum_tex_bytecode_vs_2_0, 
+	k_lightaccum_frustum_tex_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_lightaccum_frustum_tex_bytecode_size[2] 
+{ 
+	k_lightaccum_frustum_tex_bytecode_vs_2_0_size, 
+	k_lightaccum_frustum_tex_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_lightaccum_frustum_tex_detail_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_lightaccum_frustum_tex_detail_world_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_tex_detail_rigid_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_tex_detail_rigid_boned_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_tex_detail_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_tex_detail_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_tex_detail_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_tex_detail_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_lightaccum_frustum_tex_detail_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_lightaccum_frustum_tex_detail_world_vs_2_0),  
+	sizeof(k_lightaccum_frustum_tex_detail_rigid_vs_2_0),  
+	sizeof(k_lightaccum_frustum_tex_detail_rigid_boned_vs_2_0),  
+	sizeof(k_lightaccum_frustum_tex_detail_skinned_1_bone_vs_2_0),  
+	sizeof(k_lightaccum_frustum_tex_detail_skinned_2_bone_vs_2_0),  
+	sizeof(k_lightaccum_frustum_tex_detail_skinned_3_bone_vs_2_0),  
+	sizeof(k_lightaccum_frustum_tex_detail_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_lightaccum_frustum_tex_detail_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_lightaccum_frustum_tex_detail_world_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_tex_detail_rigid_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_tex_detail_rigid_boned_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_tex_detail_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_tex_detail_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_tex_detail_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_tex_detail_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_lightaccum_frustum_tex_detail_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_lightaccum_frustum_tex_detail_world_vs_3_0),  
+	sizeof(k_lightaccum_frustum_tex_detail_rigid_vs_3_0),  
+	sizeof(k_lightaccum_frustum_tex_detail_rigid_boned_vs_3_0),  
+	sizeof(k_lightaccum_frustum_tex_detail_skinned_1_bone_vs_3_0),  
+	sizeof(k_lightaccum_frustum_tex_detail_skinned_2_bone_vs_3_0),  
+	sizeof(k_lightaccum_frustum_tex_detail_skinned_3_bone_vs_3_0),  
+	sizeof(k_lightaccum_frustum_tex_detail_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_lightaccum_frustum_tex_detail_bytecode[2] 
+{ 
+	k_lightaccum_frustum_tex_detail_bytecode_vs_2_0, 
+	k_lightaccum_frustum_tex_detail_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_lightaccum_frustum_tex_detail_bytecode_size[2] 
+{ 
+	k_lightaccum_frustum_tex_detail_bytecode_vs_2_0_size, 
+	k_lightaccum_frustum_tex_detail_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_lightaccum_frustum_tex_first_person_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_lightaccum_frustum_tex_first_person_world_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_tex_first_person_rigid_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_tex_first_person_rigid_boned_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_tex_first_person_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_tex_first_person_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_tex_first_person_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_tex_first_person_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_lightaccum_frustum_tex_first_person_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_lightaccum_frustum_tex_first_person_world_vs_2_0),  
+	sizeof(k_lightaccum_frustum_tex_first_person_rigid_vs_2_0),  
+	sizeof(k_lightaccum_frustum_tex_first_person_rigid_boned_vs_2_0),  
+	sizeof(k_lightaccum_frustum_tex_first_person_skinned_1_bone_vs_2_0),  
+	sizeof(k_lightaccum_frustum_tex_first_person_skinned_2_bone_vs_2_0),  
+	sizeof(k_lightaccum_frustum_tex_first_person_skinned_3_bone_vs_2_0),  
+	sizeof(k_lightaccum_frustum_tex_first_person_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_lightaccum_frustum_tex_first_person_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_lightaccum_frustum_tex_first_person_world_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_tex_first_person_rigid_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_tex_first_person_rigid_boned_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_tex_first_person_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_tex_first_person_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_tex_first_person_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_tex_first_person_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_lightaccum_frustum_tex_first_person_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_lightaccum_frustum_tex_first_person_world_vs_3_0),  
+	sizeof(k_lightaccum_frustum_tex_first_person_rigid_vs_3_0),  
+	sizeof(k_lightaccum_frustum_tex_first_person_rigid_boned_vs_3_0),  
+	sizeof(k_lightaccum_frustum_tex_first_person_skinned_1_bone_vs_3_0),  
+	sizeof(k_lightaccum_frustum_tex_first_person_skinned_2_bone_vs_3_0),  
+	sizeof(k_lightaccum_frustum_tex_first_person_skinned_3_bone_vs_3_0),  
+	sizeof(k_lightaccum_frustum_tex_first_person_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_lightaccum_frustum_tex_first_person_bytecode[2] 
+{ 
+	k_lightaccum_frustum_tex_first_person_bytecode_vs_2_0, 
+	k_lightaccum_frustum_tex_first_person_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_lightaccum_frustum_tex_first_person_bytecode_size[2] 
+{ 
+	k_lightaccum_frustum_tex_first_person_bytecode_vs_2_0_size, 
+	k_lightaccum_frustum_tex_first_person_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_lightaccum_frustum_tex_first_person_change_color_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_lightaccum_frustum_tex_first_person_change_color_world_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_tex_first_person_change_color_rigid_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_tex_first_person_change_color_rigid_boned_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_tex_first_person_change_color_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_tex_first_person_change_color_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_tex_first_person_change_color_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_tex_first_person_change_color_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_lightaccum_frustum_tex_first_person_change_color_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_lightaccum_frustum_tex_first_person_change_color_world_vs_2_0),  
+	sizeof(k_lightaccum_frustum_tex_first_person_change_color_rigid_vs_2_0),  
+	sizeof(k_lightaccum_frustum_tex_first_person_change_color_rigid_boned_vs_2_0),  
+	sizeof(k_lightaccum_frustum_tex_first_person_change_color_skinned_1_bone_vs_2_0),  
+	sizeof(k_lightaccum_frustum_tex_first_person_change_color_skinned_2_bone_vs_2_0),  
+	sizeof(k_lightaccum_frustum_tex_first_person_change_color_skinned_3_bone_vs_2_0),  
+	sizeof(k_lightaccum_frustum_tex_first_person_change_color_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_lightaccum_frustum_tex_first_person_change_color_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_lightaccum_frustum_tex_first_person_change_color_world_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_tex_first_person_change_color_rigid_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_tex_first_person_change_color_rigid_boned_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_tex_first_person_change_color_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_tex_first_person_change_color_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_tex_first_person_change_color_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_tex_first_person_change_color_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_lightaccum_frustum_tex_first_person_change_color_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_lightaccum_frustum_tex_first_person_change_color_world_vs_3_0),  
+	sizeof(k_lightaccum_frustum_tex_first_person_change_color_rigid_vs_3_0),  
+	sizeof(k_lightaccum_frustum_tex_first_person_change_color_rigid_boned_vs_3_0),  
+	sizeof(k_lightaccum_frustum_tex_first_person_change_color_skinned_1_bone_vs_3_0),  
+	sizeof(k_lightaccum_frustum_tex_first_person_change_color_skinned_2_bone_vs_3_0),  
+	sizeof(k_lightaccum_frustum_tex_first_person_change_color_skinned_3_bone_vs_3_0),  
+	sizeof(k_lightaccum_frustum_tex_first_person_change_color_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_lightaccum_frustum_tex_first_person_change_color_bytecode[2] 
+{ 
+	k_lightaccum_frustum_tex_first_person_change_color_bytecode_vs_2_0, 
+	k_lightaccum_frustum_tex_first_person_change_color_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_lightaccum_frustum_tex_first_person_change_color_bytecode_size[2] 
+{ 
+	k_lightaccum_frustum_tex_first_person_change_color_bytecode_vs_2_0_size, 
+	k_lightaccum_frustum_tex_first_person_change_color_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_lightaccum_frustum_tex_first_person_detail_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_lightaccum_frustum_tex_first_person_detail_world_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_tex_first_person_detail_rigid_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_tex_first_person_detail_rigid_boned_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_tex_first_person_detail_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_tex_first_person_detail_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_tex_first_person_detail_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_lightaccum_frustum_tex_first_person_detail_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_lightaccum_frustum_tex_first_person_detail_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_lightaccum_frustum_tex_first_person_detail_world_vs_2_0),  
+	sizeof(k_lightaccum_frustum_tex_first_person_detail_rigid_vs_2_0),  
+	sizeof(k_lightaccum_frustum_tex_first_person_detail_rigid_boned_vs_2_0),  
+	sizeof(k_lightaccum_frustum_tex_first_person_detail_skinned_1_bone_vs_2_0),  
+	sizeof(k_lightaccum_frustum_tex_first_person_detail_skinned_2_bone_vs_2_0),  
+	sizeof(k_lightaccum_frustum_tex_first_person_detail_skinned_3_bone_vs_2_0),  
+	sizeof(k_lightaccum_frustum_tex_first_person_detail_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_lightaccum_frustum_tex_first_person_detail_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_lightaccum_frustum_tex_first_person_detail_world_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_tex_first_person_detail_rigid_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_tex_first_person_detail_rigid_boned_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_tex_first_person_detail_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_tex_first_person_detail_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_tex_first_person_detail_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_lightaccum_frustum_tex_first_person_detail_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_lightaccum_frustum_tex_first_person_detail_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_lightaccum_frustum_tex_first_person_detail_world_vs_3_0),  
+	sizeof(k_lightaccum_frustum_tex_first_person_detail_rigid_vs_3_0),  
+	sizeof(k_lightaccum_frustum_tex_first_person_detail_rigid_boned_vs_3_0),  
+	sizeof(k_lightaccum_frustum_tex_first_person_detail_skinned_1_bone_vs_3_0),  
+	sizeof(k_lightaccum_frustum_tex_first_person_detail_skinned_2_bone_vs_3_0),  
+	sizeof(k_lightaccum_frustum_tex_first_person_detail_skinned_3_bone_vs_3_0),  
+	sizeof(k_lightaccum_frustum_tex_first_person_detail_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_lightaccum_frustum_tex_first_person_detail_bytecode[2] 
+{ 
+	k_lightaccum_frustum_tex_first_person_detail_bytecode_vs_2_0, 
+	k_lightaccum_frustum_tex_first_person_detail_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_lightaccum_frustum_tex_first_person_detail_bytecode_size[2] 
+{ 
+	k_lightaccum_frustum_tex_first_person_detail_bytecode_vs_2_0_size, 
+	k_lightaccum_frustum_tex_first_person_detail_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_lightaccum_sphere_diffuse_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_lightaccum_sphere_diffuse_world_vs_2_0,  
+	(DWORD*)k_lightaccum_sphere_diffuse_rigid_vs_2_0,  
+	(DWORD*)k_lightaccum_sphere_diffuse_rigid_boned_vs_2_0,  
+	(DWORD*)k_lightaccum_sphere_diffuse_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_lightaccum_sphere_diffuse_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_lightaccum_sphere_diffuse_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_lightaccum_sphere_diffuse_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_lightaccum_sphere_diffuse_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_lightaccum_sphere_diffuse_world_vs_2_0),  
+	sizeof(k_lightaccum_sphere_diffuse_rigid_vs_2_0),  
+	sizeof(k_lightaccum_sphere_diffuse_rigid_boned_vs_2_0),  
+	sizeof(k_lightaccum_sphere_diffuse_skinned_1_bone_vs_2_0),  
+	sizeof(k_lightaccum_sphere_diffuse_skinned_2_bone_vs_2_0),  
+	sizeof(k_lightaccum_sphere_diffuse_skinned_3_bone_vs_2_0),  
+	sizeof(k_lightaccum_sphere_diffuse_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_lightaccum_sphere_diffuse_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_lightaccum_sphere_diffuse_world_vs_3_0,  
+	(DWORD*)k_lightaccum_sphere_diffuse_rigid_vs_3_0,  
+	(DWORD*)k_lightaccum_sphere_diffuse_rigid_boned_vs_3_0,  
+	(DWORD*)k_lightaccum_sphere_diffuse_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_lightaccum_sphere_diffuse_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_lightaccum_sphere_diffuse_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_lightaccum_sphere_diffuse_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_lightaccum_sphere_diffuse_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_lightaccum_sphere_diffuse_world_vs_3_0),  
+	sizeof(k_lightaccum_sphere_diffuse_rigid_vs_3_0),  
+	sizeof(k_lightaccum_sphere_diffuse_rigid_boned_vs_3_0),  
+	sizeof(k_lightaccum_sphere_diffuse_skinned_1_bone_vs_3_0),  
+	sizeof(k_lightaccum_sphere_diffuse_skinned_2_bone_vs_3_0),  
+	sizeof(k_lightaccum_sphere_diffuse_skinned_3_bone_vs_3_0),  
+	sizeof(k_lightaccum_sphere_diffuse_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_lightaccum_sphere_diffuse_bytecode[2] 
+{ 
+	k_lightaccum_sphere_diffuse_bytecode_vs_2_0, 
+	k_lightaccum_sphere_diffuse_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_lightaccum_sphere_diffuse_bytecode_size[2] 
+{ 
+	k_lightaccum_sphere_diffuse_bytecode_vs_2_0_size, 
+	k_lightaccum_sphere_diffuse_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_lightaccum_sphere_diffuse_tex_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_lightaccum_sphere_diffuse_tex_world_vs_2_0,  
+	(DWORD*)k_lightaccum_sphere_diffuse_tex_rigid_vs_2_0,  
+	(DWORD*)k_lightaccum_sphere_diffuse_tex_rigid_boned_vs_2_0,  
+	(DWORD*)k_lightaccum_sphere_diffuse_tex_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_lightaccum_sphere_diffuse_tex_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_lightaccum_sphere_diffuse_tex_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_lightaccum_sphere_diffuse_tex_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_lightaccum_sphere_diffuse_tex_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_lightaccum_sphere_diffuse_tex_world_vs_2_0),  
+	sizeof(k_lightaccum_sphere_diffuse_tex_rigid_vs_2_0),  
+	sizeof(k_lightaccum_sphere_diffuse_tex_rigid_boned_vs_2_0),  
+	sizeof(k_lightaccum_sphere_diffuse_tex_skinned_1_bone_vs_2_0),  
+	sizeof(k_lightaccum_sphere_diffuse_tex_skinned_2_bone_vs_2_0),  
+	sizeof(k_lightaccum_sphere_diffuse_tex_skinned_3_bone_vs_2_0),  
+	sizeof(k_lightaccum_sphere_diffuse_tex_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_lightaccum_sphere_diffuse_tex_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_lightaccum_sphere_diffuse_tex_world_vs_3_0,  
+	(DWORD*)k_lightaccum_sphere_diffuse_tex_rigid_vs_3_0,  
+	(DWORD*)k_lightaccum_sphere_diffuse_tex_rigid_boned_vs_3_0,  
+	(DWORD*)k_lightaccum_sphere_diffuse_tex_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_lightaccum_sphere_diffuse_tex_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_lightaccum_sphere_diffuse_tex_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_lightaccum_sphere_diffuse_tex_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_lightaccum_sphere_diffuse_tex_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_lightaccum_sphere_diffuse_tex_world_vs_3_0),  
+	sizeof(k_lightaccum_sphere_diffuse_tex_rigid_vs_3_0),  
+	sizeof(k_lightaccum_sphere_diffuse_tex_rigid_boned_vs_3_0),  
+	sizeof(k_lightaccum_sphere_diffuse_tex_skinned_1_bone_vs_3_0),  
+	sizeof(k_lightaccum_sphere_diffuse_tex_skinned_2_bone_vs_3_0),  
+	sizeof(k_lightaccum_sphere_diffuse_tex_skinned_3_bone_vs_3_0),  
+	sizeof(k_lightaccum_sphere_diffuse_tex_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_lightaccum_sphere_diffuse_tex_bytecode[2] 
+{ 
+	k_lightaccum_sphere_diffuse_tex_bytecode_vs_2_0, 
+	k_lightaccum_sphere_diffuse_tex_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_lightaccum_sphere_diffuse_tex_bytecode_size[2] 
+{ 
+	k_lightaccum_sphere_diffuse_tex_bytecode_vs_2_0_size, 
+	k_lightaccum_sphere_diffuse_tex_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_lightaccum_sphere_diffuse_tex_detail_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_lightaccum_sphere_diffuse_tex_detail_world_vs_2_0,  
+	(DWORD*)k_lightaccum_sphere_diffuse_tex_detail_rigid_vs_2_0,  
+	(DWORD*)k_lightaccum_sphere_diffuse_tex_detail_rigid_boned_vs_2_0,  
+	(DWORD*)k_lightaccum_sphere_diffuse_tex_detail_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_lightaccum_sphere_diffuse_tex_detail_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_lightaccum_sphere_diffuse_tex_detail_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_lightaccum_sphere_diffuse_tex_detail_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_lightaccum_sphere_diffuse_tex_detail_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_lightaccum_sphere_diffuse_tex_detail_world_vs_2_0),  
+	sizeof(k_lightaccum_sphere_diffuse_tex_detail_rigid_vs_2_0),  
+	sizeof(k_lightaccum_sphere_diffuse_tex_detail_rigid_boned_vs_2_0),  
+	sizeof(k_lightaccum_sphere_diffuse_tex_detail_skinned_1_bone_vs_2_0),  
+	sizeof(k_lightaccum_sphere_diffuse_tex_detail_skinned_2_bone_vs_2_0),  
+	sizeof(k_lightaccum_sphere_diffuse_tex_detail_skinned_3_bone_vs_2_0),  
+	sizeof(k_lightaccum_sphere_diffuse_tex_detail_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_lightaccum_sphere_diffuse_tex_detail_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_lightaccum_sphere_diffuse_tex_detail_world_vs_3_0,  
+	(DWORD*)k_lightaccum_sphere_diffuse_tex_detail_rigid_vs_3_0,  
+	(DWORD*)k_lightaccum_sphere_diffuse_tex_detail_rigid_boned_vs_3_0,  
+	(DWORD*)k_lightaccum_sphere_diffuse_tex_detail_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_lightaccum_sphere_diffuse_tex_detail_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_lightaccum_sphere_diffuse_tex_detail_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_lightaccum_sphere_diffuse_tex_detail_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_lightaccum_sphere_diffuse_tex_detail_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_lightaccum_sphere_diffuse_tex_detail_world_vs_3_0),  
+	sizeof(k_lightaccum_sphere_diffuse_tex_detail_rigid_vs_3_0),  
+	sizeof(k_lightaccum_sphere_diffuse_tex_detail_rigid_boned_vs_3_0),  
+	sizeof(k_lightaccum_sphere_diffuse_tex_detail_skinned_1_bone_vs_3_0),  
+	sizeof(k_lightaccum_sphere_diffuse_tex_detail_skinned_2_bone_vs_3_0),  
+	sizeof(k_lightaccum_sphere_diffuse_tex_detail_skinned_3_bone_vs_3_0),  
+	sizeof(k_lightaccum_sphere_diffuse_tex_detail_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_lightaccum_sphere_diffuse_tex_detail_bytecode[2] 
+{ 
+	k_lightaccum_sphere_diffuse_tex_detail_bytecode_vs_2_0, 
+	k_lightaccum_sphere_diffuse_tex_detail_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_lightaccum_sphere_diffuse_tex_detail_bytecode_size[2] 
+{ 
+	k_lightaccum_sphere_diffuse_tex_detail_bytecode_vs_2_0_size, 
+	k_lightaccum_sphere_diffuse_tex_detail_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_lightmap_dynamic_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_lightmap_dynamic_world_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_rigid_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_rigid_boned_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_lightmap_dynamic_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_lightmap_dynamic_world_vs_2_0),  
+	sizeof(k_lightmap_dynamic_rigid_vs_2_0),  
+	sizeof(k_lightmap_dynamic_rigid_boned_vs_2_0),  
+	sizeof(k_lightmap_dynamic_skinned_1_bone_vs_2_0),  
+	sizeof(k_lightmap_dynamic_skinned_2_bone_vs_2_0),  
+	sizeof(k_lightmap_dynamic_skinned_3_bone_vs_2_0),  
+	sizeof(k_lightmap_dynamic_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_lightmap_dynamic_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_lightmap_dynamic_world_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_rigid_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_rigid_boned_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_lightmap_dynamic_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_lightmap_dynamic_world_vs_3_0),  
+	sizeof(k_lightmap_dynamic_rigid_vs_3_0),  
+	sizeof(k_lightmap_dynamic_rigid_boned_vs_3_0),  
+	sizeof(k_lightmap_dynamic_skinned_1_bone_vs_3_0),  
+	sizeof(k_lightmap_dynamic_skinned_2_bone_vs_3_0),  
+	sizeof(k_lightmap_dynamic_skinned_3_bone_vs_3_0),  
+	sizeof(k_lightmap_dynamic_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_lightmap_dynamic_bytecode[2] 
+{ 
+	k_lightmap_dynamic_bytecode_vs_2_0, 
+	k_lightmap_dynamic_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_lightmap_dynamic_bytecode_size[2] 
+{ 
+	k_lightmap_dynamic_bytecode_vs_2_0_size, 
+	k_lightmap_dynamic_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_lightmap_dynamic_env_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_lightmap_dynamic_env_world_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_env_rigid_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_env_rigid_boned_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_env_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_env_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_env_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_env_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_lightmap_dynamic_env_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_lightmap_dynamic_env_world_vs_2_0),  
+	sizeof(k_lightmap_dynamic_env_rigid_vs_2_0),  
+	sizeof(k_lightmap_dynamic_env_rigid_boned_vs_2_0),  
+	sizeof(k_lightmap_dynamic_env_skinned_1_bone_vs_2_0),  
+	sizeof(k_lightmap_dynamic_env_skinned_2_bone_vs_2_0),  
+	sizeof(k_lightmap_dynamic_env_skinned_3_bone_vs_2_0),  
+	sizeof(k_lightmap_dynamic_env_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_lightmap_dynamic_env_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_lightmap_dynamic_env_world_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_env_rigid_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_env_rigid_boned_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_env_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_env_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_env_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_env_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_lightmap_dynamic_env_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_lightmap_dynamic_env_world_vs_3_0),  
+	sizeof(k_lightmap_dynamic_env_rigid_vs_3_0),  
+	sizeof(k_lightmap_dynamic_env_rigid_boned_vs_3_0),  
+	sizeof(k_lightmap_dynamic_env_skinned_1_bone_vs_3_0),  
+	sizeof(k_lightmap_dynamic_env_skinned_2_bone_vs_3_0),  
+	sizeof(k_lightmap_dynamic_env_skinned_3_bone_vs_3_0),  
+	sizeof(k_lightmap_dynamic_env_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_lightmap_dynamic_env_bytecode[2] 
+{ 
+	k_lightmap_dynamic_env_bytecode_vs_2_0, 
+	k_lightmap_dynamic_env_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_lightmap_dynamic_env_bytecode_size[2] 
+{ 
+	k_lightmap_dynamic_env_bytecode_vs_2_0_size, 
+	k_lightmap_dynamic_env_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_lightmap_dynamic_tex_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_lightmap_dynamic_tex_world_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_rigid_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_rigid_boned_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_lightmap_dynamic_tex_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_lightmap_dynamic_tex_world_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_rigid_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_rigid_boned_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_skinned_1_bone_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_skinned_2_bone_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_skinned_3_bone_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_lightmap_dynamic_tex_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_lightmap_dynamic_tex_world_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_rigid_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_rigid_boned_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_lightmap_dynamic_tex_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_lightmap_dynamic_tex_world_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_rigid_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_rigid_boned_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_skinned_1_bone_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_skinned_2_bone_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_skinned_3_bone_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_lightmap_dynamic_tex_bytecode[2] 
+{ 
+	k_lightmap_dynamic_tex_bytecode_vs_2_0, 
+	k_lightmap_dynamic_tex_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_lightmap_dynamic_tex_bytecode_size[2] 
+{ 
+	k_lightmap_dynamic_tex_bytecode_vs_2_0_size, 
+	k_lightmap_dynamic_tex_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_lightmap_dynamic_tex_change_color_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_lightmap_dynamic_tex_change_color_world_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_change_color_rigid_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_change_color_rigid_boned_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_change_color_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_change_color_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_change_color_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_change_color_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_lightmap_dynamic_tex_change_color_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_lightmap_dynamic_tex_change_color_world_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_change_color_rigid_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_change_color_rigid_boned_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_change_color_skinned_1_bone_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_change_color_skinned_2_bone_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_change_color_skinned_3_bone_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_change_color_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_lightmap_dynamic_tex_change_color_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_lightmap_dynamic_tex_change_color_world_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_change_color_rigid_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_change_color_rigid_boned_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_change_color_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_change_color_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_change_color_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_change_color_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_lightmap_dynamic_tex_change_color_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_lightmap_dynamic_tex_change_color_world_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_change_color_rigid_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_change_color_rigid_boned_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_change_color_skinned_1_bone_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_change_color_skinned_2_bone_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_change_color_skinned_3_bone_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_change_color_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_lightmap_dynamic_tex_change_color_bytecode[2] 
+{ 
+	k_lightmap_dynamic_tex_change_color_bytecode_vs_2_0, 
+	k_lightmap_dynamic_tex_change_color_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_lightmap_dynamic_tex_change_color_bytecode_size[2] 
+{ 
+	k_lightmap_dynamic_tex_change_color_bytecode_vs_2_0_size, 
+	k_lightmap_dynamic_tex_change_color_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_lightmap_dynamic_tex_change_color_default_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_lightmap_dynamic_tex_change_color_default_world_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_change_color_default_rigid_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_change_color_default_rigid_boned_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_change_color_default_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_change_color_default_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_change_color_default_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_change_color_default_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_lightmap_dynamic_tex_change_color_default_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_lightmap_dynamic_tex_change_color_default_world_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_change_color_default_rigid_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_change_color_default_rigid_boned_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_change_color_default_skinned_1_bone_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_change_color_default_skinned_2_bone_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_change_color_default_skinned_3_bone_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_change_color_default_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_lightmap_dynamic_tex_change_color_default_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_lightmap_dynamic_tex_change_color_default_world_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_change_color_default_rigid_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_change_color_default_rigid_boned_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_change_color_default_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_change_color_default_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_change_color_default_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_change_color_default_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_lightmap_dynamic_tex_change_color_default_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_lightmap_dynamic_tex_change_color_default_world_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_change_color_default_rigid_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_change_color_default_rigid_boned_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_change_color_default_skinned_1_bone_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_change_color_default_skinned_2_bone_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_change_color_default_skinned_3_bone_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_change_color_default_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_lightmap_dynamic_tex_change_color_default_bytecode[2] 
+{ 
+	k_lightmap_dynamic_tex_change_color_default_bytecode_vs_2_0, 
+	k_lightmap_dynamic_tex_change_color_default_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_lightmap_dynamic_tex_change_color_default_bytecode_size[2] 
+{ 
+	k_lightmap_dynamic_tex_change_color_default_bytecode_vs_2_0_size, 
+	k_lightmap_dynamic_tex_change_color_default_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_lightmap_dynamic_tex_change_color_env_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_lightmap_dynamic_tex_change_color_env_world_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_change_color_env_rigid_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_change_color_env_rigid_boned_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_change_color_env_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_change_color_env_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_change_color_env_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_change_color_env_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_lightmap_dynamic_tex_change_color_env_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_lightmap_dynamic_tex_change_color_env_world_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_change_color_env_rigid_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_change_color_env_rigid_boned_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_change_color_env_skinned_1_bone_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_change_color_env_skinned_2_bone_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_change_color_env_skinned_3_bone_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_change_color_env_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_lightmap_dynamic_tex_change_color_env_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_lightmap_dynamic_tex_change_color_env_world_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_change_color_env_rigid_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_change_color_env_rigid_boned_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_change_color_env_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_change_color_env_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_change_color_env_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_change_color_env_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_lightmap_dynamic_tex_change_color_env_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_lightmap_dynamic_tex_change_color_env_world_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_change_color_env_rigid_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_change_color_env_rigid_boned_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_change_color_env_skinned_1_bone_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_change_color_env_skinned_2_bone_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_change_color_env_skinned_3_bone_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_change_color_env_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_lightmap_dynamic_tex_change_color_env_bytecode[2] 
+{ 
+	k_lightmap_dynamic_tex_change_color_env_bytecode_vs_2_0, 
+	k_lightmap_dynamic_tex_change_color_env_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_lightmap_dynamic_tex_change_color_env_bytecode_size[2] 
+{ 
+	k_lightmap_dynamic_tex_change_color_env_bytecode_vs_2_0_size, 
+	k_lightmap_dynamic_tex_change_color_env_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_lightmap_dynamic_tex_detail_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_lightmap_dynamic_tex_detail_world_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_detail_rigid_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_detail_rigid_boned_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_detail_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_detail_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_detail_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_detail_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_lightmap_dynamic_tex_detail_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_lightmap_dynamic_tex_detail_world_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_detail_rigid_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_detail_rigid_boned_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_detail_skinned_1_bone_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_detail_skinned_2_bone_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_detail_skinned_3_bone_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_detail_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_lightmap_dynamic_tex_detail_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_lightmap_dynamic_tex_detail_world_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_detail_rigid_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_detail_rigid_boned_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_detail_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_detail_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_detail_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_detail_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_lightmap_dynamic_tex_detail_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_lightmap_dynamic_tex_detail_world_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_detail_rigid_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_detail_rigid_boned_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_detail_skinned_1_bone_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_detail_skinned_2_bone_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_detail_skinned_3_bone_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_detail_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_lightmap_dynamic_tex_detail_bytecode[2] 
+{ 
+	k_lightmap_dynamic_tex_detail_bytecode_vs_2_0, 
+	k_lightmap_dynamic_tex_detail_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_lightmap_dynamic_tex_detail_bytecode_size[2] 
+{ 
+	k_lightmap_dynamic_tex_detail_bytecode_vs_2_0_size, 
+	k_lightmap_dynamic_tex_detail_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_lightmap_dynamic_tex_detail_blend_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_lightmap_dynamic_tex_detail_blend_world_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_detail_blend_rigid_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_detail_blend_rigid_boned_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_detail_blend_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_detail_blend_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_detail_blend_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_detail_blend_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_lightmap_dynamic_tex_detail_blend_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_lightmap_dynamic_tex_detail_blend_world_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_detail_blend_rigid_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_detail_blend_rigid_boned_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_detail_blend_skinned_1_bone_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_detail_blend_skinned_2_bone_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_detail_blend_skinned_3_bone_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_detail_blend_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_lightmap_dynamic_tex_detail_blend_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_lightmap_dynamic_tex_detail_blend_world_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_detail_blend_rigid_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_detail_blend_rigid_boned_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_detail_blend_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_detail_blend_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_detail_blend_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_detail_blend_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_lightmap_dynamic_tex_detail_blend_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_lightmap_dynamic_tex_detail_blend_world_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_detail_blend_rigid_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_detail_blend_rigid_boned_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_detail_blend_skinned_1_bone_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_detail_blend_skinned_2_bone_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_detail_blend_skinned_3_bone_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_detail_blend_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_lightmap_dynamic_tex_detail_blend_bytecode[2] 
+{ 
+	k_lightmap_dynamic_tex_detail_blend_bytecode_vs_2_0, 
+	k_lightmap_dynamic_tex_detail_blend_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_lightmap_dynamic_tex_detail_blend_bytecode_size[2] 
+{ 
+	k_lightmap_dynamic_tex_detail_blend_bytecode_vs_2_0_size, 
+	k_lightmap_dynamic_tex_detail_blend_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_lightmap_dynamic_tex_env_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_lightmap_dynamic_tex_env_world_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_env_rigid_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_env_rigid_boned_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_env_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_env_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_env_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_env_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_lightmap_dynamic_tex_env_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_lightmap_dynamic_tex_env_world_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_env_rigid_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_env_rigid_boned_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_env_skinned_1_bone_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_env_skinned_2_bone_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_env_skinned_3_bone_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_env_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_lightmap_dynamic_tex_env_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_lightmap_dynamic_tex_env_world_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_env_rigid_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_env_rigid_boned_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_env_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_env_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_env_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_env_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_lightmap_dynamic_tex_env_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_lightmap_dynamic_tex_env_world_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_env_rigid_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_env_rigid_boned_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_env_skinned_1_bone_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_env_skinned_2_bone_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_env_skinned_3_bone_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_env_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_lightmap_dynamic_tex_env_bytecode[2] 
+{ 
+	k_lightmap_dynamic_tex_env_bytecode_vs_2_0, 
+	k_lightmap_dynamic_tex_env_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_lightmap_dynamic_tex_env_bytecode_size[2] 
+{ 
+	k_lightmap_dynamic_tex_env_bytecode_vs_2_0_size, 
+	k_lightmap_dynamic_tex_env_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_lightmap_dynamic_tex_env_stencil_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_lightmap_dynamic_tex_env_stencil_world_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_env_stencil_rigid_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_env_stencil_rigid_boned_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_env_stencil_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_env_stencil_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_env_stencil_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_env_stencil_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_lightmap_dynamic_tex_env_stencil_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_lightmap_dynamic_tex_env_stencil_world_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_env_stencil_rigid_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_env_stencil_rigid_boned_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_env_stencil_skinned_1_bone_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_env_stencil_skinned_2_bone_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_env_stencil_skinned_3_bone_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_env_stencil_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_lightmap_dynamic_tex_env_stencil_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_lightmap_dynamic_tex_env_stencil_world_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_env_stencil_rigid_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_env_stencil_rigid_boned_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_env_stencil_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_env_stencil_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_env_stencil_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_env_stencil_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_lightmap_dynamic_tex_env_stencil_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_lightmap_dynamic_tex_env_stencil_world_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_env_stencil_rigid_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_env_stencil_rigid_boned_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_env_stencil_skinned_1_bone_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_env_stencil_skinned_2_bone_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_env_stencil_skinned_3_bone_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_env_stencil_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_lightmap_dynamic_tex_env_stencil_bytecode[2] 
+{ 
+	k_lightmap_dynamic_tex_env_stencil_bytecode_vs_2_0, 
+	k_lightmap_dynamic_tex_env_stencil_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_lightmap_dynamic_tex_env_stencil_bytecode_size[2] 
+{ 
+	k_lightmap_dynamic_tex_env_stencil_bytecode_vs_2_0_size, 
+	k_lightmap_dynamic_tex_env_stencil_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_lightmap_dynamic_tex_mark_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_lightmap_dynamic_tex_mark_world_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_mark_rigid_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_mark_rigid_boned_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_mark_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_mark_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_mark_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_mark_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_lightmap_dynamic_tex_mark_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_lightmap_dynamic_tex_mark_world_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_mark_rigid_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_mark_rigid_boned_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_mark_skinned_1_bone_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_mark_skinned_2_bone_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_mark_skinned_3_bone_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_mark_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_lightmap_dynamic_tex_mark_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_lightmap_dynamic_tex_mark_world_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_mark_rigid_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_mark_rigid_boned_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_mark_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_mark_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_mark_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_mark_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_lightmap_dynamic_tex_mark_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_lightmap_dynamic_tex_mark_world_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_mark_rigid_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_mark_rigid_boned_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_mark_skinned_1_bone_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_mark_skinned_2_bone_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_mark_skinned_3_bone_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_mark_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_lightmap_dynamic_tex_mark_bytecode[2] 
+{ 
+	k_lightmap_dynamic_tex_mark_bytecode_vs_2_0, 
+	k_lightmap_dynamic_tex_mark_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_lightmap_dynamic_tex_mark_bytecode_size[2] 
+{ 
+	k_lightmap_dynamic_tex_mark_bytecode_vs_2_0_size, 
+	k_lightmap_dynamic_tex_mark_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_lightmap_dynamic_tex_mark_stencil_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_lightmap_dynamic_tex_mark_stencil_world_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_mark_stencil_rigid_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_mark_stencil_rigid_boned_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_mark_stencil_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_mark_stencil_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_mark_stencil_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_mark_stencil_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_lightmap_dynamic_tex_mark_stencil_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_lightmap_dynamic_tex_mark_stencil_world_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_mark_stencil_rigid_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_mark_stencil_rigid_boned_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_mark_stencil_skinned_1_bone_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_mark_stencil_skinned_2_bone_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_mark_stencil_skinned_3_bone_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_mark_stencil_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_lightmap_dynamic_tex_mark_stencil_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_lightmap_dynamic_tex_mark_stencil_world_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_mark_stencil_rigid_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_mark_stencil_rigid_boned_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_mark_stencil_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_mark_stencil_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_mark_stencil_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_mark_stencil_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_lightmap_dynamic_tex_mark_stencil_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_lightmap_dynamic_tex_mark_stencil_world_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_mark_stencil_rigid_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_mark_stencil_rigid_boned_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_mark_stencil_skinned_1_bone_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_mark_stencil_skinned_2_bone_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_mark_stencil_skinned_3_bone_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_mark_stencil_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_lightmap_dynamic_tex_mark_stencil_bytecode[2] 
+{ 
+	k_lightmap_dynamic_tex_mark_stencil_bytecode_vs_2_0, 
+	k_lightmap_dynamic_tex_mark_stencil_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_lightmap_dynamic_tex_mark_stencil_bytecode_size[2] 
+{ 
+	k_lightmap_dynamic_tex_mark_stencil_bytecode_vs_2_0_size, 
+	k_lightmap_dynamic_tex_mark_stencil_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_lightmap_dynamic_tex_stencil_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_lightmap_dynamic_tex_stencil_world_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_stencil_rigid_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_stencil_rigid_boned_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_stencil_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_stencil_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_stencil_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_lightmap_dynamic_tex_stencil_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_lightmap_dynamic_tex_stencil_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_lightmap_dynamic_tex_stencil_world_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_stencil_rigid_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_stencil_rigid_boned_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_stencil_skinned_1_bone_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_stencil_skinned_2_bone_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_stencil_skinned_3_bone_vs_2_0),  
+	sizeof(k_lightmap_dynamic_tex_stencil_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_lightmap_dynamic_tex_stencil_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_lightmap_dynamic_tex_stencil_world_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_stencil_rigid_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_stencil_rigid_boned_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_stencil_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_stencil_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_stencil_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_lightmap_dynamic_tex_stencil_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_lightmap_dynamic_tex_stencil_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_lightmap_dynamic_tex_stencil_world_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_stencil_rigid_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_stencil_rigid_boned_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_stencil_skinned_1_bone_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_stencil_skinned_2_bone_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_stencil_skinned_3_bone_vs_3_0),  
+	sizeof(k_lightmap_dynamic_tex_stencil_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_lightmap_dynamic_tex_stencil_bytecode[2] 
+{ 
+	k_lightmap_dynamic_tex_stencil_bytecode_vs_2_0, 
+	k_lightmap_dynamic_tex_stencil_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_lightmap_dynamic_tex_stencil_bytecode_size[2] 
+{ 
+	k_lightmap_dynamic_tex_stencil_bytecode_vs_2_0_size, 
+	k_lightmap_dynamic_tex_stencil_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_lightmap_perpixel_env_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_lightmap_perpixel_env_world_vs_2_0,  
+	(DWORD*)k_lightmap_perpixel_env_rigid_vs_2_0,  
+	(DWORD*)k_lightmap_perpixel_env_rigid_boned_vs_2_0,  
+	(DWORD*)k_lightmap_perpixel_env_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_lightmap_perpixel_env_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_lightmap_perpixel_env_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_lightmap_perpixel_env_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_lightmap_perpixel_env_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_lightmap_perpixel_env_world_vs_2_0),  
+	sizeof(k_lightmap_perpixel_env_rigid_vs_2_0),  
+	sizeof(k_lightmap_perpixel_env_rigid_boned_vs_2_0),  
+	sizeof(k_lightmap_perpixel_env_skinned_1_bone_vs_2_0),  
+	sizeof(k_lightmap_perpixel_env_skinned_2_bone_vs_2_0),  
+	sizeof(k_lightmap_perpixel_env_skinned_3_bone_vs_2_0),  
+	sizeof(k_lightmap_perpixel_env_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_lightmap_perpixel_env_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_lightmap_perpixel_env_world_vs_3_0,  
+	(DWORD*)k_lightmap_perpixel_env_rigid_vs_3_0,  
+	(DWORD*)k_lightmap_perpixel_env_rigid_boned_vs_3_0,  
+	(DWORD*)k_lightmap_perpixel_env_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_lightmap_perpixel_env_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_lightmap_perpixel_env_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_lightmap_perpixel_env_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_lightmap_perpixel_env_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_lightmap_perpixel_env_world_vs_3_0),  
+	sizeof(k_lightmap_perpixel_env_rigid_vs_3_0),  
+	sizeof(k_lightmap_perpixel_env_rigid_boned_vs_3_0),  
+	sizeof(k_lightmap_perpixel_env_skinned_1_bone_vs_3_0),  
+	sizeof(k_lightmap_perpixel_env_skinned_2_bone_vs_3_0),  
+	sizeof(k_lightmap_perpixel_env_skinned_3_bone_vs_3_0),  
+	sizeof(k_lightmap_perpixel_env_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_lightmap_perpixel_env_bytecode[2] 
+{ 
+	k_lightmap_perpixel_env_bytecode_vs_2_0, 
+	k_lightmap_perpixel_env_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_lightmap_perpixel_env_bytecode_size[2] 
+{ 
+	k_lightmap_perpixel_env_bytecode_vs_2_0_size, 
+	k_lightmap_perpixel_env_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_lightmap_perpixel_tex_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_lightmap_perpixel_tex_world_vs_2_0,  
+	(DWORD*)k_lightmap_perpixel_tex_rigid_vs_2_0,  
+	(DWORD*)k_lightmap_perpixel_tex_rigid_boned_vs_2_0,  
+	(DWORD*)k_lightmap_perpixel_tex_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_lightmap_perpixel_tex_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_lightmap_perpixel_tex_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_lightmap_perpixel_tex_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_lightmap_perpixel_tex_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_lightmap_perpixel_tex_world_vs_2_0),  
+	sizeof(k_lightmap_perpixel_tex_rigid_vs_2_0),  
+	sizeof(k_lightmap_perpixel_tex_rigid_boned_vs_2_0),  
+	sizeof(k_lightmap_perpixel_tex_skinned_1_bone_vs_2_0),  
+	sizeof(k_lightmap_perpixel_tex_skinned_2_bone_vs_2_0),  
+	sizeof(k_lightmap_perpixel_tex_skinned_3_bone_vs_2_0),  
+	sizeof(k_lightmap_perpixel_tex_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_lightmap_perpixel_tex_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_lightmap_perpixel_tex_world_vs_3_0,  
+	(DWORD*)k_lightmap_perpixel_tex_rigid_vs_3_0,  
+	(DWORD*)k_lightmap_perpixel_tex_rigid_boned_vs_3_0,  
+	(DWORD*)k_lightmap_perpixel_tex_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_lightmap_perpixel_tex_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_lightmap_perpixel_tex_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_lightmap_perpixel_tex_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_lightmap_perpixel_tex_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_lightmap_perpixel_tex_world_vs_3_0),  
+	sizeof(k_lightmap_perpixel_tex_rigid_vs_3_0),  
+	sizeof(k_lightmap_perpixel_tex_rigid_boned_vs_3_0),  
+	sizeof(k_lightmap_perpixel_tex_skinned_1_bone_vs_3_0),  
+	sizeof(k_lightmap_perpixel_tex_skinned_2_bone_vs_3_0),  
+	sizeof(k_lightmap_perpixel_tex_skinned_3_bone_vs_3_0),  
+	sizeof(k_lightmap_perpixel_tex_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_lightmap_perpixel_tex_bytecode[2] 
+{ 
+	k_lightmap_perpixel_tex_bytecode_vs_2_0, 
+	k_lightmap_perpixel_tex_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_lightmap_perpixel_tex_bytecode_size[2] 
+{ 
+	k_lightmap_perpixel_tex_bytecode_vs_2_0_size, 
+	k_lightmap_perpixel_tex_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_lightmap_perpixel_tex_detail_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_lightmap_perpixel_tex_detail_world_vs_2_0,  
+	(DWORD*)k_lightmap_perpixel_tex_detail_rigid_vs_2_0,  
+	(DWORD*)k_lightmap_perpixel_tex_detail_rigid_boned_vs_2_0,  
+	(DWORD*)k_lightmap_perpixel_tex_detail_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_lightmap_perpixel_tex_detail_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_lightmap_perpixel_tex_detail_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_lightmap_perpixel_tex_detail_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_lightmap_perpixel_tex_detail_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_lightmap_perpixel_tex_detail_world_vs_2_0),  
+	sizeof(k_lightmap_perpixel_tex_detail_rigid_vs_2_0),  
+	sizeof(k_lightmap_perpixel_tex_detail_rigid_boned_vs_2_0),  
+	sizeof(k_lightmap_perpixel_tex_detail_skinned_1_bone_vs_2_0),  
+	sizeof(k_lightmap_perpixel_tex_detail_skinned_2_bone_vs_2_0),  
+	sizeof(k_lightmap_perpixel_tex_detail_skinned_3_bone_vs_2_0),  
+	sizeof(k_lightmap_perpixel_tex_detail_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_lightmap_perpixel_tex_detail_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_lightmap_perpixel_tex_detail_world_vs_3_0,  
+	(DWORD*)k_lightmap_perpixel_tex_detail_rigid_vs_3_0,  
+	(DWORD*)k_lightmap_perpixel_tex_detail_rigid_boned_vs_3_0,  
+	(DWORD*)k_lightmap_perpixel_tex_detail_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_lightmap_perpixel_tex_detail_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_lightmap_perpixel_tex_detail_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_lightmap_perpixel_tex_detail_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_lightmap_perpixel_tex_detail_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_lightmap_perpixel_tex_detail_world_vs_3_0),  
+	sizeof(k_lightmap_perpixel_tex_detail_rigid_vs_3_0),  
+	sizeof(k_lightmap_perpixel_tex_detail_rigid_boned_vs_3_0),  
+	sizeof(k_lightmap_perpixel_tex_detail_skinned_1_bone_vs_3_0),  
+	sizeof(k_lightmap_perpixel_tex_detail_skinned_2_bone_vs_3_0),  
+	sizeof(k_lightmap_perpixel_tex_detail_skinned_3_bone_vs_3_0),  
+	sizeof(k_lightmap_perpixel_tex_detail_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_lightmap_perpixel_tex_detail_bytecode[2] 
+{ 
+	k_lightmap_perpixel_tex_detail_bytecode_vs_2_0, 
+	k_lightmap_perpixel_tex_detail_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_lightmap_perpixel_tex_detail_bytecode_size[2] 
+{ 
+	k_lightmap_perpixel_tex_detail_bytecode_vs_2_0_size, 
+	k_lightmap_perpixel_tex_detail_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_lightmap_perpixel_tex_detail_blend_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_lightmap_perpixel_tex_detail_blend_world_vs_2_0,  
+	(DWORD*)k_lightmap_perpixel_tex_detail_blend_rigid_vs_2_0,  
+	(DWORD*)k_lightmap_perpixel_tex_detail_blend_rigid_boned_vs_2_0,  
+	(DWORD*)k_lightmap_perpixel_tex_detail_blend_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_lightmap_perpixel_tex_detail_blend_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_lightmap_perpixel_tex_detail_blend_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_lightmap_perpixel_tex_detail_blend_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_lightmap_perpixel_tex_detail_blend_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_lightmap_perpixel_tex_detail_blend_world_vs_2_0),  
+	sizeof(k_lightmap_perpixel_tex_detail_blend_rigid_vs_2_0),  
+	sizeof(k_lightmap_perpixel_tex_detail_blend_rigid_boned_vs_2_0),  
+	sizeof(k_lightmap_perpixel_tex_detail_blend_skinned_1_bone_vs_2_0),  
+	sizeof(k_lightmap_perpixel_tex_detail_blend_skinned_2_bone_vs_2_0),  
+	sizeof(k_lightmap_perpixel_tex_detail_blend_skinned_3_bone_vs_2_0),  
+	sizeof(k_lightmap_perpixel_tex_detail_blend_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_lightmap_perpixel_tex_detail_blend_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_lightmap_perpixel_tex_detail_blend_world_vs_3_0,  
+	(DWORD*)k_lightmap_perpixel_tex_detail_blend_rigid_vs_3_0,  
+	(DWORD*)k_lightmap_perpixel_tex_detail_blend_rigid_boned_vs_3_0,  
+	(DWORD*)k_lightmap_perpixel_tex_detail_blend_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_lightmap_perpixel_tex_detail_blend_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_lightmap_perpixel_tex_detail_blend_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_lightmap_perpixel_tex_detail_blend_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_lightmap_perpixel_tex_detail_blend_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_lightmap_perpixel_tex_detail_blend_world_vs_3_0),  
+	sizeof(k_lightmap_perpixel_tex_detail_blend_rigid_vs_3_0),  
+	sizeof(k_lightmap_perpixel_tex_detail_blend_rigid_boned_vs_3_0),  
+	sizeof(k_lightmap_perpixel_tex_detail_blend_skinned_1_bone_vs_3_0),  
+	sizeof(k_lightmap_perpixel_tex_detail_blend_skinned_2_bone_vs_3_0),  
+	sizeof(k_lightmap_perpixel_tex_detail_blend_skinned_3_bone_vs_3_0),  
+	sizeof(k_lightmap_perpixel_tex_detail_blend_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_lightmap_perpixel_tex_detail_blend_bytecode[2] 
+{ 
+	k_lightmap_perpixel_tex_detail_blend_bytecode_vs_2_0, 
+	k_lightmap_perpixel_tex_detail_blend_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_lightmap_perpixel_tex_detail_blend_bytecode_size[2] 
+{ 
+	k_lightmap_perpixel_tex_detail_blend_bytecode_vs_2_0_size, 
+	k_lightmap_perpixel_tex_detail_blend_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_lightmap_perpixel_tex_env_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_lightmap_perpixel_tex_env_world_vs_2_0,  
+	(DWORD*)k_lightmap_perpixel_tex_env_rigid_vs_2_0,  
+	(DWORD*)k_lightmap_perpixel_tex_env_rigid_boned_vs_2_0,  
+	(DWORD*)k_lightmap_perpixel_tex_env_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_lightmap_perpixel_tex_env_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_lightmap_perpixel_tex_env_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_lightmap_perpixel_tex_env_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_lightmap_perpixel_tex_env_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_lightmap_perpixel_tex_env_world_vs_2_0),  
+	sizeof(k_lightmap_perpixel_tex_env_rigid_vs_2_0),  
+	sizeof(k_lightmap_perpixel_tex_env_rigid_boned_vs_2_0),  
+	sizeof(k_lightmap_perpixel_tex_env_skinned_1_bone_vs_2_0),  
+	sizeof(k_lightmap_perpixel_tex_env_skinned_2_bone_vs_2_0),  
+	sizeof(k_lightmap_perpixel_tex_env_skinned_3_bone_vs_2_0),  
+	sizeof(k_lightmap_perpixel_tex_env_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_lightmap_perpixel_tex_env_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_lightmap_perpixel_tex_env_world_vs_3_0,  
+	(DWORD*)k_lightmap_perpixel_tex_env_rigid_vs_3_0,  
+	(DWORD*)k_lightmap_perpixel_tex_env_rigid_boned_vs_3_0,  
+	(DWORD*)k_lightmap_perpixel_tex_env_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_lightmap_perpixel_tex_env_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_lightmap_perpixel_tex_env_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_lightmap_perpixel_tex_env_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_lightmap_perpixel_tex_env_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_lightmap_perpixel_tex_env_world_vs_3_0),  
+	sizeof(k_lightmap_perpixel_tex_env_rigid_vs_3_0),  
+	sizeof(k_lightmap_perpixel_tex_env_rigid_boned_vs_3_0),  
+	sizeof(k_lightmap_perpixel_tex_env_skinned_1_bone_vs_3_0),  
+	sizeof(k_lightmap_perpixel_tex_env_skinned_2_bone_vs_3_0),  
+	sizeof(k_lightmap_perpixel_tex_env_skinned_3_bone_vs_3_0),  
+	sizeof(k_lightmap_perpixel_tex_env_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_lightmap_perpixel_tex_env_bytecode[2] 
+{ 
+	k_lightmap_perpixel_tex_env_bytecode_vs_2_0, 
+	k_lightmap_perpixel_tex_env_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_lightmap_perpixel_tex_env_bytecode_size[2] 
+{ 
+	k_lightmap_perpixel_tex_env_bytecode_vs_2_0_size, 
+	k_lightmap_perpixel_tex_env_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_lightmap_perpixel_tex_env_stencil_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_lightmap_perpixel_tex_env_stencil_world_vs_2_0,  
+	(DWORD*)k_lightmap_perpixel_tex_env_stencil_rigid_vs_2_0,  
+	(DWORD*)k_lightmap_perpixel_tex_env_stencil_rigid_boned_vs_2_0,  
+	(DWORD*)k_lightmap_perpixel_tex_env_stencil_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_lightmap_perpixel_tex_env_stencil_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_lightmap_perpixel_tex_env_stencil_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_lightmap_perpixel_tex_env_stencil_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_lightmap_perpixel_tex_env_stencil_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_lightmap_perpixel_tex_env_stencil_world_vs_2_0),  
+	sizeof(k_lightmap_perpixel_tex_env_stencil_rigid_vs_2_0),  
+	sizeof(k_lightmap_perpixel_tex_env_stencil_rigid_boned_vs_2_0),  
+	sizeof(k_lightmap_perpixel_tex_env_stencil_skinned_1_bone_vs_2_0),  
+	sizeof(k_lightmap_perpixel_tex_env_stencil_skinned_2_bone_vs_2_0),  
+	sizeof(k_lightmap_perpixel_tex_env_stencil_skinned_3_bone_vs_2_0),  
+	sizeof(k_lightmap_perpixel_tex_env_stencil_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_lightmap_perpixel_tex_env_stencil_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_lightmap_perpixel_tex_env_stencil_world_vs_3_0,  
+	(DWORD*)k_lightmap_perpixel_tex_env_stencil_rigid_vs_3_0,  
+	(DWORD*)k_lightmap_perpixel_tex_env_stencil_rigid_boned_vs_3_0,  
+	(DWORD*)k_lightmap_perpixel_tex_env_stencil_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_lightmap_perpixel_tex_env_stencil_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_lightmap_perpixel_tex_env_stencil_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_lightmap_perpixel_tex_env_stencil_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_lightmap_perpixel_tex_env_stencil_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_lightmap_perpixel_tex_env_stencil_world_vs_3_0),  
+	sizeof(k_lightmap_perpixel_tex_env_stencil_rigid_vs_3_0),  
+	sizeof(k_lightmap_perpixel_tex_env_stencil_rigid_boned_vs_3_0),  
+	sizeof(k_lightmap_perpixel_tex_env_stencil_skinned_1_bone_vs_3_0),  
+	sizeof(k_lightmap_perpixel_tex_env_stencil_skinned_2_bone_vs_3_0),  
+	sizeof(k_lightmap_perpixel_tex_env_stencil_skinned_3_bone_vs_3_0),  
+	sizeof(k_lightmap_perpixel_tex_env_stencil_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_lightmap_perpixel_tex_env_stencil_bytecode[2] 
+{ 
+	k_lightmap_perpixel_tex_env_stencil_bytecode_vs_2_0, 
+	k_lightmap_perpixel_tex_env_stencil_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_lightmap_perpixel_tex_env_stencil_bytecode_size[2] 
+{ 
+	k_lightmap_perpixel_tex_env_stencil_bytecode_vs_2_0_size, 
+	k_lightmap_perpixel_tex_env_stencil_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_lightmap_perpixel_tex_mark_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_lightmap_perpixel_tex_mark_world_vs_2_0,  
+	(DWORD*)k_lightmap_perpixel_tex_mark_rigid_vs_2_0,  
+	(DWORD*)k_lightmap_perpixel_tex_mark_rigid_boned_vs_2_0,  
+	(DWORD*)k_lightmap_perpixel_tex_mark_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_lightmap_perpixel_tex_mark_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_lightmap_perpixel_tex_mark_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_lightmap_perpixel_tex_mark_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_lightmap_perpixel_tex_mark_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_lightmap_perpixel_tex_mark_world_vs_2_0),  
+	sizeof(k_lightmap_perpixel_tex_mark_rigid_vs_2_0),  
+	sizeof(k_lightmap_perpixel_tex_mark_rigid_boned_vs_2_0),  
+	sizeof(k_lightmap_perpixel_tex_mark_skinned_1_bone_vs_2_0),  
+	sizeof(k_lightmap_perpixel_tex_mark_skinned_2_bone_vs_2_0),  
+	sizeof(k_lightmap_perpixel_tex_mark_skinned_3_bone_vs_2_0),  
+	sizeof(k_lightmap_perpixel_tex_mark_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_lightmap_perpixel_tex_mark_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_lightmap_perpixel_tex_mark_world_vs_3_0,  
+	(DWORD*)k_lightmap_perpixel_tex_mark_rigid_vs_3_0,  
+	(DWORD*)k_lightmap_perpixel_tex_mark_rigid_boned_vs_3_0,  
+	(DWORD*)k_lightmap_perpixel_tex_mark_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_lightmap_perpixel_tex_mark_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_lightmap_perpixel_tex_mark_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_lightmap_perpixel_tex_mark_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_lightmap_perpixel_tex_mark_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_lightmap_perpixel_tex_mark_world_vs_3_0),  
+	sizeof(k_lightmap_perpixel_tex_mark_rigid_vs_3_0),  
+	sizeof(k_lightmap_perpixel_tex_mark_rigid_boned_vs_3_0),  
+	sizeof(k_lightmap_perpixel_tex_mark_skinned_1_bone_vs_3_0),  
+	sizeof(k_lightmap_perpixel_tex_mark_skinned_2_bone_vs_3_0),  
+	sizeof(k_lightmap_perpixel_tex_mark_skinned_3_bone_vs_3_0),  
+	sizeof(k_lightmap_perpixel_tex_mark_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_lightmap_perpixel_tex_mark_bytecode[2] 
+{ 
+	k_lightmap_perpixel_tex_mark_bytecode_vs_2_0, 
+	k_lightmap_perpixel_tex_mark_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_lightmap_perpixel_tex_mark_bytecode_size[2] 
+{ 
+	k_lightmap_perpixel_tex_mark_bytecode_vs_2_0_size, 
+	k_lightmap_perpixel_tex_mark_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_lightmap_perpixel_tex_mark_stencil_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_lightmap_perpixel_tex_mark_stencil_world_vs_2_0,  
+	(DWORD*)k_lightmap_perpixel_tex_mark_stencil_rigid_vs_2_0,  
+	(DWORD*)k_lightmap_perpixel_tex_mark_stencil_rigid_boned_vs_2_0,  
+	(DWORD*)k_lightmap_perpixel_tex_mark_stencil_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_lightmap_perpixel_tex_mark_stencil_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_lightmap_perpixel_tex_mark_stencil_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_lightmap_perpixel_tex_mark_stencil_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_lightmap_perpixel_tex_mark_stencil_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_lightmap_perpixel_tex_mark_stencil_world_vs_2_0),  
+	sizeof(k_lightmap_perpixel_tex_mark_stencil_rigid_vs_2_0),  
+	sizeof(k_lightmap_perpixel_tex_mark_stencil_rigid_boned_vs_2_0),  
+	sizeof(k_lightmap_perpixel_tex_mark_stencil_skinned_1_bone_vs_2_0),  
+	sizeof(k_lightmap_perpixel_tex_mark_stencil_skinned_2_bone_vs_2_0),  
+	sizeof(k_lightmap_perpixel_tex_mark_stencil_skinned_3_bone_vs_2_0),  
+	sizeof(k_lightmap_perpixel_tex_mark_stencil_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_lightmap_perpixel_tex_mark_stencil_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_lightmap_perpixel_tex_mark_stencil_world_vs_3_0,  
+	(DWORD*)k_lightmap_perpixel_tex_mark_stencil_rigid_vs_3_0,  
+	(DWORD*)k_lightmap_perpixel_tex_mark_stencil_rigid_boned_vs_3_0,  
+	(DWORD*)k_lightmap_perpixel_tex_mark_stencil_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_lightmap_perpixel_tex_mark_stencil_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_lightmap_perpixel_tex_mark_stencil_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_lightmap_perpixel_tex_mark_stencil_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_lightmap_perpixel_tex_mark_stencil_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_lightmap_perpixel_tex_mark_stencil_world_vs_3_0),  
+	sizeof(k_lightmap_perpixel_tex_mark_stencil_rigid_vs_3_0),  
+	sizeof(k_lightmap_perpixel_tex_mark_stencil_rigid_boned_vs_3_0),  
+	sizeof(k_lightmap_perpixel_tex_mark_stencil_skinned_1_bone_vs_3_0),  
+	sizeof(k_lightmap_perpixel_tex_mark_stencil_skinned_2_bone_vs_3_0),  
+	sizeof(k_lightmap_perpixel_tex_mark_stencil_skinned_3_bone_vs_3_0),  
+	sizeof(k_lightmap_perpixel_tex_mark_stencil_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_lightmap_perpixel_tex_mark_stencil_bytecode[2] 
+{ 
+	k_lightmap_perpixel_tex_mark_stencil_bytecode_vs_2_0, 
+	k_lightmap_perpixel_tex_mark_stencil_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_lightmap_perpixel_tex_mark_stencil_bytecode_size[2] 
+{ 
+	k_lightmap_perpixel_tex_mark_stencil_bytecode_vs_2_0_size, 
+	k_lightmap_perpixel_tex_mark_stencil_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_lightmap_perpixel_tex_stencil_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_lightmap_perpixel_tex_stencil_world_vs_2_0,  
+	(DWORD*)k_lightmap_perpixel_tex_stencil_rigid_vs_2_0,  
+	(DWORD*)k_lightmap_perpixel_tex_stencil_rigid_boned_vs_2_0,  
+	(DWORD*)k_lightmap_perpixel_tex_stencil_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_lightmap_perpixel_tex_stencil_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_lightmap_perpixel_tex_stencil_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_lightmap_perpixel_tex_stencil_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_lightmap_perpixel_tex_stencil_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_lightmap_perpixel_tex_stencil_world_vs_2_0),  
+	sizeof(k_lightmap_perpixel_tex_stencil_rigid_vs_2_0),  
+	sizeof(k_lightmap_perpixel_tex_stencil_rigid_boned_vs_2_0),  
+	sizeof(k_lightmap_perpixel_tex_stencil_skinned_1_bone_vs_2_0),  
+	sizeof(k_lightmap_perpixel_tex_stencil_skinned_2_bone_vs_2_0),  
+	sizeof(k_lightmap_perpixel_tex_stencil_skinned_3_bone_vs_2_0),  
+	sizeof(k_lightmap_perpixel_tex_stencil_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_lightmap_perpixel_tex_stencil_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_lightmap_perpixel_tex_stencil_world_vs_3_0,  
+	(DWORD*)k_lightmap_perpixel_tex_stencil_rigid_vs_3_0,  
+	(DWORD*)k_lightmap_perpixel_tex_stencil_rigid_boned_vs_3_0,  
+	(DWORD*)k_lightmap_perpixel_tex_stencil_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_lightmap_perpixel_tex_stencil_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_lightmap_perpixel_tex_stencil_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_lightmap_perpixel_tex_stencil_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_lightmap_perpixel_tex_stencil_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_lightmap_perpixel_tex_stencil_world_vs_3_0),  
+	sizeof(k_lightmap_perpixel_tex_stencil_rigid_vs_3_0),  
+	sizeof(k_lightmap_perpixel_tex_stencil_rigid_boned_vs_3_0),  
+	sizeof(k_lightmap_perpixel_tex_stencil_skinned_1_bone_vs_3_0),  
+	sizeof(k_lightmap_perpixel_tex_stencil_skinned_2_bone_vs_3_0),  
+	sizeof(k_lightmap_perpixel_tex_stencil_skinned_3_bone_vs_3_0),  
+	sizeof(k_lightmap_perpixel_tex_stencil_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_lightmap_perpixel_tex_stencil_bytecode[2] 
+{ 
+	k_lightmap_perpixel_tex_stencil_bytecode_vs_2_0, 
+	k_lightmap_perpixel_tex_stencil_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_lightmap_perpixel_tex_stencil_bytecode_size[2] 
+{ 
+	k_lightmap_perpixel_tex_stencil_bytecode_vs_2_0_size, 
+	k_lightmap_perpixel_tex_stencil_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_lightmap_pervertex_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_lightmap_pervertex_world_vs_2_0,  
+	(DWORD*)k_lightmap_pervertex_rigid_vs_2_0,  
+	(DWORD*)k_lightmap_pervertex_rigid_boned_vs_2_0,  
+	(DWORD*)k_lightmap_pervertex_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_lightmap_pervertex_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_lightmap_pervertex_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_lightmap_pervertex_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_lightmap_pervertex_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_lightmap_pervertex_world_vs_2_0),  
+	sizeof(k_lightmap_pervertex_rigid_vs_2_0),  
+	sizeof(k_lightmap_pervertex_rigid_boned_vs_2_0),  
+	sizeof(k_lightmap_pervertex_skinned_1_bone_vs_2_0),  
+	sizeof(k_lightmap_pervertex_skinned_2_bone_vs_2_0),  
+	sizeof(k_lightmap_pervertex_skinned_3_bone_vs_2_0),  
+	sizeof(k_lightmap_pervertex_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_lightmap_pervertex_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_lightmap_pervertex_world_vs_3_0,  
+	(DWORD*)k_lightmap_pervertex_rigid_vs_3_0,  
+	(DWORD*)k_lightmap_pervertex_rigid_boned_vs_3_0,  
+	(DWORD*)k_lightmap_pervertex_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_lightmap_pervertex_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_lightmap_pervertex_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_lightmap_pervertex_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_lightmap_pervertex_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_lightmap_pervertex_world_vs_3_0),  
+	sizeof(k_lightmap_pervertex_rigid_vs_3_0),  
+	sizeof(k_lightmap_pervertex_rigid_boned_vs_3_0),  
+	sizeof(k_lightmap_pervertex_skinned_1_bone_vs_3_0),  
+	sizeof(k_lightmap_pervertex_skinned_2_bone_vs_3_0),  
+	sizeof(k_lightmap_pervertex_skinned_3_bone_vs_3_0),  
+	sizeof(k_lightmap_pervertex_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_lightmap_pervertex_bytecode[2] 
+{ 
+	k_lightmap_pervertex_bytecode_vs_2_0, 
+	k_lightmap_pervertex_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_lightmap_pervertex_bytecode_size[2] 
+{ 
+	k_lightmap_pervertex_bytecode_vs_2_0_size, 
+	k_lightmap_pervertex_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_lightmap_pervertex_env_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_lightmap_pervertex_env_world_vs_2_0,  
+	(DWORD*)k_lightmap_pervertex_env_rigid_vs_2_0,  
+	(DWORD*)k_lightmap_pervertex_env_rigid_boned_vs_2_0,  
+	(DWORD*)k_lightmap_pervertex_env_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_lightmap_pervertex_env_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_lightmap_pervertex_env_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_lightmap_pervertex_env_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_lightmap_pervertex_env_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_lightmap_pervertex_env_world_vs_2_0),  
+	sizeof(k_lightmap_pervertex_env_rigid_vs_2_0),  
+	sizeof(k_lightmap_pervertex_env_rigid_boned_vs_2_0),  
+	sizeof(k_lightmap_pervertex_env_skinned_1_bone_vs_2_0),  
+	sizeof(k_lightmap_pervertex_env_skinned_2_bone_vs_2_0),  
+	sizeof(k_lightmap_pervertex_env_skinned_3_bone_vs_2_0),  
+	sizeof(k_lightmap_pervertex_env_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_lightmap_pervertex_env_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_lightmap_pervertex_env_world_vs_3_0,  
+	(DWORD*)k_lightmap_pervertex_env_rigid_vs_3_0,  
+	(DWORD*)k_lightmap_pervertex_env_rigid_boned_vs_3_0,  
+	(DWORD*)k_lightmap_pervertex_env_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_lightmap_pervertex_env_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_lightmap_pervertex_env_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_lightmap_pervertex_env_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_lightmap_pervertex_env_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_lightmap_pervertex_env_world_vs_3_0),  
+	sizeof(k_lightmap_pervertex_env_rigid_vs_3_0),  
+	sizeof(k_lightmap_pervertex_env_rigid_boned_vs_3_0),  
+	sizeof(k_lightmap_pervertex_env_skinned_1_bone_vs_3_0),  
+	sizeof(k_lightmap_pervertex_env_skinned_2_bone_vs_3_0),  
+	sizeof(k_lightmap_pervertex_env_skinned_3_bone_vs_3_0),  
+	sizeof(k_lightmap_pervertex_env_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_lightmap_pervertex_env_bytecode[2] 
+{ 
+	k_lightmap_pervertex_env_bytecode_vs_2_0, 
+	k_lightmap_pervertex_env_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_lightmap_pervertex_env_bytecode_size[2] 
+{ 
+	k_lightmap_pervertex_env_bytecode_vs_2_0_size, 
+	k_lightmap_pervertex_env_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_lightmap_pervertex_tex_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_lightmap_pervertex_tex_world_vs_2_0,  
+	(DWORD*)k_lightmap_pervertex_tex_rigid_vs_2_0,  
+	(DWORD*)k_lightmap_pervertex_tex_rigid_boned_vs_2_0,  
+	(DWORD*)k_lightmap_pervertex_tex_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_lightmap_pervertex_tex_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_lightmap_pervertex_tex_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_lightmap_pervertex_tex_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_lightmap_pervertex_tex_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_lightmap_pervertex_tex_world_vs_2_0),  
+	sizeof(k_lightmap_pervertex_tex_rigid_vs_2_0),  
+	sizeof(k_lightmap_pervertex_tex_rigid_boned_vs_2_0),  
+	sizeof(k_lightmap_pervertex_tex_skinned_1_bone_vs_2_0),  
+	sizeof(k_lightmap_pervertex_tex_skinned_2_bone_vs_2_0),  
+	sizeof(k_lightmap_pervertex_tex_skinned_3_bone_vs_2_0),  
+	sizeof(k_lightmap_pervertex_tex_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_lightmap_pervertex_tex_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_lightmap_pervertex_tex_world_vs_3_0,  
+	(DWORD*)k_lightmap_pervertex_tex_rigid_vs_3_0,  
+	(DWORD*)k_lightmap_pervertex_tex_rigid_boned_vs_3_0,  
+	(DWORD*)k_lightmap_pervertex_tex_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_lightmap_pervertex_tex_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_lightmap_pervertex_tex_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_lightmap_pervertex_tex_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_lightmap_pervertex_tex_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_lightmap_pervertex_tex_world_vs_3_0),  
+	sizeof(k_lightmap_pervertex_tex_rigid_vs_3_0),  
+	sizeof(k_lightmap_pervertex_tex_rigid_boned_vs_3_0),  
+	sizeof(k_lightmap_pervertex_tex_skinned_1_bone_vs_3_0),  
+	sizeof(k_lightmap_pervertex_tex_skinned_2_bone_vs_3_0),  
+	sizeof(k_lightmap_pervertex_tex_skinned_3_bone_vs_3_0),  
+	sizeof(k_lightmap_pervertex_tex_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_lightmap_pervertex_tex_bytecode[2] 
+{ 
+	k_lightmap_pervertex_tex_bytecode_vs_2_0, 
+	k_lightmap_pervertex_tex_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_lightmap_pervertex_tex_bytecode_size[2] 
+{ 
+	k_lightmap_pervertex_tex_bytecode_vs_2_0_size, 
+	k_lightmap_pervertex_tex_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_lightmap_pervertex_tex_detail_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_lightmap_pervertex_tex_detail_world_vs_2_0,  
+	(DWORD*)k_lightmap_pervertex_tex_detail_rigid_vs_2_0,  
+	(DWORD*)k_lightmap_pervertex_tex_detail_rigid_boned_vs_2_0,  
+	(DWORD*)k_lightmap_pervertex_tex_detail_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_lightmap_pervertex_tex_detail_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_lightmap_pervertex_tex_detail_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_lightmap_pervertex_tex_detail_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_lightmap_pervertex_tex_detail_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_lightmap_pervertex_tex_detail_world_vs_2_0),  
+	sizeof(k_lightmap_pervertex_tex_detail_rigid_vs_2_0),  
+	sizeof(k_lightmap_pervertex_tex_detail_rigid_boned_vs_2_0),  
+	sizeof(k_lightmap_pervertex_tex_detail_skinned_1_bone_vs_2_0),  
+	sizeof(k_lightmap_pervertex_tex_detail_skinned_2_bone_vs_2_0),  
+	sizeof(k_lightmap_pervertex_tex_detail_skinned_3_bone_vs_2_0),  
+	sizeof(k_lightmap_pervertex_tex_detail_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_lightmap_pervertex_tex_detail_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_lightmap_pervertex_tex_detail_world_vs_3_0,  
+	(DWORD*)k_lightmap_pervertex_tex_detail_rigid_vs_3_0,  
+	(DWORD*)k_lightmap_pervertex_tex_detail_rigid_boned_vs_3_0,  
+	(DWORD*)k_lightmap_pervertex_tex_detail_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_lightmap_pervertex_tex_detail_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_lightmap_pervertex_tex_detail_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_lightmap_pervertex_tex_detail_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_lightmap_pervertex_tex_detail_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_lightmap_pervertex_tex_detail_world_vs_3_0),  
+	sizeof(k_lightmap_pervertex_tex_detail_rigid_vs_3_0),  
+	sizeof(k_lightmap_pervertex_tex_detail_rigid_boned_vs_3_0),  
+	sizeof(k_lightmap_pervertex_tex_detail_skinned_1_bone_vs_3_0),  
+	sizeof(k_lightmap_pervertex_tex_detail_skinned_2_bone_vs_3_0),  
+	sizeof(k_lightmap_pervertex_tex_detail_skinned_3_bone_vs_3_0),  
+	sizeof(k_lightmap_pervertex_tex_detail_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_lightmap_pervertex_tex_detail_bytecode[2] 
+{ 
+	k_lightmap_pervertex_tex_detail_bytecode_vs_2_0, 
+	k_lightmap_pervertex_tex_detail_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_lightmap_pervertex_tex_detail_bytecode_size[2] 
+{ 
+	k_lightmap_pervertex_tex_detail_bytecode_vs_2_0_size, 
+	k_lightmap_pervertex_tex_detail_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_lightmap_pervertex_tex_detail_blend_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_lightmap_pervertex_tex_detail_blend_world_vs_2_0,  
+	(DWORD*)k_lightmap_pervertex_tex_detail_blend_rigid_vs_2_0,  
+	(DWORD*)k_lightmap_pervertex_tex_detail_blend_rigid_boned_vs_2_0,  
+	(DWORD*)k_lightmap_pervertex_tex_detail_blend_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_lightmap_pervertex_tex_detail_blend_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_lightmap_pervertex_tex_detail_blend_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_lightmap_pervertex_tex_detail_blend_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_lightmap_pervertex_tex_detail_blend_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_lightmap_pervertex_tex_detail_blend_world_vs_2_0),  
+	sizeof(k_lightmap_pervertex_tex_detail_blend_rigid_vs_2_0),  
+	sizeof(k_lightmap_pervertex_tex_detail_blend_rigid_boned_vs_2_0),  
+	sizeof(k_lightmap_pervertex_tex_detail_blend_skinned_1_bone_vs_2_0),  
+	sizeof(k_lightmap_pervertex_tex_detail_blend_skinned_2_bone_vs_2_0),  
+	sizeof(k_lightmap_pervertex_tex_detail_blend_skinned_3_bone_vs_2_0),  
+	sizeof(k_lightmap_pervertex_tex_detail_blend_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_lightmap_pervertex_tex_detail_blend_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_lightmap_pervertex_tex_detail_blend_world_vs_3_0,  
+	(DWORD*)k_lightmap_pervertex_tex_detail_blend_rigid_vs_3_0,  
+	(DWORD*)k_lightmap_pervertex_tex_detail_blend_rigid_boned_vs_3_0,  
+	(DWORD*)k_lightmap_pervertex_tex_detail_blend_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_lightmap_pervertex_tex_detail_blend_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_lightmap_pervertex_tex_detail_blend_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_lightmap_pervertex_tex_detail_blend_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_lightmap_pervertex_tex_detail_blend_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_lightmap_pervertex_tex_detail_blend_world_vs_3_0),  
+	sizeof(k_lightmap_pervertex_tex_detail_blend_rigid_vs_3_0),  
+	sizeof(k_lightmap_pervertex_tex_detail_blend_rigid_boned_vs_3_0),  
+	sizeof(k_lightmap_pervertex_tex_detail_blend_skinned_1_bone_vs_3_0),  
+	sizeof(k_lightmap_pervertex_tex_detail_blend_skinned_2_bone_vs_3_0),  
+	sizeof(k_lightmap_pervertex_tex_detail_blend_skinned_3_bone_vs_3_0),  
+	sizeof(k_lightmap_pervertex_tex_detail_blend_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_lightmap_pervertex_tex_detail_blend_bytecode[2] 
+{ 
+	k_lightmap_pervertex_tex_detail_blend_bytecode_vs_2_0, 
+	k_lightmap_pervertex_tex_detail_blend_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_lightmap_pervertex_tex_detail_blend_bytecode_size[2] 
+{ 
+	k_lightmap_pervertex_tex_detail_blend_bytecode_vs_2_0_size, 
+	k_lightmap_pervertex_tex_detail_blend_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_lightmap_pervertex_tex_env_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_lightmap_pervertex_tex_env_world_vs_2_0,  
+	(DWORD*)k_lightmap_pervertex_tex_env_rigid_vs_2_0,  
+	(DWORD*)k_lightmap_pervertex_tex_env_rigid_boned_vs_2_0,  
+	(DWORD*)k_lightmap_pervertex_tex_env_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_lightmap_pervertex_tex_env_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_lightmap_pervertex_tex_env_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_lightmap_pervertex_tex_env_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_lightmap_pervertex_tex_env_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_lightmap_pervertex_tex_env_world_vs_2_0),  
+	sizeof(k_lightmap_pervertex_tex_env_rigid_vs_2_0),  
+	sizeof(k_lightmap_pervertex_tex_env_rigid_boned_vs_2_0),  
+	sizeof(k_lightmap_pervertex_tex_env_skinned_1_bone_vs_2_0),  
+	sizeof(k_lightmap_pervertex_tex_env_skinned_2_bone_vs_2_0),  
+	sizeof(k_lightmap_pervertex_tex_env_skinned_3_bone_vs_2_0),  
+	sizeof(k_lightmap_pervertex_tex_env_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_lightmap_pervertex_tex_env_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_lightmap_pervertex_tex_env_world_vs_3_0,  
+	(DWORD*)k_lightmap_pervertex_tex_env_rigid_vs_3_0,  
+	(DWORD*)k_lightmap_pervertex_tex_env_rigid_boned_vs_3_0,  
+	(DWORD*)k_lightmap_pervertex_tex_env_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_lightmap_pervertex_tex_env_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_lightmap_pervertex_tex_env_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_lightmap_pervertex_tex_env_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_lightmap_pervertex_tex_env_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_lightmap_pervertex_tex_env_world_vs_3_0),  
+	sizeof(k_lightmap_pervertex_tex_env_rigid_vs_3_0),  
+	sizeof(k_lightmap_pervertex_tex_env_rigid_boned_vs_3_0),  
+	sizeof(k_lightmap_pervertex_tex_env_skinned_1_bone_vs_3_0),  
+	sizeof(k_lightmap_pervertex_tex_env_skinned_2_bone_vs_3_0),  
+	sizeof(k_lightmap_pervertex_tex_env_skinned_3_bone_vs_3_0),  
+	sizeof(k_lightmap_pervertex_tex_env_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_lightmap_pervertex_tex_env_bytecode[2] 
+{ 
+	k_lightmap_pervertex_tex_env_bytecode_vs_2_0, 
+	k_lightmap_pervertex_tex_env_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_lightmap_pervertex_tex_env_bytecode_size[2] 
+{ 
+	k_lightmap_pervertex_tex_env_bytecode_vs_2_0_size, 
+	k_lightmap_pervertex_tex_env_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_lightmap_pervertex_tex_env_stencil_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_lightmap_pervertex_tex_env_stencil_world_vs_2_0,  
+	(DWORD*)k_lightmap_pervertex_tex_env_stencil_rigid_vs_2_0,  
+	(DWORD*)k_lightmap_pervertex_tex_env_stencil_rigid_boned_vs_2_0,  
+	(DWORD*)k_lightmap_pervertex_tex_env_stencil_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_lightmap_pervertex_tex_env_stencil_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_lightmap_pervertex_tex_env_stencil_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_lightmap_pervertex_tex_env_stencil_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_lightmap_pervertex_tex_env_stencil_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_lightmap_pervertex_tex_env_stencil_world_vs_2_0),  
+	sizeof(k_lightmap_pervertex_tex_env_stencil_rigid_vs_2_0),  
+	sizeof(k_lightmap_pervertex_tex_env_stencil_rigid_boned_vs_2_0),  
+	sizeof(k_lightmap_pervertex_tex_env_stencil_skinned_1_bone_vs_2_0),  
+	sizeof(k_lightmap_pervertex_tex_env_stencil_skinned_2_bone_vs_2_0),  
+	sizeof(k_lightmap_pervertex_tex_env_stencil_skinned_3_bone_vs_2_0),  
+	sizeof(k_lightmap_pervertex_tex_env_stencil_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_lightmap_pervertex_tex_env_stencil_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_lightmap_pervertex_tex_env_stencil_world_vs_3_0,  
+	(DWORD*)k_lightmap_pervertex_tex_env_stencil_rigid_vs_3_0,  
+	(DWORD*)k_lightmap_pervertex_tex_env_stencil_rigid_boned_vs_3_0,  
+	(DWORD*)k_lightmap_pervertex_tex_env_stencil_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_lightmap_pervertex_tex_env_stencil_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_lightmap_pervertex_tex_env_stencil_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_lightmap_pervertex_tex_env_stencil_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_lightmap_pervertex_tex_env_stencil_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_lightmap_pervertex_tex_env_stencil_world_vs_3_0),  
+	sizeof(k_lightmap_pervertex_tex_env_stencil_rigid_vs_3_0),  
+	sizeof(k_lightmap_pervertex_tex_env_stencil_rigid_boned_vs_3_0),  
+	sizeof(k_lightmap_pervertex_tex_env_stencil_skinned_1_bone_vs_3_0),  
+	sizeof(k_lightmap_pervertex_tex_env_stencil_skinned_2_bone_vs_3_0),  
+	sizeof(k_lightmap_pervertex_tex_env_stencil_skinned_3_bone_vs_3_0),  
+	sizeof(k_lightmap_pervertex_tex_env_stencil_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_lightmap_pervertex_tex_env_stencil_bytecode[2] 
+{ 
+	k_lightmap_pervertex_tex_env_stencil_bytecode_vs_2_0, 
+	k_lightmap_pervertex_tex_env_stencil_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_lightmap_pervertex_tex_env_stencil_bytecode_size[2] 
+{ 
+	k_lightmap_pervertex_tex_env_stencil_bytecode_vs_2_0_size, 
+	k_lightmap_pervertex_tex_env_stencil_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_lightmap_pervertex_tex_mark_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_lightmap_pervertex_tex_mark_world_vs_2_0,  
+	(DWORD*)k_lightmap_pervertex_tex_mark_rigid_vs_2_0,  
+	(DWORD*)k_lightmap_pervertex_tex_mark_rigid_boned_vs_2_0,  
+	(DWORD*)k_lightmap_pervertex_tex_mark_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_lightmap_pervertex_tex_mark_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_lightmap_pervertex_tex_mark_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_lightmap_pervertex_tex_mark_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_lightmap_pervertex_tex_mark_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_lightmap_pervertex_tex_mark_world_vs_2_0),  
+	sizeof(k_lightmap_pervertex_tex_mark_rigid_vs_2_0),  
+	sizeof(k_lightmap_pervertex_tex_mark_rigid_boned_vs_2_0),  
+	sizeof(k_lightmap_pervertex_tex_mark_skinned_1_bone_vs_2_0),  
+	sizeof(k_lightmap_pervertex_tex_mark_skinned_2_bone_vs_2_0),  
+	sizeof(k_lightmap_pervertex_tex_mark_skinned_3_bone_vs_2_0),  
+	sizeof(k_lightmap_pervertex_tex_mark_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_lightmap_pervertex_tex_mark_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_lightmap_pervertex_tex_mark_world_vs_3_0,  
+	(DWORD*)k_lightmap_pervertex_tex_mark_rigid_vs_3_0,  
+	(DWORD*)k_lightmap_pervertex_tex_mark_rigid_boned_vs_3_0,  
+	(DWORD*)k_lightmap_pervertex_tex_mark_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_lightmap_pervertex_tex_mark_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_lightmap_pervertex_tex_mark_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_lightmap_pervertex_tex_mark_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_lightmap_pervertex_tex_mark_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_lightmap_pervertex_tex_mark_world_vs_3_0),  
+	sizeof(k_lightmap_pervertex_tex_mark_rigid_vs_3_0),  
+	sizeof(k_lightmap_pervertex_tex_mark_rigid_boned_vs_3_0),  
+	sizeof(k_lightmap_pervertex_tex_mark_skinned_1_bone_vs_3_0),  
+	sizeof(k_lightmap_pervertex_tex_mark_skinned_2_bone_vs_3_0),  
+	sizeof(k_lightmap_pervertex_tex_mark_skinned_3_bone_vs_3_0),  
+	sizeof(k_lightmap_pervertex_tex_mark_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_lightmap_pervertex_tex_mark_bytecode[2] 
+{ 
+	k_lightmap_pervertex_tex_mark_bytecode_vs_2_0, 
+	k_lightmap_pervertex_tex_mark_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_lightmap_pervertex_tex_mark_bytecode_size[2] 
+{ 
+	k_lightmap_pervertex_tex_mark_bytecode_vs_2_0_size, 
+	k_lightmap_pervertex_tex_mark_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_lightmap_pervertex_tex_mark_stencil_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_lightmap_pervertex_tex_mark_stencil_world_vs_2_0,  
+	(DWORD*)k_lightmap_pervertex_tex_mark_stencil_rigid_vs_2_0,  
+	(DWORD*)k_lightmap_pervertex_tex_mark_stencil_rigid_boned_vs_2_0,  
+	(DWORD*)k_lightmap_pervertex_tex_mark_stencil_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_lightmap_pervertex_tex_mark_stencil_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_lightmap_pervertex_tex_mark_stencil_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_lightmap_pervertex_tex_mark_stencil_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_lightmap_pervertex_tex_mark_stencil_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_lightmap_pervertex_tex_mark_stencil_world_vs_2_0),  
+	sizeof(k_lightmap_pervertex_tex_mark_stencil_rigid_vs_2_0),  
+	sizeof(k_lightmap_pervertex_tex_mark_stencil_rigid_boned_vs_2_0),  
+	sizeof(k_lightmap_pervertex_tex_mark_stencil_skinned_1_bone_vs_2_0),  
+	sizeof(k_lightmap_pervertex_tex_mark_stencil_skinned_2_bone_vs_2_0),  
+	sizeof(k_lightmap_pervertex_tex_mark_stencil_skinned_3_bone_vs_2_0),  
+	sizeof(k_lightmap_pervertex_tex_mark_stencil_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_lightmap_pervertex_tex_mark_stencil_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_lightmap_pervertex_tex_mark_stencil_world_vs_3_0,  
+	(DWORD*)k_lightmap_pervertex_tex_mark_stencil_rigid_vs_3_0,  
+	(DWORD*)k_lightmap_pervertex_tex_mark_stencil_rigid_boned_vs_3_0,  
+	(DWORD*)k_lightmap_pervertex_tex_mark_stencil_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_lightmap_pervertex_tex_mark_stencil_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_lightmap_pervertex_tex_mark_stencil_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_lightmap_pervertex_tex_mark_stencil_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_lightmap_pervertex_tex_mark_stencil_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_lightmap_pervertex_tex_mark_stencil_world_vs_3_0),  
+	sizeof(k_lightmap_pervertex_tex_mark_stencil_rigid_vs_3_0),  
+	sizeof(k_lightmap_pervertex_tex_mark_stencil_rigid_boned_vs_3_0),  
+	sizeof(k_lightmap_pervertex_tex_mark_stencil_skinned_1_bone_vs_3_0),  
+	sizeof(k_lightmap_pervertex_tex_mark_stencil_skinned_2_bone_vs_3_0),  
+	sizeof(k_lightmap_pervertex_tex_mark_stencil_skinned_3_bone_vs_3_0),  
+	sizeof(k_lightmap_pervertex_tex_mark_stencil_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_lightmap_pervertex_tex_mark_stencil_bytecode[2] 
+{ 
+	k_lightmap_pervertex_tex_mark_stencil_bytecode_vs_2_0, 
+	k_lightmap_pervertex_tex_mark_stencil_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_lightmap_pervertex_tex_mark_stencil_bytecode_size[2] 
+{ 
+	k_lightmap_pervertex_tex_mark_stencil_bytecode_vs_2_0_size, 
+	k_lightmap_pervertex_tex_mark_stencil_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_lightmap_pervertex_tex_stencil_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_lightmap_pervertex_tex_stencil_world_vs_2_0,  
+	(DWORD*)k_lightmap_pervertex_tex_stencil_rigid_vs_2_0,  
+	(DWORD*)k_lightmap_pervertex_tex_stencil_rigid_boned_vs_2_0,  
+	(DWORD*)k_lightmap_pervertex_tex_stencil_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_lightmap_pervertex_tex_stencil_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_lightmap_pervertex_tex_stencil_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_lightmap_pervertex_tex_stencil_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_lightmap_pervertex_tex_stencil_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_lightmap_pervertex_tex_stencil_world_vs_2_0),  
+	sizeof(k_lightmap_pervertex_tex_stencil_rigid_vs_2_0),  
+	sizeof(k_lightmap_pervertex_tex_stencil_rigid_boned_vs_2_0),  
+	sizeof(k_lightmap_pervertex_tex_stencil_skinned_1_bone_vs_2_0),  
+	sizeof(k_lightmap_pervertex_tex_stencil_skinned_2_bone_vs_2_0),  
+	sizeof(k_lightmap_pervertex_tex_stencil_skinned_3_bone_vs_2_0),  
+	sizeof(k_lightmap_pervertex_tex_stencil_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_lightmap_pervertex_tex_stencil_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_lightmap_pervertex_tex_stencil_world_vs_3_0,  
+	(DWORD*)k_lightmap_pervertex_tex_stencil_rigid_vs_3_0,  
+	(DWORD*)k_lightmap_pervertex_tex_stencil_rigid_boned_vs_3_0,  
+	(DWORD*)k_lightmap_pervertex_tex_stencil_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_lightmap_pervertex_tex_stencil_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_lightmap_pervertex_tex_stencil_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_lightmap_pervertex_tex_stencil_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_lightmap_pervertex_tex_stencil_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_lightmap_pervertex_tex_stencil_world_vs_3_0),  
+	sizeof(k_lightmap_pervertex_tex_stencil_rigid_vs_3_0),  
+	sizeof(k_lightmap_pervertex_tex_stencil_rigid_boned_vs_3_0),  
+	sizeof(k_lightmap_pervertex_tex_stencil_skinned_1_bone_vs_3_0),  
+	sizeof(k_lightmap_pervertex_tex_stencil_skinned_2_bone_vs_3_0),  
+	sizeof(k_lightmap_pervertex_tex_stencil_skinned_3_bone_vs_3_0),  
+	sizeof(k_lightmap_pervertex_tex_stencil_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_lightmap_pervertex_tex_stencil_bytecode[2] 
+{ 
+	k_lightmap_pervertex_tex_stencil_bytecode_vs_2_0, 
+	k_lightmap_pervertex_tex_stencil_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_lightmap_pervertex_tex_stencil_bytecode_size[2] 
+{ 
+	k_lightmap_pervertex_tex_stencil_bytecode_vs_2_0_size, 
+	k_lightmap_pervertex_tex_stencil_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_particle_bytecode_vs_2_0[] 
+{ 
+	NULL,  
+	NULL,  
+	NULL,  
+	NULL,  
+	NULL,  
+	NULL,  
+	NULL,  
+	(DWORD*)k_particle_screen_vs_2_0,  
+	(DWORD*)k_particle_parallel_vs_2_0,  
+	(DWORD*)k_particle_perpendicular_vs_2_0,  
+	(DWORD*)k_particle_vertical_vs_2_0,  
+	(DWORD*)k_particle_horizontal_vs_2_0,  
+}; 
+ 
+const int16 k_particle_bytecode_vs_2_0_size[] 
+{ 
+	0,  
+	0,  
+	0,  
+	0,  
+	0,  
+	0,  
+	0,  
+	sizeof(k_particle_screen_vs_2_0),  
+	sizeof(k_particle_parallel_vs_2_0),  
+	sizeof(k_particle_perpendicular_vs_2_0),  
+	sizeof(k_particle_vertical_vs_2_0),  
+	sizeof(k_particle_horizontal_vs_2_0),  
+}; 
+ 
+const DWORD *const k_particle_bytecode_vs_3_0[] 
+{ 
+	NULL,  
+	NULL,  
+	NULL,  
+	NULL,  
+	NULL,  
+	NULL,  
+	NULL,  
+	(DWORD*)k_particle_screen_vs_3_0,  
+	(DWORD*)k_particle_parallel_vs_3_0,  
+	(DWORD*)k_particle_perpendicular_vs_3_0,  
+	(DWORD*)k_particle_vertical_vs_3_0,  
+	(DWORD*)k_particle_horizontal_vs_3_0,  
+}; 
+ 
+const int16 k_particle_bytecode_vs_3_0_size[] 
+{ 
+	0,  
+	0,  
+	0,  
+	0,  
+	0,  
+	0,  
+	0,  
+	sizeof(k_particle_screen_vs_3_0),  
+	sizeof(k_particle_parallel_vs_3_0),  
+	sizeof(k_particle_perpendicular_vs_3_0),  
+	sizeof(k_particle_vertical_vs_3_0),  
+	sizeof(k_particle_horizontal_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_particle_bytecode[2] 
+{ 
+	k_particle_bytecode_vs_2_0, 
+	k_particle_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_particle_bytecode_size[2] 
+{ 
+	k_particle_bytecode_vs_2_0_size, 
+	k_particle_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_particle_distortion_bytecode_vs_2_0[] 
+{ 
+	NULL,  
+	NULL,  
+	NULL,  
+	NULL,  
+	NULL,  
+	NULL,  
+	NULL,  
+	(DWORD*)k_particle_distortion_screen_vs_2_0,  
+	(DWORD*)k_particle_distortion_parallel_vs_2_0,  
+	(DWORD*)k_particle_distortion_perpendicular_vs_2_0,  
+	(DWORD*)k_particle_distortion_vertical_vs_2_0,  
+	(DWORD*)k_particle_distortion_horizontal_vs_2_0,  
+}; 
+ 
+const int16 k_particle_distortion_bytecode_vs_2_0_size[] 
+{ 
+	0,  
+	0,  
+	0,  
+	0,  
+	0,  
+	0,  
+	0,  
+	sizeof(k_particle_distortion_screen_vs_2_0),  
+	sizeof(k_particle_distortion_parallel_vs_2_0),  
+	sizeof(k_particle_distortion_perpendicular_vs_2_0),  
+	sizeof(k_particle_distortion_vertical_vs_2_0),  
+	sizeof(k_particle_distortion_horizontal_vs_2_0),  
+}; 
+ 
+const DWORD *const k_particle_distortion_bytecode_vs_3_0[] 
+{ 
+	NULL,  
+	NULL,  
+	NULL,  
+	NULL,  
+	NULL,  
+	NULL,  
+	NULL,  
+	(DWORD*)k_particle_distortion_screen_vs_3_0,  
+	(DWORD*)k_particle_distortion_parallel_vs_3_0,  
+	(DWORD*)k_particle_distortion_perpendicular_vs_3_0,  
+	(DWORD*)k_particle_distortion_vertical_vs_3_0,  
+	(DWORD*)k_particle_distortion_horizontal_vs_3_0,  
+}; 
+ 
+const int16 k_particle_distortion_bytecode_vs_3_0_size[] 
+{ 
+	0,  
+	0,  
+	0,  
+	0,  
+	0,  
+	0,  
+	0,  
+	sizeof(k_particle_distortion_screen_vs_3_0),  
+	sizeof(k_particle_distortion_parallel_vs_3_0),  
+	sizeof(k_particle_distortion_perpendicular_vs_3_0),  
+	sizeof(k_particle_distortion_vertical_vs_3_0),  
+	sizeof(k_particle_distortion_horizontal_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_particle_distortion_bytecode[2] 
+{ 
+	k_particle_distortion_bytecode_vs_2_0, 
+	k_particle_distortion_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_particle_distortion_bytecode_size[2] 
+{ 
+	k_particle_distortion_bytecode_vs_2_0_size, 
+	k_particle_distortion_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_particle_model_bytecode_vs_2_0[] 
+{ 
+	NULL,  
+	(DWORD*)k_particle_model_rigid_vs_2_0,  
+}; 
+ 
+const int16 k_particle_model_bytecode_vs_2_0_size[] 
+{ 
+	0,  
+	sizeof(k_particle_model_rigid_vs_2_0),  
+}; 
+ 
+const DWORD *const k_particle_model_bytecode_vs_3_0[] 
+{ 
+	NULL,  
+	(DWORD*)k_particle_model_rigid_vs_3_0,  
+}; 
+ 
+const int16 k_particle_model_bytecode_vs_3_0_size[] 
+{ 
+	0,  
+	sizeof(k_particle_model_rigid_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_particle_model_bytecode[2] 
+{ 
+	k_particle_model_bytecode_vs_2_0, 
+	k_particle_model_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_particle_model_bytecode_size[2] 
+{ 
+	k_particle_model_bytecode_vs_2_0_size, 
+	k_particle_model_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_particle_plasma_bytecode_vs_2_0[] 
+{ 
+	NULL,  
+	NULL,  
+	NULL,  
+	NULL,  
+	NULL,  
+	NULL,  
+	NULL,  
+	(DWORD*)k_particle_plasma_screen_vs_2_0,  
+	(DWORD*)k_particle_plasma_parallel_vs_2_0,  
+	(DWORD*)k_particle_plasma_perpendicular_vs_2_0,  
+	(DWORD*)k_particle_plasma_vertical_vs_2_0,  
+	(DWORD*)k_particle_plasma_horizontal_vs_2_0,  
+}; 
+ 
+const int16 k_particle_plasma_bytecode_vs_2_0_size[] 
+{ 
+	0,  
+	0,  
+	0,  
+	0,  
+	0,  
+	0,  
+	0,  
+	sizeof(k_particle_plasma_screen_vs_2_0),  
+	sizeof(k_particle_plasma_parallel_vs_2_0),  
+	sizeof(k_particle_plasma_perpendicular_vs_2_0),  
+	sizeof(k_particle_plasma_vertical_vs_2_0),  
+	sizeof(k_particle_plasma_horizontal_vs_2_0),  
+}; 
+ 
+const DWORD *const k_particle_plasma_bytecode_vs_3_0[] 
+{ 
+	NULL,  
+	NULL,  
+	NULL,  
+	NULL,  
+	NULL,  
+	NULL,  
+	NULL,  
+	(DWORD*)k_particle_plasma_screen_vs_3_0,  
+	(DWORD*)k_particle_plasma_parallel_vs_3_0,  
+	(DWORD*)k_particle_plasma_perpendicular_vs_3_0,  
+	(DWORD*)k_particle_plasma_vertical_vs_3_0,  
+	(DWORD*)k_particle_plasma_horizontal_vs_3_0,  
+}; 
+ 
+const int16 k_particle_plasma_bytecode_vs_3_0_size[] 
+{ 
+	0,  
+	0,  
+	0,  
+	0,  
+	0,  
+	0,  
+	0,  
+	sizeof(k_particle_plasma_screen_vs_3_0),  
+	sizeof(k_particle_plasma_parallel_vs_3_0),  
+	sizeof(k_particle_plasma_perpendicular_vs_3_0),  
+	sizeof(k_particle_plasma_vertical_vs_3_0),  
+	sizeof(k_particle_plasma_horizontal_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_particle_plasma_bytecode[2] 
+{ 
+	k_particle_plasma_bytecode_vs_2_0, 
+	k_particle_plasma_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_particle_plasma_bytecode_size[2] 
+{ 
+	k_particle_plasma_bytecode_vs_2_0_size, 
+	k_particle_plasma_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_prt_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_prt_world_vs_2_0,  
+	(DWORD*)k_prt_rigid_vs_2_0,  
+	(DWORD*)k_prt_rigid_boned_vs_2_0,  
+}; 
+ 
+const int16 k_prt_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_prt_world_vs_2_0),  
+	sizeof(k_prt_rigid_vs_2_0),  
+	sizeof(k_prt_rigid_boned_vs_2_0),  
+}; 
+ 
+const DWORD *const k_prt_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_prt_world_vs_3_0,  
+	(DWORD*)k_prt_rigid_vs_3_0,  
+	(DWORD*)k_prt_rigid_boned_vs_3_0,  
+}; 
+ 
+const int16 k_prt_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_prt_world_vs_3_0),  
+	sizeof(k_prt_rigid_vs_3_0),  
+	sizeof(k_prt_rigid_boned_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_prt_bytecode[2] 
+{ 
+	k_prt_bytecode_vs_2_0, 
+	k_prt_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_prt_bytecode_size[2] 
+{ 
+	k_prt_bytecode_vs_2_0_size, 
+	k_prt_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_prt_lightmap_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_prt_lightmap_world_vs_2_0,  
+	(DWORD*)k_prt_lightmap_rigid_vs_2_0,  
+	(DWORD*)k_prt_lightmap_rigid_boned_vs_2_0,  
+}; 
+ 
+const int16 k_prt_lightmap_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_prt_lightmap_world_vs_2_0),  
+	sizeof(k_prt_lightmap_rigid_vs_2_0),  
+	sizeof(k_prt_lightmap_rigid_boned_vs_2_0),  
+}; 
+ 
+const DWORD *const k_prt_lightmap_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_prt_lightmap_world_vs_3_0,  
+	(DWORD*)k_prt_lightmap_rigid_vs_3_0,  
+	(DWORD*)k_prt_lightmap_rigid_boned_vs_3_0,  
+}; 
+ 
+const int16 k_prt_lightmap_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_prt_lightmap_world_vs_3_0),  
+	sizeof(k_prt_lightmap_rigid_vs_3_0),  
+	sizeof(k_prt_lightmap_rigid_boned_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_prt_lightmap_bytecode[2] 
+{ 
+	k_prt_lightmap_bytecode_vs_2_0, 
+	k_prt_lightmap_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_prt_lightmap_bytecode_size[2] 
+{ 
+	k_prt_lightmap_bytecode_vs_2_0_size, 
+	k_prt_lightmap_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_screen_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_screen_world_vs_2_0,  
+}; 
+ 
+const int16 k_screen_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_screen_world_vs_2_0),  
+}; 
+ 
+const DWORD *const k_screen_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_screen_world_vs_3_0,  
+}; 
+ 
+const int16 k_screen_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_screen_world_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_screen_bytecode[2] 
+{ 
+	k_screen_bytecode_vs_2_0, 
+	k_screen_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_screen_bytecode_size[2] 
+{ 
+	k_screen_bytecode_vs_2_0_size, 
+	k_screen_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_screen2_old_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_screen2_old_world_vs_2_0,  
+}; 
+ 
+const int16 k_screen2_old_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_screen2_old_world_vs_2_0),  
+}; 
+ 
+const DWORD *const k_screen2_old_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_screen2_old_world_vs_3_0,  
+}; 
+ 
+const int16 k_screen2_old_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_screen2_old_world_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_screen2_old_bytecode[2] 
+{ 
+	k_screen2_old_bytecode_vs_2_0, 
+	k_screen2_old_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_screen2_old_bytecode_size[2] 
+{ 
+	k_screen2_old_bytecode_vs_2_0_size, 
+	k_screen2_old_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_screen_0_stage_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_screen_0_stage_world_vs_2_0,  
+}; 
+ 
+const int16 k_screen_0_stage_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_screen_0_stage_world_vs_2_0),  
+}; 
+ 
+const DWORD *const k_screen_0_stage_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_screen_0_stage_world_vs_3_0,  
+}; 
+ 
+const int16 k_screen_0_stage_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_screen_0_stage_world_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_screen_0_stage_bytecode[2] 
+{ 
+	k_screen_0_stage_bytecode_vs_2_0, 
+	k_screen_0_stage_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_screen_0_stage_bytecode_size[2] 
+{ 
+	k_screen_0_stage_bytecode_vs_2_0_size, 
+	k_screen_0_stage_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_screen_1_stage_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_screen_1_stage_world_vs_2_0,  
+}; 
+ 
+const int16 k_screen_1_stage_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_screen_1_stage_world_vs_2_0),  
+}; 
+ 
+const DWORD *const k_screen_1_stage_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_screen_1_stage_world_vs_3_0,  
+}; 
+ 
+const int16 k_screen_1_stage_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_screen_1_stage_world_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_screen_1_stage_bytecode[2] 
+{ 
+	k_screen_1_stage_bytecode_vs_2_0, 
+	k_screen_1_stage_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_screen_1_stage_bytecode_size[2] 
+{ 
+	k_screen_1_stage_bytecode_vs_2_0_size, 
+	k_screen_1_stage_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_screen_2_stage_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_screen_2_stage_world_vs_2_0,  
+}; 
+ 
+const int16 k_screen_2_stage_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_screen_2_stage_world_vs_2_0),  
+}; 
+ 
+const DWORD *const k_screen_2_stage_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_screen_2_stage_world_vs_3_0,  
+}; 
+ 
+const int16 k_screen_2_stage_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_screen_2_stage_world_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_screen_2_stage_bytecode[2] 
+{ 
+	k_screen_2_stage_bytecode_vs_2_0, 
+	k_screen_2_stage_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_screen_2_stage_bytecode_size[2] 
+{ 
+	k_screen_2_stage_bytecode_vs_2_0_size, 
+	k_screen_2_stage_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_screen_3_stage_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_screen_3_stage_world_vs_2_0,  
+}; 
+ 
+const int16 k_screen_3_stage_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_screen_3_stage_world_vs_2_0),  
+}; 
+ 
+const DWORD *const k_screen_3_stage_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_screen_3_stage_world_vs_3_0,  
+}; 
+ 
+const int16 k_screen_3_stage_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_screen_3_stage_world_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_screen_3_stage_bytecode[2] 
+{ 
+	k_screen_3_stage_bytecode_vs_2_0, 
+	k_screen_3_stage_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_screen_3_stage_bytecode_size[2] 
+{ 
+	k_screen_3_stage_bytecode_vs_2_0_size, 
+	k_screen_3_stage_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_screen_4_stage_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_screen_4_stage_world_vs_2_0,  
+}; 
+ 
+const int16 k_screen_4_stage_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_screen_4_stage_world_vs_2_0),  
+}; 
+ 
+const DWORD *const k_screen_4_stage_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_screen_4_stage_world_vs_3_0,  
+}; 
+ 
+const int16 k_screen_4_stage_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_screen_4_stage_world_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_screen_4_stage_bytecode[2] 
+{ 
+	k_screen_4_stage_bytecode_vs_2_0, 
+	k_screen_4_stage_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_screen_4_stage_bytecode_size[2] 
+{ 
+	k_screen_4_stage_bytecode_vs_2_0_size, 
+	k_screen_4_stage_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_screen_5_stage_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_screen_5_stage_world_vs_2_0,  
+}; 
+ 
+const int16 k_screen_5_stage_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_screen_5_stage_world_vs_2_0),  
+}; 
+ 
+const DWORD *const k_screen_5_stage_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_screen_5_stage_world_vs_3_0,  
+}; 
+ 
+const int16 k_screen_5_stage_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_screen_5_stage_world_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_screen_5_stage_bytecode[2] 
+{ 
+	k_screen_5_stage_bytecode_vs_2_0, 
+	k_screen_5_stage_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_screen_5_stage_bytecode_size[2] 
+{ 
+	k_screen_5_stage_bytecode_vs_2_0_size, 
+	k_screen_5_stage_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_screen_6_stage_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_screen_6_stage_world_vs_2_0,  
+}; 
+ 
+const int16 k_screen_6_stage_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_screen_6_stage_world_vs_2_0),  
+}; 
+ 
+const DWORD *const k_screen_6_stage_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_screen_6_stage_world_vs_3_0,  
+}; 
+ 
+const int16 k_screen_6_stage_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_screen_6_stage_world_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_screen_6_stage_bytecode[2] 
+{ 
+	k_screen_6_stage_bytecode_vs_2_0, 
+	k_screen_6_stage_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_screen_6_stage_bytecode_size[2] 
+{ 
+	k_screen_6_stage_bytecode_vs_2_0_size, 
+	k_screen_6_stage_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_screen_7_stage_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_screen_7_stage_world_vs_2_0,  
+}; 
+ 
+const int16 k_screen_7_stage_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_screen_7_stage_world_vs_2_0),  
+}; 
+ 
+const DWORD *const k_screen_7_stage_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_screen_7_stage_world_vs_3_0,  
+}; 
+ 
+const int16 k_screen_7_stage_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_screen_7_stage_world_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_screen_7_stage_bytecode[2] 
+{ 
+	k_screen_7_stage_bytecode_vs_2_0, 
+	k_screen_7_stage_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_screen_7_stage_bytecode_size[2] 
+{ 
+	k_screen_7_stage_bytecode_vs_2_0_size, 
+	k_screen_7_stage_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_screen_hud_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_screen_hud_world_vs_2_0,  
+}; 
+ 
+const int16 k_screen_hud_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_screen_hud_world_vs_2_0),  
+}; 
+ 
+const DWORD *const k_screen_hud_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_screen_hud_world_vs_3_0,  
+}; 
+ 
+const int16 k_screen_hud_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_screen_hud_world_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_screen_hud_bytecode[2] 
+{ 
+	k_screen_hud_bytecode_vs_2_0, 
+	k_screen_hud_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_screen_hud_bytecode_size[2] 
+{ 
+	k_screen_hud_bytecode_vs_2_0_size, 
+	k_screen_hud_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_screen_old_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_screen_old_world_vs_2_0,  
+}; 
+ 
+const int16 k_screen_old_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_screen_old_world_vs_2_0),  
+}; 
+ 
+const DWORD *const k_screen_old_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_screen_old_world_vs_3_0,  
+}; 
+ 
+const int16 k_screen_old_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_screen_old_world_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_screen_old_bytecode[2] 
+{ 
+	k_screen_old_bytecode_vs_2_0, 
+	k_screen_old_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_screen_old_bytecode_size[2] 
+{ 
+	k_screen_old_bytecode_vs_2_0_size, 
+	k_screen_old_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_screen_xform_4_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_screen_xform_4_world_vs_2_0,  
+}; 
+ 
+const int16 k_screen_xform_4_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_screen_xform_4_world_vs_2_0),  
+}; 
+ 
+const DWORD *const k_screen_xform_4_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_screen_xform_4_world_vs_3_0,  
+}; 
+ 
+const int16 k_screen_xform_4_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_screen_xform_4_world_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_screen_xform_4_bytecode[2] 
+{ 
+	k_screen_xform_4_bytecode_vs_2_0, 
+	k_screen_xform_4_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_screen_xform_4_bytecode_size[2] 
+{ 
+	k_screen_xform_4_bytecode_vs_2_0_size, 
+	k_screen_xform_4_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_shadow_buffer_application_1tap_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_shadow_buffer_application_1tap_world_vs_2_0,  
+	(DWORD*)k_shadow_buffer_application_1tap_rigid_vs_2_0,  
+	(DWORD*)k_shadow_buffer_application_1tap_rigid_boned_vs_2_0,  
+	(DWORD*)k_shadow_buffer_application_1tap_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_shadow_buffer_application_1tap_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_shadow_buffer_application_1tap_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_shadow_buffer_application_1tap_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_shadow_buffer_application_1tap_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_shadow_buffer_application_1tap_world_vs_2_0),  
+	sizeof(k_shadow_buffer_application_1tap_rigid_vs_2_0),  
+	sizeof(k_shadow_buffer_application_1tap_rigid_boned_vs_2_0),  
+	sizeof(k_shadow_buffer_application_1tap_skinned_1_bone_vs_2_0),  
+	sizeof(k_shadow_buffer_application_1tap_skinned_2_bone_vs_2_0),  
+	sizeof(k_shadow_buffer_application_1tap_skinned_3_bone_vs_2_0),  
+	sizeof(k_shadow_buffer_application_1tap_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_shadow_buffer_application_1tap_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_shadow_buffer_application_1tap_world_vs_3_0,  
+	(DWORD*)k_shadow_buffer_application_1tap_rigid_vs_3_0,  
+	(DWORD*)k_shadow_buffer_application_1tap_rigid_boned_vs_3_0,  
+	(DWORD*)k_shadow_buffer_application_1tap_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_shadow_buffer_application_1tap_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_shadow_buffer_application_1tap_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_shadow_buffer_application_1tap_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_shadow_buffer_application_1tap_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_shadow_buffer_application_1tap_world_vs_3_0),  
+	sizeof(k_shadow_buffer_application_1tap_rigid_vs_3_0),  
+	sizeof(k_shadow_buffer_application_1tap_rigid_boned_vs_3_0),  
+	sizeof(k_shadow_buffer_application_1tap_skinned_1_bone_vs_3_0),  
+	sizeof(k_shadow_buffer_application_1tap_skinned_2_bone_vs_3_0),  
+	sizeof(k_shadow_buffer_application_1tap_skinned_3_bone_vs_3_0),  
+	sizeof(k_shadow_buffer_application_1tap_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_shadow_buffer_application_1tap_bytecode[2] 
+{ 
+	k_shadow_buffer_application_1tap_bytecode_vs_2_0, 
+	k_shadow_buffer_application_1tap_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_shadow_buffer_application_1tap_bytecode_size[2] 
+{ 
+	k_shadow_buffer_application_1tap_bytecode_vs_2_0_size, 
+	k_shadow_buffer_application_1tap_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_shadow_buffer_application_3tap_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_shadow_buffer_application_3tap_world_vs_2_0,  
+	(DWORD*)k_shadow_buffer_application_3tap_rigid_vs_2_0,  
+	(DWORD*)k_shadow_buffer_application_3tap_rigid_boned_vs_2_0,  
+	(DWORD*)k_shadow_buffer_application_3tap_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_shadow_buffer_application_3tap_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_shadow_buffer_application_3tap_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_shadow_buffer_application_3tap_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_shadow_buffer_application_3tap_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_shadow_buffer_application_3tap_world_vs_2_0),  
+	sizeof(k_shadow_buffer_application_3tap_rigid_vs_2_0),  
+	sizeof(k_shadow_buffer_application_3tap_rigid_boned_vs_2_0),  
+	sizeof(k_shadow_buffer_application_3tap_skinned_1_bone_vs_2_0),  
+	sizeof(k_shadow_buffer_application_3tap_skinned_2_bone_vs_2_0),  
+	sizeof(k_shadow_buffer_application_3tap_skinned_3_bone_vs_2_0),  
+	sizeof(k_shadow_buffer_application_3tap_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_shadow_buffer_application_3tap_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_shadow_buffer_application_3tap_world_vs_3_0,  
+	(DWORD*)k_shadow_buffer_application_3tap_rigid_vs_3_0,  
+	(DWORD*)k_shadow_buffer_application_3tap_rigid_boned_vs_3_0,  
+	(DWORD*)k_shadow_buffer_application_3tap_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_shadow_buffer_application_3tap_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_shadow_buffer_application_3tap_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_shadow_buffer_application_3tap_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_shadow_buffer_application_3tap_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_shadow_buffer_application_3tap_world_vs_3_0),  
+	sizeof(k_shadow_buffer_application_3tap_rigid_vs_3_0),  
+	sizeof(k_shadow_buffer_application_3tap_rigid_boned_vs_3_0),  
+	sizeof(k_shadow_buffer_application_3tap_skinned_1_bone_vs_3_0),  
+	sizeof(k_shadow_buffer_application_3tap_skinned_2_bone_vs_3_0),  
+	sizeof(k_shadow_buffer_application_3tap_skinned_3_bone_vs_3_0),  
+	sizeof(k_shadow_buffer_application_3tap_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_shadow_buffer_application_3tap_bytecode[2] 
+{ 
+	k_shadow_buffer_application_3tap_bytecode_vs_2_0, 
+	k_shadow_buffer_application_3tap_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_shadow_buffer_application_3tap_bytecode_size[2] 
+{ 
+	k_shadow_buffer_application_3tap_bytecode_vs_2_0_size, 
+	k_shadow_buffer_application_3tap_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_shadow_buffer_application_cinematic_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_shadow_buffer_application_cinematic_world_vs_2_0,  
+	(DWORD*)k_shadow_buffer_application_cinematic_rigid_vs_2_0,  
+	(DWORD*)k_shadow_buffer_application_cinematic_rigid_boned_vs_2_0,  
+	(DWORD*)k_shadow_buffer_application_cinematic_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_shadow_buffer_application_cinematic_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_shadow_buffer_application_cinematic_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_shadow_buffer_application_cinematic_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_shadow_buffer_application_cinematic_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_shadow_buffer_application_cinematic_world_vs_2_0),  
+	sizeof(k_shadow_buffer_application_cinematic_rigid_vs_2_0),  
+	sizeof(k_shadow_buffer_application_cinematic_rigid_boned_vs_2_0),  
+	sizeof(k_shadow_buffer_application_cinematic_skinned_1_bone_vs_2_0),  
+	sizeof(k_shadow_buffer_application_cinematic_skinned_2_bone_vs_2_0),  
+	sizeof(k_shadow_buffer_application_cinematic_skinned_3_bone_vs_2_0),  
+	sizeof(k_shadow_buffer_application_cinematic_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_shadow_buffer_application_cinematic_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_shadow_buffer_application_cinematic_world_vs_3_0,  
+	(DWORD*)k_shadow_buffer_application_cinematic_rigid_vs_3_0,  
+	(DWORD*)k_shadow_buffer_application_cinematic_rigid_boned_vs_3_0,  
+	(DWORD*)k_shadow_buffer_application_cinematic_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_shadow_buffer_application_cinematic_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_shadow_buffer_application_cinematic_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_shadow_buffer_application_cinematic_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_shadow_buffer_application_cinematic_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_shadow_buffer_application_cinematic_world_vs_3_0),  
+	sizeof(k_shadow_buffer_application_cinematic_rigid_vs_3_0),  
+	sizeof(k_shadow_buffer_application_cinematic_rigid_boned_vs_3_0),  
+	sizeof(k_shadow_buffer_application_cinematic_skinned_1_bone_vs_3_0),  
+	sizeof(k_shadow_buffer_application_cinematic_skinned_2_bone_vs_3_0),  
+	sizeof(k_shadow_buffer_application_cinematic_skinned_3_bone_vs_3_0),  
+	sizeof(k_shadow_buffer_application_cinematic_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_shadow_buffer_application_cinematic_bytecode[2] 
+{ 
+	k_shadow_buffer_application_cinematic_bytecode_vs_2_0, 
+	k_shadow_buffer_application_cinematic_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_shadow_buffer_application_cinematic_bytecode_size[2] 
+{ 
+	k_shadow_buffer_application_cinematic_bytecode_vs_2_0_size, 
+	k_shadow_buffer_application_cinematic_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_shadow_buffer_application_lightmap_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_shadow_buffer_application_lightmap_world_vs_2_0,  
+	(DWORD*)k_shadow_buffer_application_lightmap_rigid_vs_2_0,  
+	(DWORD*)k_shadow_buffer_application_lightmap_rigid_boned_vs_2_0,  
+	(DWORD*)k_shadow_buffer_application_lightmap_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_shadow_buffer_application_lightmap_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_shadow_buffer_application_lightmap_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_shadow_buffer_application_lightmap_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_shadow_buffer_application_lightmap_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_shadow_buffer_application_lightmap_world_vs_2_0),  
+	sizeof(k_shadow_buffer_application_lightmap_rigid_vs_2_0),  
+	sizeof(k_shadow_buffer_application_lightmap_rigid_boned_vs_2_0),  
+	sizeof(k_shadow_buffer_application_lightmap_skinned_1_bone_vs_2_0),  
+	sizeof(k_shadow_buffer_application_lightmap_skinned_2_bone_vs_2_0),  
+	sizeof(k_shadow_buffer_application_lightmap_skinned_3_bone_vs_2_0),  
+	sizeof(k_shadow_buffer_application_lightmap_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_shadow_buffer_application_lightmap_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_shadow_buffer_application_lightmap_world_vs_3_0,  
+	(DWORD*)k_shadow_buffer_application_lightmap_rigid_vs_3_0,  
+	(DWORD*)k_shadow_buffer_application_lightmap_rigid_boned_vs_3_0,  
+	(DWORD*)k_shadow_buffer_application_lightmap_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_shadow_buffer_application_lightmap_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_shadow_buffer_application_lightmap_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_shadow_buffer_application_lightmap_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_shadow_buffer_application_lightmap_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_shadow_buffer_application_lightmap_world_vs_3_0),  
+	sizeof(k_shadow_buffer_application_lightmap_rigid_vs_3_0),  
+	sizeof(k_shadow_buffer_application_lightmap_rigid_boned_vs_3_0),  
+	sizeof(k_shadow_buffer_application_lightmap_skinned_1_bone_vs_3_0),  
+	sizeof(k_shadow_buffer_application_lightmap_skinned_2_bone_vs_3_0),  
+	sizeof(k_shadow_buffer_application_lightmap_skinned_3_bone_vs_3_0),  
+	sizeof(k_shadow_buffer_application_lightmap_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_shadow_buffer_application_lightmap_bytecode[2] 
+{ 
+	k_shadow_buffer_application_lightmap_bytecode_vs_2_0, 
+	k_shadow_buffer_application_lightmap_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_shadow_buffer_application_lightmap_bytecode_size[2] 
+{ 
+	k_shadow_buffer_application_lightmap_bytecode_vs_2_0_size, 
+	k_shadow_buffer_application_lightmap_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_shadow_buffer_generation_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_shadow_buffer_generation_world_vs_2_0,  
+	(DWORD*)k_shadow_buffer_generation_rigid_vs_2_0,  
+	(DWORD*)k_shadow_buffer_generation_rigid_boned_vs_2_0,  
+	(DWORD*)k_shadow_buffer_generation_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_shadow_buffer_generation_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_shadow_buffer_generation_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_shadow_buffer_generation_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_shadow_buffer_generation_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_shadow_buffer_generation_world_vs_2_0),  
+	sizeof(k_shadow_buffer_generation_rigid_vs_2_0),  
+	sizeof(k_shadow_buffer_generation_rigid_boned_vs_2_0),  
+	sizeof(k_shadow_buffer_generation_skinned_1_bone_vs_2_0),  
+	sizeof(k_shadow_buffer_generation_skinned_2_bone_vs_2_0),  
+	sizeof(k_shadow_buffer_generation_skinned_3_bone_vs_2_0),  
+	sizeof(k_shadow_buffer_generation_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_shadow_buffer_generation_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_shadow_buffer_generation_world_vs_3_0,  
+	(DWORD*)k_shadow_buffer_generation_rigid_vs_3_0,  
+	(DWORD*)k_shadow_buffer_generation_rigid_boned_vs_3_0,  
+	(DWORD*)k_shadow_buffer_generation_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_shadow_buffer_generation_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_shadow_buffer_generation_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_shadow_buffer_generation_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_shadow_buffer_generation_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_shadow_buffer_generation_world_vs_3_0),  
+	sizeof(k_shadow_buffer_generation_rigid_vs_3_0),  
+	sizeof(k_shadow_buffer_generation_rigid_boned_vs_3_0),  
+	sizeof(k_shadow_buffer_generation_skinned_1_bone_vs_3_0),  
+	sizeof(k_shadow_buffer_generation_skinned_2_bone_vs_3_0),  
+	sizeof(k_shadow_buffer_generation_skinned_3_bone_vs_3_0),  
+	sizeof(k_shadow_buffer_generation_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_shadow_buffer_generation_bytecode[2] 
+{ 
+	k_shadow_buffer_generation_bytecode_vs_2_0, 
+	k_shadow_buffer_generation_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_shadow_buffer_generation_bytecode_size[2] 
+{ 
+	k_shadow_buffer_generation_bytecode_vs_2_0_size, 
+	k_shadow_buffer_generation_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_shadow_buffer_generation_cinematic_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_shadow_buffer_generation_cinematic_world_vs_2_0,  
+	(DWORD*)k_shadow_buffer_generation_cinematic_rigid_vs_2_0,  
+	(DWORD*)k_shadow_buffer_generation_cinematic_rigid_boned_vs_2_0,  
+	(DWORD*)k_shadow_buffer_generation_cinematic_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_shadow_buffer_generation_cinematic_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_shadow_buffer_generation_cinematic_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_shadow_buffer_generation_cinematic_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_shadow_buffer_generation_cinematic_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_shadow_buffer_generation_cinematic_world_vs_2_0),  
+	sizeof(k_shadow_buffer_generation_cinematic_rigid_vs_2_0),  
+	sizeof(k_shadow_buffer_generation_cinematic_rigid_boned_vs_2_0),  
+	sizeof(k_shadow_buffer_generation_cinematic_skinned_1_bone_vs_2_0),  
+	sizeof(k_shadow_buffer_generation_cinematic_skinned_2_bone_vs_2_0),  
+	sizeof(k_shadow_buffer_generation_cinematic_skinned_3_bone_vs_2_0),  
+	sizeof(k_shadow_buffer_generation_cinematic_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_shadow_buffer_generation_cinematic_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_shadow_buffer_generation_cinematic_world_vs_3_0,  
+	(DWORD*)k_shadow_buffer_generation_cinematic_rigid_vs_3_0,  
+	(DWORD*)k_shadow_buffer_generation_cinematic_rigid_boned_vs_3_0,  
+	(DWORD*)k_shadow_buffer_generation_cinematic_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_shadow_buffer_generation_cinematic_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_shadow_buffer_generation_cinematic_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_shadow_buffer_generation_cinematic_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_shadow_buffer_generation_cinematic_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_shadow_buffer_generation_cinematic_world_vs_3_0),  
+	sizeof(k_shadow_buffer_generation_cinematic_rigid_vs_3_0),  
+	sizeof(k_shadow_buffer_generation_cinematic_rigid_boned_vs_3_0),  
+	sizeof(k_shadow_buffer_generation_cinematic_skinned_1_bone_vs_3_0),  
+	sizeof(k_shadow_buffer_generation_cinematic_skinned_2_bone_vs_3_0),  
+	sizeof(k_shadow_buffer_generation_cinematic_skinned_3_bone_vs_3_0),  
+	sizeof(k_shadow_buffer_generation_cinematic_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_shadow_buffer_generation_cinematic_bytecode[2] 
+{ 
+	k_shadow_buffer_generation_cinematic_bytecode_vs_2_0, 
+	k_shadow_buffer_generation_cinematic_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_shadow_buffer_generation_cinematic_bytecode_size[2] 
+{ 
+	k_shadow_buffer_generation_cinematic_bytecode_vs_2_0_size, 
+	k_shadow_buffer_generation_cinematic_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_shadow_buffer_generation_lightmap_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_shadow_buffer_generation_lightmap_world_vs_2_0,  
+	(DWORD*)k_shadow_buffer_generation_lightmap_rigid_vs_2_0,  
+	(DWORD*)k_shadow_buffer_generation_lightmap_rigid_boned_vs_2_0,  
+	(DWORD*)k_shadow_buffer_generation_lightmap_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_shadow_buffer_generation_lightmap_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_shadow_buffer_generation_lightmap_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_shadow_buffer_generation_lightmap_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_shadow_buffer_generation_lightmap_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_shadow_buffer_generation_lightmap_world_vs_2_0),  
+	sizeof(k_shadow_buffer_generation_lightmap_rigid_vs_2_0),  
+	sizeof(k_shadow_buffer_generation_lightmap_rigid_boned_vs_2_0),  
+	sizeof(k_shadow_buffer_generation_lightmap_skinned_1_bone_vs_2_0),  
+	sizeof(k_shadow_buffer_generation_lightmap_skinned_2_bone_vs_2_0),  
+	sizeof(k_shadow_buffer_generation_lightmap_skinned_3_bone_vs_2_0),  
+	sizeof(k_shadow_buffer_generation_lightmap_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_shadow_buffer_generation_lightmap_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_shadow_buffer_generation_lightmap_world_vs_3_0,  
+	(DWORD*)k_shadow_buffer_generation_lightmap_rigid_vs_3_0,  
+	(DWORD*)k_shadow_buffer_generation_lightmap_rigid_boned_vs_3_0,  
+	(DWORD*)k_shadow_buffer_generation_lightmap_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_shadow_buffer_generation_lightmap_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_shadow_buffer_generation_lightmap_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_shadow_buffer_generation_lightmap_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_shadow_buffer_generation_lightmap_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_shadow_buffer_generation_lightmap_world_vs_3_0),  
+	sizeof(k_shadow_buffer_generation_lightmap_rigid_vs_3_0),  
+	sizeof(k_shadow_buffer_generation_lightmap_rigid_boned_vs_3_0),  
+	sizeof(k_shadow_buffer_generation_lightmap_skinned_1_bone_vs_3_0),  
+	sizeof(k_shadow_buffer_generation_lightmap_skinned_2_bone_vs_3_0),  
+	sizeof(k_shadow_buffer_generation_lightmap_skinned_3_bone_vs_3_0),  
+	sizeof(k_shadow_buffer_generation_lightmap_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_shadow_buffer_generation_lightmap_bytecode[2] 
+{ 
+	k_shadow_buffer_generation_lightmap_bytecode_vs_2_0, 
+	k_shadow_buffer_generation_lightmap_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_shadow_buffer_generation_lightmap_bytecode_size[2] 
+{ 
+	k_shadow_buffer_generation_lightmap_bytecode_vs_2_0_size, 
+	k_shadow_buffer_generation_lightmap_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_sh_dynamic_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_sh_dynamic_world_vs_2_0,  
+	(DWORD*)k_sh_dynamic_rigid_vs_2_0,  
+	(DWORD*)k_sh_dynamic_rigid_boned_vs_2_0,  
+	(DWORD*)k_sh_dynamic_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_sh_dynamic_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_sh_dynamic_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_sh_dynamic_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_sh_dynamic_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_sh_dynamic_world_vs_2_0),  
+	sizeof(k_sh_dynamic_rigid_vs_2_0),  
+	sizeof(k_sh_dynamic_rigid_boned_vs_2_0),  
+	sizeof(k_sh_dynamic_skinned_1_bone_vs_2_0),  
+	sizeof(k_sh_dynamic_skinned_2_bone_vs_2_0),  
+	sizeof(k_sh_dynamic_skinned_3_bone_vs_2_0),  
+	sizeof(k_sh_dynamic_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_sh_dynamic_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_sh_dynamic_world_vs_3_0,  
+	(DWORD*)k_sh_dynamic_rigid_vs_3_0,  
+	(DWORD*)k_sh_dynamic_rigid_boned_vs_3_0,  
+	(DWORD*)k_sh_dynamic_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_sh_dynamic_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_sh_dynamic_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_sh_dynamic_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_sh_dynamic_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_sh_dynamic_world_vs_3_0),  
+	sizeof(k_sh_dynamic_rigid_vs_3_0),  
+	sizeof(k_sh_dynamic_rigid_boned_vs_3_0),  
+	sizeof(k_sh_dynamic_skinned_1_bone_vs_3_0),  
+	sizeof(k_sh_dynamic_skinned_2_bone_vs_3_0),  
+	sizeof(k_sh_dynamic_skinned_3_bone_vs_3_0),  
+	sizeof(k_sh_dynamic_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_sh_dynamic_bytecode[2] 
+{ 
+	k_sh_dynamic_bytecode_vs_2_0, 
+	k_sh_dynamic_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_sh_dynamic_bytecode_size[2] 
+{ 
+	k_sh_dynamic_bytecode_vs_2_0_size, 
+	k_sh_dynamic_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_stencil_emissive_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_stencil_emissive_world_vs_2_0,  
+	(DWORD*)k_stencil_emissive_rigid_vs_2_0,  
+	(DWORD*)k_stencil_emissive_rigid_boned_vs_2_0,  
+	(DWORD*)k_stencil_emissive_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_stencil_emissive_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_stencil_emissive_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_stencil_emissive_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_stencil_emissive_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_stencil_emissive_world_vs_2_0),  
+	sizeof(k_stencil_emissive_rigid_vs_2_0),  
+	sizeof(k_stencil_emissive_rigid_boned_vs_2_0),  
+	sizeof(k_stencil_emissive_skinned_1_bone_vs_2_0),  
+	sizeof(k_stencil_emissive_skinned_2_bone_vs_2_0),  
+	sizeof(k_stencil_emissive_skinned_3_bone_vs_2_0),  
+	sizeof(k_stencil_emissive_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_stencil_emissive_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_stencil_emissive_world_vs_3_0,  
+	(DWORD*)k_stencil_emissive_rigid_vs_3_0,  
+	(DWORD*)k_stencil_emissive_rigid_boned_vs_3_0,  
+	(DWORD*)k_stencil_emissive_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_stencil_emissive_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_stencil_emissive_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_stencil_emissive_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_stencil_emissive_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_stencil_emissive_world_vs_3_0),  
+	sizeof(k_stencil_emissive_rigid_vs_3_0),  
+	sizeof(k_stencil_emissive_rigid_boned_vs_3_0),  
+	sizeof(k_stencil_emissive_skinned_1_bone_vs_3_0),  
+	sizeof(k_stencil_emissive_skinned_2_bone_vs_3_0),  
+	sizeof(k_stencil_emissive_skinned_3_bone_vs_3_0),  
+	sizeof(k_stencil_emissive_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_stencil_emissive_bytecode[2] 
+{ 
+	k_stencil_emissive_bytecode_vs_2_0, 
+	k_stencil_emissive_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_stencil_emissive_bytecode_size[2] 
+{ 
+	k_stencil_emissive_bytecode_vs_2_0_size, 
+	k_stencil_emissive_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_stencil_env_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_stencil_env_world_vs_2_0,  
+	(DWORD*)k_stencil_env_rigid_vs_2_0,  
+	(DWORD*)k_stencil_env_rigid_boned_vs_2_0,  
+	(DWORD*)k_stencil_env_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_stencil_env_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_stencil_env_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_stencil_env_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_stencil_env_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_stencil_env_world_vs_2_0),  
+	sizeof(k_stencil_env_rigid_vs_2_0),  
+	sizeof(k_stencil_env_rigid_boned_vs_2_0),  
+	sizeof(k_stencil_env_skinned_1_bone_vs_2_0),  
+	sizeof(k_stencil_env_skinned_2_bone_vs_2_0),  
+	sizeof(k_stencil_env_skinned_3_bone_vs_2_0),  
+	sizeof(k_stencil_env_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_stencil_env_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_stencil_env_world_vs_3_0,  
+	(DWORD*)k_stencil_env_rigid_vs_3_0,  
+	(DWORD*)k_stencil_env_rigid_boned_vs_3_0,  
+	(DWORD*)k_stencil_env_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_stencil_env_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_stencil_env_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_stencil_env_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_stencil_env_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_stencil_env_world_vs_3_0),  
+	sizeof(k_stencil_env_rigid_vs_3_0),  
+	sizeof(k_stencil_env_rigid_boned_vs_3_0),  
+	sizeof(k_stencil_env_skinned_1_bone_vs_3_0),  
+	sizeof(k_stencil_env_skinned_2_bone_vs_3_0),  
+	sizeof(k_stencil_env_skinned_3_bone_vs_3_0),  
+	sizeof(k_stencil_env_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_stencil_env_bytecode[2] 
+{ 
+	k_stencil_env_bytecode_vs_2_0, 
+	k_stencil_env_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_stencil_env_bytecode_size[2] 
+{ 
+	k_stencil_env_bytecode_vs_2_0_size, 
+	k_stencil_env_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_stencil_env_bumped_tangentspace_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_stencil_env_bumped_tangentspace_world_vs_2_0,  
+	(DWORD*)k_stencil_env_bumped_tangentspace_rigid_vs_2_0,  
+	(DWORD*)k_stencil_env_bumped_tangentspace_rigid_boned_vs_2_0,  
+	(DWORD*)k_stencil_env_bumped_tangentspace_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_stencil_env_bumped_tangentspace_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_stencil_env_bumped_tangentspace_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_stencil_env_bumped_tangentspace_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_stencil_env_bumped_tangentspace_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_stencil_env_bumped_tangentspace_world_vs_2_0),  
+	sizeof(k_stencil_env_bumped_tangentspace_rigid_vs_2_0),  
+	sizeof(k_stencil_env_bumped_tangentspace_rigid_boned_vs_2_0),  
+	sizeof(k_stencil_env_bumped_tangentspace_skinned_1_bone_vs_2_0),  
+	sizeof(k_stencil_env_bumped_tangentspace_skinned_2_bone_vs_2_0),  
+	sizeof(k_stencil_env_bumped_tangentspace_skinned_3_bone_vs_2_0),  
+	sizeof(k_stencil_env_bumped_tangentspace_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_stencil_env_bumped_tangentspace_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_stencil_env_bumped_tangentspace_world_vs_3_0,  
+	(DWORD*)k_stencil_env_bumped_tangentspace_rigid_vs_3_0,  
+	(DWORD*)k_stencil_env_bumped_tangentspace_rigid_boned_vs_3_0,  
+	(DWORD*)k_stencil_env_bumped_tangentspace_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_stencil_env_bumped_tangentspace_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_stencil_env_bumped_tangentspace_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_stencil_env_bumped_tangentspace_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_stencil_env_bumped_tangentspace_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_stencil_env_bumped_tangentspace_world_vs_3_0),  
+	sizeof(k_stencil_env_bumped_tangentspace_rigid_vs_3_0),  
+	sizeof(k_stencil_env_bumped_tangentspace_rigid_boned_vs_3_0),  
+	sizeof(k_stencil_env_bumped_tangentspace_skinned_1_bone_vs_3_0),  
+	sizeof(k_stencil_env_bumped_tangentspace_skinned_2_bone_vs_3_0),  
+	sizeof(k_stencil_env_bumped_tangentspace_skinned_3_bone_vs_3_0),  
+	sizeof(k_stencil_env_bumped_tangentspace_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_stencil_env_bumped_tangentspace_bytecode[2] 
+{ 
+	k_stencil_env_bumped_tangentspace_bytecode_vs_2_0, 
+	k_stencil_env_bumped_tangentspace_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_stencil_env_bumped_tangentspace_bytecode_size[2] 
+{ 
+	k_stencil_env_bumped_tangentspace_bytecode_vs_2_0_size, 
+	k_stencil_env_bumped_tangentspace_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_stencil_env_super_fast_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_stencil_env_super_fast_world_vs_2_0,  
+	(DWORD*)k_stencil_env_super_fast_rigid_vs_2_0,  
+	(DWORD*)k_stencil_env_super_fast_rigid_boned_vs_2_0,  
+	(DWORD*)k_stencil_env_super_fast_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_stencil_env_super_fast_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_stencil_env_super_fast_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_stencil_env_super_fast_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_stencil_env_super_fast_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_stencil_env_super_fast_world_vs_2_0),  
+	sizeof(k_stencil_env_super_fast_rigid_vs_2_0),  
+	sizeof(k_stencil_env_super_fast_rigid_boned_vs_2_0),  
+	sizeof(k_stencil_env_super_fast_skinned_1_bone_vs_2_0),  
+	sizeof(k_stencil_env_super_fast_skinned_2_bone_vs_2_0),  
+	sizeof(k_stencil_env_super_fast_skinned_3_bone_vs_2_0),  
+	sizeof(k_stencil_env_super_fast_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_stencil_env_super_fast_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_stencil_env_super_fast_world_vs_3_0,  
+	(DWORD*)k_stencil_env_super_fast_rigid_vs_3_0,  
+	(DWORD*)k_stencil_env_super_fast_rigid_boned_vs_3_0,  
+	(DWORD*)k_stencil_env_super_fast_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_stencil_env_super_fast_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_stencil_env_super_fast_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_stencil_env_super_fast_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_stencil_env_super_fast_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_stencil_env_super_fast_world_vs_3_0),  
+	sizeof(k_stencil_env_super_fast_rigid_vs_3_0),  
+	sizeof(k_stencil_env_super_fast_rigid_boned_vs_3_0),  
+	sizeof(k_stencil_env_super_fast_skinned_1_bone_vs_3_0),  
+	sizeof(k_stencil_env_super_fast_skinned_2_bone_vs_3_0),  
+	sizeof(k_stencil_env_super_fast_skinned_3_bone_vs_3_0),  
+	sizeof(k_stencil_env_super_fast_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_stencil_env_super_fast_bytecode[2] 
+{ 
+	k_stencil_env_super_fast_bytecode_vs_2_0, 
+	k_stencil_env_super_fast_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_stencil_env_super_fast_bytecode_size[2] 
+{ 
+	k_stencil_env_super_fast_bytecode_vs_2_0_size, 
+	k_stencil_env_super_fast_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_stencil_light_specular_tangentspace_sphere_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_stencil_light_specular_tangentspace_sphere_world_vs_2_0,  
+	(DWORD*)k_stencil_light_specular_tangentspace_sphere_rigid_vs_2_0,  
+	(DWORD*)k_stencil_light_specular_tangentspace_sphere_rigid_boned_vs_2_0,  
+	(DWORD*)k_stencil_light_specular_tangentspace_sphere_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_stencil_light_specular_tangentspace_sphere_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_stencil_light_specular_tangentspace_sphere_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_stencil_light_specular_tangentspace_sphere_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_stencil_light_specular_tangentspace_sphere_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_stencil_light_specular_tangentspace_sphere_world_vs_2_0),  
+	sizeof(k_stencil_light_specular_tangentspace_sphere_rigid_vs_2_0),  
+	sizeof(k_stencil_light_specular_tangentspace_sphere_rigid_boned_vs_2_0),  
+	sizeof(k_stencil_light_specular_tangentspace_sphere_skinned_1_bone_vs_2_0),  
+	sizeof(k_stencil_light_specular_tangentspace_sphere_skinned_2_bone_vs_2_0),  
+	sizeof(k_stencil_light_specular_tangentspace_sphere_skinned_3_bone_vs_2_0),  
+	sizeof(k_stencil_light_specular_tangentspace_sphere_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_stencil_light_specular_tangentspace_sphere_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_stencil_light_specular_tangentspace_sphere_world_vs_3_0,  
+	(DWORD*)k_stencil_light_specular_tangentspace_sphere_rigid_vs_3_0,  
+	(DWORD*)k_stencil_light_specular_tangentspace_sphere_rigid_boned_vs_3_0,  
+	(DWORD*)k_stencil_light_specular_tangentspace_sphere_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_stencil_light_specular_tangentspace_sphere_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_stencil_light_specular_tangentspace_sphere_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_stencil_light_specular_tangentspace_sphere_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_stencil_light_specular_tangentspace_sphere_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_stencil_light_specular_tangentspace_sphere_world_vs_3_0),  
+	sizeof(k_stencil_light_specular_tangentspace_sphere_rigid_vs_3_0),  
+	sizeof(k_stencil_light_specular_tangentspace_sphere_rigid_boned_vs_3_0),  
+	sizeof(k_stencil_light_specular_tangentspace_sphere_skinned_1_bone_vs_3_0),  
+	sizeof(k_stencil_light_specular_tangentspace_sphere_skinned_2_bone_vs_3_0),  
+	sizeof(k_stencil_light_specular_tangentspace_sphere_skinned_3_bone_vs_3_0),  
+	sizeof(k_stencil_light_specular_tangentspace_sphere_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_stencil_light_specular_tangentspace_sphere_bytecode[2] 
+{ 
+	k_stencil_light_specular_tangentspace_sphere_bytecode_vs_2_0, 
+	k_stencil_light_specular_tangentspace_sphere_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_stencil_light_specular_tangentspace_sphere_bytecode_size[2] 
+{ 
+	k_stencil_light_specular_tangentspace_sphere_bytecode_vs_2_0_size, 
+	k_stencil_light_specular_tangentspace_sphere_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_stencil_texture_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_stencil_texture_world_vs_2_0,  
+	(DWORD*)k_stencil_texture_rigid_vs_2_0,  
+	(DWORD*)k_stencil_texture_rigid_boned_vs_2_0,  
+	(DWORD*)k_stencil_texture_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_stencil_texture_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_stencil_texture_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_stencil_texture_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_stencil_texture_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_stencil_texture_world_vs_2_0),  
+	sizeof(k_stencil_texture_rigid_vs_2_0),  
+	sizeof(k_stencil_texture_rigid_boned_vs_2_0),  
+	sizeof(k_stencil_texture_skinned_1_bone_vs_2_0),  
+	sizeof(k_stencil_texture_skinned_2_bone_vs_2_0),  
+	sizeof(k_stencil_texture_skinned_3_bone_vs_2_0),  
+	sizeof(k_stencil_texture_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_stencil_texture_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_stencil_texture_world_vs_3_0,  
+	(DWORD*)k_stencil_texture_rigid_vs_3_0,  
+	(DWORD*)k_stencil_texture_rigid_boned_vs_3_0,  
+	(DWORD*)k_stencil_texture_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_stencil_texture_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_stencil_texture_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_stencil_texture_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_stencil_texture_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_stencil_texture_world_vs_3_0),  
+	sizeof(k_stencil_texture_rigid_vs_3_0),  
+	sizeof(k_stencil_texture_rigid_boned_vs_3_0),  
+	sizeof(k_stencil_texture_skinned_1_bone_vs_3_0),  
+	sizeof(k_stencil_texture_skinned_2_bone_vs_3_0),  
+	sizeof(k_stencil_texture_skinned_3_bone_vs_3_0),  
+	sizeof(k_stencil_texture_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_stencil_texture_bytecode[2] 
+{ 
+	k_stencil_texture_bytecode_vs_2_0, 
+	k_stencil_texture_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_stencil_texture_bytecode_size[2] 
+{ 
+	k_stencil_texture_bytecode_vs_2_0_size, 
+	k_stencil_texture_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_texture_camera_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_texture_camera_world_vs_2_0,  
+	(DWORD*)k_texture_camera_rigid_vs_2_0,  
+	(DWORD*)k_texture_camera_rigid_boned_vs_2_0,  
+	(DWORD*)k_texture_camera_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_texture_camera_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_texture_camera_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_texture_camera_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_texture_camera_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_texture_camera_world_vs_2_0),  
+	sizeof(k_texture_camera_rigid_vs_2_0),  
+	sizeof(k_texture_camera_rigid_boned_vs_2_0),  
+	sizeof(k_texture_camera_skinned_1_bone_vs_2_0),  
+	sizeof(k_texture_camera_skinned_2_bone_vs_2_0),  
+	sizeof(k_texture_camera_skinned_3_bone_vs_2_0),  
+	sizeof(k_texture_camera_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_texture_camera_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_texture_camera_world_vs_3_0,  
+	(DWORD*)k_texture_camera_rigid_vs_3_0,  
+	(DWORD*)k_texture_camera_rigid_boned_vs_3_0,  
+	(DWORD*)k_texture_camera_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_texture_camera_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_texture_camera_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_texture_camera_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_texture_camera_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_texture_camera_world_vs_3_0),  
+	sizeof(k_texture_camera_rigid_vs_3_0),  
+	sizeof(k_texture_camera_rigid_boned_vs_3_0),  
+	sizeof(k_texture_camera_skinned_1_bone_vs_3_0),  
+	sizeof(k_texture_camera_skinned_2_bone_vs_3_0),  
+	sizeof(k_texture_camera_skinned_3_bone_vs_3_0),  
+	sizeof(k_texture_camera_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_texture_camera_bytecode[2] 
+{ 
+	k_texture_camera_bytecode_vs_2_0, 
+	k_texture_camera_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_texture_camera_bytecode_size[2] 
+{ 
+	k_texture_camera_bytecode_vs_2_0_size, 
+	k_texture_camera_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_transparent_active_camo_dxdy_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_transparent_active_camo_dxdy_world_vs_2_0,  
+	(DWORD*)k_transparent_active_camo_dxdy_rigid_vs_2_0,  
+	(DWORD*)k_transparent_active_camo_dxdy_rigid_boned_vs_2_0,  
+	(DWORD*)k_transparent_active_camo_dxdy_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_transparent_active_camo_dxdy_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_transparent_active_camo_dxdy_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_transparent_active_camo_dxdy_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_transparent_active_camo_dxdy_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_transparent_active_camo_dxdy_world_vs_2_0),  
+	sizeof(k_transparent_active_camo_dxdy_rigid_vs_2_0),  
+	sizeof(k_transparent_active_camo_dxdy_rigid_boned_vs_2_0),  
+	sizeof(k_transparent_active_camo_dxdy_skinned_1_bone_vs_2_0),  
+	sizeof(k_transparent_active_camo_dxdy_skinned_2_bone_vs_2_0),  
+	sizeof(k_transparent_active_camo_dxdy_skinned_3_bone_vs_2_0),  
+	sizeof(k_transparent_active_camo_dxdy_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_transparent_active_camo_dxdy_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_transparent_active_camo_dxdy_world_vs_3_0,  
+	(DWORD*)k_transparent_active_camo_dxdy_rigid_vs_3_0,  
+	(DWORD*)k_transparent_active_camo_dxdy_rigid_boned_vs_3_0,  
+	(DWORD*)k_transparent_active_camo_dxdy_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_transparent_active_camo_dxdy_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_transparent_active_camo_dxdy_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_transparent_active_camo_dxdy_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_transparent_active_camo_dxdy_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_transparent_active_camo_dxdy_world_vs_3_0),  
+	sizeof(k_transparent_active_camo_dxdy_rigid_vs_3_0),  
+	sizeof(k_transparent_active_camo_dxdy_rigid_boned_vs_3_0),  
+	sizeof(k_transparent_active_camo_dxdy_skinned_1_bone_vs_3_0),  
+	sizeof(k_transparent_active_camo_dxdy_skinned_2_bone_vs_3_0),  
+	sizeof(k_transparent_active_camo_dxdy_skinned_3_bone_vs_3_0),  
+	sizeof(k_transparent_active_camo_dxdy_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_transparent_active_camo_dxdy_bytecode[2] 
+{ 
+	k_transparent_active_camo_dxdy_bytecode_vs_2_0, 
+	k_transparent_active_camo_dxdy_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_transparent_active_camo_dxdy_bytecode_size[2] 
+{ 
+	k_transparent_active_camo_dxdy_bytecode_vs_2_0_size, 
+	k_transparent_active_camo_dxdy_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_transparent_active_camo_viewer_normal_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_transparent_active_camo_viewer_normal_world_vs_2_0,  
+	(DWORD*)k_transparent_active_camo_viewer_normal_rigid_vs_2_0,  
+	(DWORD*)k_transparent_active_camo_viewer_normal_rigid_boned_vs_2_0,  
+	(DWORD*)k_transparent_active_camo_viewer_normal_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_transparent_active_camo_viewer_normal_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_transparent_active_camo_viewer_normal_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_transparent_active_camo_viewer_normal_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_transparent_active_camo_viewer_normal_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_transparent_active_camo_viewer_normal_world_vs_2_0),  
+	sizeof(k_transparent_active_camo_viewer_normal_rigid_vs_2_0),  
+	sizeof(k_transparent_active_camo_viewer_normal_rigid_boned_vs_2_0),  
+	sizeof(k_transparent_active_camo_viewer_normal_skinned_1_bone_vs_2_0),  
+	sizeof(k_transparent_active_camo_viewer_normal_skinned_2_bone_vs_2_0),  
+	sizeof(k_transparent_active_camo_viewer_normal_skinned_3_bone_vs_2_0),  
+	sizeof(k_transparent_active_camo_viewer_normal_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_transparent_active_camo_viewer_normal_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_transparent_active_camo_viewer_normal_world_vs_3_0,  
+	(DWORD*)k_transparent_active_camo_viewer_normal_rigid_vs_3_0,  
+	(DWORD*)k_transparent_active_camo_viewer_normal_rigid_boned_vs_3_0,  
+	(DWORD*)k_transparent_active_camo_viewer_normal_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_transparent_active_camo_viewer_normal_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_transparent_active_camo_viewer_normal_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_transparent_active_camo_viewer_normal_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_transparent_active_camo_viewer_normal_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_transparent_active_camo_viewer_normal_world_vs_3_0),  
+	sizeof(k_transparent_active_camo_viewer_normal_rigid_vs_3_0),  
+	sizeof(k_transparent_active_camo_viewer_normal_rigid_boned_vs_3_0),  
+	sizeof(k_transparent_active_camo_viewer_normal_skinned_1_bone_vs_3_0),  
+	sizeof(k_transparent_active_camo_viewer_normal_skinned_2_bone_vs_3_0),  
+	sizeof(k_transparent_active_camo_viewer_normal_skinned_3_bone_vs_3_0),  
+	sizeof(k_transparent_active_camo_viewer_normal_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_transparent_active_camo_viewer_normal_bytecode[2] 
+{ 
+	k_transparent_active_camo_viewer_normal_bytecode_vs_2_0, 
+	k_transparent_active_camo_viewer_normal_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_transparent_active_camo_viewer_normal_bytecode_size[2] 
+{ 
+	k_transparent_active_camo_viewer_normal_bytecode_vs_2_0_size, 
+	k_transparent_active_camo_viewer_normal_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_transparent_generic_default_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_transparent_generic_default_world_vs_2_0,  
+	(DWORD*)k_transparent_generic_default_rigid_vs_2_0,  
+	(DWORD*)k_transparent_generic_default_rigid_boned_vs_2_0,  
+	(DWORD*)k_transparent_generic_default_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_transparent_generic_default_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_transparent_generic_default_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_transparent_generic_default_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_transparent_generic_default_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_transparent_generic_default_world_vs_2_0),  
+	sizeof(k_transparent_generic_default_rigid_vs_2_0),  
+	sizeof(k_transparent_generic_default_rigid_boned_vs_2_0),  
+	sizeof(k_transparent_generic_default_skinned_1_bone_vs_2_0),  
+	sizeof(k_transparent_generic_default_skinned_2_bone_vs_2_0),  
+	sizeof(k_transparent_generic_default_skinned_3_bone_vs_2_0),  
+	sizeof(k_transparent_generic_default_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_transparent_generic_default_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_transparent_generic_default_world_vs_3_0,  
+	(DWORD*)k_transparent_generic_default_rigid_vs_3_0,  
+	(DWORD*)k_transparent_generic_default_rigid_boned_vs_3_0,  
+	(DWORD*)k_transparent_generic_default_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_transparent_generic_default_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_transparent_generic_default_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_transparent_generic_default_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_transparent_generic_default_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_transparent_generic_default_world_vs_3_0),  
+	sizeof(k_transparent_generic_default_rigid_vs_3_0),  
+	sizeof(k_transparent_generic_default_rigid_boned_vs_3_0),  
+	sizeof(k_transparent_generic_default_skinned_1_bone_vs_3_0),  
+	sizeof(k_transparent_generic_default_skinned_2_bone_vs_3_0),  
+	sizeof(k_transparent_generic_default_skinned_3_bone_vs_3_0),  
+	sizeof(k_transparent_generic_default_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_transparent_generic_default_bytecode[2] 
+{ 
+	k_transparent_generic_default_bytecode_vs_2_0, 
+	k_transparent_generic_default_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_transparent_generic_default_bytecode_size[2] 
+{ 
+	k_transparent_generic_default_bytecode_vs_2_0_size, 
+	k_transparent_generic_default_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_transparent_generic_default_sky_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_transparent_generic_default_sky_world_vs_2_0,  
+	(DWORD*)k_transparent_generic_default_sky_rigid_vs_2_0,  
+	(DWORD*)k_transparent_generic_default_sky_rigid_boned_vs_2_0,  
+	(DWORD*)k_transparent_generic_default_sky_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_transparent_generic_default_sky_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_transparent_generic_default_sky_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_transparent_generic_default_sky_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_transparent_generic_default_sky_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_transparent_generic_default_sky_world_vs_2_0),  
+	sizeof(k_transparent_generic_default_sky_rigid_vs_2_0),  
+	sizeof(k_transparent_generic_default_sky_rigid_boned_vs_2_0),  
+	sizeof(k_transparent_generic_default_sky_skinned_1_bone_vs_2_0),  
+	sizeof(k_transparent_generic_default_sky_skinned_2_bone_vs_2_0),  
+	sizeof(k_transparent_generic_default_sky_skinned_3_bone_vs_2_0),  
+	sizeof(k_transparent_generic_default_sky_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_transparent_generic_default_sky_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_transparent_generic_default_sky_world_vs_3_0,  
+	(DWORD*)k_transparent_generic_default_sky_rigid_vs_3_0,  
+	(DWORD*)k_transparent_generic_default_sky_rigid_boned_vs_3_0,  
+	(DWORD*)k_transparent_generic_default_sky_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_transparent_generic_default_sky_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_transparent_generic_default_sky_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_transparent_generic_default_sky_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_transparent_generic_default_sky_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_transparent_generic_default_sky_world_vs_3_0),  
+	sizeof(k_transparent_generic_default_sky_rigid_vs_3_0),  
+	sizeof(k_transparent_generic_default_sky_rigid_boned_vs_3_0),  
+	sizeof(k_transparent_generic_default_sky_skinned_1_bone_vs_3_0),  
+	sizeof(k_transparent_generic_default_sky_skinned_2_bone_vs_3_0),  
+	sizeof(k_transparent_generic_default_sky_skinned_3_bone_vs_3_0),  
+	sizeof(k_transparent_generic_default_sky_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_transparent_generic_default_sky_bytecode[2] 
+{ 
+	k_transparent_generic_default_sky_bytecode_vs_2_0, 
+	k_transparent_generic_default_sky_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_transparent_generic_default_sky_bytecode_size[2] 
+{ 
+	k_transparent_generic_default_sky_bytecode_vs_2_0_size, 
+	k_transparent_generic_default_sky_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_transparent_generic_offset_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_transparent_generic_offset_world_vs_2_0,  
+	(DWORD*)k_transparent_generic_offset_rigid_vs_2_0,  
+	(DWORD*)k_transparent_generic_offset_rigid_boned_vs_2_0,  
+	(DWORD*)k_transparent_generic_offset_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_transparent_generic_offset_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_transparent_generic_offset_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_transparent_generic_offset_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_transparent_generic_offset_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_transparent_generic_offset_world_vs_2_0),  
+	sizeof(k_transparent_generic_offset_rigid_vs_2_0),  
+	sizeof(k_transparent_generic_offset_rigid_boned_vs_2_0),  
+	sizeof(k_transparent_generic_offset_skinned_1_bone_vs_2_0),  
+	sizeof(k_transparent_generic_offset_skinned_2_bone_vs_2_0),  
+	sizeof(k_transparent_generic_offset_skinned_3_bone_vs_2_0),  
+	sizeof(k_transparent_generic_offset_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_transparent_generic_offset_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_transparent_generic_offset_world_vs_3_0,  
+	(DWORD*)k_transparent_generic_offset_rigid_vs_3_0,  
+	(DWORD*)k_transparent_generic_offset_rigid_boned_vs_3_0,  
+	(DWORD*)k_transparent_generic_offset_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_transparent_generic_offset_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_transparent_generic_offset_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_transparent_generic_offset_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_transparent_generic_offset_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_transparent_generic_offset_world_vs_3_0),  
+	sizeof(k_transparent_generic_offset_rigid_vs_3_0),  
+	sizeof(k_transparent_generic_offset_rigid_boned_vs_3_0),  
+	sizeof(k_transparent_generic_offset_skinned_1_bone_vs_3_0),  
+	sizeof(k_transparent_generic_offset_skinned_2_bone_vs_3_0),  
+	sizeof(k_transparent_generic_offset_skinned_3_bone_vs_3_0),  
+	sizeof(k_transparent_generic_offset_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_transparent_generic_offset_bytecode[2] 
+{ 
+	k_transparent_generic_offset_bytecode_vs_2_0, 
+	k_transparent_generic_offset_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_transparent_generic_offset_bytecode_size[2] 
+{ 
+	k_transparent_generic_offset_bytecode_vs_2_0_size, 
+	k_transparent_generic_offset_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_transparent_generic_reflection_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_transparent_generic_reflection_world_vs_2_0,  
+	(DWORD*)k_transparent_generic_reflection_rigid_vs_2_0,  
+	(DWORD*)k_transparent_generic_reflection_rigid_boned_vs_2_0,  
+	(DWORD*)k_transparent_generic_reflection_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_transparent_generic_reflection_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_transparent_generic_reflection_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_transparent_generic_reflection_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_transparent_generic_reflection_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_transparent_generic_reflection_world_vs_2_0),  
+	sizeof(k_transparent_generic_reflection_rigid_vs_2_0),  
+	sizeof(k_transparent_generic_reflection_rigid_boned_vs_2_0),  
+	sizeof(k_transparent_generic_reflection_skinned_1_bone_vs_2_0),  
+	sizeof(k_transparent_generic_reflection_skinned_2_bone_vs_2_0),  
+	sizeof(k_transparent_generic_reflection_skinned_3_bone_vs_2_0),  
+	sizeof(k_transparent_generic_reflection_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_transparent_generic_reflection_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_transparent_generic_reflection_world_vs_3_0,  
+	(DWORD*)k_transparent_generic_reflection_rigid_vs_3_0,  
+	(DWORD*)k_transparent_generic_reflection_rigid_boned_vs_3_0,  
+	(DWORD*)k_transparent_generic_reflection_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_transparent_generic_reflection_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_transparent_generic_reflection_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_transparent_generic_reflection_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_transparent_generic_reflection_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_transparent_generic_reflection_world_vs_3_0),  
+	sizeof(k_transparent_generic_reflection_rigid_vs_3_0),  
+	sizeof(k_transparent_generic_reflection_rigid_boned_vs_3_0),  
+	sizeof(k_transparent_generic_reflection_skinned_1_bone_vs_3_0),  
+	sizeof(k_transparent_generic_reflection_skinned_2_bone_vs_3_0),  
+	sizeof(k_transparent_generic_reflection_skinned_3_bone_vs_3_0),  
+	sizeof(k_transparent_generic_reflection_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_transparent_generic_reflection_bytecode[2] 
+{ 
+	k_transparent_generic_reflection_bytecode_vs_2_0, 
+	k_transparent_generic_reflection_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_transparent_generic_reflection_bytecode_size[2] 
+{ 
+	k_transparent_generic_reflection_bytecode_vs_2_0_size, 
+	k_transparent_generic_reflection_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_transparent_generic_reflection_sky_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_transparent_generic_reflection_sky_world_vs_2_0,  
+	(DWORD*)k_transparent_generic_reflection_sky_rigid_vs_2_0,  
+	(DWORD*)k_transparent_generic_reflection_sky_rigid_boned_vs_2_0,  
+	(DWORD*)k_transparent_generic_reflection_sky_skinned_1_bone_vs_2_0,  
+	(DWORD*)k_transparent_generic_reflection_sky_skinned_2_bone_vs_2_0,  
+	(DWORD*)k_transparent_generic_reflection_sky_skinned_3_bone_vs_2_0,  
+	(DWORD*)k_transparent_generic_reflection_sky_skinned_4_bone_vs_2_0,  
+}; 
+ 
+const int16 k_transparent_generic_reflection_sky_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_transparent_generic_reflection_sky_world_vs_2_0),  
+	sizeof(k_transparent_generic_reflection_sky_rigid_vs_2_0),  
+	sizeof(k_transparent_generic_reflection_sky_rigid_boned_vs_2_0),  
+	sizeof(k_transparent_generic_reflection_sky_skinned_1_bone_vs_2_0),  
+	sizeof(k_transparent_generic_reflection_sky_skinned_2_bone_vs_2_0),  
+	sizeof(k_transparent_generic_reflection_sky_skinned_3_bone_vs_2_0),  
+	sizeof(k_transparent_generic_reflection_sky_skinned_4_bone_vs_2_0),  
+}; 
+ 
+const DWORD *const k_transparent_generic_reflection_sky_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_transparent_generic_reflection_sky_world_vs_3_0,  
+	(DWORD*)k_transparent_generic_reflection_sky_rigid_vs_3_0,  
+	(DWORD*)k_transparent_generic_reflection_sky_rigid_boned_vs_3_0,  
+	(DWORD*)k_transparent_generic_reflection_sky_skinned_1_bone_vs_3_0,  
+	(DWORD*)k_transparent_generic_reflection_sky_skinned_2_bone_vs_3_0,  
+	(DWORD*)k_transparent_generic_reflection_sky_skinned_3_bone_vs_3_0,  
+	(DWORD*)k_transparent_generic_reflection_sky_skinned_4_bone_vs_3_0,  
+}; 
+ 
+const int16 k_transparent_generic_reflection_sky_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_transparent_generic_reflection_sky_world_vs_3_0),  
+	sizeof(k_transparent_generic_reflection_sky_rigid_vs_3_0),  
+	sizeof(k_transparent_generic_reflection_sky_rigid_boned_vs_3_0),  
+	sizeof(k_transparent_generic_reflection_sky_skinned_1_bone_vs_3_0),  
+	sizeof(k_transparent_generic_reflection_sky_skinned_2_bone_vs_3_0),  
+	sizeof(k_transparent_generic_reflection_sky_skinned_3_bone_vs_3_0),  
+	sizeof(k_transparent_generic_reflection_sky_skinned_4_bone_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_transparent_generic_reflection_sky_bytecode[2] 
+{ 
+	k_transparent_generic_reflection_sky_bytecode_vs_2_0, 
+	k_transparent_generic_reflection_sky_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_transparent_generic_reflection_sky_bytecode_size[2] 
+{ 
+	k_transparent_generic_reflection_sky_bytecode_vs_2_0_size, 
+	k_transparent_generic_reflection_sky_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_transparent_simple_world_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_transparent_simple_world_world_vs_2_0,  
+}; 
+ 
+const int16 k_transparent_simple_world_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_transparent_simple_world_world_vs_2_0),  
+}; 
+ 
+const DWORD *const k_transparent_simple_world_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_transparent_simple_world_world_vs_3_0,  
+}; 
+ 
+const int16 k_transparent_simple_world_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_transparent_simple_world_world_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_transparent_simple_world_bytecode[2] 
+{ 
+	k_transparent_simple_world_bytecode_vs_2_0, 
+	k_transparent_simple_world_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_transparent_simple_world_bytecode_size[2] 
+{ 
+	k_transparent_simple_world_bytecode_vs_2_0_size, 
+	k_transparent_simple_world_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_water_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_water_world_vs_2_0,  
+	(DWORD*)k_water_rigid_vs_2_0,  
+}; 
+ 
+const int16 k_water_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_water_world_vs_2_0),  
+	sizeof(k_water_rigid_vs_2_0),  
+}; 
+ 
+const DWORD *const k_water_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_water_world_vs_3_0,  
+	(DWORD*)k_water_rigid_vs_3_0,  
+}; 
+ 
+const int16 k_water_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_water_world_vs_3_0),  
+	sizeof(k_water_rigid_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_water_bytecode[2] 
+{ 
+	k_water_bytecode_vs_2_0, 
+	k_water_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_water_bytecode_size[2] 
+{ 
+	k_water_bytecode_vs_2_0_size, 
+	k_water_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_water_edge_blend_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_water_edge_blend_world_vs_2_0,  
+}; 
+ 
+const int16 k_water_edge_blend_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_water_edge_blend_world_vs_2_0),  
+}; 
+ 
+const DWORD *const k_water_edge_blend_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_water_edge_blend_world_vs_3_0,  
+}; 
+ 
+const int16 k_water_edge_blend_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_water_edge_blend_world_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_water_edge_blend_bytecode[2] 
+{ 
+	k_water_edge_blend_bytecode_vs_2_0, 
+	k_water_edge_blend_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_water_edge_blend_bytecode_size[2] 
+{ 
+	k_water_edge_blend_bytecode_vs_2_0_size, 
+	k_water_edge_blend_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_water_pool_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_water_pool_world_vs_2_0,  
+	(DWORD*)k_water_pool_rigid_vs_2_0,  
+}; 
+ 
+const int16 k_water_pool_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_water_pool_world_vs_2_0),  
+	sizeof(k_water_pool_rigid_vs_2_0),  
+}; 
+ 
+const DWORD *const k_water_pool_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_water_pool_world_vs_3_0,  
+	(DWORD*)k_water_pool_rigid_vs_3_0,  
+}; 
+ 
+const int16 k_water_pool_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_water_pool_world_vs_3_0),  
+	sizeof(k_water_pool_rigid_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_water_pool_bytecode[2] 
+{ 
+	k_water_pool_bytecode_vs_2_0, 
+	k_water_pool_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_water_pool_bytecode_size[2] 
+{ 
+	k_water_pool_bytecode_vs_2_0_size, 
+	k_water_pool_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_water_pool_static_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_water_pool_static_world_vs_2_0,  
+	(DWORD*)k_water_pool_static_rigid_vs_2_0,  
+}; 
+ 
+const int16 k_water_pool_static_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_water_pool_static_world_vs_2_0),  
+	sizeof(k_water_pool_static_rigid_vs_2_0),  
+}; 
+ 
+const DWORD *const k_water_pool_static_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_water_pool_static_world_vs_3_0,  
+	(DWORD*)k_water_pool_static_rigid_vs_3_0,  
+}; 
+ 
+const int16 k_water_pool_static_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_water_pool_static_world_vs_3_0),  
+	sizeof(k_water_pool_static_rigid_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_water_pool_static_bytecode[2] 
+{ 
+	k_water_pool_static_bytecode_vs_2_0, 
+	k_water_pool_static_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_water_pool_static_bytecode_size[2] 
+{ 
+	k_water_pool_static_bytecode_vs_2_0_size, 
+	k_water_pool_static_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_water_static_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_water_static_world_vs_2_0,  
+	(DWORD*)k_water_static_rigid_vs_2_0,  
+}; 
+ 
+const int16 k_water_static_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_water_static_world_vs_2_0),  
+	sizeof(k_water_static_rigid_vs_2_0),  
+}; 
+ 
+const DWORD *const k_water_static_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_water_static_world_vs_3_0,  
+	(DWORD*)k_water_static_rigid_vs_3_0,  
+}; 
+ 
+const int16 k_water_static_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_water_static_world_vs_3_0),  
+	sizeof(k_water_static_rigid_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_water_static_bytecode[2] 
+{ 
+	k_water_static_bytecode_vs_2_0, 
+	k_water_static_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_water_static_bytecode_size[2] 
+{ 
+	k_water_static_bytecode_vs_2_0_size, 
+	k_water_static_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_weather_particle_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_weather_particle_world_vs_2_0,  
+}; 
+ 
+const int16 k_weather_particle_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_weather_particle_world_vs_2_0),  
+}; 
+ 
+const DWORD *const k_weather_particle_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_weather_particle_world_vs_3_0,  
+}; 
+ 
+const int16 k_weather_particle_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_weather_particle_world_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_weather_particle_bytecode[2] 
+{ 
+	k_weather_particle_bytecode_vs_2_0, 
+	k_weather_particle_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_weather_particle_bytecode_size[2] 
+{ 
+	k_weather_particle_bytecode_vs_2_0_size, 
+	k_weather_particle_bytecode_vs_3_0_size 
+}; 
+ 
+const DWORD *const k_weather_plate_bytecode_vs_2_0[] 
+{ 
+	(DWORD*)k_weather_plate_world_vs_2_0,  
+}; 
+ 
+const int16 k_weather_plate_bytecode_vs_2_0_size[] 
+{ 
+	sizeof(k_weather_plate_world_vs_2_0),  
+}; 
+ 
+const DWORD *const k_weather_plate_bytecode_vs_3_0[] 
+{ 
+	(DWORD*)k_weather_plate_world_vs_3_0,  
+}; 
+ 
+const int16 k_weather_plate_bytecode_vs_3_0_size[] 
+{ 
+	sizeof(k_weather_plate_world_vs_3_0),  
+}; 
+ 
+const DWORD *const *const k_weather_plate_bytecode[2] 
+{ 
+	k_weather_plate_bytecode_vs_2_0, 
+	k_weather_plate_bytecode_vs_3_0 
+}; 
+ 
+const int16 *const k_weather_plate_bytecode_size[2] 
+{ 
+	k_weather_plate_bytecode_vs_2_0_size, 
+	k_weather_plate_bytecode_vs_3_0_size 
+}; 
+ 
+const s_vertex_shader_replacement_information k_vertex_shader_replacement_information[111] 
+{ 
+	{  
+		"convolution",  
+		k_convolution_bytecode,  
+		k_convolution_bytecode_size  
+	}, 
+	{  
+		"debug",  
+		k_debug_bytecode,  
+		k_debug_bytecode_size  
+	}, 
+	{  
+		"debug_screenspace",  
+		k_debug_screenspace_bytecode,  
+		k_debug_screenspace_bytecode_size  
+	}, 
+	{  
+		"decal",  
+		k_decal_bytecode,  
+		k_decal_bytecode_size  
+	}, 
+	{  
+		"decal_hardcoded",  
+		k_decal_hardcoded_bytecode,  
+		k_decal_hardcoded_bytecode_size  
+	}, 
+	{  
+		"decorator",  
+		k_decorator_bytecode,  
+		k_decorator_bytecode_size  
+	}, 
+	{  
+		"decorator_decal",  
+		k_decorator_decal_bytecode,  
+		k_decorator_decal_bytecode_size  
+	}, 
+	{  
+		"effect",  
+		k_effect_bytecode,  
+		k_effect_bytecode_size  
+	}, 
+	{  
+		"filter_copy",  
+		k_filter_copy_bytecode,  
+		k_filter_copy_bytecode_size  
+	}, 
+	{  
+		"fog_patchy_stencil_modulate",  
+		k_fog_patchy_stencil_modulate_bytecode,  
+		k_fog_patchy_stencil_modulate_bytecode_size  
+	}, 
+	{  
+		"fog_planar",  
+		k_fog_planar_bytecode,  
+		k_fog_planar_bytecode_size  
+	}, 
+	{  
+		"hologram",  
+		k_hologram_bytecode,  
+		k_hologram_bytecode_size  
+	}, 
+	{  
+		"lens_flare",  
+		k_lens_flare_bytecode,  
+		k_lens_flare_bytecode_size  
+	}, 
+	{  
+		"lightaccum_frustum",  
+		k_lightaccum_frustum_bytecode,  
+		k_lightaccum_frustum_bytecode_size  
+	}, 
+	{  
+		"lightaccum_frustum_no_specular",  
+		k_lightaccum_frustum_no_specular_bytecode,  
+		k_lightaccum_frustum_no_specular_bytecode_size  
+	}, 
+	{  
+		"lightaccum_frustum_no_specular_gel",  
+		k_lightaccum_frustum_no_specular_gel_bytecode,  
+		k_lightaccum_frustum_no_specular_gel_bytecode_size  
+	}, 
+	{  
+		"lightaccum_frustum_no_specular_gel_tex",  
+		k_lightaccum_frustum_no_specular_gel_tex_bytecode,  
+		k_lightaccum_frustum_no_specular_gel_tex_bytecode_size  
+	}, 
+	{  
+		"lightaccum_frustum_no_specular_gel_tex_detail",  
+		k_lightaccum_frustum_no_specular_gel_tex_detail_bytecode,  
+		k_lightaccum_frustum_no_specular_gel_tex_detail_bytecode_size  
+	}, 
+	{  
+		"lightaccum_frustum_no_specular_tex",  
+		k_lightaccum_frustum_no_specular_tex_bytecode,  
+		k_lightaccum_frustum_no_specular_tex_bytecode_size  
+	}, 
+	{  
+		"lightaccum_frustum_no_specular_tex_detail",  
+		k_lightaccum_frustum_no_specular_tex_detail_bytecode,  
+		k_lightaccum_frustum_no_specular_tex_detail_bytecode_size  
+	}, 
+	{  
+		"lightaccum_frustum_tex",  
+		k_lightaccum_frustum_tex_bytecode,  
+		k_lightaccum_frustum_tex_bytecode_size  
+	}, 
+	{  
+		"lightaccum_frustum_tex_detail",  
+		k_lightaccum_frustum_tex_detail_bytecode,  
+		k_lightaccum_frustum_tex_detail_bytecode_size  
+	}, 
+	{  
+		"lightaccum_frustum_tex_first_person",  
+		k_lightaccum_frustum_tex_first_person_bytecode,  
+		k_lightaccum_frustum_tex_first_person_bytecode_size  
+	}, 
+	{  
+		"lightaccum_frustum_tex_first_person_change_color",  
+		k_lightaccum_frustum_tex_first_person_change_color_bytecode,  
+		k_lightaccum_frustum_tex_first_person_change_color_bytecode_size  
+	}, 
+	{  
+		"lightaccum_frustum_tex_first_person_detail",  
+		k_lightaccum_frustum_tex_first_person_detail_bytecode,  
+		k_lightaccum_frustum_tex_first_person_detail_bytecode_size  
+	}, 
+	{  
+		"lightaccum_sphere_diffuse",  
+		k_lightaccum_sphere_diffuse_bytecode,  
+		k_lightaccum_sphere_diffuse_bytecode_size  
+	}, 
+	{  
+		"lightaccum_sphere_diffuse_tex",  
+		k_lightaccum_sphere_diffuse_tex_bytecode,  
+		k_lightaccum_sphere_diffuse_tex_bytecode_size  
+	}, 
+	{  
+		"lightaccum_sphere_diffuse_tex_detail",  
+		k_lightaccum_sphere_diffuse_tex_detail_bytecode,  
+		k_lightaccum_sphere_diffuse_tex_detail_bytecode_size  
+	}, 
+	{  
+		"lightmap_dynamic",  
+		k_lightmap_dynamic_bytecode,  
+		k_lightmap_dynamic_bytecode_size  
+	}, 
+	{  
+		"lightmap_dynamic_env",  
+		k_lightmap_dynamic_env_bytecode,  
+		k_lightmap_dynamic_env_bytecode_size  
+	}, 
+	{  
+		"lightmap_dynamic_tex",  
+		k_lightmap_dynamic_tex_bytecode,  
+		k_lightmap_dynamic_tex_bytecode_size  
+	}, 
+	{  
+		"lightmap_dynamic_tex_change_color",  
+		k_lightmap_dynamic_tex_change_color_bytecode,  
+		k_lightmap_dynamic_tex_change_color_bytecode_size  
+	}, 
+	{  
+		"lightmap_dynamic_tex_change_color_default",  
+		k_lightmap_dynamic_tex_change_color_default_bytecode,  
+		k_lightmap_dynamic_tex_change_color_default_bytecode_size  
+	}, 
+	{  
+		"lightmap_dynamic_tex_change_color_env",  
+		k_lightmap_dynamic_tex_change_color_env_bytecode,  
+		k_lightmap_dynamic_tex_change_color_env_bytecode_size  
+	}, 
+	{  
+		"lightmap_dynamic_tex_detail",  
+		k_lightmap_dynamic_tex_detail_bytecode,  
+		k_lightmap_dynamic_tex_detail_bytecode_size  
+	}, 
+	{  
+		"lightmap_dynamic_tex_detail_blend",  
+		k_lightmap_dynamic_tex_detail_blend_bytecode,  
+		k_lightmap_dynamic_tex_detail_blend_bytecode_size  
+	}, 
+	{  
+		"lightmap_dynamic_tex_env",  
+		k_lightmap_dynamic_tex_env_bytecode,  
+		k_lightmap_dynamic_tex_env_bytecode_size  
+	}, 
+	{  
+		"lightmap_dynamic_tex_env_stencil",  
+		k_lightmap_dynamic_tex_env_stencil_bytecode,  
+		k_lightmap_dynamic_tex_env_stencil_bytecode_size  
+	}, 
+	{  
+		"lightmap_dynamic_tex_mark",  
+		k_lightmap_dynamic_tex_mark_bytecode,  
+		k_lightmap_dynamic_tex_mark_bytecode_size  
+	}, 
+	{  
+		"lightmap_dynamic_tex_mark_stencil",  
+		k_lightmap_dynamic_tex_mark_stencil_bytecode,  
+		k_lightmap_dynamic_tex_mark_stencil_bytecode_size  
+	}, 
+	{  
+		"lightmap_dynamic_tex_stencil",  
+		k_lightmap_dynamic_tex_stencil_bytecode,  
+		k_lightmap_dynamic_tex_stencil_bytecode_size  
+	}, 
+	{  
+		"lightmap_perpixel_env",  
+		k_lightmap_perpixel_env_bytecode,  
+		k_lightmap_perpixel_env_bytecode_size  
+	}, 
+	{  
+		"lightmap_perpixel_tex",  
+		k_lightmap_perpixel_tex_bytecode,  
+		k_lightmap_perpixel_tex_bytecode_size  
+	}, 
+	{  
+		"lightmap_perpixel_tex_detail",  
+		k_lightmap_perpixel_tex_detail_bytecode,  
+		k_lightmap_perpixel_tex_detail_bytecode_size  
+	}, 
+	{  
+		"lightmap_perpixel_tex_detail_blend",  
+		k_lightmap_perpixel_tex_detail_blend_bytecode,  
+		k_lightmap_perpixel_tex_detail_blend_bytecode_size  
+	}, 
+	{  
+		"lightmap_perpixel_tex_env",  
+		k_lightmap_perpixel_tex_env_bytecode,  
+		k_lightmap_perpixel_tex_env_bytecode_size  
+	}, 
+	{  
+		"lightmap_perpixel_tex_env_stencil",  
+		k_lightmap_perpixel_tex_env_stencil_bytecode,  
+		k_lightmap_perpixel_tex_env_stencil_bytecode_size  
+	}, 
+	{  
+		"lightmap_perpixel_tex_mark",  
+		k_lightmap_perpixel_tex_mark_bytecode,  
+		k_lightmap_perpixel_tex_mark_bytecode_size  
+	}, 
+	{  
+		"lightmap_perpixel_tex_mark_stencil",  
+		k_lightmap_perpixel_tex_mark_stencil_bytecode,  
+		k_lightmap_perpixel_tex_mark_stencil_bytecode_size  
+	}, 
+	{  
+		"lightmap_perpixel_tex_stencil",  
+		k_lightmap_perpixel_tex_stencil_bytecode,  
+		k_lightmap_perpixel_tex_stencil_bytecode_size  
+	}, 
+	{  
+		"lightmap_pervertex",  
+		k_lightmap_pervertex_bytecode,  
+		k_lightmap_pervertex_bytecode_size  
+	}, 
+	{  
+		"lightmap_pervertex_env",  
+		k_lightmap_pervertex_env_bytecode,  
+		k_lightmap_pervertex_env_bytecode_size  
+	}, 
+	{  
+		"lightmap_pervertex_tex",  
+		k_lightmap_pervertex_tex_bytecode,  
+		k_lightmap_pervertex_tex_bytecode_size  
+	}, 
+	{  
+		"lightmap_pervertex_tex_detail",  
+		k_lightmap_pervertex_tex_detail_bytecode,  
+		k_lightmap_pervertex_tex_detail_bytecode_size  
+	}, 
+	{  
+		"lightmap_pervertex_tex_detail_blend",  
+		k_lightmap_pervertex_tex_detail_blend_bytecode,  
+		k_lightmap_pervertex_tex_detail_blend_bytecode_size  
+	}, 
+	{  
+		"lightmap_pervertex_tex_env",  
+		k_lightmap_pervertex_tex_env_bytecode,  
+		k_lightmap_pervertex_tex_env_bytecode_size  
+	}, 
+	{  
+		"lightmap_pervertex_tex_env_stencil",  
+		k_lightmap_pervertex_tex_env_stencil_bytecode,  
+		k_lightmap_pervertex_tex_env_stencil_bytecode_size  
+	}, 
+	{  
+		"lightmap_pervertex_tex_mark",  
+		k_lightmap_pervertex_tex_mark_bytecode,  
+		k_lightmap_pervertex_tex_mark_bytecode_size  
+	}, 
+	{  
+		"lightmap_pervertex_tex_mark_stencil",  
+		k_lightmap_pervertex_tex_mark_stencil_bytecode,  
+		k_lightmap_pervertex_tex_mark_stencil_bytecode_size  
+	}, 
+	{  
+		"lightmap_pervertex_tex_stencil",  
+		k_lightmap_pervertex_tex_stencil_bytecode,  
+		k_lightmap_pervertex_tex_stencil_bytecode_size  
+	}, 
+	{  
+		"particle",  
+		k_particle_bytecode,  
+		k_particle_bytecode_size  
+	}, 
+	{  
+		"particle_distortion",  
+		k_particle_distortion_bytecode,  
+		k_particle_distortion_bytecode_size  
+	}, 
+	{  
+		"particle_model",  
+		k_particle_model_bytecode,  
+		k_particle_model_bytecode_size  
+	}, 
+	{  
+		"particle_plasma",  
+		k_particle_plasma_bytecode,  
+		k_particle_plasma_bytecode_size  
+	}, 
+	{  
+		"prt",  
+		k_prt_bytecode,  
+		k_prt_bytecode_size  
+	}, 
+	{  
+		"prt_lightmap",  
+		k_prt_lightmap_bytecode,  
+		k_prt_lightmap_bytecode_size  
+	}, 
+	{  
+		"screen",  
+		k_screen_bytecode,  
+		k_screen_bytecode_size  
+	}, 
+	{  
+		"screen2_old",  
+		k_screen2_old_bytecode,  
+		k_screen2_old_bytecode_size  
+	}, 
+	{  
+		"screen_0_stage",  
+		k_screen_0_stage_bytecode,  
+		k_screen_0_stage_bytecode_size  
+	}, 
+	{  
+		"screen_1_stage",  
+		k_screen_1_stage_bytecode,  
+		k_screen_1_stage_bytecode_size  
+	}, 
+	{  
+		"screen_2_stage",  
+		k_screen_2_stage_bytecode,  
+		k_screen_2_stage_bytecode_size  
+	}, 
+	{  
+		"screen_3_stage",  
+		k_screen_3_stage_bytecode,  
+		k_screen_3_stage_bytecode_size  
+	}, 
+	{  
+		"screen_4_stage",  
+		k_screen_4_stage_bytecode,  
+		k_screen_4_stage_bytecode_size  
+	}, 
+	{  
+		"screen_5_stage",  
+		k_screen_5_stage_bytecode,  
+		k_screen_5_stage_bytecode_size  
+	}, 
+	{  
+		"screen_6_stage",  
+		k_screen_6_stage_bytecode,  
+		k_screen_6_stage_bytecode_size  
+	}, 
+	{  
+		"screen_7_stage",  
+		k_screen_7_stage_bytecode,  
+		k_screen_7_stage_bytecode_size  
+	}, 
+	{  
+		"screen_hud",  
+		k_screen_hud_bytecode,  
+		k_screen_hud_bytecode_size  
+	}, 
+	{  
+		"screen_old",  
+		k_screen_old_bytecode,  
+		k_screen_old_bytecode_size  
+	}, 
+	{  
+		"screen_xform_4",  
+		k_screen_xform_4_bytecode,  
+		k_screen_xform_4_bytecode_size  
+	}, 
+	{  
+		"shadow_buffer_application_1tap",  
+		k_shadow_buffer_application_1tap_bytecode,  
+		k_shadow_buffer_application_1tap_bytecode_size  
+	}, 
+	{  
+		"shadow_buffer_application_3tap",  
+		k_shadow_buffer_application_3tap_bytecode,  
+		k_shadow_buffer_application_3tap_bytecode_size  
+	}, 
+	{  
+		"shadow_buffer_application_cinematic",  
+		k_shadow_buffer_application_cinematic_bytecode,  
+		k_shadow_buffer_application_cinematic_bytecode_size  
+	}, 
+	{  
+		"shadow_buffer_application_lightmap",  
+		k_shadow_buffer_application_lightmap_bytecode,  
+		k_shadow_buffer_application_lightmap_bytecode_size  
+	}, 
+	{  
+		"shadow_buffer_generation",  
+		k_shadow_buffer_generation_bytecode,  
+		k_shadow_buffer_generation_bytecode_size  
+	}, 
+	{  
+		"shadow_buffer_generation_cinematic",  
+		k_shadow_buffer_generation_cinematic_bytecode,  
+		k_shadow_buffer_generation_cinematic_bytecode_size  
+	}, 
+	{  
+		"shadow_buffer_generation_lightmap",  
+		k_shadow_buffer_generation_lightmap_bytecode,  
+		k_shadow_buffer_generation_lightmap_bytecode_size  
+	}, 
+	{  
+		"sh_dynamic",  
+		k_sh_dynamic_bytecode,  
+		k_sh_dynamic_bytecode_size  
+	}, 
+	{  
+		"stencil_emissive",  
+		k_stencil_emissive_bytecode,  
+		k_stencil_emissive_bytecode_size  
+	}, 
+	{  
+		"stencil_env",  
+		k_stencil_env_bytecode,  
+		k_stencil_env_bytecode_size  
+	}, 
+	{  
+		"stencil_env_bumped_tangentspace",  
+		k_stencil_env_bumped_tangentspace_bytecode,  
+		k_stencil_env_bumped_tangentspace_bytecode_size  
+	}, 
+	{  
+		"stencil_env_super_fast",  
+		k_stencil_env_super_fast_bytecode,  
+		k_stencil_env_super_fast_bytecode_size  
+	}, 
+	{  
+		"stencil_light_specular_tangentspace_sphere",  
+		k_stencil_light_specular_tangentspace_sphere_bytecode,  
+		k_stencil_light_specular_tangentspace_sphere_bytecode_size  
+	}, 
+	{  
+		"stencil_texture",  
+		k_stencil_texture_bytecode,  
+		k_stencil_texture_bytecode_size  
+	}, 
+	{  
+		"texture_camera",  
+		k_texture_camera_bytecode,  
+		k_texture_camera_bytecode_size  
+	}, 
+	{  
+		"transparent_active_camo_dxdy",  
+		k_transparent_active_camo_dxdy_bytecode,  
+		k_transparent_active_camo_dxdy_bytecode_size  
+	}, 
+	{  
+		"transparent_active_camo_viewer_normal",  
+		k_transparent_active_camo_viewer_normal_bytecode,  
+		k_transparent_active_camo_viewer_normal_bytecode_size  
+	}, 
+	{  
+		"transparent_generic_default",  
+		k_transparent_generic_default_bytecode,  
+		k_transparent_generic_default_bytecode_size  
+	}, 
+	{  
+		"transparent_generic_default_sky",  
+		k_transparent_generic_default_sky_bytecode,  
+		k_transparent_generic_default_sky_bytecode_size  
+	}, 
+	{  
+		"transparent_generic_offset",  
+		k_transparent_generic_offset_bytecode,  
+		k_transparent_generic_offset_bytecode_size  
+	}, 
+	{  
+		"transparent_generic_reflection",  
+		k_transparent_generic_reflection_bytecode,  
+		k_transparent_generic_reflection_bytecode_size  
+	}, 
+	{  
+		"transparent_generic_reflection_sky",  
+		k_transparent_generic_reflection_sky_bytecode,  
+		k_transparent_generic_reflection_sky_bytecode_size  
+	}, 
+	{  
+		"transparent_simple_world",  
+		k_transparent_simple_world_bytecode,  
+		k_transparent_simple_world_bytecode_size  
+	}, 
+	{  
+		"water",  
+		k_water_bytecode,  
+		k_water_bytecode_size  
+	}, 
+	{  
+		"water_edge_blend",  
+		k_water_edge_blend_bytecode,  
+		k_water_edge_blend_bytecode_size  
+	}, 
+	{  
+		"water_pool",  
+		k_water_pool_bytecode,  
+		k_water_pool_bytecode_size  
+	}, 
+	{  
+		"water_pool_static",  
+		k_water_pool_static_bytecode,  
+		k_water_pool_static_bytecode_size  
+	}, 
+	{  
+		"water_static",  
+		k_water_static_bytecode,  
+		k_water_static_bytecode_size  
+	}, 
+	{  
+		"weather_particle",  
+		k_weather_particle_bytecode,  
+		k_weather_particle_bytecode_size  
+	}, 
+	{  
+		"weather_plate",  
+		k_weather_plate_bytecode,  
+		k_weather_plate_bytecode_size  
+	}, 
+}; 
