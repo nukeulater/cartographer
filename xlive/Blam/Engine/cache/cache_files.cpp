@@ -393,6 +393,12 @@ const char* tag_get_name(datum tag_index)
 	return &g_cache_file_debug_globals.debug_tag_name_buffer[tag_name_offset];
 }
 
+cache_file_tag_instance* tag_instance_get(datum tag_index)
+{
+	cache_file_tag_instance* global_tag_instances = global_tag_instances_get();
+	return &global_tag_instances[DATUM_INDEX_TO_ABSOLUTE_INDEX(tag_index)];
+}
+
 /* private code */
 
 bool __cdecl read_shared_resource_database(e_shared_resource_database_type database_type, int32 unused_flags, uint32 offset, uint32 size, void* out_buffer, bool async)
