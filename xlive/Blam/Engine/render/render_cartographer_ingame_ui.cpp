@@ -147,8 +147,8 @@ void render_cartographer_git_build_info(void)
 
 	rectangle2d bounds;
 	rasterizer_get_frame_bounds(&bounds);
-	bounds.top += (1050 * rasterizer_globals->ui_scale);
-	bounds.left = bounds.right - (765 * rasterizer_globals->ui_scale);
+	bounds.top += (int16)(1050 * rasterizer_globals->ui_scale);
+	bounds.left = bounds.right - (int16)(765 * rasterizer_globals->ui_scale);
 	bounds.bottom = bounds.top + line_height;
 
 	draw_string_reset();
@@ -217,7 +217,7 @@ void render_cartographer_update_message(const char* update_text, int64 update_si
 {
 	rectangle2d bounds;
 	rasterizer_get_frame_bounds(&bounds);
-	bounds.top += rectangle2d_height(&bounds) * .1f;
+	bounds.top += (int16)(rectangle2d_height(&bounds) * .1f);
 
 	if (update_text != nullptr)
 	{

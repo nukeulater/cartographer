@@ -117,7 +117,7 @@ enum e_advanced_string
 
 /* constants */
 
-const char* g_advanced_settings_string_table_english[k_advanced_string_count]
+const char *const k_advanced_settings_string_table_english[k_advanced_string_count]
 {
 	"        Advanced Settings",
 	"HUD Settings",
@@ -230,7 +230,7 @@ const char* g_advanced_settings_string_table_english[k_advanced_string_count]
 
 // Make sure that the spanish strings include u8 at the front of them or else they wont display properly
 
-const char* g_advanced_settings_string_table_spanish[k_advanced_string_count]
+const char *const k_advanced_settings_string_table_spanish[k_advanced_string_count]
 {
 	u8"      Ajustes avanzados",
 	u8"Ajustes de Interfaz",
@@ -342,15 +342,15 @@ const char* g_advanced_settings_string_table_spanish[k_advanced_string_count]
 };
 
 // TODO: finish localization
-const char** g_advanced_settings_string_table[k_language_count] =
+const char *const *const k_advanced_settings_string_table[k_language_count] =
 {
-	g_advanced_settings_string_table_english,
-	g_advanced_settings_string_table_english,
-	g_advanced_settings_string_table_english,
-	g_advanced_settings_string_table_english,
-	g_advanced_settings_string_table_spanish,
-	g_advanced_settings_string_table_english,
-	g_advanced_settings_string_table_english,
-	g_advanced_settings_string_table_english,
-	g_advanced_settings_string_table_english
+	k_advanced_settings_string_table_english,
+	k_advanced_settings_string_table_english,
+	k_advanced_settings_string_table_english,
+	k_advanced_settings_string_table_english,
+	k_advanced_settings_string_table_spanish,
+	k_advanced_settings_string_table_english,
+	k_advanced_settings_string_table_english,
+	k_advanced_settings_string_table_english,
+	k_advanced_settings_string_table_english
 };

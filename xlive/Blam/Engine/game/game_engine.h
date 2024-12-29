@@ -1,5 +1,4 @@
 #pragma once
-
 #include "game/game_allegiance.h"
 #include "game_statborg.h"
 #include "math/color_math.h"
@@ -257,11 +256,15 @@ ASSERT_STRUCT_SIZE(s_multiplayer_event_response_definition, 0xA8);
 
 /* prototypes */
 
-c_game_engine* current_game_engine();
+c_game_engine* current_game_engine(void);
 
 s_game_engine_globals* game_engine_globals_get(void);
 
+c_game_engine** get_game_mode_engines(void);
+
 s_simulation_player_netdebug_data* game_engine_get_netdebug_data(datum player_index);
+
+void __cdecl game_engine_apply_map_patches(void);
 
 bool __cdecl game_engine_get_change_colors(s_player_profile* player_profile, e_game_team team_index, real_rgb_color* change_colors);
 
@@ -272,7 +275,3 @@ void __cdecl game_engine_player_activated(datum player_index);
 bool __cdecl game_engine_team_is_enemy(e_game_team a, e_game_team b);
 
 void __cdecl game_engine_render(void);
-
-bool game_engine_in_round();
-
-c_game_engine** get_game_mode_engines();

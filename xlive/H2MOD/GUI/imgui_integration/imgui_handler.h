@@ -37,26 +37,6 @@ namespace ImGuiHandler
 		patch_notes
 	};
 
-	typedef int ImWWindowHandlerFlags;
-	enum ImWWindowHandlerFlags_
-	{
-		_ImWindow_no_input = 1 << 0,
-	};
-
-	struct s_imgui_window
-	{
-		const char* name;
-		void(__cdecl* renderFunc)(bool*);
-		void(__cdecl* openFunc)();
-		void(__cdecl* closeFunc)();
-		ImWWindowHandlerFlags flags;
-
-		bool NoImInput() const
-		{
-			return (flags & _ImWindow_no_input) != 0;
-		}
-	};
-
 	enum e_imgui_aspect_ratio : byte
 	{
 		four_three,
@@ -94,7 +74,7 @@ namespace ImGuiHandler
 	namespace ImMessageBox
 	{
 		void Render(bool* p_open);
-		void SetMessage(std::string message);
+		void SetMessage(const char* message);
 		void Open();
 		void Close();
 	}

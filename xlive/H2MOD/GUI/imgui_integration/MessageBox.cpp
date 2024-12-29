@@ -10,10 +10,7 @@ namespace ImGuiHandler
 {
 	namespace ImMessageBox
 	{
-		namespace
-		{
-			std::string message;
-		}
+		const char *message = NULL;
 		void Render(bool* p_open)
 		{
 			bool open = *p_open;
@@ -30,9 +27,9 @@ namespace ImGuiHandler
 			ImGui::SetNextWindowSizeConstraints(ImVec2(610, 250), ImVec2(1920, 1080));
 			if (game_is_ui_shell())
 				ImGui::SetNextWindowBgAlpha(1);
-			if (ImGui::Begin("Message", NULL, window_flags))
+			if (ImGui::Begin("msg", NULL, window_flags))
 			{
-				ImGui::TextWrapped(message.c_str());
+				ImGui::TextWrapped(message);
 				ImGui::SetCursorPosY(190);
 				if (ImGui::Button("Ok", ImVec2(610, 50)))
 				{
@@ -44,9 +41,9 @@ namespace ImGuiHandler
 			ImGui::End();
 			
 		}
-		void SetMessage(std::string Message)
+		void SetMessage(const char* msg)
 		{
-			message = Message;
+			message = msg;
 		}
 
 		void Open()

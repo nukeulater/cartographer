@@ -1,12 +1,9 @@
 #include "stdafx.h"
 #include "game_engine.h"
 
-#include "game.h"
-#include "game_engine_util.h"
-
 /* public code */
 
-c_game_engine* current_game_engine()
+c_game_engine* current_game_engine(void)
 {
 	return get_game_mode_engines()[game_engine_globals_get()->game_engine_index];
 }
@@ -29,6 +26,13 @@ c_game_engine** get_game_mode_engines()
 c_game_engine* get_slayer_engine()
 {
 	return get_game_mode_engines()[_game_engine_type_slayer];
+}
+
+
+void __cdecl game_engine_apply_map_patches(void)
+{
+	INVOKE(0x6EFDB, 0x0, game_engine_apply_map_patches);
+	return;
 }
 
 bool __cdecl game_engine_get_change_colors(s_player_profile* player_profile, e_game_team team_index, real_rgb_color* change_colors)

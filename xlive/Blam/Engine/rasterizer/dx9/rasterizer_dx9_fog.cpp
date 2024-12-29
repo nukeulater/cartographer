@@ -14,7 +14,7 @@
 
 /* constants */
 
-static real32 fog_wind_x_axis_velocity_factor1 = 30.0f;
+static const real32 fog_wind_x_axis_velocity_factor1 = 30.0f;
 
 /* typedefs */
 

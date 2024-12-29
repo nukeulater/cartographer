@@ -3,39 +3,39 @@
 
 /* globals */
 
-const int16 g_bits_per_pixel[k_bitmap_format_count] =
+const int16 k_bits_per_pixel[k_bitmap_format_count] =
 {
-  8,
-  8,
-  8,
-  16,
-  4,
-  4,
-  16,
-  0,
-  16,
-  16,
-  32,
-  32,
-  1,
-  0,
-  4,
-  8,
-  8,
-  8,
-  8,
-  128,
-  96,
-  48,
-  16,
-  16,
+	8,
+	8,
+	8,
+	16,
+	4,
+	4,
+	16,
+	0,
+	16,
+	16,
+	32,
+	32,
+	1,
+	0,
+	4,
+	8,
+	8,
+	8,
+	8,
+	128,
+	96,
+	48,
+	16,
+	16,
 };
 
 /* public code */
 
 int16 bitmap_format_get_bits_per_pixel(e_bitmap_data_format format)
 {
-	return (format != NONE ? g_bits_per_pixel[format] : 0);
+	return (format != NONE ? k_bits_per_pixel[format] : 0);
 }
 
 uint32* __cdecl bitmap_2d_address(const bitmap_data* bitmap, int16 x, int16 y, uint16 mipmap_index)

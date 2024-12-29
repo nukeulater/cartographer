@@ -115,9 +115,9 @@ extern void* ui_load_cartographer_update_notice_menu();
 
 /* constants */
 
-const char* k_cartographer_account_manager_list_name = "cartographer account manager list";
+const char *const k_cartographer_account_manager_list_name = "cartographer account manager list";
 
-const wchar_t** k_screen_label_table_eng[k_cartographer_account_manager_screen_type_count] =
+const wchar_t *const *const k_screen_label_table_eng[k_cartographer_account_manager_screen_type_count] =
 {
 	k_screen_type_list_table_eng,
 	NULL,
@@ -125,7 +125,7 @@ const wchar_t** k_screen_label_table_eng[k_cartographer_account_manager_screen_t
 	k_screen_type_list_add_account_eng
 };
 
-const wchar_t*** k_screen_label_table[k_language_count] =
+const wchar_t const* const* const* k_screen_label_table[k_language_count] =
 {
 	k_screen_label_table_eng,
 	k_screen_label_table_eng,

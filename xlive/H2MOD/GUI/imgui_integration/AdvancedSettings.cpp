@@ -27,8 +27,8 @@
 
 /* constants */
 
-const char* k_button_items[] = { "Dpad Up","Dpad Down","Dpad Left","Dpad Right","Start","Back","Left Thumb","Right Thumb","Left Bumper","Right Bumper","A","B","X","Y" };
-const char* k_action_items[] = { "Dpad Up","Dpad Down","Dpad Left","Dpad Right","Start","Back","Crouch","Zoom","Flashlight","Switch Grenades","Jump","Melee","Reload","Switch Weapons" };
+const char* const k_button_items[] = { "Dpad Up","Dpad Down","Dpad Left","Dpad Right","Start","Back","Left Thumb","Right Thumb","Left Bumper","Right Bumper","A","B","X","Y" };
+const char* const k_action_items[] = { "Dpad Up","Dpad Down","Dpad Left","Dpad Right","Start","Back","Crouch","Zoom","Flashlight","Switch Grenades","Jump","Melee","Reload","Switch Weapons" };
 const uint16 k_button_values[k_number_of_xinput_buttons] =
 { 
 	XINPUT_GAMEPAD_DPAD_UP, 
@@ -1089,7 +1089,7 @@ namespace ImGuiHandler {
 const char* advanced_settings_get_string(e_advanced_string string, const char* id)
 {
 	const e_language language = get_current_language();
-	const char* result = g_advanced_settings_string_table[language][string];
+	const char* result = k_advanced_settings_string_table[language][string];
 
 	if (id != NULL)
 	{
