@@ -750,3 +750,14 @@ void* c_tag_injecting_manager::extend_tag_block(void* block, uint32 entry_size, 
 	// return the location in memory where the first newly added block exists
 	return (void*)(cache_get_tag_data() + injection_offset + base_block_total_size);
 }
+
+void* c_tag_injecting_manager::reserve_space_in_cache_memory(uint32 size, uint32* out_data_offset)
+{
+	const uint32 reserved_offset = this->m_base_tag_data_size + this->m_injectable_used_size;
+
+	this->m_injectable_used_size += size;
+
+	*out_data_offset = reserved_offset;
+
+	return (void*)(cache_get_tag_data() + reserved_offset);
+}

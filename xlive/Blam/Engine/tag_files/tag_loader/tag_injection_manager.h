@@ -43,6 +43,7 @@ public:
 
 	void inject_tags();
 	void* extend_tag_block(void* block, uint32 entry_size, uint32 count);
+	void* reserve_space_in_cache_memory(uint32 size, uint32* out_data_offset);
 private:
 	c_tag_injection_table m_table;
 	c_static_flags<k_tag_group_count> m_agents_initialized;

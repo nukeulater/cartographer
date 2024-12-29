@@ -117,6 +117,11 @@ void* tag_injection_extend_block(void* block, uint32 entry_size, uint32 count)
 	return g_manager.extend_tag_block(block, entry_size, count);
 }
 
+void* tag_injection_reserve_cache_memory(uint32 size, uint32* out_data_offset)
+{
+	return g_manager.reserve_space_in_cache_memory(size, out_data_offset);
+}
+
 void tag_injection_apply_hooks()
 {
 }

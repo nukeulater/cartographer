@@ -30,5 +30,7 @@ void tag_injection_scenario_load_setup(uint32 allocation_size);
 
 void* tag_injection_extend_block(void* block, uint32 entry_size, uint32 count);
 
+void* tag_injection_reserve_cache_memory(uint32 size, uint32* out_data_offset);
+
 void tag_injection_apply_hooks();
 void tag_injection_initialize();
