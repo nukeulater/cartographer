@@ -418,8 +418,7 @@ bool __cdecl OnMapLoad(s_game_options* options)
 	}
 	else
 	{
-		wchar_t* variant_name = NetworkSession::GetGameVariantName();
-		LOG_INFO_GAME(L"[h2mod] engine type: {}, game variant name: {}", (int)options->game_mode, variant_name);
+		LOG_INFO_GAME(L"[h2mod] engine type: {}", (int)options->game_mode);
 
 		if (!Memory::IsDedicatedServer())
 		{
@@ -430,6 +429,9 @@ bool __cdecl OnMapLoad(s_game_options* options)
 
 		if (options->game_mode == _game_mode_multiplayer)
 		{
+			const wchar_t* variant_name = NetworkSession::GetGameVariantName();
+			LOG_INFO_GAME(L"game variant name: {}", variant_name);
+
 			addDebugText("Engine type: Multiplayer");
 			load_special_event();
 
