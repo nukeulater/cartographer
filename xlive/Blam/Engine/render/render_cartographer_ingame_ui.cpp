@@ -271,17 +271,19 @@ void render_netdebug_text(void)
 		{
 			s_simulation_player_netdebug_data netdebug_data_default{};
 			s_simulation_player_netdebug_data* netdebug_data = &netdebug_data_default;
+			s_observer_channel* observer_channel = NULL;
+			int32 observer_channel_index;
 			if (!session->is_host())
 			{
 				s_membership_peer* membership_peer = session->get_peer_membership(session->get_local_peer_index());
 
-				int32 observer_channel_index = session->m_session_peers[session->get_session_host_peer_index()].observer_channel_index;
+				observer_channel_index = session->m_session_peers[session->get_session_host_peer_index()].observer_channel_index;
 				if (observer_channel_index != NONE)
 				{
-					s_observer_channel* observer_channel = &session->m_network_observer->m_observer_channels[observer_channel_index];
+					observer_channel = &session->m_network_observer->m_observer_channels[observer_channel_index];
 
 					netdebug_data->client_rtt_msec = observer_channel->net_rtt;
-					netdebug_data->client_packet_rate = observer_channel->net_rate_managed_stream * 10.f;
+					netdebug_data->client_packet_rate = observer_channel->stream_packet_rate * 10.f;
 					netdebug_data->client_throughput = (observer_channel->throughput_bps * 10.f) / 1024.f;
 					netdebug_data->client_packet_loss_percentage = observer_channel->field_440.average_values_in_window() * 100.f;
 
@@ -312,7 +314,7 @@ void render_netdebug_text(void)
 			text_color_console.alpha *= (65.f / 100.f);
 
 			swprintf_s(netdebug_text, ARRAYSIZE(netdebug_text),
-				L"[up^ rtt: %d msec, pck rate: %.3f, throughput: %.3f bps, loss: %d %%]",
+				L"[up^ rtt: %3d msec, pck rate: %.1f, throughput: %.3f bps, loss: %3d %%]",
 				netdebug_data->client_rtt_msec,
 				(real32)netdebug_data->client_packet_rate / 10.f,
 				((real32)netdebug_data->client_throughput / 10.f) * 1024.f,

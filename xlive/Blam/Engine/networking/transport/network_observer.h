@@ -18,7 +18,7 @@
 #if defined(USE_LIVE_NETWORK_PROTOCOL)
 #	if USE_LIVE_NETWORK_PROTOCOL == true
 #		define INCREASE_NETWORK_TICKRATE_OBSOLETE 0 // old method of incresing the packet rate, now OBSOLETE
-#		define LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS 1
+#		define LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS true
 #	endif
 #endif
 #endif
@@ -34,6 +34,8 @@
 // defaults
 #define k_online_netcode_client_rate_real 60.0f
 #define k_online_netcode_server_rate_real 60.0f
+
+#define k_online_netcode_rate_real 60.0f
 
 #define k_online_netcode_client_max_packet_size_bytes 1264
 #define k_online_netcode_server_max_packet_size_bytes 1264
@@ -109,9 +111,9 @@ struct alignas(8) s_observer_channel
 	bool simulation_authority;
 	bool simulation_not_authority;
 	uint8 gap_6A9[3];
-	int32 net_managed_stream_bandwidth;
-	int32 net_managed_stream_window_size;
-	real32 net_rate_managed_stream;
+	int32 stream_bps;
+	int32 stream_window_size;
+	real32 stream_packet_rate;
 	bool field_6B8;
 	int8 field_6B9;
 	int8 field_6BA;
@@ -160,7 +162,7 @@ public:
 	void* m_network_link;
 	void* m_network_message_gateway;
 	void* m_message_types;
-	s_network_observer_configuration* configuration;
+	s_network_observer_configuration* m_configuration;
 	int32 *field_14;
 	uint8 gap_18[8];
 	XNKID session_id;
@@ -218,7 +220,7 @@ public:
 		bool a5,
 		int32 a6,
 		int32* out_send_sequenced_packet,
-		int32* out_force_fill_packet,
+		bool* out_force_fill_packet,
 		int32* out_packet_size,
 		int32* out_voice_size,
 		int32 out_voice_chat_data_buffer_size,
@@ -233,22 +235,22 @@ private:
 };
 ASSERT_STRUCT_SIZE(c_network_observer, 0x75C8);
 
-struct s_network_observer_configuration
+struct __declspec(align(4)) s_network_observer_configuration
 {
 	int32 field_0;
 	int32 field_4;
-	uint8 gap_8[28];
+	int8 gap_8[28];
 	int32 field_24;
 	int32 field_28;
 	int32 field_2C;
 	int32 field_30;
-	uint8 gap_34[20];
+	int8 gap_34[20];
 	int32 field_48;
 	int32 field_4C;
 	int32 field_50;
 	int32 field_54;
 	int32 field_58;
-	uint8 gap_5C[16];
+	int8 gap_5C[16];
 	int32 field_6C;
 	int32 field_70;
 	int32 field_74;
@@ -261,10 +263,9 @@ struct s_network_observer_configuration
 	real32 field_90;
 	real32 field_94;
 	real32 field_98;
-	int32 unk_total_flt_array_elements;
-	real32 unk_floats_A0[7];
-	uint8 gap_BC[36];
-	int32 field_E0;
+	int32 stream_packet_rate_throttle_scale_stage_count;
+	real32 stream_packet_rate_throttle_scale_stages[16];
+	int32 stream_minimum_window_size_bytes;
 	real32 field_E4;
 	real32 field_E8;
 	real32 field_EC;
@@ -274,10 +275,10 @@ struct s_network_observer_configuration
 	int32 field_FC;
 	int32 field_100;
 	real32 field_104;
-	int32 field_108;
-	int32 field_10C;
-	real32 field_110;
-	int32 field_114;
+	int32 avg_payload_size_outside_simulation;
+	int32 avg_payload_size_in_simulation;
+	real32 minimum_packet_rate_scale;
+	int32 minimum_estimated_upstream_bandwidth_bps;
 	int32 field_118;
 	real32 field_11C;
 	int32 field_120;
@@ -289,30 +290,30 @@ struct s_network_observer_configuration
 	int32 field_138;
 	int32 field_13C;
 	int32 field_140;
-	uint8 field_144;
+	int32 field_144;
 	int32 field_148;
-	int32 field_14C;
-	int32 field_150;
+	int32 stream_minimum_bps;
+	int32 stream_maximum_bps;
 	int32 field_154;
-	int32 max_bits_per_second_single_player;
-	int32 max_bits_per_second_full_lobby;
-	int32 max_bits_per_second_splitscreen_players;
-	int32 field_164;
+	int32 stream_desired_bps;
+	int32 upstream_bandwidth0;
+	int32 upstream_bandwidth1;
+	int32 stream_default_bps;
 	int32 field_168;
 	int32 field_16C;
 	int32 field_170;
 	int32 field_174;
 	real32 field_178;
 	int32 field_17C;
-	real32 field_180;
+	real32 stream_packet_rate_scale_during_packet_loss;
 	int32 field_184;
 	int32 field_188;
-	int32 field_18C;
+	int32 stream_maximum_bps_regrowth_per_cycle;
 	real32 field_190;
-	int32 field_194;
+	int32 stream_maximum_bps_throttle_per_cycle;
 	real32 field_198;
 	int32 field_19C;
-	int32 field_1A0;
+	int32 stream_minimum_period_before_adjust_attempt_msec;
 	int32 field_1A4;
 	int32 field_1A8;
 	real32 field_1AC;
