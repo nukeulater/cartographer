@@ -3,6 +3,9 @@
 
 #include "camera/camera.h"
 #include "camera/dead_camera.h"
+#include "camera/editor_camera.h"
+#include "camera/first_person_camera.h"
+#include "camera/following_camera.h"
 #include "camera/observer.h"
 #include "cartographer/discord/discord_interface.h"
 #include "cartographer/tag_fixes/tag_fixes.h"
@@ -27,8 +30,10 @@
 #include "interface/motion_sensor.h"
 #include "interface/first_person_weapons.h"
 #include "interface/new_hud.h"
-#include "interface/user_interface_text.h"
+#include "interface/new_hud_draw.h"
 #include "interface/user_interface_controller.h"
+#include "interface/user_interface_text.h"
+#include "interface/user_interface_utilities.h"
 #include "interface/screens/screens_patches.h"
 #include "items/weapon_definitions.h"
 #include "main/levels.h"
@@ -58,7 +63,9 @@
 #include "render/render_submit.h"
 #include "render/render_lod_new.h"
 #include "render/render_weather.h"
+#include "saved_games/cartographer_player_profile.h"
 #include "saved_games/game_state_procs.h"
+#include "scenario/scenario.h"
 #include "shell/shell_windows.h"
 #include "simulation/simulation.h"
 #include "simulation/simulation_players.h"
@@ -86,9 +93,6 @@
 #include "H2MOD/Modules/MainMenu/Ranks.h"
 #include "H2MOD/Modules/MapManager/MapManager.h"
 #include "H2MOD/Modules/MainLoopPatches/RunLoop/RunLoop.h"
-#include "camera/editor_camera.h"
-#include "camera/first_person_camera.h"
-#include "camera/following_camera.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Modules/PlaylistLoader/PlaylistLoader.h"
 #include "H2MOD/Modules/RenderHooks/RenderHooks.h"
@@ -97,9 +101,6 @@
 #include "H2MOD/Modules/TagFixes/TagFixes.h"
 #include "H2MOD/Variants/VariantSystem.h"
 #include "H2MOD/Variants/H2X/H2X.h"
-#include "interface/new_hud_draw.h"
-#include "interface/user_interface_utilities.h"
-#include "saved_games/cartographer_player_profile.h"
 
 bool H2XFirerateEnabled = false;
 bool g_xbox_tickrate_enabled = false;
@@ -417,8 +418,7 @@ bool __cdecl OnMapLoad(s_game_options* options)
 	}
 	else
 	{
-		wchar_t* variant_name = NetworkSession::GetGameVariantName();
-		LOG_INFO_GAME(L"[h2mod] engine type: {}, game variant name: {}", (int)options->game_mode, variant_name);
+		LOG_INFO_GAME(L"[h2mod] engine type: {}", (int)options->game_mode);
 
 		if (!Memory::IsDedicatedServer())
 		{
@@ -429,6 +429,9 @@ bool __cdecl OnMapLoad(s_game_options* options)
 
 		if (options->game_mode == _game_mode_multiplayer)
 		{
+			const wchar_t* variant_name = NetworkSession::GetGameVariantName();
+			LOG_INFO_GAME(L"game variant name: {}", variant_name);
+
 			addDebugText("Engine type: Multiplayer");
 			load_special_event();
 
@@ -1122,6 +1125,7 @@ void H2MOD::ApplyHooks() {
 		apply_interface_hooks();
 		new_hud_draw_apply_patches();
 		user_interface_utilities_apply_patches();
+		scenario_apply_patches();
 	}
 	else {
 		LOG_INFO_GAME("{} - applying dedicated server hooks", __FUNCTION__);

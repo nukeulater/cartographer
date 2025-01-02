@@ -687,7 +687,7 @@ namespace ImGuiHandler {
 			}
 			void HostSettings()
 			{
-				if (NetworkSession::LocalPeerIsSessionHost() || game_is_campaign()) {
+				if (game_is_campaign() || (network_life_cycle_in_squad_session(NULL) && NetworkSession::LocalPeerIsSessionHost())) {
 					if (ImGui::CollapsingHeader(advanced_settings_get_string(_advanced_string_host_campagin_settings)))
 					{
 						ImGui::Columns(2, NULL, false);

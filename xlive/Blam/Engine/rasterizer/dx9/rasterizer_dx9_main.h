@@ -129,6 +129,8 @@ void __cdecl rasterizer_dx9_initialize_camera_projection(
 
 bool __cdecl rasterizer_dx9_initialize(void);
 
+bool __cdecl rasterizer_dx9_vertex_shaders_initialize(void);
+
 bool __cdecl rasterizer_dx9_render_scene_start(const s_render_scene_parameters* parameters);
 
 bool __cdecl rasterizer_dx9_render_scene_end(void);

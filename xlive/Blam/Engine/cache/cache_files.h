@@ -179,3 +179,5 @@ bool __cdecl scenario_tags_load_internal(const char* scenario_path);
 datum tag_loaded(uint32 group_tag, const char* name);
 
 const char* tag_get_name(datum tag_name_index);
+
+cache_file_tag_instance* tag_instance_get(datum tag_index);
