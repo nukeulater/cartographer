@@ -64,7 +64,18 @@ static_assert(sizeof(datum) == 4);
 // ADDR_SERVER: file offset in h2server.exe
 // TYPE: function
 // __VA_ARGS__: arguments for the function we want to invoke
-#define INVOKE_BY_TYPE(_addr_client, _addr_server, _type, ...) Memory::GetAddress<_type>(_addr_client, _addr_server)(__VA_ARGS__)
+// NOTE:
+// if _addr_server is equal to 0 then we pass the client address as the server address (ONLY ON RELEASE BUILDS)
+// REASON:
+// optimizes out a cmov or related instruction when building release whenever we call a function that doesn't have a dedi address specified
+#ifdef NDEBUG
+#define INVOKE_BY_TYPE(_addr_client, _addr_server, _type, ...) \
+Memory::GetAddress<_type>(_addr_client, _addr_server != 0 ? _addr_server : _addr_client)(__VA_ARGS__)
+#else
+#define INVOKE_BY_TYPE(_addr_client, _addr_server, _type, ...) \
+Memory::GetAddress<_type>(_addr_client, _addr_server)(__VA_ARGS__)
+#endif
+
 #define INVOKE(_addr_client, _addr_server, _fn_decl, ...) INVOKE_BY_TYPE(_addr_client, _addr_server, decltype(_fn_decl)*, __VA_ARGS__)
 // ### TODO find better name
 #define INVOKE_TYPE(_addr_client, _addr_server, _type, ...) INVOKE_BY_TYPE(_addr_client, _addr_server, _type, __VA_ARGS__)
