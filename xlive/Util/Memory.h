@@ -28,15 +28,27 @@ public:
 		return GetBaseAddress();
 	}
 
-	static DWORD GetAddress(DWORD client, DWORD server = 0)
+	static DWORD GetAddress(DWORD client)
+	{
+		ASSERT(client != 0);
+		return GetBaseAddress() + client;
+	}
+
+	static DWORD GetAddress(DWORD client, DWORD server)
 	{
 		ASSERT( Memory::IsDedicatedServer() || client != 0);
 		ASSERT(!Memory::IsDedicatedServer() || server != 0);
 		return GetBaseAddress() + (IsDedicatedServer() ? server : client);
 	}
+	
+	template <typename T = void*>
+	static T GetAddress(DWORD client)
+	{
+		return reinterpret_cast<T>((DWORD)GetAddress(client));
+	}
 
 	template <typename T = void*>
-	static T GetAddress(DWORD client, DWORD server = 0)
+	static T GetAddress(DWORD client, DWORD server)
 	{
 		return reinterpret_cast<T>((DWORD)GetAddress(client, server));
 	}
