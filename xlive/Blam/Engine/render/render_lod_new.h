@@ -1,4 +1,5 @@
 #pragma once
+#include "render/render_lights.h"
 
 enum e_render_lod : int8
 {
@@ -18,7 +19,7 @@ struct s_render_cache_storage
 	uint32 rasterizer_cpu_render_cache_offset;
 	// kinda sucks this gets reset each frame
 	uint32 render_frame_allocated;
-	uint8 field_A[84];
+    render_lighting lighting;
 };
 ASSERT_STRUCT_SIZE(s_render_cache_storage, 100);
 
