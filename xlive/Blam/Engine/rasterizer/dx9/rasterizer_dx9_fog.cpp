@@ -256,7 +256,7 @@ bool __cdecl rasterizer_dx9_atmospheric_fog_build_vertex_buffer(
 		global_window_parameters = global_window_parameters_get();
 		atmospheric_distance = global_window_parameters->fog_result.atmospheric_max_distance - global_window_parameters->fog_result.atmospheric_min_distance;
 
-		val = atmospheric_distance >= k_real_math_epsilon ? atmospheric_distance : k_real_math_epsilon;
+		val = atmospheric_distance >= k_real_epsilon ? atmospheric_distance : k_real_epsilon;
 		val = (1.f / val);
 		((real_vector4d*)output)->i = global_window_parameters->camera.z_far * val;
 		((real_vector4d*)output)->j = 0.f;
@@ -267,7 +267,7 @@ bool __cdecl rasterizer_dx9_atmospheric_fog_build_vertex_buffer(
 		global_window_parameters = global_window_parameters_get();
 		atmospheric_distance = global_window_parameters->fog_result.secondary_max_distance - global_window_parameters->fog_result.secondary_min_distance;
 
-		val = atmospheric_distance >= k_real_math_epsilon ? atmospheric_distance : k_real_math_epsilon;
+		val = atmospheric_distance >= k_real_epsilon ? atmospheric_distance : k_real_epsilon;
 		val = (1.f / val);
 		((real_vector4d*)output)->i = global_window_parameters->camera.z_far * val;
 		((real_vector4d*)output)->j = 0.f;
@@ -313,7 +313,7 @@ bool __cdecl rasterizer_dx9_patchy_fog_apply_build_vertex_buffer(
 		global_window_parameters = global_window_parameters_get();
 		patchy_distance = global_window_parameters->fog_result.patchy_max_distance - global_window_parameters->fog_result.patchy_min_distance;
 
-		val = patchy_distance >= k_real_math_epsilon ? patchy_distance : k_real_math_epsilon;
+		val = patchy_distance >= k_real_epsilon ? patchy_distance : k_real_epsilon;
 		val = (1.f / val);
 		((real_vector4d*)output)->i = global_window_parameters->camera.z_far * val;
 		((real_vector4d*)output)->j = 0.f;

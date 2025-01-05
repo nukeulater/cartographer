@@ -195,6 +195,7 @@ void hud_widget_effect_evaluate(uint32 local_render_user_index, s_new_hud_tempor
 void hud_widget_anchor_calculate_point(e_hud_anchor anchor, real_point2d* out_point)
 {
 	INVOKE(0x223969, 0, hud_widget_anchor_calculate_point, anchor, out_point);
+	return;
 }
 
 bool draw_hud_bitmap_is_crosshair(datum bitmap_datum)

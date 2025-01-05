@@ -1,6 +1,7 @@
 #pragma once
 
-#define k_real_math_epsilon 0.0001f
+#define k_real_epsilon 0.0001f
+#define _pi M_PI
 
 #define DEGREES_TO_RADIANS(angle) ((real32)((angle) * M_PI / 180.0))
 #define RADIANS_TO_DEGREES(angle) ((real32)((angle) * 180.0 / M_PI))
@@ -312,7 +313,7 @@ static BLAM_MATH_INL real_point3d* point_from_line3d(const real_point3d* p, cons
 static BLAM_MATH_INL real32 normalize3d(real_vector3d* v1)
 {
 	real32 length = magnitude3d(v1);
-	if (abs(length) >= k_real_math_epsilon)
+	if (abs(length) >= k_real_epsilon)
 	{
 		scale_vector3d(v1, 1.0f / length, v1);
 	}
@@ -356,7 +357,7 @@ static BLAM_MATH_INL real32 tangent(real32 x)
 
 static BLAM_MATH_INL real32 arccosine(real32 x)
 {
-	ASSERT(x >= -1.f - k_real_math_epsilon && x <= +1.f + k_real_math_epsilon);
+	ASSERT(x >= -1.f - k_real_epsilon && x <= +1.f + k_real_epsilon);
 
 	// Pin parameter between -1 and 1
 	return acos(PIN(x, -1.f, 1.f));
@@ -364,7 +365,7 @@ static BLAM_MATH_INL real32 arccosine(real32 x)
 
 static BLAM_MATH_INL real32 arcsine(real32 x)
 {
-	ASSERT(x >= -1.f - k_real_math_epsilon && x <= +1.f + k_real_math_epsilon);
+	ASSERT(x >= -1.f - k_real_epsilon && x <= +1.f + k_real_epsilon);
 
 	// Pin parameter between -1 and 1
 	return asin(PIN(x, -1.f, 1.0f));

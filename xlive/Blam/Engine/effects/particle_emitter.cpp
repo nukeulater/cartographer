@@ -80,7 +80,7 @@ void c_particle_emitter::pulse(
 	{
 		_this->particles_to_emit = emitter_definition->get_particle_emissions_per_tick(particle_state) * delta + _this->particles_to_emit;
 	}
-	if (_this->particles_to_emit + k_real_math_epsilon >= 1.0f)
+	if (_this->particles_to_emit + k_real_epsilon >= 1.0f)
 	{
 		real32 spread = 0.f;
 		real32 accumulator = 0.f;
@@ -96,7 +96,7 @@ void c_particle_emitter::pulse(
 		}
 
 		// while there are multiple particles to emit, spawn them
-		while (_this->particles_to_emit + k_real_math_epsilon >= 1.0f)
+		while (_this->particles_to_emit + k_real_epsilon >= 1.0f)
 		{
 			// subtract 1 particle
 			_this->particles_to_emit -= 1.0f;
@@ -120,8 +120,8 @@ void c_particle_emitter::calc_matrix(
 	real_vector3d translated_vector;
 	matrix3x3_transform_vector(&this->m_matrix, &definition->translational_offset, &translated_vector);
 
-	if (abs(definition->relative_direction.yaw) >= k_real_math_epsilon ||
-		abs(definition->relative_direction.pitch) >= k_real_math_epsilon)
+	if (abs(definition->relative_direction.yaw) >= k_real_epsilon ||
+		abs(definition->relative_direction.pitch) >= k_real_epsilon)
 	{
 		real_matrix3x3 rotations_matrix;
 		matrix3x3_from_angles(&rotations_matrix, definition->relative_direction.yaw, definition->relative_direction.pitch, 0.0f);
@@ -183,7 +183,7 @@ void c_particle_emitter::adjust_initial_particle_position(
 			particle_count_to_emit = emitter_definition->get_particle_emissions_per_tick(particle_state) * dt + particle_count_to_emit;
 		}
 
-		if (particle_count_to_emit + k_real_math_epsilon >= 1.0f)
+		if (particle_count_to_emit + k_real_epsilon >= 1.0f)
 		{
 			real32 spread = 0.f;
 			real32 accumulator = 0.f;
@@ -199,13 +199,13 @@ void c_particle_emitter::adjust_initial_particle_position(
 				dt = 0.f;
 			}
 
-			while (particle_count_to_emit + k_real_math_epsilon >= 1.0f)
+			while (particle_count_to_emit + k_real_epsilon >= 1.0f)
 			{
 				particle_count_to_emit -= 1.0f;
 				particle->adjust_initial_position(emitter_definition, this, particle_state, particle_system, accumulator, dt, scale);
 				accumulator += spread;
 				
-				if (particle_count_to_emit + k_real_math_epsilon >= 1.0f && particle->next_particle != NONE)
+				if (particle_count_to_emit + k_real_epsilon >= 1.0f && particle->next_particle != NONE)
 				{
 					particle = (c_particle*)datum_get(get_particle_table(), particle->next_particle);
 				}

@@ -13,7 +13,7 @@ real_matrix3x3* matrix3x3_rotation_from_quaternion(real_matrix3x3* matrix, const
 {
 	const real32 dot_product = dot_product4d_quaternion(quaternion, quaternion);
 
-	const real32 scalar = (dot_product > k_real_math_epsilon ? 2.0f / dot_product : 0.0f);
+	const real32 scalar = (dot_product > k_real_epsilon ? 2.0f / dot_product : 0.0f);
 
 	real_vector3d scaled_vector;
 	scale_vector3d(&quaternion->v, scalar, &scaled_vector);
@@ -59,7 +59,7 @@ real_quaternion* matrix3x3_rotation_to_quaternion(const real_matrix3x3* matrix, 
 		quaternion->v.n[i] = forward_result_sqroot * 0.5f;
 
 		// Make sure value set is greater than epsilon
-		ASSERT(quaternion->v.n[i] > k_real_math_epsilon);
+		ASSERT(quaternion->v.n[i] > k_real_epsilon);
 
 		real32 scalar = 0.25f / quaternion->v.n[i];
 
@@ -73,7 +73,7 @@ real_quaternion* matrix3x3_rotation_to_quaternion(const real_matrix3x3* matrix, 
 		quaternion->w = v1_root * 0.5f;
 		
 		// Make sure w is greater than epsilon
-		ASSERT(quaternion->w > k_real_math_epsilon);
+		ASSERT(quaternion->w > k_real_epsilon);
 
 		real32 scalar = 0.25f / quaternion->w;
 		quaternion->v.i = (matrix->left.k - matrix->up.j) * scalar;

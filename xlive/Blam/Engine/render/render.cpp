@@ -329,7 +329,7 @@ void __cdecl render_window(window_bound* window, bool is_texture_camera)
     ASSERT(!memcmp(&window->render_camera.window_bounds, &window->rasterizer_camera.window_bounds, sizeof(rectangle2d)));
 
     rasterizer_globals_get()->rasterizer_draw_on_main_back_buffer = false;
-    if (window->render_camera.vertical_field_of_view > k_real_math_epsilon)
+    if (window->render_camera.vertical_field_of_view > k_real_epsilon)
     {
         g_render_current_controller_index = controller_index;
         g_render_current_user_index = window->user_index;
