@@ -46,7 +46,6 @@ bool g_dx9_dont_draw_to_depth_target_if_mrt_is_used = false;
 
 IDirect3DPixelShader9** global_d3d_shader_white_source_get(void);
 
-uint32* cubemap_target_size_get(void);
 uint32* motion_sensor_texture_size_get(void);
 IDirect3DTexture9* rasterizer_dx9_get_target_texture(e_rasterizer_target rasterizer_target);
 IDirect3DSurface9* __cdecl rasterizer_dx9_get_target_mip_surface(e_rasterizer_target target, int16 mip);
@@ -79,6 +78,11 @@ void rasterizer_dx9_targets_apply_patches(void)
     PatchCall(Memory::GetAddress(0x284BF3), rasterizer_set_render_target_internal_hook_set_viewport);
 
     return;
+}
+
+uint32* cubemap_target_size_get(void)
+{
+    return Memory::GetAddress<uint32*>(0x41F674);
 }
 
 e_rasterizer_target* rasterizer_dx9_main_render_target_get(void)
@@ -884,11 +888,6 @@ bool __cdecl rasterizer_dx9_targets_initialize(void)
 IDirect3DPixelShader9** global_d3d_shader_white_source_get(void)
 {
     return Memory::GetAddress<IDirect3DPixelShader9**>(0x9DAAB0);
-}
-
-uint32* cubemap_target_size_get(void)
-{
-    return Memory::GetAddress<uint32*>(0x41F674);
 }
 
 uint32* motion_sensor_texture_size_get(void)
