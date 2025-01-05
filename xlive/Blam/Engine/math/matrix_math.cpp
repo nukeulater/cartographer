@@ -327,3 +327,20 @@ real_matrix3x3* matrix3x3_from_angles(real_matrix3x3* matrix, real32 i, real32 j
 	matrix->up.k = cosine_vector.j * cosine_vector.k;
 	return matrix;
 }
+
+real_vector3d* matrix4x3_transform_normal(const real_matrix4x3* matrix, const real_vector3d* normal, real_vector3d* result)
+{
+	const real_vector3d copy = *normal;
+	result->i = ((copy.i * matrix->vectors.forward.i) + (copy.j * matrix->vectors.left.i)) + (copy.k * matrix->vectors.up.i);
+	result->j = ((copy.i * matrix->vectors.forward.j) + (copy.j * matrix->vectors.left.j)) + (copy.k * matrix->vectors.up.j);
+	result->k = ((copy.i * matrix->vectors.forward.k) + (copy.j * matrix->vectors.left.k)) + (copy.k * matrix->vectors.up.k);
+	return result;
+}
+
+real_plane3d* matrix4x3_transform_plane(const real_matrix4x3* matrix, const real_plane3d* plane, real_plane3d* result)
+{
+	matrix4x3_transform_normal(matrix, &plane->n, &result->n);
+	const real32 scale_product = matrix->scale * plane->d;
+	result->d = scale_product + dot_product3d((real_vector3d*)&matrix->position, &result->n);
+	return result;
+}
