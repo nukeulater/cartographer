@@ -15,7 +15,7 @@ real_quaternion* matrix4x3_rotation_to_quaternion(const real_matrix4x3* matrix, 
 
 void matrix4x3_from_point_and_vectors(real_matrix4x3* matrix, const real_point3d* position, const real_vector3d* forward, const real_vector3d* up);
 
-void matrix4x3_inverse(const real_matrix4x3* input, real_matrix4x3* output);
+real_matrix4x3* matrix4x3_inverse(const real_matrix4x3* input, real_matrix4x3* output);
 
 void __cdecl matrix4x3_inverse_transform_normal(real_matrix4x3* input, real_vector3d* input_vector, real_vector3d* out_vector);
 

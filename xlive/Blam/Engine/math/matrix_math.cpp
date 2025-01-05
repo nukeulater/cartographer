@@ -130,48 +130,45 @@ void matrix4x3_from_point_and_vectors(real_matrix4x3* matrix, const real_point3d
 	return;
 }
 
-void matrix4x3_inverse(const real_matrix4x3* input, real_matrix4x3* output)
+real_matrix4x3* matrix4x3_inverse(const real_matrix4x3* input, real_matrix4x3* output)
 {
-	if (input->scale == 0.0f)
-	{
-		csmemset(output, 0, sizeof(real_matrix4x3));
-	}
-	else
+	if (input->scale != 0.0f)
 	{
 		real_point3d inverse_pos = { -input->position.x, -input->position.y, -input->position.z };
-		if (input->scale == 1.0f)
+		if (input->scale == 1.f)
 		{
-			output->scale = 1.0f;
+			output->scale = 1.f;
 		}
 		else
 		{
-			output->scale = 1.0f / input->scale;
+			output->scale = 1.f / input->scale;
 			inverse_pos.x *= output->scale;
 			inverse_pos.y *= output->scale;
 			inverse_pos.z *= output->scale;
 		}
+
 		output->vectors.forward.i = input->vectors.forward.i;
 		output->vectors.left.j = input->vectors.left.j;
 		output->vectors.up.k = input->vectors.up.k;
 
-		real32 temp_value = input->vectors.left.i;
 		output->vectors.left.i = input->vectors.forward.j;
-		output->vectors.forward.j = temp_value;
+		output->vectors.forward.j = input->vectors.left.i;
 		
-		temp_value = input->vectors.up.i;
 		output->vectors.up.i = input->vectors.forward.k;
-		output->vectors.forward.k = temp_value;
+		output->vectors.forward.k = input->vectors.up.i;;
 
-		temp_value = input->vectors.up.j;
 		output->vectors.up.j = input->vectors.left.k;
-		output->vectors.left.k = temp_value;
+		output->vectors.left.k = input->vectors.up.j;
 
-		output->position.x = output->vectors.left.i * inverse_pos.y		+ output->vectors.forward.i * inverse_pos.x + output->vectors.up.i * inverse_pos.z;
-		output->position.y = output->vectors.forward.j * inverse_pos.x	+ output->vectors.left.j * inverse_pos.x	+ output->vectors.up.j * inverse_pos.z;
-		output->position.z = output->vectors.forward.k * inverse_pos.x	+ output->vectors.left.k * inverse_pos.y	+ output->vectors.up.k * inverse_pos.z;
+		output->position.x = output->vectors.forward.i * inverse_pos.x + output->vectors.left.i * inverse_pos.y + output->vectors.up.i * inverse_pos.z;
+		output->position.y = output->vectors.forward.j * inverse_pos.x + output->vectors.left.j * inverse_pos.y + output->vectors.up.j * inverse_pos.z;
+		output->position.z = output->vectors.forward.k * inverse_pos.x + output->vectors.left.k * inverse_pos.y + output->vectors.up.k * inverse_pos.z;
 	}
-
-	return;
+	else
+	{
+		csmemset(output, 0, sizeof(real_matrix4x3));
+	}
+	return output;
 }
 
 void matrix4x3_inverse_transform_normal(real_matrix4x3* input, real_vector3d* input_vector, real_vector3d* out_vector)
