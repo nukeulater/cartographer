@@ -253,6 +253,30 @@ static BLAM_MATH_INL bool valid_real_normal3d(const real_vector3d* normal)
 	return valid_realcmp(magnitude, 1.0f);
 }
 
+static BLAM_MATH_INL bool valid_real_point3d(real_point3d const* p)
+{
+	return valid_real(p->x) && valid_real(p->y) && valid_real(p->z);
+}
+
+static BLAM_MATH_INL bool valid_real_vector3d_axes3(const real_vector3d* f, const real_vector3d* l, const real_vector3d* u)
+{
+	return 
+		valid_real_normal3d(f) &&
+		valid_real_normal3d(l) &&
+		valid_real_normal3d(u) &&
+		valid_realcmp(dot_product3d(f, l), 0.f) &&
+		valid_realcmp(dot_product3d(l, u), 0.f) &&
+		valid_realcmp(dot_product3d(u, f), 0.f);
+}
+
+static BLAM_MATH_INL bool valid_real_matrix4x3(real_matrix4x3 const *matrix)
+{
+	return 
+		valid_real(matrix->scale) &&
+		valid_real_vector3d_axes3(&matrix->vectors.forward, &matrix->vectors.left, &matrix->vectors.up) &&
+		valid_real_point3d(&matrix->position);
+}
+
 static BLAM_MATH_INL real_vector2d* scale_vector2d(const real_vector2d* in, real32 scale, real_vector2d* out)
 {
 	out->i = in->i * scale;
@@ -266,6 +290,23 @@ static BLAM_MATH_INL real_vector3d* scale_vector3d(const real_vector3d* in, real
 	out->j = in->j * scale;
 	out->k = in->k * scale;
 	return out;
+}
+
+static BLAM_MATH_INL real_vector3d* negate_vector3d(const real_vector3d* in, real_vector3d* out)
+{
+	out->i = -in->i;
+	out->j = -in->j;
+	out->k = -in->k;
+	return out;
+}
+
+static BLAM_MATH_INL void scale_vector4d(const real_vector4d* in, real32 scale, real_vector4d* out)
+{
+	out->i = in->i * scale;
+	out->j = in->j * scale;
+	out->k = in->k * scale;
+	out->l = in->l * scale;
+	return;
 }
 
 static BLAM_MATH_INL real_vector3d* add_vectors3d(const real_vector3d* a, const real_vector3d* b, real_vector3d* out)
@@ -324,12 +365,12 @@ static BLAM_MATH_INL real32 normalize3d(real_vector3d* v1)
 	return length;
 }
 
-static BLAM_MATH_INL real_vector3d* cross_product3d(const real_vector3d* up, const real_vector3d* forward, real_vector3d* out_left)
+static BLAM_MATH_INL real_vector3d* cross_product3d(const real_vector3d* a, const real_vector3d* b, real_vector3d* result)
 {
-	out_left->i = up->j * forward->k - up->k * forward->j;
-	out_left->j = up->k * forward->i - up->i * forward->k;
-	out_left->k = up->i * forward->j - up->j * forward->i;
-	return out_left;
+	result->i = a->j * b->k - a->k * b->j;
+	result->j = a->k * b->i - a->i * b->k;
+	result->k = a->i * b->j - a->j * b->i;
+	return result;
 }
 
 static BLAM_MATH_INL void set_real_point3d(real_point3d* point, real32 x, real32 y, real32 z)
@@ -414,3 +455,78 @@ real_vector3d* __cdecl generate_up_vector3d(const real_vector3d* forward, real_v
 void vectors3d_from_euler_angles3d(real_vector3d* forward, real_vector3d* up, const real_euler_angles3d* angles);
 
 void vector3d_from_euler_angles2d(real_vector3d* forward, const real_euler_angles2d* angles);
+
+/* macros */
+
+#ifdef VALIDATE_REAL_ENABLED
+#define assert_valid_real(value)	\
+if (!valid_real(value))				\
+{									\
+	const char* string = csprintf(g_temporary, NUMBEROF(g_temporary), NUMBEROF(g_temporary), "%s: assert_valid_real(0x%08X %f)", #value, value, value);	\
+	DISPLAY_ASSERT(string);			\
+}									\
+(void)0
+
+#define assert_valid_real_matrix4x3(matrix)		\
+if (!valid_real_matrix4x3(matrix))				\
+{												\
+	if (!valid_real(*matrix.scale))				\
+	{											\
+		const char* string = csprintf(g_temporary, NUMBEROF(g_temporary), "%s had a bad scale %f", #matrix, *matrix.scale);	\
+		DISPLAY_ASSERT(string);					\
+	}											\
+	if (!valid_real_normal3d(matrix.vectors.forward))	\
+	{											\
+		const char* string = csprintf(g_temporary, NUMBEROF(g_temporary), "%s had a bad forward (%f,%f,%f)", #matrix, *matrix.vectors.forward.i, *matrix.vectors.forward.j, *matrix.vectors.forward.k);	\
+		DISPLAY_ASSERT(string);					\
+	}											\
+	if (!valid_real_normal3d(matrix.vectors.left))		\
+	{											\
+		const char* string = csprintf(g_temporary, NUMBEROF(g_temporary), "%s had a bad left (%f,%f,%f)", #matrix, *matrix.vectors.left.i, *matrix.vectors.left.j, *matrix.vectors.left.k);	\
+		DISPLAY_ASSERT(string);					\
+	}											\
+	if (!valid_real_normal3d(matrix.vectors.forward))	\
+	{											\
+		const char* string = csprintf(g_temporary, NUMBEROF(g_temporary), "%s had a bad up (%f,%f,%f)", #matrix, *matrix.vectors.up.i, *matrix.vectors.up.j, *matrix.vectors.up.k);	\
+		DISPLAY_ASSERT(string);					\
+	}											\
+	if (!valid_real_point3d(matrix.position))	\
+	{											\
+		const char* string = csprintf(g_temporary, NUMBEROF(g_temporary), "%s had a bad up (%f,%f,%f)", #matrix, *matrix.position.x, *matrix.position.y, *matrix.position.z);	\
+		DISPLAY_ASSERT(string);					\
+	}											\
+	if (!valid_realcmp(dot_product3d(matrix.vectors.forward, matrix.vectors.left), 0.0))	\
+	{											\
+		const char* string = csprintf(g_temporary, NUMBEROF(g_temporary), "%s had a forward (%f,%f,%f) not perpendicular to left (%f,%f,%f)", \
+										#matrix,\
+										*matrix.vectors.forward.i, *matrix.vectors.forward.j, *matrix.vectors.forward.k,	\
+										*matrix.vectors.left.i, *matrix.vectors.left.j, *matrix.vectors.left.k);			\
+		DISPLAY_ASSERT(string);					\
+	}											\
+	if (!valid_realcmp(dot_product3d(matrix.vectors.up, matrix.vectors.left), 0.0))	\
+	{											\
+		const char* string = csprintf(g_temporary, NUMBEROF(g_temporary), "%s had a up (%f,%f,%f) not perpendicular to left (%f,%f,%f)", \
+										#matrix,\
+										*matrix.vectors.up.i, *matrix.vectors.up.j, *matrix.vectors.up.k,			\
+										*matrix.vectors.left.i, *matrix.vectors.left.j, *matrix.vectors.left.k);	\
+		DISPLAY_ASSERT(string);					\
+	}											\
+	if (!valid_realcmp(dot_product3d(matrix.vectors.forward, matrix.vectors.up), 0.0))	\
+	{											\
+		const char* error_string = csprintf(g_temporary, NUMBEROF(g_temporary), "%s had a forward (%f,%f,%f) not perpendicular to up (%f,%f,%f)", \
+										#matrix,\
+										*matrix.vectors.forward.i, *matrix.vectors.forward.j, *matrix.vectors.forward.k,	\
+										*matrix.vectors.up.i, *matrix.vectors.up.j, *matrix.vectors.up.k);					\
+		DISPLAY_ASSERT(error_string);			\
+	}											\
+	if (!valid_real_matrix4x3(matrix))			\
+	{											\
+		const char* string = csprintf(g_temporary, NUMBEROF(g_temporary), "%s: assert_valid_real_matrix4x3", #matrix);	\
+		DISPLAY_ASSERT(string);					\
+	}											\
+}												\
+(void)0
+#else
+#define assert_valid_real(value)			(void)0
+#define assert_valid_real_matrix4x3(matrix)	(void)0
+#endif
