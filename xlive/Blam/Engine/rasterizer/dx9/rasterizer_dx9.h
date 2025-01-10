@@ -48,13 +48,9 @@ public:
             // Copy over the rest of the constants if the values don't match
             if (!contents_match)
             {
-                if (count != i)
+                for (; i < count; ++i)
                 {
-                    for (i; i < count; ++i)
-                    {
-                        values[index + i] = constants[i];
-                    }
-
+                    values[index + i] = constants[i];
                 }
                 result = true;
             }
