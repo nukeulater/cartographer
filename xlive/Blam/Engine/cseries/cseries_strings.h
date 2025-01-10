@@ -283,4 +283,3 @@ int32 csstricmp(const char* s1, const char* s2);
 
 int32 csstrncmp(const char* s1, const char* s2, size_t size);
 
-int32 cvsnzprintf(char* buffer, size_t size, char const* format, ...);

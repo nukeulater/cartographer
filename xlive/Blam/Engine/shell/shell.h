@@ -50,6 +50,8 @@ bool shell_command_line_flag_is_set(e_shell_command_line_flags flag);
 int32 __cdecl shell_command_line_flag_get(e_shell_command_line_flags flag);
 void shell_command_line_flag_set(e_shell_command_line_flags flag, int32 state);
 
+const char* shell_get_version(void);
+
 bool shell_initialize(void);
 
 void shell_dispose(void);

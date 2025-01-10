@@ -19,7 +19,7 @@ void rasterizer_dx9_vertex_shaders_replace_map_bytecode(datum vertex_shader_tag_
 	{
 		const s_vertex_shader_replacement_information* type = &k_vertex_shader_replacement_information[i];
 		char name[256];
-		cvsnzprintf(name, NUMBEROF(name), "rasterizer\\vertex_shaders_dx9\\%s", type->tag_name);
+		csprintf(name, NUMBEROF(name), "rasterizer\\vertex_shaders_dx9\\%s", type->tag_name);
 		const char* tag_name = tag_get_name(vertex_shader_tag_index);
 		if (csstrncmp(tag_name, name, 256) == 0)
 		{

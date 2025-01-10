@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #include "rasterizer_dx9_errors.h"
 
-#include "cseries/cseries_strings.h"
-
 /* public code */
 
 void rasterizer_dx9_errors_log(HRESULT hr, const char* format, ...)
@@ -14,7 +12,7 @@ void rasterizer_dx9_errors_log(HRESULT hr, const char* format, ...)
 	const char* hr_string = "<unknown error>";
 	char error_string[1024] = {};
 	char buffer[1024] = {};
-	cvsnzprintf(error_string, NUMBEROF(error_string), format, va);
+    vsprintf(error_string, NUMBEROF(error_string), format, va);
 	switch (hr)
 	{
 	case D3DERR_UNSUPPORTEDCOLOROPERATION:

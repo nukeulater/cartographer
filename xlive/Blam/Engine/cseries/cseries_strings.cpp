@@ -34,18 +34,3 @@ int32 csstrncmp(const char* s1, const char* s2, size_t size)
 	// TODO: add asserts and logging
 	return strncmp(s1, s2, size);
 }
-
-int32 cvsnzprintf(char* buffer, size_t size, char const* format, ...)
-{
-	ASSERT(buffer);
-	ASSERT(format);
-	ASSERT(size > 0);
-
-	va_list va_args;
-	va_start(va_args, format);
-	int32 result = vsnprintf(buffer, size, format, va_args);
-	buffer[size - 1] = '\0';
-	
-	va_end(va_args);
-	return result;
-}

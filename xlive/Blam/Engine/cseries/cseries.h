@@ -59,6 +59,12 @@ static_assert(sizeof(datum) == 4);
 #define IS_MSVC_COMPILER
 #endif
 
+/* globals */
+
+extern char g_temporary[256];
+
+/* macros */
+
 // Invokes a function
 // ADDR_CLIENT: file offset in halo2.exe
 // ADDR_SERVER: file offset in h2server.exe
@@ -70,7 +76,7 @@ static_assert(sizeof(datum) == 4);
 // optimizes out a cmov or related instruction when building release whenever we call a function that doesn't have a dedi address specified
 #ifdef NDEBUG
 #define INVOKE_BY_TYPE(_addr_client, _addr_server, _type, ...) \
-Memory::GetAddress<_type>(_addr_client, _addr_server != 0 ? _addr_server : _addr_client)(__VA_ARGS__)
+Memory::GetAddress<_type>(_addr_client, (_addr_server) != 0 ? _addr_server : _addr_client)(__VA_ARGS__)
 #else
 #define INVOKE_BY_TYPE(_addr_client, _addr_server, _type, ...) \
 Memory::GetAddress<_type>(_addr_client, _addr_server)(__VA_ARGS__)
@@ -144,24 +150,36 @@ static_assert (sizeof(STRUCT) == (_SIZE), "Invalid size for struct ("#STRUCT") e
 static_assert (offsetof(STRUCT, FIELD) == (OFFSET), #STRUCT " Offset(" #OFFSET ") for " #FIELD " is invalid");
 
 #ifdef ASSERTS_ENABLED
-#define DISPLAY_ASSERT_EXCEPTION(STATEMENT, IS_EXCEPTION)       \
-display_assert(#STATEMENT, __FILE__, __LINE__, IS_EXCEPTION);   \
-if (!is_debugger_present() && g_catch_exceptions)               \
-	exit(-1);                                                   \
-else                                                            \
-	__debugbreak();                                             \
+#define ASSERT_TRIGGER_EXCEPTION()					\
+if (!is_debugger_present() && g_catch_exceptions)	\
+	exit(-1);                                       \
+else                                                \
+	__debugbreak();                                 \
+(void)0
 
-#define DISPLAY_ASSERT(STATEMENT) DISPLAY_ASSERT_EXCEPTION(STATEMENT, true)
+
+#define DISPLAY_ASSERT_EXCEPTION(STATEMENT, IS_EXCEPTION)       \
+display_assert(STATEMENT, __FILE__, __LINE__, IS_EXCEPTION);   \
+ASSERT_TRIGGER_EXCEPTION();										\
+(void)0
+
+#define DISPLAY_ASSERT(STATEMENT)			\
+DISPLAY_ASSERT_EXCEPTION(STATEMENT, true);	\
+(void)0
 
 #define ASSERT_EXCEPTION(STATEMENT, IS_EXCEPTION)               \
 if (!(STATEMENT))                                               \
-{                                                               \
-	DISPLAY_ASSERT_EXCEPTION(STATEMENT, IS_EXCEPTION)           \
+{																\
+	DISPLAY_ASSERT_EXCEPTION(#STATEMENT, IS_EXCEPTION);			\
 }                                                               \
 (void)0
 
-#define ASSERT(STATEMENT)   ASSERT_EXCEPTION(STATEMENT, true)
+#define ASSERT(STATEMENT)			\
+ASSERT_EXCEPTION(STATEMENT, true);	\
+(void)0
+
 #else
+#define ASSERT_EXCEPTION()									(void)(0)
 #define DISPLAY_ASSERT_EXCEPTION(STATEMENT, IS_EXCEPTION)   (void)(#STATEMENT)
 #define DISPLAY_ASSERT(STATEMENT)                           (void)(#STATEMENT)
 #define ASSERT_EXCEPTION(STATEMENT, IS_EXCEPTION)           (void)(#STATEMENT)
@@ -170,17 +188,30 @@ if (!(STATEMENT))                                               \
 
 #endif // _DEBUG
 
-
 extern bool g_catch_exceptions;
 
 // TODO implement
 void display_assert(char const* condition, char const* file, int32 line, bool assertion_failed);
 
-// TODO reimplement this properly
-void* csmemmove(void* dst, void* src, size_t size);
+void* csmemmove(void* destination, void* source, size_t size);
 
-// TODO reimplement this properly
-void* csmemset(void* dst, int32 val, size_t size);
+void* csmemset(void* destination, int32 val, size_t size);
 
-// TODO reimplement this properly
-void* csmemcpy(void* dst, const void* src, size_t size);
+void* csmemcpy(void* destination, const void* source, size_t size);
+
+int32 vsprintf(char* buffer, size_t size, const char* format, ...);
+
+/* 
+* NOTES:
+* size_t max_count was added in vista to this function call
+*/
+int32 vsnprintf(char* buffer, size_t size, size_t max_count, const char* format, ...);
+
+
+const char* csprintf(char* buffer, size_t size, const char* format, ...);
+
+/*
+* NOTES:
+* size_t max_count was added in vista to this function call
+*/
+const char* csnprintf(char* buffer, size_t size, size_t max_count, const char* format, ...);

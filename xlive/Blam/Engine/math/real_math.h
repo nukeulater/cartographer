@@ -462,7 +462,7 @@ void vector3d_from_euler_angles2d(real_vector3d* forward, const real_euler_angle
 #define assert_valid_real(value)	\
 if (!valid_real(value))				\
 {									\
-	const char* string = csprintf(g_temporary, NUMBEROF(g_temporary), NUMBEROF(g_temporary), "%s: assert_valid_real(0x%08X %f)", #value, value, value);	\
+	const char* string = csnprintf(g_temporary, NUMBEROF(g_temporary), NUMBEROF(g_temporary), "%s: assert_valid_real(0x%08X %f)", #value, value, value);	\
 	DISPLAY_ASSERT(string);			\
 }									\
 (void)0
