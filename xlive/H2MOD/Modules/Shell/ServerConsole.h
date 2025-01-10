@@ -48,7 +48,7 @@ namespace ServerConsole
 
 		kablam_command_send_msg(DWORD _vtbl, const wchar_t* _message) : vtbl(_vtbl)
 		{
-			memset((void*)&unk_1, 0, sizeof(kablam_command_send_msg) - sizeof(vtbl));
+			csmemset((void*)&unk_1, 0, sizeof(kablam_command_send_msg) - sizeof(vtbl));
 			wcscpy_s(message, ARRAYSIZE(message), _message);
 		}
 

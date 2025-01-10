@@ -20,7 +20,7 @@ namespace ControllerInput
 		void ToArray(WORD* out)
 		{
 			WORD temp[] = { DPAD_UP , DPAD_DOWN , DPAD_LEFT, DPAD_RIGHT, START, BACK, LEFT_THUMB, RIGHT_THUMB, LEFT_SHOULDER, RIGHT_SHOULDER, A, B ,X, Y };
-			memcpy(out, temp, sizeof(temp));
+			csmemcpy(out, temp, sizeof(temp));
 		}
 	};
 }

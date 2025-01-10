@@ -32,7 +32,7 @@ char* add_label(std::unordered_map<int, std::unordered_map<int, char*>>& label_m
 	int label_buflen = (label ? strlen(label) : 0) + 1;
 	char* new_label = (char*)calloc(label_buflen, sizeof(char));
 	if (label)
-		memcpy(new_label, label, sizeof(char) * label_buflen);
+		csmemcpy(new_label, label, sizeof(char) * label_buflen);
 	new_label[label_buflen - 1] = 0;
 	return label_map[label_menu_id][label_id] = new_label;
 }
@@ -145,7 +145,7 @@ bool read_custom_labels() {
 	H2Config_custom_labels_capture_missing = false;
 
 	wchar_t labels_file_path[1024];
-	swprintf(labels_file_path, ARRAYSIZE(labels_file_path), L"%wsh2customlanguage.ini", H2ProcessFilePath);
+	swprintf(labels_file_path, ARRAYSIZE(labels_file_path), L"%wsh2customlanguage.ini", L".\\");
 	FILE* labelsFile = _wfopen(labels_file_path, L"rb");
 	addDebugText(labels_file_path);
 
@@ -342,7 +342,7 @@ void write_custom_labels() {
 		H2Config_custom_labels_capture_missing = false;
 
 		wchar_t labels_file_path[1024];
-		swprintf(labels_file_path, ARRAYSIZE(labels_file_path), L"%wsh2customlanguage.ini", H2ProcessFilePath);
+		swprintf(labels_file_path, ARRAYSIZE(labels_file_path), L"%wsh2customlanguage.ini", L".\\");
 		FILE* labelsFile = _wfopen(labels_file_path, L"wb");
 		addDebugText(labels_file_path);
 

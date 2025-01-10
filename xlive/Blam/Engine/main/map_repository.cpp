@@ -200,7 +200,7 @@ bool c_custom_map_manager::read_custom_map_data_cache_from_file(const utf8* path
 
 		// clear unused custom map entries
 		size_t remaining_size = custom_map_data_cache_buffer_size - sizeof(s_custom_map_file_cache_header) - file_custom_map_entries_size;
-		memset((uint8*)entry_list + file_custom_map_entries_size, 0, remaining_size);
+		csmemset((uint8*)entry_list + file_custom_map_entries_size, 0, remaining_size);
 		success = true;
 
 	} while (0);
@@ -347,7 +347,7 @@ void __thiscall c_custom_map_manager::load_custom_map_data_cache()
 		|| !read_custom_map_data_cache_from_file(path_multibyte, custom_map_cache_file_header, map_file_cache_buffer_size))
 	{
 		// if we fail clear the buffer
-		memset(custom_map_cache_file_header, 0, map_file_cache_buffer_size);
+		csmemset(custom_map_cache_file_header, 0, map_file_cache_buffer_size);
 		custom_map_cache_file_header->signature = custom_map_cache_signature;
 		custom_map_cache_file_header->version = k_custom_map_data_cache_header_version;
 
@@ -389,7 +389,7 @@ uint32 __thiscall c_custom_map_manager::get_custom_map_list_ids(s_custom_map_id*
 		{
 			if (i < out_ids_count)
 			{
-				memcpy(out_ids[i].map_sha256_hash, m_new_custom_map_entry_list_buffer[i].map_sha256_hash, k_sha256_hash_size);
+				csmemcpy(out_ids[i].map_sha256_hash, m_new_custom_map_entry_list_buffer[i].map_sha256_hash, k_sha256_hash_size);
 				wcsncpy(out_ids[i].map_name, m_new_custom_map_entry_list_buffer[i].map_name, k_max_map_name_size);
 			}
 		}
@@ -418,7 +418,7 @@ uint32 __thiscall c_custom_map_manager::get_custom_map_list_ids_by_map_name(cons
 			{
 				if (matching_count_found < out_ids_count)
 				{
-					memcpy(out_ids[matching_count_found].map_sha256_hash, m_new_custom_map_entry_list_buffer[i].map_sha256_hash, k_sha256_hash_size);
+					csmemcpy(out_ids[matching_count_found].map_sha256_hash, m_new_custom_map_entry_list_buffer[i].map_sha256_hash, k_sha256_hash_size);
 					wcsncpy(out_ids[matching_count_found].map_name, m_new_custom_map_entry_list_buffer[i].map_name, k_max_map_name_size);
 				}
 			}
@@ -602,7 +602,7 @@ void __thiscall c_custom_map_manager::remove_entry_by_index(uint16 idx)
 	// if so just memset to 0
 	if (idx == m_map_count - 1)
 	{
-		memset(&m_new_custom_map_entry_list_buffer[idx], 0, sizeof(s_custom_map_entry));
+		csmemset(&m_new_custom_map_entry_list_buffer[idx], 0, sizeof(s_custom_map_entry));
 	}
 	else
 	{
@@ -610,7 +610,7 @@ void __thiscall c_custom_map_manager::remove_entry_by_index(uint16 idx)
 		// TODO: consider replacing this implementation with a linked list
 		// this might get very expensive
 		// but it shouldn't execute too many times
-		memmove(&m_new_custom_map_entry_list_buffer[idx], &m_new_custom_map_entry_list_buffer[idx + 1], (m_map_count - 1 - idx) * sizeof(s_custom_map_entry));
+		csmemmove(&m_new_custom_map_entry_list_buffer[idx], &m_new_custom_map_entry_list_buffer[idx + 1], (m_map_count - 1 - idx) * sizeof(s_custom_map_entry));
 	}
 
 	m_map_count--;
@@ -687,7 +687,7 @@ bool __thiscall c_custom_map_manager::add_entry(const s_custom_map_entry* entry)
 
 	if (m_map_count < k_maximum_number_of_custom_multiplayer_maps_new && validate_entry_data(entry, 1) && !entry_is_duplicate(entry))
 	{
-		memcpy(&m_new_custom_map_entry_list_buffer[m_map_count++], entry, sizeof(s_custom_map_entry));
+		csmemcpy(&m_new_custom_map_entry_list_buffer[m_map_count++], entry, sizeof(s_custom_map_entry));
 	}
 	else
 	{
@@ -884,7 +884,7 @@ public:
 			{
 				s_custom_map_id* list_entry
 					= &((s_custom_map_id*)(*custom_map_menu_list)->data)[DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_new(*custom_map_menu_list))];
-				memcpy(list_entry, &map_ids_buffer[i], sizeof(s_custom_map_id));
+				csmemcpy(list_entry, &map_ids_buffer[i], sizeof(s_custom_map_id));
 			}
 		}
 

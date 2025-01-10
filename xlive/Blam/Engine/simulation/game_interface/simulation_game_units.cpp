@@ -42,7 +42,7 @@ datum __stdcall c_simulation_unit_entity_definition__create_object(void* _this,
         game_engine_get_change_colors(&creation_data->profile_traits.profile, creation_data->team, change_colors))
     {
         placement_data.active_change_colors_mask |= 15u;
-        memcpy(placement_data.change_colors, change_colors, sizeof(placement_data.change_colors));
+        csmemcpy(placement_data.change_colors, change_colors, sizeof(placement_data.change_colors));
     }
 
     datum unit_index = c_simulation_object_entity_definition__object_create_object(_this, &creation_data->object, &initial_state_data->object_state_data, flags, &placement_data);

@@ -29,7 +29,7 @@ CartographerConsole::CartographerConsole() :
 	m_selected_tab = 0;
 	m_selected_tab_dirty = false;
 	m_console_opacity = .75f;
-	memset(m_input_buffer, 0, sizeof(m_input_buffer));
+	csmemset(m_input_buffer, 0, sizeof(m_input_buffer));
 
 	m_output.reserve(CONSOLE_TABS);
 	for (int i = 0; i < CONSOLE_TABS; i++)
@@ -143,7 +143,7 @@ int CartographerConsole::TextEditCallback(ImGuiInputTextCallbackData* data)
 		for (size_t i = 0; i < completion_commands.size(); i++)
 		{
 			ConsoleCommand* command = completion_commands[i];
-			memset(&console_data->m_completion_data->CompletionCandidate[i], 0, sizeof(ImGuiTextInputCompletionCandidate));
+			csmemset(&console_data->m_completion_data->CompletionCandidate[i], 0, sizeof(ImGuiTextInputCompletionCandidate));
 			console_data->m_completion_data->CompletionCandidate[i].CompletionText = command->GetName();
 			console_data->m_completion_data->CompletionCandidate[i].CompletionDescription = command->GetDescription();
 
@@ -323,7 +323,7 @@ void CartographerConsole::AllocateCompletionCandidatesBuf(unsigned int candidate
 	// TODO maybe move this to function for object using dynamic allocated memory
 	unsigned int buffer_size = sizeof(ImGuiTextInputCompletion) + sizeof(ImGuiTextInputCompletionCandidate) * candidates_count;
 	m_completion_data = (ImGuiTextInputCompletion*)new char[buffer_size];
-	memset(m_completion_data, 0, buffer_size);
+	csmemset(m_completion_data, 0, buffer_size);
 	new (m_completion_data) ImGuiTextInputCompletion(candidates_count); // new here calls constructor
 	// completion candidates are stored contiguously
 	m_completion_data->CompletionCandidate = (ImGuiTextInputCompletionCandidate*)((char*)m_completion_data + sizeof(ImGuiTextInputCompletion));
@@ -523,7 +523,7 @@ void CartographerConsole::Draw(const char* title, bool* p_open)
 			if (input_buffer_string_length > 0)
 			{
 				ExecCommand(m_input_buffer, input_buffer_string_length);
-				memset(m_input_buffer, 0, 2);
+				csmemset(m_input_buffer, 0, 2);
 			}
 			m_reclaim_input_box_focus = true;
 		}
@@ -547,7 +547,7 @@ void CartographerConsole::Draw(const char* title, bool* p_open)
 			if (input_buffer_string_length > 0)
 			{
 				ExecCommand(m_input_buffer, input_buffer_string_length);
-				memset(m_input_buffer, 0, 2);
+				csmemset(m_input_buffer, 0, 2);
 			}
 			m_reclaim_input_box_focus = true;
 		}
