@@ -146,7 +146,7 @@ bool __cdecl rasterizer_dx9_weather_plate_build_vertex_buffer(
 	case _rasterizer_dx9_weather_plate_output_type_plane_position:
 		global_window_parameters = global_window_parameters_get();
 
-		val = MAX(k_real_math_epsilon, ctx->depth_blend_z_bounds.upper - ctx->depth_blend_z_bounds.lower);
+		val = MAX(k_real_epsilon, ctx->depth_blend_z_bounds.upper - ctx->depth_blend_z_bounds.lower);
 		val = (1.f / val);
 
 		((real_rectangle2d*)output)->x0 = global_window_parameters->camera.z_far * val;

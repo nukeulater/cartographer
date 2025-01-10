@@ -18,6 +18,7 @@ union rectangle2d
 {
 	int16 v[4];
 	struct { int16 top, left, bottom, right; };
+	struct { int16 y0, x0, y1, x1; };
 };
 ASSERT_STRUCT_SIZE(rectangle2d, sizeof(int16) * 4);
 

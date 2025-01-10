@@ -168,7 +168,7 @@ int16 c_model_animation::get_frame_count(void) const
 // Unsure what the original name of this is
 double c_model_animation::get_frame_count_minus_epsilon(void) const
 {
-	return this->frame_count - k_real_math_epsilon;
+	return this->frame_count - k_real_epsilon;
 }
 
 size_t c_model_animation::get_frame_events_size(void) const
@@ -184,7 +184,7 @@ e_frame_info_type c_model_animation::get_frame_info_type(void) const
 real64 c_model_animation::get_frame_position_from_playback_ratio(real32 playback_ratio) const
 {
 
-	real32 last_frame_index = this->get_last_frame_index() + k_real_math_epsilon;
+	real32 last_frame_index = this->get_last_frame_index() + k_real_epsilon;
 	real32 frame_index_times_playback_ratio = last_frame_index * playback_ratio;
 
 	if ((last_frame_index * playback_ratio) < 0.0f)

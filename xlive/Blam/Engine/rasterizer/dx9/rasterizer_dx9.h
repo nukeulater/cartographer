@@ -17,7 +17,7 @@ class c_rasterizer_constant_4f_cache
 {
     real_vector4d values[size];
 public:
-    bool test_cache(int32 index, const real_vector4d* constants, int32 count)
+    bool test_cache(uint32 index, const real_vector4d* constants, uint32 count)
     {
         ASSERT(index < size && index + count <= size);
 
@@ -28,17 +28,17 @@ public:
             bool contents_match = false;
 
             // Loop through values and constants and xor to determine if values are different
-            int32 i = 0;
+            uint32 i = 0;
             for (;
                 !(
-                    *(uint32*)&values[index].i ^ *(uint32*)&constants[i].i |
-                    *(uint32*)&values[index].j ^ *(uint32*)&constants[i].j |
-                    *(uint32*)&values[index].k ^ *(uint32*)&constants[i].k |
-                    *(uint32*)&values[index].l ^ *(uint32*)&constants[i].l
+                    *(uint32*)&values[index + i].i ^ *(uint32*)&constants[i].i |
+                    *(uint32*)&values[index + i].j ^ *(uint32*)&constants[i].j |
+                    *(uint32*)&values[index + i].k ^ *(uint32*)&constants[i].k |
+                    *(uint32*)&values[index + i].l ^ *(uint32*)&constants[i].l
                     );
-                i++)
+                )
             {
-                if (i >= count)
+                if (++i >= count)
                 {
                     contents_match = true;
                     break;
@@ -48,14 +48,9 @@ public:
             // Copy over the rest of the constants if the values don't match
             if (!contents_match)
             {
-                if (count != i)
+                for (; i < count; ++i)
                 {
-                    for (int32 j = i + index; j < size; j++)
-                    {
-                        values[j] = constants[i];
-                        ++i;
-                    }
-
+                    values[index + i] = constants[i];
                 }
                 result = true;
             }

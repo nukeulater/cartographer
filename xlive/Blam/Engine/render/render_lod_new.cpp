@@ -55,9 +55,10 @@ bool render_object_cache_storage_is_object_cached(s_render_cache_storage* storag
     return result;
 }
 
-void render_object_cache_unk2(datum object_index, bool a2)
+void render_object_update_change_colors(datum object_index, bool a2)
 {
-    INVOKE(0x195F91, 0x0, render_object_cache_unk2, object_index, a2);
+    INVOKE(0x195F91, 0x0, render_object_update_change_colors, object_index, a2);
+    return;
 }
 
 int16 sub_59CC02_to_usercall(
@@ -162,7 +163,7 @@ bool __cdecl sub_59EB0C(
     return INVOKE(0x19EB0C, 0x0, sub_59EB0C, a1, prt, level_of_detail, object_index, object_render_cache_pool, a6, section_indices, object_model_index);
 }
 
-void* __cdecl sub_597370(datum object_index, float a2)
+render_lighting* __cdecl sub_597370(datum object_index, real32 a2)
 {
     return INVOKE(0x197370, 0x0, sub_597370, object_index, a2);
 }
@@ -385,14 +386,12 @@ void __cdecl object_build_render_cache_and_info(
                     );
                 }
 				
-                render_object_cache_unk2(info->object_index[render_model_storage_index], false);
+                render_object_update_change_colors(info->object_index[render_model_storage_index], false);
 
 				if (info->render_info[render_model_storage_index] != NULL)
 				{
 					s_render_cache_storage* render_cache_storage = info->render_info[render_model_storage_index];
-
-					void* render_object_cpu_cache_data = sub_597370(info->object_index[render_model_storage_index], a4);
-					csmemcpy(render_cache_storage->field_A, render_object_cpu_cache_data, sizeof(render_cache_storage->field_A));
+					render_cache_storage->lighting = *sub_597370(info->object_index[render_model_storage_index], a4);
 				}
             }
         }

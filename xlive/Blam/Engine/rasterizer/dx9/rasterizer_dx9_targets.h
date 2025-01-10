@@ -72,6 +72,8 @@ extern bool g_dx9_dont_draw_to_depth_target_if_mrt_is_used;
 
 void rasterizer_dx9_targets_apply_patches(void);
 
+uint32* cubemap_target_size_get(void);
+
 e_rasterizer_target* rasterizer_dx9_main_render_target_get(void);
 
 s_rasterizer_target* rasterizer_dx9_texture_target_get(e_rasterizer_target rasterizer_target);

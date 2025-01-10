@@ -13,7 +13,7 @@ real_matrix3x3* matrix3x3_rotation_from_quaternion(real_matrix3x3* matrix, const
 {
 	const real32 dot_product = dot_product4d_quaternion(quaternion, quaternion);
 
-	const real32 scalar = (dot_product > k_real_math_epsilon ? 2.0f / dot_product : 0.0f);
+	const real32 scalar = (dot_product > k_real_epsilon ? 2.0f / dot_product : 0.0f);
 
 	real_vector3d scaled_vector;
 	scale_vector3d(&quaternion->v, scalar, &scaled_vector);
@@ -59,7 +59,7 @@ real_quaternion* matrix3x3_rotation_to_quaternion(const real_matrix3x3* matrix, 
 		quaternion->v.n[i] = forward_result_sqroot * 0.5f;
 
 		// Make sure value set is greater than epsilon
-		ASSERT(quaternion->v.n[i] > k_real_math_epsilon);
+		ASSERT(quaternion->v.n[i] > k_real_epsilon);
 
 		real32 scalar = 0.25f / quaternion->v.n[i];
 
@@ -73,7 +73,7 @@ real_quaternion* matrix3x3_rotation_to_quaternion(const real_matrix3x3* matrix, 
 		quaternion->w = v1_root * 0.5f;
 		
 		// Make sure w is greater than epsilon
-		ASSERT(quaternion->w > k_real_math_epsilon);
+		ASSERT(quaternion->w > k_real_epsilon);
 
 		real32 scalar = 0.25f / quaternion->w;
 		quaternion->v.i = (matrix->left.k - matrix->up.j) * scalar;
@@ -132,43 +132,41 @@ void matrix4x3_from_point_and_vectors(real_matrix4x3* matrix, const real_point3d
 
 void matrix4x3_inverse(const real_matrix4x3* input, real_matrix4x3* output)
 {
-	if (input->scale == 0.0f)
-	{
-		csmemset(output, 0, sizeof(real_matrix4x3));
-	}
-	else
+	if (input->scale != 0.0f)
 	{
 		real_point3d inverse_pos = { -input->position.x, -input->position.y, -input->position.z };
-		if (input->scale == 1.0f)
+		if (input->scale == 1.f)
 		{
-			output->scale = 1.0f;
+			output->scale = 1.f;
 		}
 		else
 		{
-			output->scale = 1.0f / input->scale;
+			output->scale = 1.f / input->scale;
 			inverse_pos.x *= output->scale;
 			inverse_pos.y *= output->scale;
 			inverse_pos.z *= output->scale;
 		}
+
 		output->vectors.forward.i = input->vectors.forward.i;
 		output->vectors.left.j = input->vectors.left.j;
 		output->vectors.up.k = input->vectors.up.k;
 
-		real32 temp_value = input->vectors.left.i;
 		output->vectors.left.i = input->vectors.forward.j;
-		output->vectors.forward.j = temp_value;
+		output->vectors.forward.j = input->vectors.left.i;
 		
-		temp_value = input->vectors.up.i;
 		output->vectors.up.i = input->vectors.forward.k;
-		output->vectors.forward.k = temp_value;
+		output->vectors.forward.k = input->vectors.up.i;;
 
-		temp_value = input->vectors.up.j;
 		output->vectors.up.j = input->vectors.left.k;
-		output->vectors.left.k = temp_value;
+		output->vectors.left.k = input->vectors.up.j;
 
-		output->position.x = output->vectors.left.i * inverse_pos.y		+ output->vectors.forward.i * inverse_pos.x + output->vectors.up.i * inverse_pos.z;
-		output->position.y = output->vectors.forward.j * inverse_pos.x	+ output->vectors.left.j * inverse_pos.x	+ output->vectors.up.j * inverse_pos.z;
-		output->position.z = output->vectors.forward.k * inverse_pos.x	+ output->vectors.left.k * inverse_pos.y	+ output->vectors.up.k * inverse_pos.z;
+		output->position.x = output->vectors.forward.i * inverse_pos.x + output->vectors.left.i * inverse_pos.y + output->vectors.up.i * inverse_pos.z;
+		output->position.y = output->vectors.forward.j * inverse_pos.x + output->vectors.left.j * inverse_pos.y + output->vectors.up.j * inverse_pos.z;
+		output->position.z = output->vectors.forward.k * inverse_pos.x + output->vectors.left.k * inverse_pos.y + output->vectors.up.k * inverse_pos.z;
+	}
+	else
+	{
+		csmemset(output, 0, sizeof(real_matrix4x3));
 	}
 
 	return;
@@ -329,4 +327,21 @@ real_matrix3x3* matrix3x3_from_angles(real_matrix3x3* matrix, real32 i, real32 j
 	matrix->up.j = -(si_ck * cosine_vector.j) - ci_sk;
 	matrix->up.k = cosine_vector.j * cosine_vector.k;
 	return matrix;
+}
+
+real_vector3d* matrix4x3_transform_normal(const real_matrix4x3* matrix, const real_vector3d* normal, real_vector3d* result)
+{
+	const real_vector3d copy = *normal;
+	result->i = ((copy.i * matrix->vectors.forward.i) + (copy.j * matrix->vectors.left.i)) + (copy.k * matrix->vectors.up.i);
+	result->j = ((copy.i * matrix->vectors.forward.j) + (copy.j * matrix->vectors.left.j)) + (copy.k * matrix->vectors.up.j);
+	result->k = ((copy.i * matrix->vectors.forward.k) + (copy.j * matrix->vectors.left.k)) + (copy.k * matrix->vectors.up.k);
+	return result;
+}
+
+real_plane3d* matrix4x3_transform_plane(const real_matrix4x3* matrix, const real_plane3d* plane, real_plane3d* result)
+{
+	matrix4x3_transform_normal(matrix, &plane->n, &result->n);
+	const real32 scale_product = matrix->scale * plane->d;
+	result->d = scale_product + dot_product3d((real_vector3d*)&matrix->position, &result->n);
+	return result;
 }
