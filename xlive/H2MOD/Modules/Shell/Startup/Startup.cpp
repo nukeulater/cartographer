@@ -74,8 +74,8 @@ bool configureXinput() {
 
 			char xinputName[_MAX_PATH];
 			char xinputdir[_MAX_PATH];
-			sprintf(xinputdir, "xinput/p%02d", _Shell::GetInstanceId());
-			sprintf(xinputName, "%s/xinput9_1_0.dll", xinputdir);
+			csprintf(xinputdir, NUMBEROF(xinputdir), "xinput/p%02d", _Shell::GetInstanceId());
+			csprintf(xinputName, NUMBEROF(xinputdir), "%s/xinput9_1_0.dll", xinputdir);
 
 			/* Creates a directory and displays error if it fails */
 			auto create_dir = [=](const std::string &path) -> bool {

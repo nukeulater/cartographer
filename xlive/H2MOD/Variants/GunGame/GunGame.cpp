@@ -150,16 +150,19 @@ void GunGame::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 
 				datum currentWeapon = k_level_weapons[level];
 
-				if (level < 15) {
-					call_give_player_weapon(absPlayerIdx, currentWeapon, 1);
-				}
-				else if (level == 15) {
+				if (level == 15)
+				{
 					LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} - {} on frag grenade level!", __FUNCTIONW__, s_player::get_name(playerIdx));
 					s_player::set_player_unit_grenade_count(playerIdx, _unit_grenade_human_fragmentation, 99, true);
 				}
-				else if (level == 16) {
+				else if (level == 16)
+				{
 					LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} - {} on plasma grenade level!", __FUNCTIONW__, s_player::get_name(playerIdx));
 					s_player::set_player_unit_grenade_count(playerIdx, _unit_grenade_covenant_plasma, 99, true);
+				}
+				else
+				{
+					call_give_player_weapon(absPlayerIdx, currentWeapon, 1);
 				}
 			}
 		}
