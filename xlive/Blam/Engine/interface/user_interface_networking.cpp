@@ -76,9 +76,10 @@ s_game_variant* __cdecl user_interface_session_get_game_variant(void)
 void user_interface_networking_set_globals(bool a1, XSESSION_INFO* session, int32 unused, bool from_game_invite)
 {
     *byte_D6840E_get() = a1;
-    memcpy(global_session_info_get(), session, sizeof(XSESSION_INFO));
+    *global_session_info_get() = *session;
     *dword_86EEE0_get() = unused;
     *from_game_invite_global_get() = from_game_invite;
+    return;
 }
 
 void __cdecl user_interface_networking_reset_player_counts(void)

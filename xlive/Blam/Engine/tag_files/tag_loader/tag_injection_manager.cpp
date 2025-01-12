@@ -169,8 +169,8 @@ void c_tag_injecting_manager::reset()
 
 	// just for safety clear the stored data for active map
 	this->m_active_map.clear();
-	memset(&this->m_active_map_cache_header, 0, sizeof(s_cache_header));
-	memset(&this->m_active_map_tags_header, 0, sizeof(cache_file_tags_header));
+	csmemset(&this->m_active_map_cache_header, 0, sizeof(s_cache_header));
+	csmemset(&this->m_active_map_tags_header, 0, sizeof(cache_file_tags_header));
 	this->m_active_map_scenario_instance_offset = 0;
 
 	this->m_table.clear();
@@ -740,7 +740,7 @@ void* c_tag_injecting_manager::extend_tag_block(void* block, uint32 entry_size, 
 	uint32 injection_offset = this->m_base_tag_data_size + this->m_injectable_used_size;
 	int8* injection_location = (int8*)(cache_get_tag_data() + injection_offset);
 
-	memcpy(injection_location, base_block_location, base_block_total_size);
+	csmemcpy(injection_location, base_block_location, base_block_total_size);
 
 	basic_block->data = injection_offset;
 	basic_block->count += count;

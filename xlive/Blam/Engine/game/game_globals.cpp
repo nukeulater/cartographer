@@ -190,7 +190,7 @@ static void game_globals_prepare_lmao_representation(s_game_globals_custom_repre
 		new_variant->name = 0xABABABA;
 		new_variant->dialogue.group = base_variant->dialogue.group;
 		new_variant->dialogue.index = base_variant->dialogue.index;
-		memcpy(new_variant->runtime_model_region_index, base_variant->runtime_model_region_index, sizeof(new_variant->runtime_model_region_index));
+		csmemcpy(new_variant->runtime_model_region_index, base_variant->runtime_model_region_index, sizeof(new_variant->runtime_model_region_index));
 
 		s_model_variant_region* region_blocks = (s_model_variant_region*)tag_injection_extend_block(&new_variant->regions, new_variant->regions.type_size(), base_variant->regions.count);
 		for (auto i = 0; i < base_variant->regions.count; i++)
@@ -214,8 +214,8 @@ static void game_globals_prepare_lmao_representation(s_game_globals_custom_repre
 				new_permutation->runtime_model_permutation_index = permutation->runtime_model_permutation_index;
 				new_permutation->flags = permutation->flags;
 				new_permutation->probability = permutation->probability;
-				memcpy(new_permutation->runtime_state_permutation_index, permutation->runtime_state_permutation_index, sizeof(new_permutation->runtime_state_permutation_index));
-				memcpy(new_permutation->pad1, permutation->pad1, sizeof(new_permutation->pad1));
+				csmemcpy(new_permutation->runtime_state_permutation_index, permutation->runtime_state_permutation_index, sizeof(new_permutation->runtime_state_permutation_index));
+				csmemcpy(new_permutation->pad1, permutation->pad1, sizeof(new_permutation->pad1));
 			}
 		}
 

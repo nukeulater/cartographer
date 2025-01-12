@@ -209,7 +209,7 @@ void discord_interface_set_difficulty(int16 difficulty)
 	
 	// Convert difficulty to string
 	char number_string[2];
-	snprintf(number_string, sizeof(number_string), "%hd", difficulty);
+	csnprintf(number_string, 1, sizeof(number_string), "%hd", difficulty);
 
 	// Create image name we select for the difficulty
 	c_static_string<16> difficulty_image_name;
@@ -343,7 +343,7 @@ void discord_rich_presence_update(s_discord_data* discord)
 		XUID host;
 		XUserGetXUID(0, &host);
 
-		snprintf(g_discord_globals.activity.party.id, sizeof(g_discord_globals.activity.party.id), "%016llx", host);
+		csprintf(g_discord_globals.activity.party.id, sizeof(g_discord_globals.activity.party.id), "%016llx", host);
 		g_discord_globals.activity.party.privacy = DiscordActivityPartyPrivacy_Public;
 		discord_interface_encode_xsession_info(&session);
 	}
@@ -379,7 +379,7 @@ void discord_interface_encode_xsession_info(XSESSION_INFO* session_info)
 	// Encode the data into hex string
 	for (uint32 i = 0; i < sizeof(XSESSION_INFO); i++)
 	{
-		sprintf(&g_discord_globals.activity.secrets.join[2 * i], "%02hhX", session_bytes[i]);
+		csprintf(&g_discord_globals.activity.secrets.join[2 * i], NUMBEROF(g_discord_globals.activity.secrets.join), "%02hhX", session_bytes[i]);
 	}
 
 	error(0, "Encoded join secret: %s", g_discord_globals.activity.secrets.join);

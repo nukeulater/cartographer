@@ -85,7 +85,7 @@ bool GetNTStringLine(char* text, int lineNum, char** line) {
 
 	*line = (char*)malloc(sizeof(char) * (line_len + 1));
 
-	memcpy(*line, line_begin, line_len);
+	csmemcpy(*line, line_begin, line_len);
 	(*line)[line_len] = 0;
 
 	return true;
@@ -483,7 +483,7 @@ static size_t writefunc(void *ptr, size_t size, size_t nmemb, struct stringMe *s
 		fprintf(stderr, "realloc() failed\n");
 		exit(EXIT_FAILURE);
 	}
-	memcpy(s->ptr + s->len, ptr, size*nmemb);
+	csmemcpy(s->ptr + s->len, ptr, size*nmemb);
 	s->ptr[new_len] = '\0';
 	s->len = new_len;
 

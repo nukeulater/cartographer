@@ -504,7 +504,7 @@ void __cdecl create_account_xbox_task_progress_cb(c_screen_xbox_live_task_progre
 		SecureZeroMemory(g_account_create_data.user_name, sizeof(g_account_create_data.user_name));
 		SecureZeroMemory(g_account_create_data.email, sizeof(g_account_create_data.email));
 		SecureZeroMemory(g_account_create_data.password, sizeof(g_account_create_data.password));
-		memset(&g_account_create_data, 0, sizeof(g_account_create_data));
+		csmemset(&g_account_create_data, 0, sizeof(g_account_create_data));
 	}
 }
 

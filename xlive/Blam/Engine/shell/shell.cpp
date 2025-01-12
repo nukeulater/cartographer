@@ -58,6 +58,12 @@ void shell_command_line_flag_set(e_shell_command_line_flags flag, int32 state)
 	return;
 }
 
+// TODO: properly set this up
+const char* shell_get_version(void)
+{
+	return "halo2_pc_cache_  release pc 11122.07.08.24.1808.main";
+}
+
 bool shell_initialize(void)
 {
 	for (int32 i = 0; i < k_number_of_shell_command_line_flags; i++)

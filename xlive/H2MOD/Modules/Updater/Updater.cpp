@@ -199,11 +199,11 @@ static int interpretUpdateEntry(char* fileLine, char* version, int lineNumber) {
 
 			int namebufflen = strlen(tempstr1) + 1;
 			update_file_entry->local_name = (char*)malloc(namebufflen);
-			memcpy(update_file_entry->local_name, tempstr1, namebufflen);
+			csmemcpy(update_file_entry->local_name, tempstr1, namebufflen);
 
 			namebufflen = strlen(tempstr2) + 1;
 			update_file_entry->server_uri = (char*)malloc(namebufflen);
-			memcpy(update_file_entry->server_uri, tempstr2, namebufflen);
+			csmemcpy(update_file_entry->server_uri, tempstr2, namebufflen);
 
 			bool save = true;
 

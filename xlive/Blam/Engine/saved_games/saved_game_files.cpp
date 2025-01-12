@@ -119,12 +119,12 @@ void saved_games_get_display_name(uint32 enumerated_index, wchar_t* display_name
 			{
 				if ((enumerated_index & 0xF) <= 9)
 				{
-					memcpy(display_name, &default_save->buffer[0xC], 128);
+					csmemcpy(display_name, &default_save->buffer[0xC], 128);
 				}
 			}
 			else
 			{
-				memcpy(display_name, &default_save->buffer[0x8], 0x80);
+				csmemcpy(display_name, &default_save->buffer[0x8], 128);
 			}
 		}
 	}

@@ -115,7 +115,7 @@ void c_tag_injection_table::resize_table()
 	if (this->m_table)
 	{
 		// Copy old buffer into the new one
-		memcpy(new_buffer, this->m_table, sizeof(s_tag_injecting_table_entry) * this->m_table_size);
+		csmemcpy(new_buffer, this->m_table, sizeof(s_tag_injecting_table_entry) * this->m_table_size);
 
 		// Free the old buffer
 		free(this->m_table);

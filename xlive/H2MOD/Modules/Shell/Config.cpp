@@ -780,7 +780,7 @@ void ReadH2Config() {
 				{
 					strncpy_s(H2Config_team_bit_flags_str, sizeof(H2Config_team_bit_flags_str), team_bit_mask.c_str(), 15);
 					H2Config_team_bit_flags = 0;
-					memset(H2Config_team_flag_array, 0, sizeof(H2Config_team_flag_array));
+					csmemset(H2Config_team_flag_array, 0, sizeof(H2Config_team_flag_array));
 
 					size_t true_bit_value_count = std::count(team_bit_mask.begin(), team_bit_mask.end(), '1');
 					size_t false_bit_value_count = std::count(team_bit_mask.begin(), team_bit_mask.end(), '0');

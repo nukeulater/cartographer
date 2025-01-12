@@ -32,7 +32,7 @@ int horizontalRes = 0;
 
 void XLiveRendering::InitializeD3D9(D3DPRESENT_PARAMETERS* presentParameters)
 {
-	memcpy(&g_d3dPresentParameters, presentParameters, sizeof(D3DPRESENT_PARAMETERS));
+	g_d3dPresentParameters = *presentParameters;
 
 	ImGuiHandler::Initalize(presentParameters->hDeviceWindow);
 }
@@ -92,7 +92,7 @@ int WINAPI XLiveOnCreateDevice(IUnknown* pD3D, VOID* vD3DPP)
 // #5007: XLiveOnResetDevice
 int WINAPI XLiveOnResetDevice(D3DPRESENT_PARAMETERS* pD3DPP)
 {
-	memcpy(&g_d3dPresentParameters, pD3DPP, sizeof(D3DPRESENT_PARAMETERS));
+	g_d3dPresentParameters = *pD3DPP;
 
 	//Have to invalidate ImGUI on device reset, otherwise it hangs the device in a reset loop.
 	//https://github.com/ocornut/imgui/issues/1464#issuecomment-347469716

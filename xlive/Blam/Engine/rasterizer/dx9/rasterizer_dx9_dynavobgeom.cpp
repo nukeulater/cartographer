@@ -165,7 +165,7 @@ void rasterizer_dx9_dynamic_screen_geometry_draw(const s_dynamic_geometry_parame
 				const s_dynamic_geometry_map_color_parameters* color = parameters->map_color[i];
 
 				// Copy colour to vs constants if one is supplied, otherwise copy white
-				memcpy(&ps_constants[i], (color != NULL ? color->color : global_real_rgb_white), sizeof(real_rgb_color));
+				csmemcpy(&ps_constants[i], (color != NULL ? color->color : global_real_rgb_white), sizeof(real_rgb_color));
 
 				const s_dynamic_geometry_map_alpha* alpha = parameters->map_alpha[i];
 				ps_constants[i].l = (alpha != NULL ? *alpha->alpha : 1.f);

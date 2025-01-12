@@ -109,7 +109,7 @@ public:
 
 		// allocate once we know the size
 		m_buf = new char[GetBufferSize()];
-		memset(m_buf, 0, GetBufferSize());
+		csmemset(m_buf, 0, GetBufferSize());
 		m_buffer_idx = 0;
 		m_strings_headers.reserve(m_line_count);
 	};
@@ -146,7 +146,7 @@ public:
 		char* new_buffer = (char*)malloc(newBufferSize);
 		if (m_buf != NULL)
 		{
-			memcpy(new_buffer, m_buf, GetBufferSize());
+			csmemcpy(new_buffer, m_buf, GetBufferSize());
 			delete[] m_buf;
 		}
 		m_buf = new_buffer;

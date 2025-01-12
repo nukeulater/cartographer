@@ -101,11 +101,11 @@ void tag_injection_scenario_load_setup(uint32 allocation_size)
 	g_manager.reset();
 
 	uint32* tag_table_start = Memory::GetAddress<uint32*>(0x47CD50, 0x4A29B8);
-	memset((BYTE*)g_tag_table, 0, 0x3BA40);
+	csmemset((BYTE*)g_tag_table, 0, 0x3BA40);
 
 	if (*tag_table_start != NULL)
 	{
-		memcpy(g_tag_table, (BYTE*)*tag_table_start, 0x3BA40);
+		csmemcpy(g_tag_table, (BYTE*)*tag_table_start, 0x3BA40);
 		*tag_table_start = (uint32)g_tag_table;
 		s_cache_file_memory_globals* cache_file_memory_globals = cache_file_memory_globals_get();
 		cache_file_memory_globals->tags_header->tag_instances = (cache_file_tag_instance*)g_tag_table;

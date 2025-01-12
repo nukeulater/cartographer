@@ -627,7 +627,7 @@ namespace ImGuiHandler {
 
 						// 2 digit number + null terminator
 						char index_string[3];
-						sprintf(index_string, "%d", i);
+						csprintf(index_string, NUMBEROF(index_string), "%d", i);
 
 						c_static_string<8> label("##C_L");
 						label.append(index_string);

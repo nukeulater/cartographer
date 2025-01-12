@@ -149,7 +149,7 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 	char* index_next = 0;
 	while (index_next = strstr(index_current, "<br>")) {
 		char* fileLine = (char*)malloc((index_next - index_current + 1) * sizeof(char));
-		memcpy(fileLine, index_current, index_next - index_current);
+		csmemcpy(fileLine, index_current, index_next - index_current);
 		fileLine[index_next - index_current] = 0;
 
 		if (sscanf(fileLine, "return_code=%d", &tempint1) == 1) {

@@ -88,7 +88,7 @@ public:
 		m_head = NULL;
 		m_tail = NULL;
 		m_initialized = true;
-		memset(&m_stats, 0, sizeof(m_stats));
+		csmemset(&m_stats, 0, sizeof(m_stats));
 	}
 
 	bool initialized() const

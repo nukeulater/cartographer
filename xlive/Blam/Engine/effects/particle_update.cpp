@@ -13,9 +13,9 @@ void __cdecl particle_update_points_interpolate_hook(const real_point3d* previou
 	// there for instead of rendering the particle at the root origin do it at the target (initial) position instead
 	// this is only really noticeable on 30 tick gameplay
 	if (memcmp(previous_point, &global_zero_vector3d, sizeof(real_point3d)) == 0)
-		memcpy(out, target_point, sizeof(real_point3d));
+		csmemcpy(out, target_point, sizeof(real_point3d));
 	else
-		memcpy(out, previous_point, sizeof(real_point3d));
+		csmemcpy(out, previous_point, sizeof(real_point3d));
 }
 
 void particle_update(real32 delta)

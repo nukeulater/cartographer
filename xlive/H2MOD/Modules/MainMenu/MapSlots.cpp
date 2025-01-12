@@ -7,7 +7,6 @@
 #include "main/level_definitions.h"
 #include "scenario/scenario_definitions.h"
 #include "tag_files/tag_loader/tag_injection.h"
-#include "Util/filesys.h"
 
 
 // TODO Move to Blam/Engine/main/levels once the below are complete
@@ -51,16 +50,12 @@ namespace MapSlots
 	{
 		//lots copied over from Tag Loader, using this function to grab the Level data in the scenario tag
 		//And using that to construct a new s_multiplayer_levels_block and grab the bitmap datum for tag loading
-		c_static_wchar_string<MAX_PATH> game_path;
-		game_path.set(GetExeDirectoryWide().c_str());
-
 		LOG_TRACE_GAME("[Map Slots]: Startup - Caching map data");
 
 		for (uint32 i = 0; i < k_default_map_to_add_count; ++i)
 		{
 			c_static_wchar_string<MAX_PATH> map_location;
-			map_location.set(game_path.get_string());
-			map_location.append(L"\\maps\\");
+			map_location.set(L".\\maps\\");
 			map_location.append(k_default_maps_to_add[i]);
 			map_location.append(L".map");
 
@@ -95,7 +90,7 @@ namespace MapSlots
 					s_multiplayer_ui_level_definition* slot = ui_levels->multiplayer_levels[added_maps + k_multiplayer_first_unused_slot];
 
 					//Write the data loaded from the maps into the unused slot
-					memcpy(slot, &newSlot, sizeof(newSlot));
+					csmemcpy(slot, &newSlot, sizeof(newSlot));
 					//Resolve the loaded bitmap datum
 					slot->bitmap.index = tag_injection_resolve_cache_datum(newSlot.bitmap.index);
 
@@ -131,7 +126,7 @@ namespace MapSlots
 				VirtualProtect(slot, sizeof(s_multiplayer_ui_level_definition), PAGE_EXECUTE_READWRITE, &dwBack[0]);
 
 				//Write the data loaded from the maps into the unused slot
-				memcpy(slot, &newSlot, sizeof(s_multiplayer_ui_level_definition));
+				csmemcpy(slot, &newSlot, sizeof(s_multiplayer_ui_level_definition));
 
 				//Change the map id and sort ID so that the maps are 
 				//placed in order at the end of the list
