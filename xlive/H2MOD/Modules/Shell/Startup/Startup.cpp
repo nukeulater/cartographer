@@ -156,7 +156,12 @@ bool configureXinput() {
 				}
 
 				int len_to_write = 2;
-				BYTE assmXinputDuraznoNameEdit[] = { 0x30 + (_Shell::GetInstanceId() / 10), 0x30 + (_Shell::GetInstanceId() % 10), 0x30 + (_Shell::GetInstanceId() % 10) };
+				uint8 assmXinputDuraznoNameEdit[] = 
+				{ 
+					(uint8)(0x30 + (_Shell::GetInstanceId() / 10)),
+					(uint8)(0x30 + (_Shell::GetInstanceId() % 10)),
+					(uint8)(0x30 + (_Shell::GetInstanceId() % 10))
+				};
 				if (xinput_unicode[xinput_index]) {
 					assmXinputDuraznoNameEdit[1] = 0x00;
 					len_to_write = 3;

@@ -420,7 +420,7 @@ void __cdecl first_person_weapons_update_nodes(int32 user_index, int32 weapon_sl
                             rounds_total = magazine->rounds_loaded_maximum;
                         }
 
-                        ammunition_frame_position = ((rounds_total - rounds_loaded_maximum) * v1) + rounds_loaded_maximum;
+                        ammunition_frame_position = (int16)(((rounds_total - rounds_loaded_maximum) * v1) + rounds_loaded_maximum);
                     }
                     weapon_channel.set_frame_position((real32)ammunition_frame_position);
                     weapon_channel.apply_node_orientations(0.0f, 0.0f, weapon_data->node_orientations_count, fp_orientations->weapon_orientations, 0, 0);
@@ -448,7 +448,11 @@ void __cdecl first_person_weapons_update_nodes(int32 user_index, int32 weapon_sl
             if (TEST_BIT(fp_data->flags, 1) && weapon_data->animation_manager.interpolator_controls[1].enabled())
             {
                 ASSERT(weapon_data->node_orientations_count == weapon_data->animation_manager.get_node_count());
-                weapon_data->animation_manager.interpolate_node_orientations(weapon_data->node_orientations_count, NULL, fp_orientations->hand_orientations, fp_orientations->weapon_orientations);
+                weapon_data->animation_manager.interpolate_node_orientations(
+                    (int16)weapon_data->node_orientations_count,
+                    NULL,
+                    fp_orientations->hand_orientations,
+                    fp_orientations->weapon_orientations);
             }
             SET_FLAG(fp_data->flags, 1, true);
             
