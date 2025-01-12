@@ -653,7 +653,7 @@ void draw_hud_text_get_string(s_draw_hud_widget_input_results* widget_function_r
 
 void __cdecl draw_hud_text_widget(uint32 local_render_user_index, s_new_hud_temporary_user_state* user_state, s_hud_text_widget_definition* text_widget, s_draw_hud_widget_input_results* widget_function_results)
 {
-	if (!text_widget->string.is_valid() || text_widget->shader.index == NONE)
+	if (!text_widget->string != 0 || text_widget->shader.index == NONE)
 		return;
 
 	wchar_t widget_string[512]{};

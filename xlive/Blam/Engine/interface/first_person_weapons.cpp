@@ -778,7 +778,7 @@ void first_person_weapon_apply_ik(int32 user_index, s_first_person_model_data* f
                     while (fp_data->weapons[0].animation_manager.find_next_weapon_ik_point(&iterator))
                     {
                         if (iterator.attach_to_marker != NONE 
-                            && iterator.attach_to_marker.get_packed() 
+                            && iterator.attach_to_marker 
                             && IN_RANGE(fp_data->character_type, _character_type_masterchief, globals->player_representation.count - 1) )
                         {
                             const s_game_globals_player_representation* player_rep = globals->player_representation[fp_data->character_type];
