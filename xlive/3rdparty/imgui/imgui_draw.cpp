@@ -1,4 +1,4 @@
-// dear imgui, v1.87 WIP
+// dear imgui, v1.91.6
 // (drawing and font code)
 
 /*
@@ -8,12 +8,13 @@ Index of this file:
 // [SECTION] STB libraries implementation
 // [SECTION] Style functions
 // [SECTION] ImDrawList
+// [SECTION] ImTriangulator, ImDrawList concave polygon fill
 // [SECTION] ImDrawListSplitter
 // [SECTION] ImDrawData
 // [SECTION] Helpers ShadeVertsXXX functions
 // [SECTION] ImFontConfig
 // [SECTION] ImFontAtlas
-// [SECTION] ImFontAtlas glyph ranges helpers
+// [SECTION] ImFontAtlas: glyph ranges helpers
 // [SECTION] ImFontGlyphRangesBuilder
 // [SECTION] ImFont
 // [SECTION] ImGui Internal Render Helpers
@@ -26,38 +27,24 @@ Index of this file:
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 
-#include "imgui.h"
-#ifndef IMGUI_DISABLE
-
 #ifndef IMGUI_DEFINE_MATH_OPERATORS
 #define IMGUI_DEFINE_MATH_OPERATORS
 #endif
 
+#include "imgui.h"
+#ifndef IMGUI_DISABLE
 #include "imgui_internal.h"
 #ifdef IMGUI_ENABLE_FREETYPE
 #include "misc/freetype/imgui_freetype.h"
 #endif
 
 #include <stdio.h>      // vsnprintf, sscanf, printf
-#if !defined(alloca)
-#if defined(__GLIBC__) || defined(__sun) || defined(__APPLE__) || defined(__NEWLIB__)
-#include <alloca.h>     // alloca (glibc uses <alloca.h>. Note that Cygwin may have _WIN32 defined, so the order matters here)
-#elif defined(_WIN32)
-#include <malloc.h>     // alloca
-#if !defined(alloca)
-#define alloca _alloca  // for clang with MS Codegen
-#endif
-#else
-#include <stdlib.h>     // alloca
-#endif
-#endif
 
 // Visual Studio warnings
 #ifdef _MSC_VER
 #pragma warning (disable: 4127)     // condition expression is constant
 #pragma warning (disable: 4505)     // unreferenced local function has been removed (stb stuff)
 #pragma warning (disable: 4996)     // 'This function or variable may be unsafe': strcpy, strdup, sprintf, vsnprintf, sscanf, fopen
-#pragma warning (disable: 6255)     // [Static Analyzer] _alloca indicates failure by raising a stack overflow exception.  Consider using _malloca instead.
 #pragma warning (disable: 26451)    // [Static Analyzer] Arithmetic overflow : Using operator 'xxx' on a 4 byte value and then casting the result to a 8 byte value. Cast the value to the wider type before calling operator 'xxx' to avoid overflow(io.2).
 #pragma warning (disable: 26812)    // [Static Analyzer] The enum type 'xxx' is unscoped. Prefer 'enum class' over 'enum' (Enum.3). [MSVC Static Analyzer)
 #endif
@@ -66,9 +53,6 @@ Index of this file:
 #if defined(__clang__)
 #if __has_warning("-Wunknown-warning-option")
 #pragma clang diagnostic ignored "-Wunknown-warning-option"         // warning: unknown warning group 'xxx'                      // not all warnings are known by all Clang versions and they tend to be rename-happy.. so ignoring warnings triggers new warnings on some configuration. Great!
-#endif
-#if __has_warning("-Walloca")
-#pragma clang diagnostic ignored "-Walloca"                         // warning: use of function '__builtin_alloca' is discouraged
 #endif
 #pragma clang diagnostic ignored "-Wunknown-pragmas"                // warning: unknown warning group 'xxx'
 #pragma clang diagnostic ignored "-Wold-style-cast"                 // warning: use of old-style cast                            // yes, they are more terse.
@@ -80,17 +64,20 @@ Index of this file:
 #pragma clang diagnostic ignored "-Wreserved-id-macro"              // warning: macro name is a reserved identifier
 #pragma clang diagnostic ignored "-Wdouble-promotion"               // warning: implicit conversion from 'float' to 'double' when passing argument to function  // using printf() is a misery with this as C++ va_arg ellipsis changes float to double.
 #pragma clang diagnostic ignored "-Wimplicit-int-float-conversion"  // warning: implicit conversion from 'xxx' to 'float' may lose precision
+#pragma clang diagnostic ignored "-Wreserved-identifier"            // warning: identifier '_Xxx' is reserved because it starts with '_' followed by a capital letter
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"            // warning: 'xxx' is an unsafe pointer used for buffer access
+#pragma clang diagnostic ignored "-Wnontrivial-memaccess"           // warning: first argument in call to 'memset' is a pointer to non-trivially copyable type
 #elif defined(__GNUC__)
-#pragma GCC diagnostic ignored "-Wpragmas"                  // warning: unknown option after '#pragma GCC diagnostic' kind
-#pragma GCC diagnostic ignored "-Wunused-function"          // warning: 'xxxx' defined but not used
-#pragma GCC diagnostic ignored "-Wdouble-promotion"         // warning: implicit conversion from 'float' to 'double' when passing argument to function
-#pragma GCC diagnostic ignored "-Wconversion"               // warning: conversion to 'xxxx' from 'xxxx' may alter its value
-#pragma GCC diagnostic ignored "-Wstack-protector"          // warning: stack protector not protecting local variables: variable length buffer
-#pragma GCC diagnostic ignored "-Wclass-memaccess"          // [__GNUC__ >= 8] warning: 'memset/memcpy' clearing/writing an object of type 'xxxx' with no trivial copy-assignment; use assignment or value-initialization instead
+#pragma GCC diagnostic ignored "-Wpragmas"                          // warning: unknown option after '#pragma GCC diagnostic' kind
+#pragma GCC diagnostic ignored "-Wunused-function"                  // warning: 'xxxx' defined but not used
+#pragma GCC diagnostic ignored "-Wdouble-promotion"                 // warning: implicit conversion from 'float' to 'double' when passing argument to function
+#pragma GCC diagnostic ignored "-Wconversion"                       // warning: conversion to 'xxxx' from 'xxxx' may alter its value
+#pragma GCC diagnostic ignored "-Wstack-protector"                  // warning: stack protector not protecting local variables: variable length buffer
+#pragma GCC diagnostic ignored "-Wclass-memaccess"                  // [__GNUC__ >= 8] warning: 'memset/memcpy' clearing/writing an object of type 'xxxx' with no trivial copy-assignment; use assignment or value-initialization instead
 #endif
 
 //-------------------------------------------------------------------------
-// [SECTION] STB libraries implementation
+// [SECTION] STB libraries implementation (for stb_truetype and stb_rect_pack)
 //-------------------------------------------------------------------------
 
 // Compile time options:
@@ -115,7 +102,7 @@ namespace IMGUI_STB_NAMESPACE
 
 #if defined(__clang__)
 #pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-function"
+#pragma clang diagnostic ignored "-Wunused-function"        // warning: 'xxxx' defined but not used
 #pragma clang diagnostic ignored "-Wmissing-prototypes"
 #pragma clang diagnostic ignored "-Wimplicit-fallthrough"
 #pragma clang diagnostic ignored "-Wcast-qual"              // warning: cast from 'const xxxx *' to 'xxx *' drops const qualifier
@@ -151,7 +138,7 @@ namespace IMGUI_STB_NAMESPACE
 #define STBTT_sqrt(x)       ImSqrt(x)
 #define STBTT_pow(x,y)      ImPow(x,y)
 #define STBTT_fabs(x)       ImFabs(x)
-#define STBTT_ifloor(x)     ((int)ImFloorSigned(x))
+#define STBTT_ifloor(x)     ((int)ImFloor(x))
 #define STBTT_iceil(x)      ((int)ImCeil(x))
 #define STBTT_STATIC
 #define STB_TRUETYPE_IMPLEMENTATION
@@ -225,11 +212,13 @@ void ImGui::StyleColorsDark(ImGuiStyle* dst)
     colors[ImGuiCol_ResizeGrip]             = ImVec4(0.26f, 0.59f, 0.98f, 0.20f);
     colors[ImGuiCol_ResizeGripHovered]      = ImVec4(0.26f, 0.59f, 0.98f, 0.67f);
     colors[ImGuiCol_ResizeGripActive]       = ImVec4(0.26f, 0.59f, 0.98f, 0.95f);
-    colors[ImGuiCol_Tab]                    = ImLerp(colors[ImGuiCol_Header],       colors[ImGuiCol_TitleBgActive], 0.80f);
     colors[ImGuiCol_TabHovered]             = colors[ImGuiCol_HeaderHovered];
-    colors[ImGuiCol_TabActive]              = ImLerp(colors[ImGuiCol_HeaderActive], colors[ImGuiCol_TitleBgActive], 0.60f);
-    colors[ImGuiCol_TabUnfocused]           = ImLerp(colors[ImGuiCol_Tab],          colors[ImGuiCol_TitleBg], 0.80f);
-    colors[ImGuiCol_TabUnfocusedActive]     = ImLerp(colors[ImGuiCol_TabActive],    colors[ImGuiCol_TitleBg], 0.40f);
+    colors[ImGuiCol_Tab]                    = ImLerp(colors[ImGuiCol_Header],       colors[ImGuiCol_TitleBgActive], 0.80f);
+    colors[ImGuiCol_TabSelected]            = ImLerp(colors[ImGuiCol_HeaderActive], colors[ImGuiCol_TitleBgActive], 0.60f);
+    colors[ImGuiCol_TabSelectedOverline]    = colors[ImGuiCol_HeaderActive];
+    colors[ImGuiCol_TabDimmed]              = ImLerp(colors[ImGuiCol_Tab],          colors[ImGuiCol_TitleBg], 0.80f);
+    colors[ImGuiCol_TabDimmedSelected]      = ImLerp(colors[ImGuiCol_TabSelected],  colors[ImGuiCol_TitleBg], 0.40f);
+    colors[ImGuiCol_TabDimmedSelectedOverline] = ImVec4(0.50f, 0.50f, 0.50f, 0.00f);
     colors[ImGuiCol_PlotLines]              = ImVec4(0.61f, 0.61f, 0.61f, 1.00f);
     colors[ImGuiCol_PlotLinesHovered]       = ImVec4(1.00f, 0.43f, 0.35f, 1.00f);
     colors[ImGuiCol_PlotHistogram]          = ImVec4(0.90f, 0.70f, 0.00f, 1.00f);
@@ -239,9 +228,10 @@ void ImGui::StyleColorsDark(ImGuiStyle* dst)
     colors[ImGuiCol_TableBorderLight]       = ImVec4(0.23f, 0.23f, 0.25f, 1.00f);   // Prefer using Alpha=1.0 here
     colors[ImGuiCol_TableRowBg]             = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
     colors[ImGuiCol_TableRowBgAlt]          = ImVec4(1.00f, 1.00f, 1.00f, 0.06f);
+    colors[ImGuiCol_TextLink]               = colors[ImGuiCol_HeaderActive];
     colors[ImGuiCol_TextSelectedBg]         = ImVec4(0.26f, 0.59f, 0.98f, 0.35f);
     colors[ImGuiCol_DragDropTarget]         = ImVec4(1.00f, 1.00f, 0.00f, 0.90f);
-    colors[ImGuiCol_NavHighlight]           = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
+    colors[ImGuiCol_NavCursor]              = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
     colors[ImGuiCol_NavWindowingHighlight]  = ImVec4(1.00f, 1.00f, 1.00f, 0.70f);
     colors[ImGuiCol_NavWindowingDimBg]      = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);
     colors[ImGuiCol_ModalWindowDimBg]       = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
@@ -285,11 +275,13 @@ void ImGui::StyleColorsClassic(ImGuiStyle* dst)
     colors[ImGuiCol_ResizeGrip]             = ImVec4(1.00f, 1.00f, 1.00f, 0.10f);
     colors[ImGuiCol_ResizeGripHovered]      = ImVec4(0.78f, 0.82f, 1.00f, 0.60f);
     colors[ImGuiCol_ResizeGripActive]       = ImVec4(0.78f, 0.82f, 1.00f, 0.90f);
-    colors[ImGuiCol_Tab]                    = ImLerp(colors[ImGuiCol_Header],       colors[ImGuiCol_TitleBgActive], 0.80f);
     colors[ImGuiCol_TabHovered]             = colors[ImGuiCol_HeaderHovered];
-    colors[ImGuiCol_TabActive]              = ImLerp(colors[ImGuiCol_HeaderActive], colors[ImGuiCol_TitleBgActive], 0.60f);
-    colors[ImGuiCol_TabUnfocused]           = ImLerp(colors[ImGuiCol_Tab],          colors[ImGuiCol_TitleBg], 0.80f);
-    colors[ImGuiCol_TabUnfocusedActive]     = ImLerp(colors[ImGuiCol_TabActive],    colors[ImGuiCol_TitleBg], 0.40f);
+    colors[ImGuiCol_Tab]                    = ImLerp(colors[ImGuiCol_Header],       colors[ImGuiCol_TitleBgActive], 0.80f);
+    colors[ImGuiCol_TabSelected]            = ImLerp(colors[ImGuiCol_HeaderActive], colors[ImGuiCol_TitleBgActive], 0.60f);
+    colors[ImGuiCol_TabSelectedOverline]    = colors[ImGuiCol_HeaderActive];
+    colors[ImGuiCol_TabDimmed]              = ImLerp(colors[ImGuiCol_Tab],          colors[ImGuiCol_TitleBg], 0.80f);
+    colors[ImGuiCol_TabDimmedSelected]      = ImLerp(colors[ImGuiCol_TabSelected],  colors[ImGuiCol_TitleBg], 0.40f);
+    colors[ImGuiCol_TabDimmedSelectedOverline] = ImVec4(0.53f, 0.53f, 0.87f, 0.00f);
     colors[ImGuiCol_PlotLines]              = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
     colors[ImGuiCol_PlotLinesHovered]       = ImVec4(0.90f, 0.70f, 0.00f, 1.00f);
     colors[ImGuiCol_PlotHistogram]          = ImVec4(0.90f, 0.70f, 0.00f, 1.00f);
@@ -299,9 +291,10 @@ void ImGui::StyleColorsClassic(ImGuiStyle* dst)
     colors[ImGuiCol_TableBorderLight]       = ImVec4(0.26f, 0.26f, 0.28f, 1.00f);   // Prefer using Alpha=1.0 here
     colors[ImGuiCol_TableRowBg]             = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
     colors[ImGuiCol_TableRowBgAlt]          = ImVec4(1.00f, 1.00f, 1.00f, 0.07f);
+    colors[ImGuiCol_TextLink]               = colors[ImGuiCol_HeaderActive];
     colors[ImGuiCol_TextSelectedBg]         = ImVec4(0.00f, 0.00f, 1.00f, 0.35f);
     colors[ImGuiCol_DragDropTarget]         = ImVec4(1.00f, 1.00f, 0.00f, 0.90f);
-    colors[ImGuiCol_NavHighlight]           = colors[ImGuiCol_HeaderHovered];
+    colors[ImGuiCol_NavCursor]              = colors[ImGuiCol_HeaderHovered];
     colors[ImGuiCol_NavWindowingHighlight]  = ImVec4(1.00f, 1.00f, 1.00f, 0.70f);
     colors[ImGuiCol_NavWindowingDimBg]      = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);
     colors[ImGuiCol_ModalWindowDimBg]       = ImVec4(0.20f, 0.20f, 0.20f, 0.35f);
@@ -346,11 +339,13 @@ void ImGui::StyleColorsLight(ImGuiStyle* dst)
     colors[ImGuiCol_ResizeGrip]             = ImVec4(0.35f, 0.35f, 0.35f, 0.17f);
     colors[ImGuiCol_ResizeGripHovered]      = ImVec4(0.26f, 0.59f, 0.98f, 0.67f);
     colors[ImGuiCol_ResizeGripActive]       = ImVec4(0.26f, 0.59f, 0.98f, 0.95f);
-    colors[ImGuiCol_Tab]                    = ImLerp(colors[ImGuiCol_Header],       colors[ImGuiCol_TitleBgActive], 0.90f);
     colors[ImGuiCol_TabHovered]             = colors[ImGuiCol_HeaderHovered];
-    colors[ImGuiCol_TabActive]              = ImLerp(colors[ImGuiCol_HeaderActive], colors[ImGuiCol_TitleBgActive], 0.60f);
-    colors[ImGuiCol_TabUnfocused]           = ImLerp(colors[ImGuiCol_Tab],          colors[ImGuiCol_TitleBg], 0.80f);
-    colors[ImGuiCol_TabUnfocusedActive]     = ImLerp(colors[ImGuiCol_TabActive],    colors[ImGuiCol_TitleBg], 0.40f);
+    colors[ImGuiCol_Tab]                    = ImLerp(colors[ImGuiCol_Header],       colors[ImGuiCol_TitleBgActive], 0.90f);
+    colors[ImGuiCol_TabSelected]            = ImLerp(colors[ImGuiCol_HeaderActive], colors[ImGuiCol_TitleBgActive], 0.60f);
+    colors[ImGuiCol_TabSelectedOverline]    = colors[ImGuiCol_HeaderActive];
+    colors[ImGuiCol_TabDimmed]              = ImLerp(colors[ImGuiCol_Tab],          colors[ImGuiCol_TitleBg], 0.80f);
+    colors[ImGuiCol_TabDimmedSelected]      = ImLerp(colors[ImGuiCol_TabSelected],  colors[ImGuiCol_TitleBg], 0.40f);
+    colors[ImGuiCol_TabDimmedSelectedOverline] = ImVec4(0.26f, 0.59f, 1.00f, 0.00f);
     colors[ImGuiCol_PlotLines]              = ImVec4(0.39f, 0.39f, 0.39f, 1.00f);
     colors[ImGuiCol_PlotLinesHovered]       = ImVec4(1.00f, 0.43f, 0.35f, 1.00f);
     colors[ImGuiCol_PlotHistogram]          = ImVec4(0.90f, 0.70f, 0.00f, 1.00f);
@@ -360,9 +355,10 @@ void ImGui::StyleColorsLight(ImGuiStyle* dst)
     colors[ImGuiCol_TableBorderLight]       = ImVec4(0.68f, 0.68f, 0.74f, 1.00f);   // Prefer using Alpha=1.0 here
     colors[ImGuiCol_TableRowBg]             = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
     colors[ImGuiCol_TableRowBgAlt]          = ImVec4(0.30f, 0.30f, 0.30f, 0.09f);
+    colors[ImGuiCol_TextLink]               = colors[ImGuiCol_HeaderActive];
     colors[ImGuiCol_TextSelectedBg]         = ImVec4(0.26f, 0.59f, 0.98f, 0.35f);
     colors[ImGuiCol_DragDropTarget]         = ImVec4(0.26f, 0.59f, 0.98f, 0.95f);
-    colors[ImGuiCol_NavHighlight]           = colors[ImGuiCol_HeaderHovered];
+    colors[ImGuiCol_NavCursor]              = colors[ImGuiCol_HeaderHovered];
     colors[ImGuiCol_NavWindowingHighlight]  = ImVec4(0.70f, 0.70f, 0.70f, 0.70f);
     colors[ImGuiCol_NavWindowingDimBg]      = ImVec4(0.20f, 0.20f, 0.20f, 0.20f);
     colors[ImGuiCol_ModalWindowDimBg]       = ImVec4(0.20f, 0.20f, 0.20f, 0.35f);
@@ -393,19 +389,32 @@ void ImDrawListSharedData::SetCircleTessellationMaxError(float max_error)
     for (int i = 0; i < IM_ARRAYSIZE(CircleSegmentCounts); i++)
     {
         const float radius = (float)i;
-        CircleSegmentCounts[i] = (ImU8)((i > 0) ? IM_DRAWLIST_CIRCLE_AUTO_SEGMENT_CALC(radius, CircleSegmentMaxError) : 0);
+        CircleSegmentCounts[i] = (ImU8)((i > 0) ? IM_DRAWLIST_CIRCLE_AUTO_SEGMENT_CALC(radius, CircleSegmentMaxError) : IM_DRAWLIST_ARCFAST_SAMPLE_MAX);
     }
     ArcFastRadiusCutoff = IM_DRAWLIST_CIRCLE_AUTO_SEGMENT_CALC_R(IM_DRAWLIST_ARCFAST_SAMPLE_MAX, CircleSegmentMaxError);
 }
 
+ImDrawList::ImDrawList(ImDrawListSharedData* shared_data)
+{
+    memset(this, 0, sizeof(*this));
+    _Data = shared_data;
+}
+
+ImDrawList::~ImDrawList()
+{
+    _ClearFreeMemory();
+}
+
 // Initialize before use in a new frame. We always have a command ready in the buffer.
+// In the majority of cases, you would want to call PushClipRect() and PushTextureID() after this.
 void ImDrawList::_ResetForNewFrame()
 {
     // Verify that the ImDrawCmd fields we want to memcmp() are contiguous in memory.
-    // (those should be IM_STATIC_ASSERT() in theory but with our pre C++11 setup the whole check doesn't compile with GCC)
-    IM_ASSERT(IM_OFFSETOF(ImDrawCmd, ClipRect) == 0);
-    IM_ASSERT(IM_OFFSETOF(ImDrawCmd, TextureId) == sizeof(ImVec4));
-    IM_ASSERT(IM_OFFSETOF(ImDrawCmd, VtxOffset) == sizeof(ImVec4) + sizeof(ImTextureID));
+    IM_STATIC_ASSERT(offsetof(ImDrawCmd, ClipRect) == 0);
+    IM_STATIC_ASSERT(offsetof(ImDrawCmd, TextureId) == sizeof(ImVec4));
+    IM_STATIC_ASSERT(offsetof(ImDrawCmd, VtxOffset) == sizeof(ImVec4) + sizeof(ImTextureID));
+    if (_Splitter._Count > 1)
+        _Splitter.Merge(this);
 
     CmdBuffer.resize(0);
     IdxBuffer.resize(0);
@@ -417,6 +426,7 @@ void ImDrawList::_ResetForNewFrame()
     _IdxWritePtr = NULL;
     _ClipRectStack.resize(0);
     _TextureIdStack.resize(0);
+    _CallbacksDataBuf.resize(0);
     _Path.resize(0);
     _Splitter.Clear();
     CmdBuffer.push_back(ImDrawCmd());
@@ -434,6 +444,7 @@ void ImDrawList::_ClearFreeMemory()
     _IdxWritePtr = NULL;
     _ClipRectStack.clear();
     _TextureIdStack.clear();
+    _CallbacksDataBuf.clear();
     _Path.clear();
     _Splitter.ClearFreeMemory();
 }
@@ -464,14 +475,16 @@ void ImDrawList::AddDrawCmd()
 // Note that this leaves the ImDrawList in a state unfit for further commands, as most code assume that CmdBuffer.Size > 0 && CmdBuffer.back().UserCallback == NULL
 void ImDrawList::_PopUnusedDrawCmd()
 {
-    if (CmdBuffer.Size == 0)
-        return;
-    ImDrawCmd* curr_cmd = &CmdBuffer.Data[CmdBuffer.Size - 1];
-    if (curr_cmd->ElemCount == 0 && curr_cmd->UserCallback == NULL)
+    while (CmdBuffer.Size > 0)
+    {
+        ImDrawCmd* curr_cmd = &CmdBuffer.Data[CmdBuffer.Size - 1];
+        if (curr_cmd->ElemCount != 0 || curr_cmd->UserCallback != NULL)
+            return;// break;
         CmdBuffer.pop_back();
+    }
 }
 
-void ImDrawList::AddCallback(ImDrawCallback callback, void* callback_data)
+void ImDrawList::AddCallback(ImDrawCallback callback, void* userdata, size_t userdata_size)
 {
     IM_ASSERT_PARANOID(CmdBuffer.Size > 0);
     ImDrawCmd* curr_cmd = &CmdBuffer.Data[CmdBuffer.Size - 1];
@@ -481,16 +494,35 @@ void ImDrawList::AddCallback(ImDrawCallback callback, void* callback_data)
         AddDrawCmd();
         curr_cmd = &CmdBuffer.Data[CmdBuffer.Size - 1];
     }
+
     curr_cmd->UserCallback = callback;
-    curr_cmd->UserCallbackData = callback_data;
+    if (userdata_size == 0)
+    {
+        // Store user data directly in command (no indirection)
+        curr_cmd->UserCallbackData = userdata;
+        curr_cmd->UserCallbackDataSize = 0;
+        curr_cmd->UserCallbackDataOffset = -1;
+    }
+    else
+    {
+        // Copy and store user data in a buffer
+        IM_ASSERT(userdata != NULL);
+        IM_ASSERT(userdata_size < (1u << 31));
+        curr_cmd->UserCallbackData = NULL; // Will be resolved during Render()
+        curr_cmd->UserCallbackDataSize = (int)userdata_size;
+        curr_cmd->UserCallbackDataOffset = _CallbacksDataBuf.Size;
+        _CallbacksDataBuf.resize(_CallbacksDataBuf.Size + (int)userdata_size);
+        memcpy(_CallbacksDataBuf.Data + (size_t)curr_cmd->UserCallbackDataOffset, userdata, userdata_size);
+    }
 
     AddDrawCmd(); // Force a new command after us (see comment below)
 }
 
 // Compare ClipRect, TextureId and VtxOffset with a single memcmp()
-#define ImDrawCmd_HeaderSize                        (IM_OFFSETOF(ImDrawCmd, VtxOffset) + sizeof(unsigned int))
-#define ImDrawCmd_HeaderCompare(CMD_LHS, CMD_RHS)   (memcmp(CMD_LHS, CMD_RHS, ImDrawCmd_HeaderSize))    // Compare ClipRect, TextureId, VtxOffset
-#define ImDrawCmd_HeaderCopy(CMD_DST, CMD_SRC)      (memcpy(CMD_DST, CMD_SRC, ImDrawCmd_HeaderSize))    // Copy ClipRect, TextureId, VtxOffset
+#define ImDrawCmd_HeaderSize                            (offsetof(ImDrawCmd, VtxOffset) + sizeof(unsigned int))
+#define ImDrawCmd_HeaderCompare(CMD_LHS, CMD_RHS)       (memcmp(CMD_LHS, CMD_RHS, ImDrawCmd_HeaderSize))    // Compare ClipRect, TextureId, VtxOffset
+#define ImDrawCmd_HeaderCopy(CMD_DST, CMD_SRC)          (memcpy(CMD_DST, CMD_SRC, ImDrawCmd_HeaderSize))    // Copy ClipRect, TextureId, VtxOffset
+#define ImDrawCmd_AreSequentialIdxOffset(CMD_0, CMD_1)  (CMD_0->IdxOffset + CMD_0->ElemCount == CMD_1->IdxOffset)
 
 // Try to merge two last draw commands
 void ImDrawList::_TryMergeDrawCmds()
@@ -498,7 +530,7 @@ void ImDrawList::_TryMergeDrawCmds()
     IM_ASSERT_PARANOID(CmdBuffer.Size > 0);
     ImDrawCmd* curr_cmd = &CmdBuffer.Data[CmdBuffer.Size - 1];
     ImDrawCmd* prev_cmd = curr_cmd - 1;
-    if (ImDrawCmd_HeaderCompare(curr_cmd, prev_cmd) == 0 && curr_cmd->UserCallback == NULL && prev_cmd->UserCallback == NULL)
+    if (ImDrawCmd_HeaderCompare(curr_cmd, prev_cmd) == 0 && ImDrawCmd_AreSequentialIdxOffset(prev_cmd, curr_cmd) && curr_cmd->UserCallback == NULL && prev_cmd->UserCallback == NULL)
     {
         prev_cmd->ElemCount += curr_cmd->ElemCount;
         CmdBuffer.pop_back();
@@ -521,12 +553,11 @@ void ImDrawList::_OnChangedClipRect()
 
     // Try to merge with previous command if it matches, else use current command
     ImDrawCmd* prev_cmd = curr_cmd - 1;
-    if (curr_cmd->ElemCount == 0 && CmdBuffer.Size > 1 && ImDrawCmd_HeaderCompare(&_CmdHeader, prev_cmd) == 0 && prev_cmd->UserCallback == NULL)
+    if (curr_cmd->ElemCount == 0 && CmdBuffer.Size > 1 && ImDrawCmd_HeaderCompare(&_CmdHeader, prev_cmd) == 0 && ImDrawCmd_AreSequentialIdxOffset(prev_cmd, curr_cmd) && prev_cmd->UserCallback == NULL)
     {
         CmdBuffer.pop_back();
         return;
     }
-
     curr_cmd->ClipRect = _CmdHeader.ClipRect;
 }
 
@@ -544,12 +575,11 @@ void ImDrawList::_OnChangedTextureID()
 
     // Try to merge with previous command if it matches, else use current command
     ImDrawCmd* prev_cmd = curr_cmd - 1;
-    if (curr_cmd->ElemCount == 0 && CmdBuffer.Size > 1 && ImDrawCmd_HeaderCompare(&_CmdHeader, prev_cmd) == 0 && prev_cmd->UserCallback == NULL)
+    if (curr_cmd->ElemCount == 0 && CmdBuffer.Size > 1 && ImDrawCmd_HeaderCompare(&_CmdHeader, prev_cmd) == 0 && ImDrawCmd_AreSequentialIdxOffset(prev_cmd, curr_cmd) && prev_cmd->UserCallback == NULL)
     {
         CmdBuffer.pop_back();
         return;
     }
-
     curr_cmd->TextureId = _CmdHeader.TextureId;
 }
 
@@ -573,14 +603,14 @@ int ImDrawList::_CalcCircleAutoSegmentCount(float radius) const
 {
     // Automatic segment count
     const int radius_idx = (int)(radius + 0.999999f); // ceil to never reduce accuracy
-    if (radius_idx < IM_ARRAYSIZE(_Data->CircleSegmentCounts))
+    if (radius_idx >= 0 && radius_idx < IM_ARRAYSIZE(_Data->CircleSegmentCounts))
         return _Data->CircleSegmentCounts[radius_idx]; // Use cached value
     else
         return IM_DRAWLIST_CIRCLE_AUTO_SEGMENT_CALC(radius, _Data->CircleSegmentMaxError);
 }
 
 // Render-level scissoring. This is passed down to your render function but not used for CPU-side coarse clipping. Prefer using higher-level ImGui::PushClipRect() to affect logic (hit-testing and widget culling)
-void ImDrawList::PushClipRect(ImVec2 cr_min, ImVec2 cr_max, bool intersect_with_current_clip_rect)
+void ImDrawList::PushClipRect(const ImVec2& cr_min, const ImVec2& cr_max, bool intersect_with_current_clip_rect)
 {
     ImVec4 cr(cr_min.x, cr_min.y, cr_max.x, cr_max.y);
     if (intersect_with_current_clip_rect)
@@ -625,6 +655,15 @@ void ImDrawList::PopTextureID()
     _OnChangedTextureID();
 }
 
+// This is used by ImGui::PushFont()/PopFont(). It works because we never use _TextureIdStack[] elsewhere than in PushTextureID()/PopTextureID().
+void ImDrawList::_SetTextureID(ImTextureID texture_id)
+{
+    if (_CmdHeader.TextureId == texture_id)
+        return;
+    _CmdHeader.TextureId = texture_id;
+    _OnChangedTextureID();
+}
+
 // Reserve space for a number of vertices and indices.
 // You must finish filling your reserved data before calling PrimReserve() again, as it may reallocate or
 // submit the intermediate results. PrimUnreserve() can be used to release unused allocations.
@@ -653,7 +692,7 @@ void ImDrawList::PrimReserve(int idx_count, int vtx_count)
     _IdxWritePtr = IdxBuffer.Data + idx_buffer_old_size;
 }
 
-// Release the a number of reserved vertices/indices from the end of the last reservation made with PrimReserve().
+// Release the number of reserved vertices/indices from the end of the last reservation made with PrimReserve().
 void ImDrawList::PrimUnreserve(int idx_count, int vtx_count)
 {
     IM_ASSERT_PARANOID(idx_count >= 0 && vtx_count >= 0);
@@ -720,7 +759,7 @@ void ImDrawList::PrimQuadUV(const ImVec2& a, const ImVec2& b, const ImVec2& c, c
 // We avoid using the ImVec2 math operators here to reduce cost to a minimum for debug/non-inlined builds.
 void ImDrawList::AddPolyline(const ImVec2* points, const int points_count, ImU32 col, ImDrawFlags flags, float thickness)
 {
-    if (points_count < 2)
+    if (points_count < 2 || (col & IM_COL32_A_MASK) == 0)
         return;
 
     const bool closed = (flags & ImDrawFlags_Closed) != 0;
@@ -753,7 +792,8 @@ void ImDrawList::AddPolyline(const ImVec2* points, const int points_count, ImU32
 
         // Temporary buffer
         // The first <points_count> items are normals at each line point, then after that there are either 2 or 4 temp points for each line point
-        ImVec2* temp_normals = (ImVec2*)alloca(points_count * ((use_texture || !thick_line) ? 3 : 5) * sizeof(ImVec2)); //-V630
+        _Data->TempBuffer.reserve_discard(points_count * ((use_texture || !thick_line) ? 3 : 5));
+        ImVec2* temp_normals = _Data->TempBuffer.Data;
         ImVec2* temp_points = temp_normals + points_count;
 
         // Calculate normals (tangents) for each line segment
@@ -973,10 +1013,11 @@ void ImDrawList::AddPolyline(const ImVec2* points, const int points_count, ImU32
     }
 }
 
-// We intentionally avoid using ImVec2 and its math operators here to reduce cost to a minimum for debug/non-inlined builds.
+// - We intentionally avoid using ImVec2 and its math operators here to reduce cost to a minimum for debug/non-inlined builds.
+// - Filled shapes must always use clockwise winding order. The anti-aliasing fringe depends on it. Counter-clockwise shapes will have "inward" anti-aliasing.
 void ImDrawList::AddConvexPolyFilled(const ImVec2* points, const int points_count, ImU32 col)
 {
-    if (points_count < 3)
+    if (points_count < 3 || (col & IM_COL32_A_MASK) == 0)
         return;
 
     const ImVec2 uv = _Data->TexUvWhitePixel;
@@ -1000,7 +1041,8 @@ void ImDrawList::AddConvexPolyFilled(const ImVec2* points, const int points_coun
         }
 
         // Compute normals
-        ImVec2* temp_normals = (ImVec2*)alloca(points_count * sizeof(ImVec2)); //-V630
+        _Data->TempBuffer.reserve_discard(points_count);
+        ImVec2* temp_normals = _Data->TempBuffer.Data;
         for (int i0 = points_count - 1, i1 = 0; i1 < points_count; i0 = i1++)
         {
             const ImVec2& p0 = points[i0];
@@ -1057,7 +1099,7 @@ void ImDrawList::AddConvexPolyFilled(const ImVec2* points, const int points_coun
 
 void ImDrawList::_PathArcToFastEx(const ImVec2& center, float radius, int a_min_sample, int a_max_sample, int a_step)
 {
-    if (radius <= 0.0f)
+    if (radius < 0.5f)
     {
         _Path.push_back(center);
         return;
@@ -1149,7 +1191,7 @@ void ImDrawList::_PathArcToFastEx(const ImVec2& center, float radius, int a_min_
 
 void ImDrawList::_PathArcToN(const ImVec2& center, float radius, float a_min, float a_max, int num_segments)
 {
-    if (radius <= 0.0f)
+    if (radius < 0.5f)
     {
         _Path.push_back(center);
         return;
@@ -1168,7 +1210,7 @@ void ImDrawList::_PathArcToN(const ImVec2& center, float radius, float a_min, fl
 // 0: East, 3: South, 6: West, 9: North, 12: East
 void ImDrawList::PathArcToFast(const ImVec2& center, float radius, int a_min_of_12, int a_max_of_12)
 {
-    if (radius <= 0.0f)
+    if (radius < 0.5f)
     {
         _Path.push_back(center);
         return;
@@ -1178,7 +1220,7 @@ void ImDrawList::PathArcToFast(const ImVec2& center, float radius, int a_min_of_
 
 void ImDrawList::PathArcTo(const ImVec2& center, float radius, float a_min, float a_max, int num_segments)
 {
-    if (radius <= 0.0f)
+    if (radius < 0.5f)
     {
         _Path.push_back(center);
         return;
@@ -1200,14 +1242,14 @@ void ImDrawList::PathArcTo(const ImVec2& center, float radius, float a_min, floa
         const float a_min_sample_f = IM_DRAWLIST_ARCFAST_SAMPLE_MAX * a_min / (IM_PI * 2.0f);
         const float a_max_sample_f = IM_DRAWLIST_ARCFAST_SAMPLE_MAX * a_max / (IM_PI * 2.0f);
 
-        const int a_min_sample = a_is_reverse ? (int)ImFloorSigned(a_min_sample_f) : (int)ImCeil(a_min_sample_f);
-        const int a_max_sample = a_is_reverse ? (int)ImCeil(a_max_sample_f) : (int)ImFloorSigned(a_max_sample_f);
+        const int a_min_sample = a_is_reverse ? (int)ImFloor(a_min_sample_f) : (int)ImCeil(a_min_sample_f);
+        const int a_max_sample = a_is_reverse ? (int)ImCeil(a_max_sample_f) : (int)ImFloor(a_max_sample_f);
         const int a_mid_samples = a_is_reverse ? ImMax(a_min_sample - a_max_sample, 0) : ImMax(a_max_sample - a_min_sample, 0);
 
         const float a_min_segment_angle = a_min_sample * IM_PI * 2.0f / IM_DRAWLIST_ARCFAST_SAMPLE_MAX;
         const float a_max_segment_angle = a_max_sample * IM_PI * 2.0f / IM_DRAWLIST_ARCFAST_SAMPLE_MAX;
-        const bool a_emit_start = (a_min_segment_angle - a_min) != 0.0f;
-        const bool a_emit_end = (a_max - a_max_segment_angle) != 0.0f;
+        const bool a_emit_start = ImAbs(a_min_segment_angle - a_min) >= 1e-5f;
+        const bool a_emit_end = ImAbs(a_max - a_max_segment_angle) >= 1e-5f;
 
         _Path.reserve(_Path.Size + (a_mid_samples + 1 + (a_emit_start ? 1 : 0) + (a_emit_end ? 1 : 0)));
         if (a_emit_start)
@@ -1223,6 +1265,26 @@ void ImDrawList::PathArcTo(const ImVec2& center, float radius, float a_min, floa
         const int circle_segment_count = _CalcCircleAutoSegmentCount(radius);
         const int arc_segment_count = ImMax((int)ImCeil(circle_segment_count * arc_length / (IM_PI * 2.0f)), (int)(2.0f * IM_PI / arc_length));
         _PathArcToN(center, radius, a_min, a_max, arc_segment_count);
+    }
+}
+
+void ImDrawList::PathEllipticalArcTo(const ImVec2& center, const ImVec2& radius, float rot, float a_min, float a_max, int num_segments)
+{
+    if (num_segments <= 0)
+        num_segments = _CalcCircleAutoSegmentCount(ImMax(radius.x, radius.y)); // A bit pessimistic, maybe there's a better computation to do here.
+
+    _Path.reserve(_Path.Size + (num_segments + 1));
+
+    const float cos_rot = ImCos(rot);
+    const float sin_rot = ImSin(rot);
+    for (int i = 0; i <= num_segments; i++)
+    {
+        const float a = a_min + ((float)i / (float)num_segments) * (a_max - a_min);
+        ImVec2 point(ImCos(a) * radius.x, ImSin(a) * radius.y);
+        const ImVec2 rel((point.x * cos_rot) - (point.y * sin_rot), (point.x * sin_rot) + (point.y * cos_rot));
+        point.x = rel.x + center.x;
+        point.y = rel.y + center.y;
+        _Path.push_back(point);
     }
 }
 
@@ -1294,6 +1356,7 @@ void ImDrawList::PathBezierCubicCurveTo(const ImVec2& p2, const ImVec2& p3, cons
     ImVec2 p1 = _Path.back();
     if (num_segments == 0)
     {
+        IM_ASSERT(_Data->CurveTessellationTol > 0.0f);
         PathBezierCubicCurveToCasteljau(&_Path, p1.x, p1.y, p2.x, p2.y, p3.x, p3.y, p4.x, p4.y, _Data->CurveTessellationTol, 0); // Auto-tessellated
     }
     else
@@ -1309,6 +1372,7 @@ void ImDrawList::PathBezierQuadraticCurveTo(const ImVec2& p2, const ImVec2& p3, 
     ImVec2 p1 = _Path.back();
     if (num_segments == 0)
     {
+        IM_ASSERT(_Data->CurveTessellationTol > 0.0f);
         PathBezierQuadraticCurveToCasteljau(&_Path, p1.x, p1.y, p2.x, p2.y, p3.x, p3.y, _Data->CurveTessellationTol, 0);// Auto-tessellated
     }
     else
@@ -1319,32 +1383,22 @@ void ImDrawList::PathBezierQuadraticCurveTo(const ImVec2& p2, const ImVec2& p3, 
     }
 }
 
-IM_STATIC_ASSERT(ImDrawFlags_RoundCornersTopLeft == (1 << 4));
 static inline ImDrawFlags FixRectCornerFlags(ImDrawFlags flags)
 {
+    /*
+    IM_STATIC_ASSERT(ImDrawFlags_RoundCornersTopLeft == (1 << 4));
 #ifndef IMGUI_DISABLE_OBSOLETE_FUNCTIONS
-    // Legacy Support for hard coded ~0 (used to be a suggested equivalent to ImDrawCornerFlags_All)
-    //   ~0   --> ImDrawFlags_RoundCornersAll or 0
-    if (flags == ~0)
-        return ImDrawFlags_RoundCornersAll;
-
-    // Legacy Support for hard coded 0x01 to 0x0F (matching 15 out of 16 old flags combinations)
-    //   0x01 --> ImDrawFlags_RoundCornersTopLeft (VALUE 0x01 OVERLAPS ImDrawFlags_Closed but ImDrawFlags_Closed is never valid in this path!)
-    //   0x02 --> ImDrawFlags_RoundCornersTopRight
-    //   0x03 --> ImDrawFlags_RoundCornersTopLeft | ImDrawFlags_RoundCornersTopRight
-    //   0x04 --> ImDrawFlags_RoundCornersBotLeft
-    //   0x05 --> ImDrawFlags_RoundCornersTopLeft | ImDrawFlags_RoundCornersBotLeft
-    //   ...
-    //   0x0F --> ImDrawFlags_RoundCornersAll or 0
-    // (See all values in ImDrawCornerFlags_)
-    if (flags >= 0x01 && flags <= 0x0F)
-        return (flags << 4);
-
+    // Obsoleted in 1.82 (from February 2021). This code was stripped/simplified and mostly commented in 1.90 (from September 2023)
+    // - Legacy Support for hard coded ~0 (used to be a suggested equivalent to ImDrawCornerFlags_All)
+    if (flags == ~0)                    { return ImDrawFlags_RoundCornersAll; }
+    // - Legacy Support for hard coded 0x01 to 0x0F (matching 15 out of 16 old flags combinations). Read details in older version of this code.
+    if (flags >= 0x01 && flags <= 0x0F) { return (flags << 4); }
     // We cannot support hard coded 0x00 with 'float rounding > 0.0f' --> replace with ImDrawFlags_RoundCornersNone or use 'float rounding = 0.0f'
 #endif
-
-    // If this triggers, please update your code replacing hardcoded values with new ImDrawFlags_RoundCorners* values.
-    // Note that ImDrawFlags_Closed (== 0x01) is an invalid flag for AddRect(), AddRectFilled(), PathRect() etc...
+    */
+    // If this assert triggers, please update your code replacing hardcoded values with new ImDrawFlags_RoundCorners* values.
+    // Note that ImDrawFlags_Closed (== 0x01) is an invalid flag for AddRect(), AddRectFilled(), PathRect() etc. anyway.
+    // See details in 1.82 Changelog as well as 2021/03/12 and 2023/09/08 entries in "API BREAKING CHANGES" section.
     IM_ASSERT((flags & 0x0F) == 0 && "Misuse of legacy hardcoded ImDrawCornerFlags values!");
 
     if ((flags & ImDrawFlags_RoundCornersMask_) == 0)
@@ -1355,11 +1409,13 @@ static inline ImDrawFlags FixRectCornerFlags(ImDrawFlags flags)
 
 void ImDrawList::PathRect(const ImVec2& a, const ImVec2& b, float rounding, ImDrawFlags flags)
 {
-    flags = FixRectCornerFlags(flags);
-    rounding = ImMin(rounding, ImFabs(b.x - a.x) * ( ((flags & ImDrawFlags_RoundCornersTop)  == ImDrawFlags_RoundCornersTop)  || ((flags & ImDrawFlags_RoundCornersBottom) == ImDrawFlags_RoundCornersBottom) ? 0.5f : 1.0f ) - 1.0f);
-    rounding = ImMin(rounding, ImFabs(b.y - a.y) * ( ((flags & ImDrawFlags_RoundCornersLeft) == ImDrawFlags_RoundCornersLeft) || ((flags & ImDrawFlags_RoundCornersRight)  == ImDrawFlags_RoundCornersRight)  ? 0.5f : 1.0f ) - 1.0f);
-
-    if (rounding <= 0.0f || (flags & ImDrawFlags_RoundCornersMask_) == ImDrawFlags_RoundCornersNone)
+    if (rounding >= 0.5f)
+    {
+        flags = FixRectCornerFlags(flags);
+        rounding = ImMin(rounding, ImFabs(b.x - a.x) * (((flags & ImDrawFlags_RoundCornersTop) == ImDrawFlags_RoundCornersTop) || ((flags & ImDrawFlags_RoundCornersBottom) == ImDrawFlags_RoundCornersBottom) ? 0.5f : 1.0f) - 1.0f);
+        rounding = ImMin(rounding, ImFabs(b.y - a.y) * (((flags & ImDrawFlags_RoundCornersLeft) == ImDrawFlags_RoundCornersLeft) || ((flags & ImDrawFlags_RoundCornersRight) == ImDrawFlags_RoundCornersRight) ? 0.5f : 1.0f) - 1.0f);
+    }
+    if (rounding < 0.5f || (flags & ImDrawFlags_RoundCornersMask_) == ImDrawFlags_RoundCornersNone)
     {
         PathLineTo(a);
         PathLineTo(ImVec2(b.x, a.y));
@@ -1405,7 +1461,7 @@ void ImDrawList::AddRectFilled(const ImVec2& p_min, const ImVec2& p_max, ImU32 c
 {
     if ((col & IM_COL32_A_MASK) == 0)
         return;
-    if (rounding <= 0.0f || (flags & ImDrawFlags_RoundCornersMask_) == ImDrawFlags_RoundCornersNone)
+    if (rounding < 0.5f || (flags & ImDrawFlags_RoundCornersMask_) == ImDrawFlags_RoundCornersNone)
     {
         PrimReserve(6, 4);
         PrimRect(p_min, p_max, col);
@@ -1481,7 +1537,7 @@ void ImDrawList::AddTriangleFilled(const ImVec2& p1, const ImVec2& p2, const ImV
 
 void ImDrawList::AddCircle(const ImVec2& center, float radius, ImU32 col, int num_segments, float thickness)
 {
-    if ((col & IM_COL32_A_MASK) == 0 || radius <= 0.0f)
+    if ((col & IM_COL32_A_MASK) == 0 || radius < 0.5f)
         return;
 
     if (num_segments <= 0)
@@ -1505,7 +1561,7 @@ void ImDrawList::AddCircle(const ImVec2& center, float radius, ImU32 col, int nu
 
 void ImDrawList::AddCircleFilled(const ImVec2& center, float radius, ImU32 col, int num_segments)
 {
-    if ((col & IM_COL32_A_MASK) == 0 || radius <= 0.0f)
+    if ((col & IM_COL32_A_MASK) == 0 || radius < 0.5f)
         return;
 
     if (num_segments <= 0)
@@ -1551,6 +1607,35 @@ void ImDrawList::AddNgonFilled(const ImVec2& center, float radius, ImU32 col, in
     PathFillConvex(col);
 }
 
+// Ellipse
+void ImDrawList::AddEllipse(const ImVec2& center, const ImVec2& radius, ImU32 col, float rot, int num_segments, float thickness)
+{
+    if ((col & IM_COL32_A_MASK) == 0)
+        return;
+
+    if (num_segments <= 0)
+        num_segments = _CalcCircleAutoSegmentCount(ImMax(radius.x, radius.y)); // A bit pessimistic, maybe there's a better computation to do here.
+
+    // Because we are filling a closed shape we remove 1 from the count of segments/points
+    const float a_max = IM_PI * 2.0f * ((float)num_segments - 1.0f) / (float)num_segments;
+    PathEllipticalArcTo(center, radius, rot, 0.0f, a_max, num_segments - 1);
+    PathStroke(col, true, thickness);
+}
+
+void ImDrawList::AddEllipseFilled(const ImVec2& center, const ImVec2& radius, ImU32 col, float rot, int num_segments)
+{
+    if ((col & IM_COL32_A_MASK) == 0)
+        return;
+
+    if (num_segments <= 0)
+        num_segments = _CalcCircleAutoSegmentCount(ImMax(radius.x, radius.y)); // A bit pessimistic, maybe there's a better computation to do here.
+
+    // Because we are filling a closed shape we remove 1 from the count of segments/points
+    const float a_max = IM_PI * 2.0f * ((float)num_segments - 1.0f) / (float)num_segments;
+    PathEllipticalArcTo(center, radius, rot, 0.0f, a_max, num_segments - 1);
+    PathFillConvex(col);
+}
+
 // Cubic Bezier takes 4 controls points
 void ImDrawList::AddBezierCubic(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, ImU32 col, float thickness, int num_segments)
 {
@@ -1573,15 +1658,16 @@ void ImDrawList::AddBezierQuadratic(const ImVec2& p1, const ImVec2& p2, const Im
     PathStroke(col, 0, thickness);
 }
 
-void ImDrawList::AddText(const ImFont* font, float font_size, const ImVec2& pos, ImU32 col, const char* text_begin, const char* text_end, float wrap_width, const ImVec4* cpu_fine_clip_rect)
+void ImDrawList::AddText(ImFont* font, float font_size, const ImVec2& pos, ImU32 col, const char* text_begin, const char* text_end, float wrap_width, const ImVec4* cpu_fine_clip_rect)
 {
     if ((col & IM_COL32_A_MASK) == 0)
         return;
 
+    // Accept null ranges
+    if (text_begin == text_end || text_begin[0] == 0)
+        return;
     if (text_end == NULL)
         text_end = text_begin + strlen(text_begin);
-    if (text_begin == text_end)
-        return;
 
     // Pull default font/size from the shared ImDrawListSharedData instance
     if (font == NULL)
@@ -1645,7 +1731,7 @@ void ImDrawList::AddImageRounded(ImTextureID user_texture_id, const ImVec2& p_mi
         return;
 
     flags = FixRectCornerFlags(flags);
-    if (rounding <= 0.0f || (flags & ImDrawFlags_RoundCornersMask_) == ImDrawFlags_RoundCornersNone)
+    if (rounding < 0.5f || (flags & ImDrawFlags_RoundCornersMask_) == ImDrawFlags_RoundCornersNone)
     {
         AddImage(user_texture_id, p_min, p_max, uv_min, uv_max, col);
         return;
@@ -1665,6 +1751,316 @@ void ImDrawList::AddImageRounded(ImTextureID user_texture_id, const ImVec2& p_mi
         PopTextureID();
 }
 
+//-----------------------------------------------------------------------------
+// [SECTION] ImTriangulator, ImDrawList concave polygon fill
+//-----------------------------------------------------------------------------
+// Triangulate concave polygons. Based on "Triangulation by Ear Clipping" paper, O(N^2) complexity.
+// Reference: https://www.geometrictools.com/Documentation/TriangulationByEarClipping.pdf
+// Provided as a convenience for user but not used by main library.
+//-----------------------------------------------------------------------------
+// - ImTriangulator [Internal]
+// - AddConcavePolyFilled()
+//-----------------------------------------------------------------------------
+
+enum ImTriangulatorNodeType
+{
+    ImTriangulatorNodeType_Convex,
+    ImTriangulatorNodeType_Ear,
+    ImTriangulatorNodeType_Reflex
+};
+
+struct ImTriangulatorNode
+{
+    ImTriangulatorNodeType  Type;
+    int                     Index;
+    ImVec2                  Pos;
+    ImTriangulatorNode*     Next;
+    ImTriangulatorNode*     Prev;
+
+    void    Unlink()        { Next->Prev = Prev; Prev->Next = Next; }
+};
+
+struct ImTriangulatorNodeSpan
+{
+    ImTriangulatorNode**    Data = NULL;
+    int                     Size = 0;
+
+    void    push_back(ImTriangulatorNode* node) { Data[Size++] = node; }
+    void    find_erase_unsorted(int idx)        { for (int i = Size - 1; i >= 0; i--) if (Data[i]->Index == idx) { Data[i] = Data[Size - 1]; Size--; return; } }
+};
+
+struct ImTriangulator
+{
+    static int EstimateTriangleCount(int points_count)      { return (points_count < 3) ? 0 : points_count - 2; }
+    static int EstimateScratchBufferSize(int points_count)  { return sizeof(ImTriangulatorNode) * points_count + sizeof(ImTriangulatorNode*) * points_count * 2; }
+
+    void    Init(const ImVec2* points, int points_count, void* scratch_buffer);
+    void    GetNextTriangle(unsigned int out_triangle[3]);     // Return relative indexes for next triangle
+
+    // Internal functions
+    void    BuildNodes(const ImVec2* points, int points_count);
+    void    BuildReflexes();
+    void    BuildEars();
+    void    FlipNodeList();
+    bool    IsEar(int i0, int i1, int i2, const ImVec2& v0, const ImVec2& v1, const ImVec2& v2) const;
+    void    ReclassifyNode(ImTriangulatorNode* node);
+
+    // Internal members
+    int                     _TrianglesLeft = 0;
+    ImTriangulatorNode*     _Nodes = NULL;
+    ImTriangulatorNodeSpan  _Ears;
+    ImTriangulatorNodeSpan  _Reflexes;
+};
+
+// Distribute storage for nodes, ears and reflexes.
+// FIXME-OPT: if everything is convex, we could report it to caller and let it switch to an convex renderer
+// (this would require first building reflexes to bail to convex if empty, without even building nodes)
+void ImTriangulator::Init(const ImVec2* points, int points_count, void* scratch_buffer)
+{
+    IM_ASSERT(scratch_buffer != NULL && points_count >= 3);
+    _TrianglesLeft = EstimateTriangleCount(points_count);
+    _Nodes         = (ImTriangulatorNode*)scratch_buffer;                          // points_count x Node
+    _Ears.Data     = (ImTriangulatorNode**)(_Nodes + points_count);                // points_count x Node*
+    _Reflexes.Data = (ImTriangulatorNode**)(_Nodes + points_count) + points_count; // points_count x Node*
+    BuildNodes(points, points_count);
+    BuildReflexes();
+    BuildEars();
+}
+
+void ImTriangulator::BuildNodes(const ImVec2* points, int points_count)
+{
+    for (int i = 0; i < points_count; i++)
+    {
+        _Nodes[i].Type = ImTriangulatorNodeType_Convex;
+        _Nodes[i].Index = i;
+        _Nodes[i].Pos = points[i];
+        _Nodes[i].Next = _Nodes + i + 1;
+        _Nodes[i].Prev = _Nodes + i - 1;
+    }
+    _Nodes[0].Prev = _Nodes + points_count - 1;
+    _Nodes[points_count - 1].Next = _Nodes;
+}
+
+void ImTriangulator::BuildReflexes()
+{
+    ImTriangulatorNode* n1 = _Nodes;
+    for (int i = _TrianglesLeft; i >= 0; i--, n1 = n1->Next)
+    {
+        if (ImTriangleIsClockwise(n1->Prev->Pos, n1->Pos, n1->Next->Pos))
+            continue;
+        n1->Type = ImTriangulatorNodeType_Reflex;
+        _Reflexes.push_back(n1);
+    }
+}
+
+void ImTriangulator::BuildEars()
+{
+    ImTriangulatorNode* n1 = _Nodes;
+    for (int i = _TrianglesLeft; i >= 0; i--, n1 = n1->Next)
+    {
+        if (n1->Type != ImTriangulatorNodeType_Convex)
+            continue;
+        if (!IsEar(n1->Prev->Index, n1->Index, n1->Next->Index, n1->Prev->Pos, n1->Pos, n1->Next->Pos))
+            continue;
+        n1->Type = ImTriangulatorNodeType_Ear;
+        _Ears.push_back(n1);
+    }
+}
+
+void ImTriangulator::GetNextTriangle(unsigned int out_triangle[3])
+{
+    if (_Ears.Size == 0)
+    {
+        FlipNodeList();
+
+        ImTriangulatorNode* node = _Nodes;
+        for (int i = _TrianglesLeft; i >= 0; i--, node = node->Next)
+            node->Type = ImTriangulatorNodeType_Convex;
+        _Reflexes.Size = 0;
+        BuildReflexes();
+        BuildEars();
+
+        // If we still don't have ears, it means geometry is degenerated.
+        if (_Ears.Size == 0)
+        {
+            // Return first triangle available, mimicking the behavior of convex fill.
+            IM_ASSERT(_TrianglesLeft > 0); // Geometry is degenerated
+            _Ears.Data[0] = _Nodes;
+            _Ears.Size    = 1;
+        }
+    }
+
+    ImTriangulatorNode* ear = _Ears.Data[--_Ears.Size];
+    out_triangle[0] = ear->Prev->Index;
+    out_triangle[1] = ear->Index;
+    out_triangle[2] = ear->Next->Index;
+
+    ear->Unlink();
+    if (ear == _Nodes)
+        _Nodes = ear->Next;
+
+    ReclassifyNode(ear->Prev);
+    ReclassifyNode(ear->Next);
+    _TrianglesLeft--;
+}
+
+void ImTriangulator::FlipNodeList()
+{
+    ImTriangulatorNode* prev = _Nodes;
+    ImTriangulatorNode* temp = _Nodes;
+    ImTriangulatorNode* current = _Nodes->Next;
+    prev->Next = prev;
+    prev->Prev = prev;
+    while (current != _Nodes)
+    {
+        temp = current->Next;
+
+        current->Next = prev;
+        prev->Prev = current;
+        _Nodes->Next = current;
+        current->Prev = _Nodes;
+
+        prev = current;
+        current = temp;
+    }
+    _Nodes = prev;
+}
+
+// A triangle is an ear is no other vertex is inside it. We can test reflexes vertices only (see reference algorithm)
+bool ImTriangulator::IsEar(int i0, int i1, int i2, const ImVec2& v0, const ImVec2& v1, const ImVec2& v2) const
+{
+    ImTriangulatorNode** p_end = _Reflexes.Data + _Reflexes.Size;
+    for (ImTriangulatorNode** p = _Reflexes.Data; p < p_end; p++)
+    {
+        ImTriangulatorNode* reflex = *p;
+        if (reflex->Index != i0 && reflex->Index != i1 && reflex->Index != i2)
+            if (ImTriangleContainsPoint(v0, v1, v2, reflex->Pos))
+                return false;
+    }
+    return true;
+}
+
+void ImTriangulator::ReclassifyNode(ImTriangulatorNode* n1)
+{
+    // Classify node
+    ImTriangulatorNodeType type;
+    const ImTriangulatorNode* n0 = n1->Prev;
+    const ImTriangulatorNode* n2 = n1->Next;
+    if (!ImTriangleIsClockwise(n0->Pos, n1->Pos, n2->Pos))
+        type = ImTriangulatorNodeType_Reflex;
+    else if (IsEar(n0->Index, n1->Index, n2->Index, n0->Pos, n1->Pos, n2->Pos))
+        type = ImTriangulatorNodeType_Ear;
+    else
+        type = ImTriangulatorNodeType_Convex;
+
+    // Update lists when a type changes
+    if (type == n1->Type)
+        return;
+    if (n1->Type == ImTriangulatorNodeType_Reflex)
+        _Reflexes.find_erase_unsorted(n1->Index);
+    else if (n1->Type == ImTriangulatorNodeType_Ear)
+        _Ears.find_erase_unsorted(n1->Index);
+    if (type == ImTriangulatorNodeType_Reflex)
+        _Reflexes.push_back(n1);
+    else if (type == ImTriangulatorNodeType_Ear)
+        _Ears.push_back(n1);
+    n1->Type = type;
+}
+
+// Use ear-clipping algorithm to triangulate a simple polygon (no self-interaction, no holes).
+// (Reminder: we don't perform any coarse clipping/culling in ImDrawList layer!
+// It is up to caller to ensure not making costly calls that will be outside of visible area.
+// As concave fill is noticeably more expensive than other primitives, be mindful of this...
+// Caller can build AABB of points, and avoid filling if 'draw_list->_CmdHeader.ClipRect.Overlays(points_bb) == false')
+void ImDrawList::AddConcavePolyFilled(const ImVec2* points, const int points_count, ImU32 col)
+{
+    if (points_count < 3 || (col & IM_COL32_A_MASK) == 0)
+        return;
+
+    const ImVec2 uv = _Data->TexUvWhitePixel;
+    ImTriangulator triangulator;
+    unsigned int triangle[3];
+    if (Flags & ImDrawListFlags_AntiAliasedFill)
+    {
+        // Anti-aliased Fill
+        const float AA_SIZE = _FringeScale;
+        const ImU32 col_trans = col & ~IM_COL32_A_MASK;
+        const int idx_count = (points_count - 2) * 3 + points_count * 6;
+        const int vtx_count = (points_count * 2);
+        PrimReserve(idx_count, vtx_count);
+
+        // Add indexes for fill
+        unsigned int vtx_inner_idx = _VtxCurrentIdx;
+        unsigned int vtx_outer_idx = _VtxCurrentIdx + 1;
+
+        _Data->TempBuffer.reserve_discard((ImTriangulator::EstimateScratchBufferSize(points_count) + sizeof(ImVec2)) / sizeof(ImVec2));
+        triangulator.Init(points, points_count, _Data->TempBuffer.Data);
+        while (triangulator._TrianglesLeft > 0)
+        {
+            triangulator.GetNextTriangle(triangle);
+            _IdxWritePtr[0] = (ImDrawIdx)(vtx_inner_idx + (triangle[0] << 1)); _IdxWritePtr[1] = (ImDrawIdx)(vtx_inner_idx + (triangle[1] << 1)); _IdxWritePtr[2] = (ImDrawIdx)(vtx_inner_idx + (triangle[2] << 1));
+            _IdxWritePtr += 3;
+        }
+
+        // Compute normals
+        _Data->TempBuffer.reserve_discard(points_count);
+        ImVec2* temp_normals = _Data->TempBuffer.Data;
+        for (int i0 = points_count - 1, i1 = 0; i1 < points_count; i0 = i1++)
+        {
+            const ImVec2& p0 = points[i0];
+            const ImVec2& p1 = points[i1];
+            float dx = p1.x - p0.x;
+            float dy = p1.y - p0.y;
+            IM_NORMALIZE2F_OVER_ZERO(dx, dy);
+            temp_normals[i0].x = dy;
+            temp_normals[i0].y = -dx;
+        }
+
+        for (int i0 = points_count - 1, i1 = 0; i1 < points_count; i0 = i1++)
+        {
+            // Average normals
+            const ImVec2& n0 = temp_normals[i0];
+            const ImVec2& n1 = temp_normals[i1];
+            float dm_x = (n0.x + n1.x) * 0.5f;
+            float dm_y = (n0.y + n1.y) * 0.5f;
+            IM_FIXNORMAL2F(dm_x, dm_y);
+            dm_x *= AA_SIZE * 0.5f;
+            dm_y *= AA_SIZE * 0.5f;
+
+            // Add vertices
+            _VtxWritePtr[0].pos.x = (points[i1].x - dm_x); _VtxWritePtr[0].pos.y = (points[i1].y - dm_y); _VtxWritePtr[0].uv = uv; _VtxWritePtr[0].col = col;        // Inner
+            _VtxWritePtr[1].pos.x = (points[i1].x + dm_x); _VtxWritePtr[1].pos.y = (points[i1].y + dm_y); _VtxWritePtr[1].uv = uv; _VtxWritePtr[1].col = col_trans;  // Outer
+            _VtxWritePtr += 2;
+
+            // Add indexes for fringes
+            _IdxWritePtr[0] = (ImDrawIdx)(vtx_inner_idx + (i1 << 1)); _IdxWritePtr[1] = (ImDrawIdx)(vtx_inner_idx + (i0 << 1)); _IdxWritePtr[2] = (ImDrawIdx)(vtx_outer_idx + (i0 << 1));
+            _IdxWritePtr[3] = (ImDrawIdx)(vtx_outer_idx + (i0 << 1)); _IdxWritePtr[4] = (ImDrawIdx)(vtx_outer_idx + (i1 << 1)); _IdxWritePtr[5] = (ImDrawIdx)(vtx_inner_idx + (i1 << 1));
+            _IdxWritePtr += 6;
+        }
+        _VtxCurrentIdx += (ImDrawIdx)vtx_count;
+    }
+    else
+    {
+        // Non Anti-aliased Fill
+        const int idx_count = (points_count - 2) * 3;
+        const int vtx_count = points_count;
+        PrimReserve(idx_count, vtx_count);
+        for (int i = 0; i < vtx_count; i++)
+        {
+            _VtxWritePtr[0].pos = points[i]; _VtxWritePtr[0].uv = uv; _VtxWritePtr[0].col = col;
+            _VtxWritePtr++;
+        }
+        _Data->TempBuffer.reserve_discard((ImTriangulator::EstimateScratchBufferSize(points_count) + sizeof(ImVec2)) / sizeof(ImVec2));
+        triangulator.Init(points, points_count, _Data->TempBuffer.Data);
+        while (triangulator._TrianglesLeft > 0)
+        {
+            triangulator.GetNextTriangle(triangle);
+            _IdxWritePtr[0] = (ImDrawIdx)(_VtxCurrentIdx + triangle[0]); _IdxWritePtr[1] = (ImDrawIdx)(_VtxCurrentIdx + triangle[1]); _IdxWritePtr[2] = (ImDrawIdx)(_VtxCurrentIdx + triangle[2]);
+            _IdxWritePtr += 3;
+        }
+        _VtxCurrentIdx += (ImDrawIdx)vtx_count;
+    }
+}
 
 //-----------------------------------------------------------------------------
 // [SECTION] ImDrawListSplitter
@@ -1733,13 +2129,13 @@ void ImDrawListSplitter::Merge(ImDrawList* draw_list)
     for (int i = 1; i < _Count; i++)
     {
         ImDrawChannel& ch = _Channels[i];
-
-        // Equivalent of PopUnusedDrawCmd() for this channel's cmdbuffer and except we don't need to test for UserCallback.
-        if (ch._CmdBuffer.Size > 0 && ch._CmdBuffer.back().ElemCount == 0)
+        if (ch._CmdBuffer.Size > 0 && ch._CmdBuffer.back().ElemCount == 0 && ch._CmdBuffer.back().UserCallback == NULL) // Equivalent of PopUnusedDrawCmd()
             ch._CmdBuffer.pop_back();
 
         if (ch._CmdBuffer.Size > 0 && last_cmd != NULL)
         {
+            // Do not include ImDrawCmd_AreSequentialIdxOffset() in the compare as we rebuild IdxOffset values ourselves.
+            // Manipulating IdxOffset (e.g. by reordering draw commands like done by RenderDimmedBackgroundBehindWindow()) is not supported within a splitter.
             ImDrawCmd* next_cmd = &ch._CmdBuffer[0];
             if (ImDrawCmd_HeaderCompare(last_cmd, next_cmd) == 0 && last_cmd->UserCallback == NULL && next_cmd->UserCallback == NULL)
             {
@@ -1815,6 +2211,69 @@ void ImDrawListSplitter::SetCurrentChannel(ImDrawList* draw_list, int idx)
 // [SECTION] ImDrawData
 //-----------------------------------------------------------------------------
 
+void ImDrawData::Clear()
+{
+    Valid = false;
+    CmdListsCount = TotalIdxCount = TotalVtxCount = 0;
+    CmdLists.resize(0); // The ImDrawList are NOT owned by ImDrawData but e.g. by ImGuiContext, so we don't clear them.
+    DisplayPos = DisplaySize = FramebufferScale = ImVec2(0.0f, 0.0f);
+    OwnerViewport = NULL;
+}
+
+// Important: 'out_list' is generally going to be draw_data->CmdLists, but may be another temporary list
+// as long at it is expected that the result will be later merged into draw_data->CmdLists[].
+void ImGui::AddDrawListToDrawDataEx(ImDrawData* draw_data, ImVector<ImDrawList*>* out_list, ImDrawList* draw_list)
+{
+    if (draw_list->CmdBuffer.Size == 0)
+        return;
+    if (draw_list->CmdBuffer.Size == 1 && draw_list->CmdBuffer[0].ElemCount == 0 && draw_list->CmdBuffer[0].UserCallback == NULL)
+        return;
+
+    // Draw list sanity check. Detect mismatch between PrimReserve() calls and incrementing _VtxCurrentIdx, _VtxWritePtr etc.
+    // May trigger for you if you are using PrimXXX functions incorrectly.
+    IM_ASSERT(draw_list->VtxBuffer.Size == 0 || draw_list->_VtxWritePtr == draw_list->VtxBuffer.Data + draw_list->VtxBuffer.Size);
+    IM_ASSERT(draw_list->IdxBuffer.Size == 0 || draw_list->_IdxWritePtr == draw_list->IdxBuffer.Data + draw_list->IdxBuffer.Size);
+    if (!(draw_list->Flags & ImDrawListFlags_AllowVtxOffset))
+        IM_ASSERT((int)draw_list->_VtxCurrentIdx == draw_list->VtxBuffer.Size);
+
+    // Check that draw_list doesn't use more vertices than indexable (default ImDrawIdx = unsigned short = 2 bytes = 64K vertices per ImDrawList = per window)
+    // If this assert triggers because you are drawing lots of stuff manually:
+    // - First, make sure you are coarse clipping yourself and not trying to draw many things outside visible bounds.
+    //   Be mindful that the lower-level ImDrawList API doesn't filter vertices. Use the Metrics/Debugger window to inspect draw list contents.
+    // - If you want large meshes with more than 64K vertices, you can either:
+    //   (A) Handle the ImDrawCmd::VtxOffset value in your renderer backend, and set 'io.BackendFlags |= ImGuiBackendFlags_RendererHasVtxOffset'.
+    //       Most example backends already support this from 1.71. Pre-1.71 backends won't.
+    //       Some graphics API such as GL ES 1/2 don't have a way to offset the starting vertex so it is not supported for them.
+    //   (B) Or handle 32-bit indices in your renderer backend, and uncomment '#define ImDrawIdx unsigned int' line in imconfig.h.
+    //       Most example backends already support this. For example, the OpenGL example code detect index size at compile-time:
+    //         glDrawElements(GL_TRIANGLES, (GLsizei)pcmd->ElemCount, sizeof(ImDrawIdx) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT, idx_buffer_offset);
+    //       Your own engine or render API may use different parameters or function calls to specify index sizes.
+    //       2 and 4 bytes indices are generally supported by most graphics API.
+    // - If for some reason neither of those solutions works for you, a workaround is to call BeginChild()/EndChild() before reaching
+    //   the 64K limit to split your draw commands in multiple draw lists.
+    if (sizeof(ImDrawIdx) == 2)
+        IM_ASSERT(draw_list->_VtxCurrentIdx < (1 << 16) && "Too many vertices in ImDrawList using 16-bit indices. Read comment above");
+
+    // Resolve callback data pointers
+    if (draw_list->_CallbacksDataBuf.Size > 0)
+        for (ImDrawCmd& cmd : draw_list->CmdBuffer)
+            if (cmd.UserCallback != NULL && cmd.UserCallbackDataOffset != -1 && cmd.UserCallbackDataSize > 0)
+                cmd.UserCallbackData = draw_list->_CallbacksDataBuf.Data + cmd.UserCallbackDataOffset;
+
+    // Add to output list + records state in ImDrawData
+    out_list->push_back(draw_list);
+    draw_data->CmdListsCount++;
+    draw_data->TotalVtxCount += draw_list->VtxBuffer.Size;
+    draw_data->TotalIdxCount += draw_list->IdxBuffer.Size;
+}
+
+void ImDrawData::AddDrawList(ImDrawList* draw_list)
+{
+    IM_ASSERT(CmdLists.Size == CmdListsCount);
+    draw_list->_PopUnusedDrawCmd();
+    ImGui::AddDrawListToDrawDataEx(this, &CmdLists, draw_list);
+}
+
 // For backward compatibility: convert all buffers from indexed to de-indexed, in case you cannot render indexed. Note: this is slow and most likely a waste of resources. Always prefer indexed rendering!
 void ImDrawData::DeIndexAllBuffers()
 {
@@ -1839,15 +2298,9 @@ void ImDrawData::DeIndexAllBuffers()
 // or if there is a difference between your window resolution and framebuffer resolution.
 void ImDrawData::ScaleClipRects(const ImVec2& fb_scale)
 {
-    for (int i = 0; i < CmdListsCount; i++)
-    {
-        ImDrawList* cmd_list = CmdLists[i];
-        for (int cmd_i = 0; cmd_i < cmd_list->CmdBuffer.Size; cmd_i++)
-        {
-            ImDrawCmd* cmd = &cmd_list->CmdBuffer[cmd_i];
-            cmd->ClipRect = ImVec4(cmd->ClipRect.x * fb_scale.x, cmd->ClipRect.y * fb_scale.y, cmd->ClipRect.z * fb_scale.x, cmd->ClipRect.w * fb_scale.y);
-        }
-    }
+    for (ImDrawList* draw_list : CmdLists)
+        for (ImDrawCmd& cmd : draw_list->CmdBuffer)
+            cmd.ClipRect = ImVec4(cmd.ClipRect.x * fb_scale.x, cmd.ClipRect.y * fb_scale.y, cmd.ClipRect.z * fb_scale.x, cmd.ClipRect.w * fb_scale.y);
 }
 
 //-----------------------------------------------------------------------------
@@ -1903,6 +2356,14 @@ void ImGui::ShadeVertsLinearUV(ImDrawList* draw_list, int vert_start_idx, int ve
     }
 }
 
+void ImGui::ShadeVertsTransformPos(ImDrawList* draw_list, int vert_start_idx, int vert_end_idx, const ImVec2& pivot_in, float cos_a, float sin_a, const ImVec2& pivot_out)
+{
+    ImDrawVert* vert_start = draw_list->VtxBuffer.Data + vert_start_idx;
+    ImDrawVert* vert_end = draw_list->VtxBuffer.Data + vert_end_idx;
+    for (ImDrawVert* vertex = vert_start; vertex < vert_end; ++vertex)
+        vertex->pos = ImRotate(vertex->pos- pivot_in, cos_a, sin_a) + pivot_out;
+}
+
 //-----------------------------------------------------------------------------
 // [SECTION] ImFontConfig
 //-----------------------------------------------------------------------------
@@ -1911,10 +2372,11 @@ ImFontConfig::ImFontConfig()
 {
     memset(this, 0, sizeof(*this));
     FontDataOwnedByAtlas = true;
-    OversampleH = 3; // FIXME: 2 may be a better default?
+    OversampleH = 2;
     OversampleV = 1;
     GlyphMaxAdvanceX = FLT_MAX;
     RasterizerMultiply = 1.0f;
+    RasterizerDensity = 1.0f;
     EllipsisChar = (ImWchar)-1;
 }
 
@@ -1988,19 +2450,19 @@ ImFontAtlas::~ImFontAtlas()
 void    ImFontAtlas::ClearInputData()
 {
     IM_ASSERT(!Locked && "Cannot modify a locked ImFontAtlas between NewFrame() and EndFrame/Render()!");
-    for (int i = 0; i < ConfigData.Size; i++)
-        if (ConfigData[i].FontData && ConfigData[i].FontDataOwnedByAtlas)
+    for (ImFontConfig& font_cfg : ConfigData)
+        if (font_cfg.FontData && font_cfg.FontDataOwnedByAtlas)
         {
-            IM_FREE(ConfigData[i].FontData);
-            ConfigData[i].FontData = NULL;
+            IM_FREE(font_cfg.FontData);
+            font_cfg.FontData = NULL;
         }
 
     // When clearing this we lose access to the font name and other information used to build the font.
-    for (int i = 0; i < Fonts.Size; i++)
-        if (Fonts[i]->ConfigData >= ConfigData.Data && Fonts[i]->ConfigData < ConfigData.Data + ConfigData.Size)
+    for (ImFont* font : Fonts)
+        if (font->ConfigData >= ConfigData.Data && font->ConfigData < ConfigData.Data + ConfigData.Size)
         {
-            Fonts[i]->ConfigData = NULL;
-            Fonts[i]->ConfigDataCount = 0;
+            font->ConfigData = NULL;
+            font->ConfigDataCount = 0;
         }
     ConfigData.clear();
     CustomRects.clear();
@@ -2075,13 +2537,15 @@ ImFont* ImFontAtlas::AddFont(const ImFontConfig* font_cfg)
 {
     IM_ASSERT(!Locked && "Cannot modify a locked ImFontAtlas between NewFrame() and EndFrame/Render()!");
     IM_ASSERT(font_cfg->FontData != NULL && font_cfg->FontDataSize > 0);
-    IM_ASSERT(font_cfg->SizePixels > 0.0f);
+    IM_ASSERT(font_cfg->SizePixels > 0.0f && "Is ImFontConfig struct correctly initialized?");
+    IM_ASSERT(font_cfg->OversampleH > 0 && font_cfg->OversampleV > 0 && "Is ImFontConfig struct correctly initialized?");
+    IM_ASSERT(font_cfg->RasterizerDensity > 0.0f);
 
     // Create new font
     if (!font_cfg->MergeMode)
         Fonts.push_back(IM_NEW(ImFont));
     else
-        IM_ASSERT(!Fonts.empty() && "Cannot use MergeMode for the first font"); // When using MergeMode make sure that a font has already been added before. You can use ImGui::GetIO().Fonts->AddFontDefault() to add the default imgui font.
+        IM_ASSERT(Fonts.Size > 0 && "Cannot use MergeMode for the first font"); // When using MergeMode make sure that a font has already been added before. You can use ImGui::GetIO().Fonts->AddFontDefault() to add the default imgui font.
 
     ConfigData.push_back(*font_cfg);
     ImFontConfig& new_font_cfg = ConfigData.back();
@@ -2094,8 +2558,17 @@ ImFont* ImFontAtlas::AddFont(const ImFontConfig* font_cfg)
         memcpy(new_font_cfg.FontData, font_cfg->FontData, (size_t)new_font_cfg.FontDataSize);
     }
 
+    // Round font size
+    // - We started rounding in 1.90 WIP (18991) as our layout system currently doesn't support non-rounded font size well yet.
+    // - Note that using io.FontGlobalScale or SetWindowFontScale(), with are legacy-ish, partially supported features, can still lead to unrounded sizes.
+    // - We may support it better later and remove this rounding.
+    new_font_cfg.SizePixels = ImTrunc(new_font_cfg.SizePixels);
+
     if (new_font_cfg.DstFont->EllipsisChar == (ImWchar)-1)
         new_font_cfg.DstFont->EllipsisChar = font_cfg->EllipsisChar;
+
+    // Pointers to ConfigData and BuilderData are otherwise dangling
+    ImFontAtlasUpdateConfigDataPointers(this);
 
     // Invalidate texture
     TexReady = false;
@@ -2106,7 +2579,6 @@ ImFont* ImFontAtlas::AddFont(const ImFontConfig* font_cfg)
 // Default font TTF is compressed with stb_compress then base85 encoded (see misc/fonts/binary_to_compressed_c.cpp for encoder)
 static unsigned int stb_decompress_length(const unsigned char* input);
 static unsigned int stb_decompress(unsigned char* output, const unsigned char* input, unsigned int length);
-static const char*  GetDefaultCompressedFontDataTTFBase85();
 static unsigned int Decode85Byte(char c)                                    { return c >= '\\' ? c-36 : c-35; }
 static void         Decode85(const unsigned char* src, unsigned char* dst)
 {
@@ -2118,10 +2590,14 @@ static void         Decode85(const unsigned char* src, unsigned char* dst)
         dst += 4;
     }
 }
+#ifndef IMGUI_DISABLE_DEFAULT_FONT
+static const char* GetDefaultCompressedFontDataTTF(int* out_size);
+#endif
 
 // Load embedded ProggyClean.ttf at size 13, disable oversampling
 ImFont* ImFontAtlas::AddFontDefault(const ImFontConfig* font_cfg_template)
 {
+#ifndef IMGUI_DISABLE_DEFAULT_FONT
     ImFontConfig font_cfg = font_cfg_template ? *font_cfg_template : ImFontConfig();
     if (!font_cfg_template)
     {
@@ -2133,12 +2609,18 @@ ImFont* ImFontAtlas::AddFontDefault(const ImFontConfig* font_cfg_template)
     if (font_cfg.Name[0] == '\0')
         ImFormatString(font_cfg.Name, IM_ARRAYSIZE(font_cfg.Name), "ProggyClean.ttf, %dpx", (int)font_cfg.SizePixels);
     font_cfg.EllipsisChar = (ImWchar)0x0085;
-    font_cfg.GlyphOffset.y = 1.0f * IM_FLOOR(font_cfg.SizePixels / 13.0f);  // Add +1 offset per 13 units
+    font_cfg.GlyphOffset.y = 1.0f * IM_TRUNC(font_cfg.SizePixels / 13.0f);  // Add +1 offset per 13 units
 
-    const char* ttf_compressed_base85 = GetDefaultCompressedFontDataTTFBase85();
+    int ttf_compressed_size = 0;
+    const char* ttf_compressed = GetDefaultCompressedFontDataTTF(&ttf_compressed_size);
     const ImWchar* glyph_ranges = font_cfg.GlyphRanges != NULL ? font_cfg.GlyphRanges : GetGlyphRangesDefault();
-    ImFont* font = AddFontFromMemoryCompressedBase85TTF(ttf_compressed_base85, font_cfg.SizePixels, &font_cfg, glyph_ranges);
+    ImFont* font = AddFontFromMemoryCompressedTTF(ttf_compressed, ttf_compressed_size, font_cfg.SizePixels, &font_cfg, glyph_ranges);
     return font;
+#else
+    IM_ASSERT(0 && "AddFontDefault() disabled in this build.");
+    IM_UNUSED(font_cfg_template);
+    return NULL;
+#endif // #ifndef IMGUI_DISABLE_DEFAULT_FONT
 }
 
 ImFont* ImFontAtlas::AddFontFromFileTTF(const char* filename, float size_pixels, const ImFontConfig* font_cfg_template, const ImWchar* glyph_ranges)
@@ -2163,13 +2645,14 @@ ImFont* ImFontAtlas::AddFontFromFileTTF(const char* filename, float size_pixels,
 }
 
 // NB: Transfer ownership of 'ttf_data' to ImFontAtlas, unless font_cfg_template->FontDataOwnedByAtlas == false. Owned TTF buffer will be deleted after Build().
-ImFont* ImFontAtlas::AddFontFromMemoryTTF(void* ttf_data, int ttf_size, float size_pixels, const ImFontConfig* font_cfg_template, const ImWchar* glyph_ranges)
+ImFont* ImFontAtlas::AddFontFromMemoryTTF(void* font_data, int font_data_size, float size_pixels, const ImFontConfig* font_cfg_template, const ImWchar* glyph_ranges)
 {
     IM_ASSERT(!Locked && "Cannot modify a locked ImFontAtlas between NewFrame() and EndFrame/Render()!");
     ImFontConfig font_cfg = font_cfg_template ? *font_cfg_template : ImFontConfig();
     IM_ASSERT(font_cfg.FontData == NULL);
-    font_cfg.FontData = ttf_data;
-    font_cfg.FontDataSize = ttf_size;
+    IM_ASSERT(font_data_size > 100 && "Incorrect value for font_data_size!"); // Heuristic to prevent accidentally passing a wrong value to font_data_size.
+    font_cfg.FontData = font_data;
+    font_cfg.FontDataSize = font_data_size;
     font_cfg.SizePixels = size_pixels > 0.0f ? size_pixels : font_cfg.SizePixels;
     if (glyph_ranges)
         font_cfg.GlyphRanges = glyph_ranges;
@@ -2221,6 +2704,7 @@ int ImFontAtlas::AddCustomRectFontGlyph(ImFont* font, ImWchar id, int width, int
     r.Width = (unsigned short)width;
     r.Height = (unsigned short)height;
     r.GlyphID = id;
+    r.GlyphColored = 0; // Set to 1 manually to mark glyph as colored // FIXME: No official API for that (#8133)
     r.GlyphAdvanceX = advance_x;
     r.GlyphOffset = offset;
     r.Font = font;
@@ -2297,10 +2781,11 @@ void    ImFontAtlasBuildMultiplyCalcLookupTable(unsigned char out_table[256], fl
 
 void    ImFontAtlasBuildMultiplyRectAlpha8(const unsigned char table[256], unsigned char* pixels, int x, int y, int w, int h, int stride)
 {
+    IM_ASSERT_PARANOID(w <= stride);
     unsigned char* data = pixels + x + y * stride;
-    for (int j = h; j > 0; j--, data += stride)
-        for (int i = 0; i < w; i++)
-            data[i] = table[data[i]];
+    for (int j = h; j > 0; j--, data += stride - w)
+        for (int i = w; i > 0; i--, data++)
+            *data = table[*data];
 }
 
 #ifdef IMGUI_ENABLE_STB_TRUETYPE
@@ -2317,7 +2802,7 @@ struct ImFontBuildSrcData
     int                 GlyphsHighest;      // Highest requested codepoint
     int                 GlyphsCount;        // Glyph count (excluding missing glyphs and glyphs already set by an earlier source font)
     ImBitVector         GlyphsSet;          // Glyph bit map (random access, 1-bit per codepoint. This will be a maximum of 8KB)
-    ImVector<int>       GlyphsList;         // Glyph codepoints list (flattened version of GlyphsMap)
+    ImVector<int>       GlyphsList;         // Glyph codepoints list (flattened version of GlyphsSet)
 };
 
 // Temporary data for one destination ImFont* (multiple source fonts can be merged into one destination ImFont)
@@ -2383,13 +2868,22 @@ static bool ImFontAtlasBuildWithStbTruetype(ImFontAtlas* atlas)
         const int font_offset = stbtt_GetFontOffsetForIndex((unsigned char*)cfg.FontData, cfg.FontNo);
         IM_ASSERT(font_offset >= 0 && "FontData is incorrect, or FontNo cannot be found.");
         if (!stbtt_InitFont(&src_tmp.FontInfo, (unsigned char*)cfg.FontData, font_offset))
+        {
+            IM_ASSERT(0 && "stbtt_InitFont(): failed to parse FontData. It is correct and complete? Check FontDataSize.");
             return false;
+        }
 
         // Measure highest codepoints
         ImFontBuildDstData& dst_tmp = dst_tmp_array[src_tmp.DstIndex];
         src_tmp.SrcRanges = cfg.GlyphRanges ? cfg.GlyphRanges : atlas->GetGlyphRangesDefault();
         for (const ImWchar* src_range = src_tmp.SrcRanges; src_range[0] && src_range[1]; src_range += 2)
+        {
+            // Check for valid range. This may also help detect *some* dangling pointers, because a common
+            // user error is to setup ImFontConfig::GlyphRanges with a pointer to data that isn't persistent,
+            // or to forget to zero-terminate the glyph range array.
+            IM_ASSERT(src_range[0] <= src_range[1] && "Invalid range: is your glyph range array persistent? it is zero-terminated?");
             src_tmp.GlyphsHighest = ImMax(src_tmp.GlyphsHighest, (int)src_range[1]);
+        }
         dst_tmp.SrcCount++;
         dst_tmp.GlyphsHighest = ImMax(dst_tmp.GlyphsHighest, src_tmp.GlyphsHighest);
     }
@@ -2447,6 +2941,7 @@ static bool ImFontAtlasBuildWithStbTruetype(ImFontAtlas* atlas)
     int total_surface = 0;
     int buf_rects_out_n = 0;
     int buf_packedchars_out_n = 0;
+    const int pack_padding = atlas->TexGlyphPadding;
     for (int src_i = 0; src_i < src_tmp_array.Size; src_i++)
     {
         ImFontBuildSrcData& src_tmp = src_tmp_array[src_i];
@@ -2460,7 +2955,7 @@ static bool ImFontAtlasBuildWithStbTruetype(ImFontAtlas* atlas)
 
         // Convert our ranges in the format stb_truetype wants
         ImFontConfig& cfg = atlas->ConfigData[src_i];
-        src_tmp.PackRange.font_size = cfg.SizePixels;
+        src_tmp.PackRange.font_size = cfg.SizePixels * cfg.RasterizerDensity;
         src_tmp.PackRange.first_unicode_codepoint_in_range = 0;
         src_tmp.PackRange.array_of_unicode_codepoints = src_tmp.GlyphsList.Data;
         src_tmp.PackRange.num_chars = src_tmp.GlyphsList.Size;
@@ -2469,19 +2964,20 @@ static bool ImFontAtlasBuildWithStbTruetype(ImFontAtlas* atlas)
         src_tmp.PackRange.v_oversample = (unsigned char)cfg.OversampleV;
 
         // Gather the sizes of all rectangles we will need to pack (this loop is based on stbtt_PackFontRangesGatherRects)
-        const float scale = (cfg.SizePixels > 0) ? stbtt_ScaleForPixelHeight(&src_tmp.FontInfo, cfg.SizePixels) : stbtt_ScaleForMappingEmToPixels(&src_tmp.FontInfo, -cfg.SizePixels);
-        const int padding = atlas->TexGlyphPadding;
+        const float scale = (cfg.SizePixels > 0.0f) ? stbtt_ScaleForPixelHeight(&src_tmp.FontInfo, cfg.SizePixels * cfg.RasterizerDensity) : stbtt_ScaleForMappingEmToPixels(&src_tmp.FontInfo, -cfg.SizePixels * cfg.RasterizerDensity);
         for (int glyph_i = 0; glyph_i < src_tmp.GlyphsList.Size; glyph_i++)
         {
             int x0, y0, x1, y1;
             const int glyph_index_in_font = stbtt_FindGlyphIndex(&src_tmp.FontInfo, src_tmp.GlyphsList[glyph_i]);
             IM_ASSERT(glyph_index_in_font != 0);
             stbtt_GetGlyphBitmapBoxSubpixel(&src_tmp.FontInfo, glyph_index_in_font, scale * cfg.OversampleH, scale * cfg.OversampleV, 0, 0, &x0, &y0, &x1, &y1);
-            src_tmp.Rects[glyph_i].w = (stbrp_coord)(x1 - x0 + padding + cfg.OversampleH - 1);
-            src_tmp.Rects[glyph_i].h = (stbrp_coord)(y1 - y0 + padding + cfg.OversampleV - 1);
+            src_tmp.Rects[glyph_i].w = (stbrp_coord)(x1 - x0 + pack_padding + cfg.OversampleH - 1);
+            src_tmp.Rects[glyph_i].h = (stbrp_coord)(y1 - y0 + pack_padding + cfg.OversampleV - 1);
             total_surface += src_tmp.Rects[glyph_i].w * src_tmp.Rects[glyph_i].h;
         }
     }
+    for (int i = 0; i < atlas->CustomRects.Size; i++)
+        total_surface += (atlas->CustomRects[i].Width + pack_padding) * (atlas->CustomRects[i].Height + pack_padding);
 
     // We need a width for the skyline algorithm, any width!
     // The exact width doesn't really matter much, but some API/GPU have texture size limitations and increasing width can decrease height.
@@ -2497,7 +2993,8 @@ static bool ImFontAtlasBuildWithStbTruetype(ImFontAtlas* atlas)
     // Pack our extra data rectangles first, so it will be on the upper-left corner of our texture (UV will have small values).
     const int TEX_HEIGHT_MAX = 1024 * 32;
     stbtt_pack_context spc = {};
-    stbtt_PackBegin(&spc, NULL, atlas->TexWidth, TEX_HEIGHT_MAX, 0, atlas->TexGlyphPadding, NULL);
+    stbtt_PackBegin(&spc, NULL, atlas->TexWidth, TEX_HEIGHT_MAX, 0, 0, NULL);
+    spc.padding = atlas->TexGlyphPadding; // Because we mixup stbtt_PackXXX and stbrp_PackXXX there's a bit of a hack here, not passing the value to stbtt_PackBegin() allows us to still pack a TexWidth-1 wide item. (#8107)
     ImFontAtlasBuildPackCustomRects(atlas, spc.pack_info);
 
     // 6. Pack each source font. No rendering yet, we are working with rectangles in an infinitely tall texture at this point.
@@ -2554,13 +3051,10 @@ static bool ImFontAtlasBuildWithStbTruetype(ImFontAtlas* atlas)
     // 9. Setup ImFont and glyphs for runtime
     for (int src_i = 0; src_i < src_tmp_array.Size; src_i++)
     {
-        ImFontBuildSrcData& src_tmp = src_tmp_array[src_i];
-        if (src_tmp.GlyphsCount == 0)
-            continue;
-
         // When merging fonts with MergeMode=true:
         // - We can have multiple input fonts writing into a same destination font.
         // - dst_font->ConfigData is != from cfg which is our source configuration.
+        ImFontBuildSrcData& src_tmp = src_tmp_array[src_i];
         ImFontConfig& cfg = atlas->ConfigData[src_i];
         ImFont* dst_font = cfg.DstFont;
 
@@ -2568,11 +3062,13 @@ static bool ImFontAtlasBuildWithStbTruetype(ImFontAtlas* atlas)
         int unscaled_ascent, unscaled_descent, unscaled_line_gap;
         stbtt_GetFontVMetrics(&src_tmp.FontInfo, &unscaled_ascent, &unscaled_descent, &unscaled_line_gap);
 
-        const float ascent = ImFloor(unscaled_ascent * font_scale + ((unscaled_ascent > 0.0f) ? +1 : -1));
-        const float descent = ImFloor(unscaled_descent * font_scale + ((unscaled_descent > 0.0f) ? +1 : -1));
+        const float ascent = ImCeil(unscaled_ascent * font_scale);
+        const float descent = ImFloor(unscaled_descent * font_scale);
         ImFontAtlasBuildSetupFont(atlas, dst_font, &cfg, ascent, descent);
         const float font_off_x = cfg.GlyphOffset.x;
         const float font_off_y = cfg.GlyphOffset.y + IM_ROUND(dst_font->Ascent);
+
+        const float inv_rasterization_scale = 1.0f / cfg.RasterizerDensity;
 
         for (int glyph_i = 0; glyph_i < src_tmp.GlyphsCount; glyph_i++)
         {
@@ -2582,7 +3078,11 @@ static bool ImFontAtlasBuildWithStbTruetype(ImFontAtlas* atlas)
             stbtt_aligned_quad q;
             float unused_x = 0.0f, unused_y = 0.0f;
             stbtt_GetPackedQuad(src_tmp.PackedChars, atlas->TexWidth, atlas->TexHeight, glyph_i, &unused_x, &unused_y, &q, 0);
-            dst_font->AddGlyph(&cfg, (ImWchar)codepoint, q.x0 + font_off_x, q.y0 + font_off_y, q.x1 + font_off_x, q.y1 + font_off_y, q.s0, q.t0, q.s1, q.t1, pc.xadvance);
+            float x0 = q.x0 * inv_rasterization_scale + font_off_x;
+            float y0 = q.y0 * inv_rasterization_scale + font_off_y;
+            float x1 = q.x1 * inv_rasterization_scale + font_off_x;
+            float y1 = q.y1 * inv_rasterization_scale + font_off_y;
+            dst_font->AddGlyph(&cfg, (ImWchar)codepoint, x0, y0, x1, y1, q.s0, q.t0, q.s1, q.t1, pc.xadvance * inv_rasterization_scale);
         }
     }
 
@@ -2602,19 +3102,31 @@ const ImFontBuilderIO* ImFontAtlasGetBuilderForStbTruetype()
 
 #endif // IMGUI_ENABLE_STB_TRUETYPE
 
+void ImFontAtlasUpdateConfigDataPointers(ImFontAtlas* atlas)
+{
+    for (ImFontConfig& font_cfg : atlas->ConfigData)
+    {
+        ImFont* font = font_cfg.DstFont;
+        if (!font_cfg.MergeMode)
+        {
+            font->ConfigData = &font_cfg;
+            font->ConfigDataCount = 0;
+        }
+        font->ConfigDataCount++;
+    }
+}
+
 void ImFontAtlasBuildSetupFont(ImFontAtlas* atlas, ImFont* font, ImFontConfig* font_config, float ascent, float descent)
 {
     if (!font_config->MergeMode)
     {
         font->ClearOutputData();
         font->FontSize = font_config->SizePixels;
-        font->ConfigData = font_config;
-        font->ConfigDataCount = 0;
+        IM_ASSERT(font->ConfigData == font_config);
         font->ContainerAtlas = atlas;
         font->Ascent = ascent;
         font->Descent = descent;
     }
-    font->ConfigDataCount++;
 }
 
 void ImFontAtlasBuildPackCustomRects(ImFontAtlas* atlas, void* stbrp_context_opaque)
@@ -2624,22 +3136,26 @@ void ImFontAtlasBuildPackCustomRects(ImFontAtlas* atlas, void* stbrp_context_opa
 
     ImVector<ImFontAtlasCustomRect>& user_rects = atlas->CustomRects;
     IM_ASSERT(user_rects.Size >= 1); // We expect at least the default custom rects to be registered, else something went wrong.
+#ifdef __GNUC__
+    if (user_rects.Size < 1) { __builtin_unreachable(); } // Workaround for GCC bug if IM_ASSERT() is defined to conditionally throw (see #5343)
+#endif
 
+    const int pack_padding = atlas->TexGlyphPadding;
     ImVector<stbrp_rect> pack_rects;
     pack_rects.resize(user_rects.Size);
     memset(pack_rects.Data, 0, (size_t)pack_rects.size_in_bytes());
     for (int i = 0; i < user_rects.Size; i++)
     {
-        pack_rects[i].w = user_rects[i].Width;
-        pack_rects[i].h = user_rects[i].Height;
+        pack_rects[i].w = user_rects[i].Width + pack_padding;
+        pack_rects[i].h = user_rects[i].Height + pack_padding;
     }
     stbrp_pack_rects(pack_context, &pack_rects[0], pack_rects.Size);
     for (int i = 0; i < pack_rects.Size; i++)
         if (pack_rects[i].was_packed)
         {
-            user_rects[i].X = pack_rects[i].x;
-            user_rects[i].Y = pack_rects[i].y;
-            IM_ASSERT(pack_rects[i].w == user_rects[i].Width && pack_rects[i].h == user_rects[i].Height);
+            user_rects[i].X = (unsigned short)pack_rects[i].x;
+            user_rects[i].Y = (unsigned short)pack_rects[i].y;
+            IM_ASSERT(pack_rects[i].w == user_rects[i].Width + pack_padding && pack_rects[i].h == user_rects[i].Height + pack_padding);
             atlas->TexHeight = ImMax(atlas->TexHeight, pack_rects[i].y + pack_rects[i].h);
         }
 }
@@ -2670,9 +3186,23 @@ static void ImFontAtlasBuildRenderDefaultTexData(ImFontAtlas* atlas)
     IM_ASSERT(r->IsPacked());
 
     const int w = atlas->TexWidth;
-    if (!(atlas->Flags & ImFontAtlasFlags_NoMouseCursors))
+    if (atlas->Flags & ImFontAtlasFlags_NoMouseCursors)
     {
-        // Render/copy pixels
+        // White pixels only
+        IM_ASSERT(r->Width == 2 && r->Height == 2);
+        const int offset = (int)r->X + (int)r->Y * w;
+        if (atlas->TexPixelsAlpha8 != NULL)
+        {
+            atlas->TexPixelsAlpha8[offset] = atlas->TexPixelsAlpha8[offset + 1] = atlas->TexPixelsAlpha8[offset + w] = atlas->TexPixelsAlpha8[offset + w + 1] = 0xFF;
+        }
+        else
+        {
+            atlas->TexPixelsRGBA32[offset] = atlas->TexPixelsRGBA32[offset + 1] = atlas->TexPixelsRGBA32[offset + w] = atlas->TexPixelsRGBA32[offset + w + 1] = IM_COL32_WHITE;
+        }
+    }
+    else
+    {
+        // White pixels and mouse cursor
         IM_ASSERT(r->Width == FONT_ATLAS_DEFAULT_TEX_DATA_W * 2 + 1 && r->Height == FONT_ATLAS_DEFAULT_TEX_DATA_H);
         const int x_for_white = r->X;
         const int x_for_black = r->X + FONT_ATLAS_DEFAULT_TEX_DATA_W + 1;
@@ -2687,20 +3217,6 @@ static void ImFontAtlasBuildRenderDefaultTexData(ImFontAtlas* atlas)
             ImFontAtlasBuildRender32bppRectFromString(atlas, x_for_black, r->Y, FONT_ATLAS_DEFAULT_TEX_DATA_W, FONT_ATLAS_DEFAULT_TEX_DATA_H, FONT_ATLAS_DEFAULT_TEX_DATA_PIXELS, 'X', IM_COL32_WHITE);
         }
     }
-    else
-    {
-        // Render 4 white pixels
-        IM_ASSERT(r->Width == 2 && r->Height == 2);
-        const int offset = (int)r->X + (int)r->Y * w;
-        if (atlas->TexPixelsAlpha8 != NULL)
-        {
-            atlas->TexPixelsAlpha8[offset] = atlas->TexPixelsAlpha8[offset + 1] = atlas->TexPixelsAlpha8[offset + w] = atlas->TexPixelsAlpha8[offset + w + 1] = 0xFF;
-        }
-        else
-        {
-            atlas->TexPixelsRGBA32[offset] = atlas->TexPixelsRGBA32[offset + 1] = atlas->TexPixelsRGBA32[offset + w] = atlas->TexPixelsRGBA32[offset + w + 1] = IM_COL32_WHITE;
-        }
-    }
     atlas->TexUvWhitePixel = ImVec2((r->X + 0.5f) * atlas->TexUvScale.x, (r->Y + 0.5f) * atlas->TexUvScale.y);
 }
 
@@ -2712,39 +3228,39 @@ static void ImFontAtlasBuildRenderLinesTexData(ImFontAtlas* atlas)
     // This generates a triangular shape in the texture, with the various line widths stacked on top of each other to allow interpolation between them
     ImFontAtlasCustomRect* r = atlas->GetCustomRectByIndex(atlas->PackIdLines);
     IM_ASSERT(r->IsPacked());
-    for (unsigned int n = 0; n < IM_DRAWLIST_TEX_LINES_WIDTH_MAX + 1; n++) // +1 because of the zero-width row
+    for (int n = 0; n < IM_DRAWLIST_TEX_LINES_WIDTH_MAX + 1; n++) // +1 because of the zero-width row
     {
         // Each line consists of at least two empty pixels at the ends, with a line of solid pixels in the middle
-        unsigned int y = n;
-        unsigned int line_width = n;
-        unsigned int pad_left = (r->Width - line_width) / 2;
-        unsigned int pad_right = r->Width - (pad_left + line_width);
+        int y = n;
+        int line_width = n;
+        int pad_left = (r->Width - line_width) / 2;
+        int pad_right = r->Width - (pad_left + line_width);
 
         // Write each slice
         IM_ASSERT(pad_left + line_width + pad_right == r->Width && y < r->Height); // Make sure we're inside the texture bounds before we start writing pixels
         if (atlas->TexPixelsAlpha8 != NULL)
         {
             unsigned char* write_ptr = &atlas->TexPixelsAlpha8[r->X + ((r->Y + y) * atlas->TexWidth)];
-            for (unsigned int i = 0; i < pad_left; i++)
+            for (int i = 0; i < pad_left; i++)
                 *(write_ptr + i) = 0x00;
 
-            for (unsigned int i = 0; i < line_width; i++)
+            for (int i = 0; i < line_width; i++)
                 *(write_ptr + pad_left + i) = 0xFF;
 
-            for (unsigned int i = 0; i < pad_right; i++)
+            for (int i = 0; i < pad_right; i++)
                 *(write_ptr + pad_left + line_width + i) = 0x00;
         }
         else
         {
             unsigned int* write_ptr = &atlas->TexPixelsRGBA32[r->X + ((r->Y + y) * atlas->TexWidth)];
-            for (unsigned int i = 0; i < pad_left; i++)
-                *(write_ptr + i) = IM_COL32_BLACK_TRANS;
+            for (int i = 0; i < pad_left; i++)
+                *(write_ptr + i) = IM_COL32(255, 255, 255, 0);
 
-            for (unsigned int i = 0; i < line_width; i++)
+            for (int i = 0; i < line_width; i++)
                 *(write_ptr + pad_left + i) = IM_COL32_WHITE;
 
-            for (unsigned int i = 0; i < pad_right; i++)
-                *(write_ptr + pad_left + line_width + i) = IM_COL32_BLACK_TRANS;
+            for (int i = 0; i < pad_right; i++)
+                *(write_ptr + pad_left + line_width + i) = IM_COL32(255, 255, 255, 0);
         }
 
         // Calculate UVs for this line
@@ -2796,15 +3312,21 @@ void ImFontAtlasBuildFinish(ImFontAtlas* atlas)
         ImVec2 uv0, uv1;
         atlas->CalcCustomRectUV(r, &uv0, &uv1);
         r->Font->AddGlyph(NULL, (ImWchar)r->GlyphID, r->GlyphOffset.x, r->GlyphOffset.y, r->GlyphOffset.x + r->Width, r->GlyphOffset.y + r->Height, uv0.x, uv0.y, uv1.x, uv1.y, r->GlyphAdvanceX);
+        if (r->GlyphColored)
+            r->Font->Glyphs.back().Colored = 1;
     }
 
     // Build all fonts lookup tables
-    for (int i = 0; i < atlas->Fonts.Size; i++)
-        if (atlas->Fonts[i]->DirtyLookupTables)
-            atlas->Fonts[i]->BuildLookupTable();
+    for (ImFont* font : atlas->Fonts)
+        if (font->DirtyLookupTables)
+            font->BuildLookupTable();
 
     atlas->TexReady = true;
 }
+
+//-------------------------------------------------------------------------
+// [SECTION] ImFontAtlas: glyph ranges helpers
+//-------------------------------------------------------------------------
 
 // Retrieve list of range (2 int per range, values are inclusive)
 const ImWchar*   ImFontAtlas::GetGlyphRangesDefault()
@@ -2812,6 +3334,17 @@ const ImWchar*   ImFontAtlas::GetGlyphRangesDefault()
     static const ImWchar ranges[] =
     {
         0x0020, 0x00FF, // Basic Latin + Latin Supplement
+        0,
+    };
+    return &ranges[0];
+}
+
+const ImWchar*   ImFontAtlas::GetGlyphRangesGreek()
+{
+    static const ImWchar ranges[] =
+    {
+        0x0020, 0x00FF, // Basic Latin + Latin Supplement
+        0x0370, 0x03FF, // Greek and Coptic
         0,
     };
     return &ranges[0];
@@ -2855,10 +3388,6 @@ static void UnpackAccumulativeOffsetsIntoRanges(int base_codepoint, const short*
     }
     out_ranges[0] = 0;
 }
-
-//-------------------------------------------------------------------------
-// [SECTION] ImFontAtlas glyph ranges helpers
-//-------------------------------------------------------------------------
 
 const ImWchar*  ImFontAtlas::GetGlyphRangesChineseSimplifiedCommon()
 {
@@ -2933,19 +3462,19 @@ const ImWchar*  ImFontAtlas::GetGlyphRangesJapanese()
     // 2999 ideograms code points for Japanese
     // - 2136 Joyo (meaning "for regular use" or "for common use") Kanji code points
     // - 863 Jinmeiyo (meaning "for personal name") Kanji code points
-    // - Sourced from the character information database of the Information-technology Promotion Agency, Japan
-    //   - https://mojikiban.ipa.go.jp/mji/
-    //   - Available under the terms of the Creative Commons Attribution-ShareAlike 2.1 Japan (CC BY-SA 2.1 JP).
-    //     - https://creativecommons.org/licenses/by-sa/2.1/jp/deed.en
-    //     - https://creativecommons.org/licenses/by-sa/2.1/jp/legalcode
-    //   - You can generate this code by the script at:
-    //     - https://github.com/vaiorabbit/everyday_use_kanji
+    // - Sourced from official information provided by the government agencies of Japan:
+    //   - List of Joyo Kanji by the Agency for Cultural Affairs
+    //     - https://www.bunka.go.jp/kokugo_nihongo/sisaku/joho/joho/kijun/naikaku/kanji/
+    //   - List of Jinmeiyo Kanji by the Ministry of Justice
+    //     - http://www.moj.go.jp/MINJI/minji86.html
+    //   - Available under the terms of the Creative Commons Attribution 4.0 International (CC BY 4.0).
+    //     - https://creativecommons.org/licenses/by/4.0/legalcode
+    // - You can generate this code by the script at:
+    //   - https://github.com/vaiorabbit/everyday_use_kanji
     // - References:
     //   - List of Joyo Kanji
-    //     - (Official list by the Agency for Cultural Affairs) https://www.bunka.go.jp/kokugo_nihongo/sisaku/joho/joho/kakuki/14/tosin02/index.html
     //     - (Wikipedia) https://en.wikipedia.org/wiki/List_of_j%C5%8Dy%C5%8D_kanji
     //   - List of Jinmeiyo Kanji
-    //     - (Official list by the Ministry of Justice) http://www.moj.go.jp/MINJI/minji86.html
     //     - (Wikipedia) https://en.wikipedia.org/wiki/Jinmeiy%C5%8D_kanji
     // - Missing 1 Joyo Kanji: U+20B9F (Kun'yomi: Shikaru, On'yomi: Shitsu,shichi), see https://github.com/ocornut/imgui/pull/3627 for details.
     // You can use ImFontGlyphRangesBuilder to create your own ranges derived from this, by merging existing ranges or adding new characters.
@@ -3108,7 +3637,8 @@ ImFont::ImFont()
     FallbackAdvanceX = 0.0f;
     FallbackChar = (ImWchar)-1;
     EllipsisChar = (ImWchar)-1;
-    DotChar = (ImWchar)-1;
+    EllipsisWidth = EllipsisCharStep = 0.0f;
+    EllipsisCharCount = 0;
     FallbackGlyph = NULL;
     ContainerAtlas = NULL;
     ConfigData = NULL;
@@ -3137,6 +3667,7 @@ void    ImFont::ClearOutputData()
     DirtyLookupTables = true;
     Ascent = Descent = 0.0f;
     MetricsTotalSurface = 0;
+    memset(Used4kPagesMap, 0, sizeof(Used4kPagesMap));
 }
 
 static ImWchar FindFirstExistingGlyph(ImFont* font, const ImWchar* candidate_chars, int candidate_chars_count)
@@ -3154,6 +3685,7 @@ void ImFont::BuildLookupTable()
         max_codepoint = ImMax(max_codepoint, (int)Glyphs[i].Codepoint);
 
     // Build lookup table
+    IM_ASSERT(Glyphs.Size > 0 && "Font has not loaded glyph!");
     IM_ASSERT(Glyphs.Size < 0xFFFF); // -1 is reserved
     IndexAdvanceX.clear();
     IndexLookup.clear();
@@ -3189,17 +3721,7 @@ void ImFont::BuildLookupTable()
     SetGlyphVisible((ImWchar)' ', false);
     SetGlyphVisible((ImWchar)'\t', false);
 
-    // Ellipsis character is required for rendering elided text. We prefer using U+2026 (horizontal ellipsis).
-    // However some old fonts may contain ellipsis at U+0085. Here we auto-detect most suitable ellipsis character.
-    // FIXME: Note that 0x2026 is rarely included in our font ranges. Because of this we are more likely to use three individual dots.
-    const ImWchar ellipsis_chars[] = { (ImWchar)0x2026, (ImWchar)0x0085 };
-    const ImWchar dots_chars[] = { (ImWchar)'.', (ImWchar)0xFF0E };
-    if (EllipsisChar == (ImWchar)-1)
-        EllipsisChar = FindFirstExistingGlyph(this, ellipsis_chars, IM_ARRAYSIZE(ellipsis_chars));
-    if (DotChar == (ImWchar)-1)
-        DotChar = FindFirstExistingGlyph(this, dots_chars, IM_ARRAYSIZE(dots_chars));
-
-    // Setup fallback character
+    // Setup Fallback character
     const ImWchar fallback_chars[] = { (ImWchar)IM_UNICODE_CODEPOINT_INVALID, (ImWchar)'?', (ImWchar)' ' };
     FallbackGlyph = FindGlyphNoFallback(FallbackChar);
     if (FallbackGlyph == NULL)
@@ -3212,11 +3734,32 @@ void ImFont::BuildLookupTable()
             FallbackChar = (ImWchar)FallbackGlyph->Codepoint;
         }
     }
-
     FallbackAdvanceX = FallbackGlyph->AdvanceX;
     for (int i = 0; i < max_codepoint + 1; i++)
         if (IndexAdvanceX[i] < 0.0f)
             IndexAdvanceX[i] = FallbackAdvanceX;
+
+    // Setup Ellipsis character. It is required for rendering elided text. We prefer using U+2026 (horizontal ellipsis).
+    // However some old fonts may contain ellipsis at U+0085. Here we auto-detect most suitable ellipsis character.
+    // FIXME: Note that 0x2026 is rarely included in our font ranges. Because of this we are more likely to use three individual dots.
+    const ImWchar ellipsis_chars[] = { (ImWchar)0x2026, (ImWchar)0x0085 };
+    const ImWchar dots_chars[] = { (ImWchar)'.', (ImWchar)0xFF0E };
+    if (EllipsisChar == (ImWchar)-1)
+        EllipsisChar = FindFirstExistingGlyph(this, ellipsis_chars, IM_ARRAYSIZE(ellipsis_chars));
+    const ImWchar dot_char = FindFirstExistingGlyph(this, dots_chars, IM_ARRAYSIZE(dots_chars));
+    if (EllipsisChar != (ImWchar)-1)
+    {
+        EllipsisCharCount = 1;
+        EllipsisWidth = EllipsisCharStep = FindGlyph(EllipsisChar)->X1;
+    }
+    else if (dot_char != (ImWchar)-1)
+    {
+        const ImFontGlyph* glyph = FindGlyph(dot_char);
+        EllipsisChar = dot_char;
+        EllipsisCharCount = 3;
+        EllipsisCharStep = (glyph->X1 - glyph->X0) + 1.0f;
+        EllipsisWidth = EllipsisCharStep * 3.0f - 1.0f;
+    }
 }
 
 // API is designed this way to avoid exposing the 4K page size
@@ -3259,7 +3802,7 @@ void ImFont::AddGlyph(const ImFontConfig* cfg, ImWchar codepoint, float x0, floa
         advance_x = ImClamp(advance_x, cfg->GlyphMinAdvanceX, cfg->GlyphMaxAdvanceX);
         if (advance_x != advance_x_original)
         {
-            float char_off_x = cfg->PixelSnapH ? ImFloor((advance_x - advance_x_original) * 0.5f) : (advance_x - advance_x_original) * 0.5f;
+            float char_off_x = cfg->PixelSnapH ? ImTrunc((advance_x - advance_x_original) * 0.5f) : (advance_x - advance_x_original) * 0.5f;
             x0 += char_off_x;
             x1 += char_off_x;
         }
@@ -3272,8 +3815,9 @@ void ImFont::AddGlyph(const ImFontConfig* cfg, ImWchar codepoint, float x0, floa
         advance_x += cfg->GlyphExtraSpacing.x;
     }
 
+    int glyph_idx = Glyphs.Size;
     Glyphs.resize(Glyphs.Size + 1);
-    ImFontGlyph& glyph = Glyphs.back();
+    ImFontGlyph& glyph = Glyphs[glyph_idx];
     glyph.Codepoint = (unsigned int)codepoint;
     glyph.Visible = (x0 != x1) && (y0 != y1);
     glyph.Colored = false;
@@ -3309,7 +3853,8 @@ void ImFont::AddRemapChar(ImWchar dst, ImWchar src, bool overwrite_dst)
     IndexAdvanceX[dst] = (src < index_size) ? IndexAdvanceX.Data[src] : 1.0f;
 }
 
-const ImFontGlyph* ImFont::FindGlyph(ImWchar c) const
+// Find glyph, return fallback if missing
+const ImFontGlyph* ImFont::FindGlyph(ImWchar c)
 {
     if (c >= (size_t)IndexLookup.Size)
         return FallbackGlyph;
@@ -3319,7 +3864,7 @@ const ImFontGlyph* ImFont::FindGlyph(ImWchar c) const
     return &Glyphs.Data[i];
 }
 
-const ImFontGlyph* ImFont::FindGlyphNoFallback(ImWchar c) const
+const ImFontGlyph* ImFont::FindGlyphNoFallback(ImWchar c)
 {
     if (c >= (size_t)IndexLookup.Size)
         return NULL;
@@ -3329,11 +3874,23 @@ const ImFontGlyph* ImFont::FindGlyphNoFallback(ImWchar c) const
     return &Glyphs.Data[i];
 }
 
-const char* ImFont::CalcWordWrapPositionA(float scale, const char* text, const char* text_end, float wrap_width) const
+// Trim trailing space and find beginning of next line
+static inline const char* CalcWordWrapNextLineStartA(const char* text, const char* text_end)
 {
-    // Simple word-wrapping for English, not full-featured. Please submit failing cases!
-    // FIXME: Much possible improvements (don't cut things like "word !", "word!!!" but cut within "word,,,,", more sensible support for punctuations, support for Unicode punctuations, etc.)
+    while (text < text_end && ImCharIsBlankA(*text))
+        text++;
+    if (*text == '\n')
+        text++;
+    return text;
+}
 
+#define ImFontGetCharAdvanceX(_FONT, _CH)  ((int)(_CH) < (_FONT)->IndexAdvanceX.Size ? (_FONT)->IndexAdvanceX.Data[_CH] : (_FONT)->FallbackAdvanceX)
+
+// Simple word-wrapping for English, not full-featured. Please submit failing cases!
+// This will return the next location to wrap from. If no wrapping if necessary, this will fast-forward to e.g. text_end.
+// FIXME: Much possible improvements (don't cut things like "word !", "word!!!" but cut within "word,,,,", more sensible support for punctuations, support for Unicode punctuations, etc.)
+const char* ImFont::CalcWordWrapPositionA(float scale, const char* text, const char* text_end, float wrap_width)
+{
     // For references, possible wrap point marked with ^
     //  "aaa bbb, ccc,ddd. eee   fff. ggg!"
     //      ^    ^    ^   ^   ^__    ^    ^
@@ -3345,7 +3902,6 @@ const char* ImFont::CalcWordWrapPositionA(float scale, const char* text, const c
 
     // Cut words that cannot possibly fit within one line.
     // e.g.: "The tropical fish" with ~5 characters worth of width --> "The tr" "opical" "fish"
-
     float line_width = 0.0f;
     float word_width = 0.0f;
     float blank_width = 0.0f;
@@ -3356,6 +3912,7 @@ const char* ImFont::CalcWordWrapPositionA(float scale, const char* text, const c
     bool inside_word = true;
 
     const char* s = text;
+    IM_ASSERT(text_end != NULL);
     while (s < text_end)
     {
         unsigned int c = (unsigned int)*s;
@@ -3364,8 +3921,6 @@ const char* ImFont::CalcWordWrapPositionA(float scale, const char* text, const c
             next_s = s + 1;
         else
             next_s = s + ImTextCharFromUtf8(&c, s, text_end);
-        if (c == 0)
-            break;
 
         if (c < 32)
         {
@@ -3383,7 +3938,7 @@ const char* ImFont::CalcWordWrapPositionA(float scale, const char* text, const c
             }
         }
 
-        const float char_width = ((int)c < IndexAdvanceX.Size ? IndexAdvanceX.Data[c] : FallbackAdvanceX);
+        const float char_width = ImFontGetCharAdvanceX(this, c);
         if (ImCharIsBlankW(c))
         {
             if (inside_word)
@@ -3425,10 +3980,14 @@ const char* ImFont::CalcWordWrapPositionA(float scale, const char* text, const c
         s = next_s;
     }
 
+    // Wrap_width is too small to fit anything. Force displaying 1 character to minimize the height discontinuity.
+    // +1 may not be a character start point in UTF-8 but it's ok because caller loops use (text >= word_wrap_eol).
+    if (s == text && text < text_end)
+        return s + 1;
     return s;
 }
 
-ImVec2 ImFont::CalcTextSizeA(float size, float max_width, float wrap_width, const char* text_begin, const char* text_end, const char** remaining) const
+ImVec2 ImFont::CalcTextSizeA(float size, float max_width, float wrap_width, const char* text_begin, const char* text_end, const char** remaining)
 {
     if (!text_end)
         text_end = text_begin + strlen(text_begin); // FIXME-OPT: Need to avoid this.
@@ -3449,11 +4008,7 @@ ImVec2 ImFont::CalcTextSizeA(float size, float max_width, float wrap_width, cons
         {
             // Calculate how far we can render. Requires two passes on the string data but keeps the code simple and not intrusive for what's essentially an uncommon feature.
             if (!word_wrap_eol)
-            {
                 word_wrap_eol = CalcWordWrapPositionA(scale, s, text_end, wrap_width - line_width);
-                if (word_wrap_eol == s) // Wrap_width is too small to fit anything. Force displaying 1 character to minimize the height discontinuity.
-                    word_wrap_eol++;    // +1 may not be a character start point in UTF-8 but it's ok because we use s >= word_wrap_eol below
-            }
 
             if (s >= word_wrap_eol)
             {
@@ -3462,13 +4017,7 @@ ImVec2 ImFont::CalcTextSizeA(float size, float max_width, float wrap_width, cons
                 text_size.y += line_height;
                 line_width = 0.0f;
                 word_wrap_eol = NULL;
-
-                // Wrapping skips upcoming blanks
-                while (s < text_end)
-                {
-                    const char c = *s;
-                    if (ImCharIsBlankA(c)) { s++; } else if (c == '\n') { s++; break; } else { break; }
-                }
+                s = CalcWordWrapNextLineStartA(s, text_end); // Wrapping skips upcoming blanks
                 continue;
             }
         }
@@ -3477,15 +4026,9 @@ ImVec2 ImFont::CalcTextSizeA(float size, float max_width, float wrap_width, cons
         const char* prev_s = s;
         unsigned int c = (unsigned int)*s;
         if (c < 0x80)
-        {
             s += 1;
-        }
         else
-        {
             s += ImTextCharFromUtf8(&c, s, text_end);
-            if (c == 0) // Malformed UTF-8?
-                break;
-        }
 
         if (c < 32)
         {
@@ -3500,7 +4043,7 @@ ImVec2 ImFont::CalcTextSizeA(float size, float max_width, float wrap_width, cons
                 continue;
         }
 
-        const float char_width = ((int)c < IndexAdvanceX.Size ? IndexAdvanceX.Data[c] : FallbackAdvanceX) * scale;
+        const float char_width = ImFontGetCharAdvanceX(this, c) * scale;
         if (line_width + char_width >= max_width)
         {
             s = prev_s;
@@ -3523,7 +4066,7 @@ ImVec2 ImFont::CalcTextSizeA(float size, float max_width, float wrap_width, cons
 }
 
 // Note: as with every ImDrawList drawing function, this expects that the font atlas texture is bound.
-void ImFont::RenderChar(ImDrawList* draw_list, float size, ImVec2 pos, ImU32 col, ImWchar c) const
+void ImFont::RenderChar(ImDrawList* draw_list, float size, const ImVec2& pos, ImU32 col, ImWchar c)
 {
     const ImFontGlyph* glyph = FindGlyph(c);
     if (!glyph || !glyph->Visible)
@@ -3531,38 +4074,47 @@ void ImFont::RenderChar(ImDrawList* draw_list, float size, ImVec2 pos, ImU32 col
     if (glyph->Colored)
         col |= ~IM_COL32_A_MASK;
     float scale = (size >= 0.0f) ? (size / FontSize) : 1.0f;
-    pos.x = IM_FLOOR(pos.x);
-    pos.y = IM_FLOOR(pos.y);
+    float x = IM_TRUNC(pos.x);
+    float y = IM_TRUNC(pos.y);
     draw_list->PrimReserve(6, 4);
-    draw_list->PrimRectUV(ImVec2(pos.x + glyph->X0 * scale, pos.y + glyph->Y0 * scale), ImVec2(pos.x + glyph->X1 * scale, pos.y + glyph->Y1 * scale), ImVec2(glyph->U0, glyph->V0), ImVec2(glyph->U1, glyph->V1), col);
+    draw_list->PrimRectUV(ImVec2(x + glyph->X0 * scale, y + glyph->Y0 * scale), ImVec2(x + glyph->X1 * scale, y + glyph->Y1 * scale), ImVec2(glyph->U0, glyph->V0), ImVec2(glyph->U1, glyph->V1), col);
 }
 
 // Note: as with every ImDrawList drawing function, this expects that the font atlas texture is bound.
-void ImFont::RenderText(ImDrawList* draw_list, float size, ImVec2 pos, ImU32 col, const ImVec4& clip_rect, const char* text_begin, const char* text_end, float wrap_width, bool cpu_fine_clip) const
+void ImFont::RenderText(ImDrawList* draw_list, float size, const ImVec2& pos, ImU32 col, const ImVec4& clip_rect, const char* text_begin, const char* text_end, float wrap_width, bool cpu_fine_clip)
 {
     if (!text_end)
         text_end = text_begin + strlen(text_begin); // ImGui:: functions generally already provides a valid text_end, so this is merely to handle direct calls.
 
     // Align to be pixel perfect
-    pos.x = IM_FLOOR(pos.x);
-    pos.y = IM_FLOOR(pos.y);
-    float x = pos.x;
-    float y = pos.y;
+    float x = IM_TRUNC(pos.x);
+    float y = IM_TRUNC(pos.y);
     if (y > clip_rect.w)
         return;
 
     const float scale = size / FontSize;
     const float line_height = FontSize * scale;
+    const float origin_x = x;
     const bool word_wrap_enabled = (wrap_width > 0.0f);
-    const char* word_wrap_eol = NULL;
 
     // Fast-forward to first visible line
     const char* s = text_begin;
-    if (y + line_height < clip_rect.y && !word_wrap_enabled)
+    if (y + line_height < clip_rect.y)
         while (y + line_height < clip_rect.y && s < text_end)
         {
-            s = (const char*)memchr(s, '\n', text_end - s);
-            s = s ? s + 1 : text_end;
+            const char* line_end = (const char*)memchr(s, '\n', text_end - s);
+            if (word_wrap_enabled)
+            {
+                // FIXME-OPT: This is not optimal as do first do a search for \n before calling CalcWordWrapPositionA().
+                // If the specs for CalcWordWrapPositionA() were reworked to optionally return on \n we could combine both.
+                // However it is still better than nothing performing the fast-forward!
+                s = CalcWordWrapPositionA(scale, s, line_end ? line_end : text_end, wrap_width);
+                s = CalcWordWrapNextLineStartA(s, text_end);
+            }
+            else
+            {
+                s = line_end ? line_end + 1 : text_end;
+            }
             y += line_height;
         }
 
@@ -3588,12 +4140,12 @@ void ImFont::RenderText(ImDrawList* draw_list, float size, ImVec2 pos, ImU32 col
     const int idx_count_max = (int)(text_end - s) * 6;
     const int idx_expected_size = draw_list->IdxBuffer.Size + idx_count_max;
     draw_list->PrimReserve(idx_count_max, vtx_count_max);
-
-    ImDrawVert* vtx_write = draw_list->_VtxWritePtr;
-    ImDrawIdx* idx_write = draw_list->_IdxWritePtr;
-    unsigned int vtx_current_idx = draw_list->_VtxCurrentIdx;
+    ImDrawVert*  vtx_write = draw_list->_VtxWritePtr;
+    ImDrawIdx*   idx_write = draw_list->_IdxWritePtr;
+    unsigned int vtx_index = draw_list->_VtxCurrentIdx;
 
     const ImU32 col_untinted = col | ~IM_COL32_A_MASK;
+    const char* word_wrap_eol = NULL;
 
     while (s < text_end)
     {
@@ -3601,24 +4153,16 @@ void ImFont::RenderText(ImDrawList* draw_list, float size, ImVec2 pos, ImU32 col
         {
             // Calculate how far we can render. Requires two passes on the string data but keeps the code simple and not intrusive for what's essentially an uncommon feature.
             if (!word_wrap_eol)
-            {
-                word_wrap_eol = CalcWordWrapPositionA(scale, s, text_end, wrap_width - (x - pos.x));
-                if (word_wrap_eol == s) // Wrap_width is too small to fit anything. Force displaying 1 character to minimize the height discontinuity.
-                    word_wrap_eol++;    // +1 may not be a character start point in UTF-8 but it's ok because we use s >= word_wrap_eol below
-            }
+                word_wrap_eol = CalcWordWrapPositionA(scale, s, text_end, wrap_width - (x - origin_x));
 
             if (s >= word_wrap_eol)
             {
-                x = pos.x;
+                x = origin_x;
                 y += line_height;
+                if (y > clip_rect.w)
+                    break; // break out of main loop
                 word_wrap_eol = NULL;
-
-                // Wrapping skips upcoming blanks
-                while (s < text_end)
-                {
-                    const char c = *s;
-                    if (ImCharIsBlankA(c)) { s++; } else if (c == '\n') { s++; break; } else { break; }
-                }
+                s = CalcWordWrapNextLineStartA(s, text_end); // Wrapping skips upcoming blanks
                 continue;
             }
         }
@@ -3626,21 +4170,15 @@ void ImFont::RenderText(ImDrawList* draw_list, float size, ImVec2 pos, ImU32 col
         // Decode and advance source
         unsigned int c = (unsigned int)*s;
         if (c < 0x80)
-        {
             s += 1;
-        }
         else
-        {
             s += ImTextCharFromUtf8(&c, s, text_end);
-            if (c == 0) // Malformed UTF-8?
-                break;
-        }
 
         if (c < 32)
         {
             if (c == '\n')
             {
-                x = pos.x;
+                x = origin_x;
                 y += line_height;
                 if (y > clip_rect.w)
                     break; // break out of main loop
@@ -3705,14 +4243,14 @@ void ImFont::RenderText(ImDrawList* draw_list, float size, ImVec2 pos, ImU32 col
 
                 // We are NOT calling PrimRectUV() here because non-inlined causes too much overhead in a debug builds. Inlined here:
                 {
-                    idx_write[0] = (ImDrawIdx)(vtx_current_idx); idx_write[1] = (ImDrawIdx)(vtx_current_idx+1); idx_write[2] = (ImDrawIdx)(vtx_current_idx+2);
-                    idx_write[3] = (ImDrawIdx)(vtx_current_idx); idx_write[4] = (ImDrawIdx)(vtx_current_idx+2); idx_write[5] = (ImDrawIdx)(vtx_current_idx+3);
                     vtx_write[0].pos.x = x1; vtx_write[0].pos.y = y1; vtx_write[0].col = glyph_col; vtx_write[0].uv.x = u1; vtx_write[0].uv.y = v1;
                     vtx_write[1].pos.x = x2; vtx_write[1].pos.y = y1; vtx_write[1].col = glyph_col; vtx_write[1].uv.x = u2; vtx_write[1].uv.y = v1;
                     vtx_write[2].pos.x = x2; vtx_write[2].pos.y = y2; vtx_write[2].col = glyph_col; vtx_write[2].uv.x = u2; vtx_write[2].uv.y = v2;
                     vtx_write[3].pos.x = x1; vtx_write[3].pos.y = y2; vtx_write[3].col = glyph_col; vtx_write[3].uv.x = u1; vtx_write[3].uv.y = v2;
+                    idx_write[0] = (ImDrawIdx)(vtx_index); idx_write[1] = (ImDrawIdx)(vtx_index + 1); idx_write[2] = (ImDrawIdx)(vtx_index + 2);
+                    idx_write[3] = (ImDrawIdx)(vtx_index); idx_write[4] = (ImDrawIdx)(vtx_index + 2); idx_write[5] = (ImDrawIdx)(vtx_index + 3);
                     vtx_write += 4;
-                    vtx_current_idx += 4;
+                    vtx_index += 4;
                     idx_write += 6;
                 }
             }
@@ -3726,7 +4264,7 @@ void ImFont::RenderText(ImDrawList* draw_list, float size, ImVec2 pos, ImU32 col
     draw_list->CmdBuffer[draw_list->CmdBuffer.Size - 1].ElemCount -= (idx_expected_size - draw_list->IdxBuffer.Size);
     draw_list->_VtxWritePtr = vtx_write;
     draw_list->_IdxWritePtr = idx_write;
-    draw_list->_VtxCurrentIdx = vtx_current_idx;
+    draw_list->_VtxCurrentIdx = vtx_index;
 }
 
 //-----------------------------------------------------------------------------
@@ -3736,7 +4274,6 @@ void ImFont::RenderText(ImDrawList* draw_list, float size, ImVec2 pos, ImU32 col
 // - RenderArrow()
 // - RenderBullet()
 // - RenderCheckMark()
-// - RenderMouseCursor()
 // - RenderArrowPointingAt()
 // - RenderRectFilledRangeH()
 // - RenderRectFilledWithHole()
@@ -3779,6 +4316,7 @@ void ImGui::RenderArrow(ImDrawList* draw_list, ImVec2 pos, ImU32 col, ImGuiDir d
 
 void ImGui::RenderBullet(ImDrawList* draw_list, ImVec2 pos, ImU32 col)
 {
+    // FIXME-OPT: This should be baked in font.
     draw_list->AddCircleFilled(pos, draw_list->_Data->FontSize * 0.20f, col, 8);
 }
 
@@ -3795,27 +4333,6 @@ void ImGui::RenderCheckMark(ImDrawList* draw_list, ImVec2 pos, ImU32 col, float 
     draw_list->PathLineTo(ImVec2(bx, by));
     draw_list->PathLineTo(ImVec2(bx + third * 2.0f, by - third * 2.0f));
     draw_list->PathStroke(col, 0, thickness);
-}
-
-void ImGui::RenderMouseCursor(ImDrawList* draw_list, ImVec2 pos, float scale, ImGuiMouseCursor mouse_cursor, ImU32 col_fill, ImU32 col_border, ImU32 col_shadow)
-{
-    if (mouse_cursor == ImGuiMouseCursor_None)
-        return;
-    IM_ASSERT(mouse_cursor > ImGuiMouseCursor_None && mouse_cursor < ImGuiMouseCursor_COUNT);
-
-    ImFontAtlas* font_atlas = draw_list->_Data->Font->ContainerAtlas;
-    ImVec2 offset, size, uv[4];
-    if (font_atlas->GetMouseCursorTexData(mouse_cursor, &offset, &size, &uv[0], &uv[2]))
-    {
-        pos -= offset;
-        ImTextureID tex_id = font_atlas->TexID;
-        draw_list->PushTextureID(tex_id);
-        draw_list->AddImage(tex_id, pos + ImVec2(1, 0) * scale, pos + (ImVec2(1, 0) + size) * scale,    uv[2], uv[3], col_shadow);
-        draw_list->AddImage(tex_id, pos + ImVec2(2, 0) * scale, pos + (ImVec2(2, 0) + size) * scale,    uv[2], uv[3], col_shadow);
-        draw_list->AddImage(tex_id, pos,                        pos + size * scale,                     uv[2], uv[3], col_border);
-        draw_list->AddImage(tex_id, pos,                        pos + size * scale,                     uv[0], uv[1], col_fill);
-        draw_list->PopTextureID();
-    }
 }
 
 // Render an arrow. 'pos' is position of the arrow tip. half_sz.x is length from base to tip. half_sz.y is length on each side.
@@ -3873,8 +4390,8 @@ void ImGui::RenderRectFilledRangeH(ImDrawList* draw_list, const ImRect& rect, Im
     }
     else
     {
-        draw_list->PathArcTo(ImVec2(x0, p1.y - rounding), rounding, IM_PI - arc0_e, IM_PI - arc0_b, 3); // BL
-        draw_list->PathArcTo(ImVec2(x0, p0.y + rounding), rounding, IM_PI + arc0_b, IM_PI + arc0_e, 3); // TR
+        draw_list->PathArcTo(ImVec2(x0, p1.y - rounding), rounding, IM_PI - arc0_e, IM_PI - arc0_b); // BL
+        draw_list->PathArcTo(ImVec2(x0, p0.y + rounding), rounding, IM_PI + arc0_b, IM_PI + arc0_e); // TR
     }
     if (p1.x > rect.Min.x + rounding)
     {
@@ -3893,14 +4410,14 @@ void ImGui::RenderRectFilledRangeH(ImDrawList* draw_list, const ImRect& rect, Im
         }
         else
         {
-            draw_list->PathArcTo(ImVec2(x1, p0.y + rounding), rounding, -arc1_e, -arc1_b, 3); // TR
-            draw_list->PathArcTo(ImVec2(x1, p1.y - rounding), rounding, +arc1_b, +arc1_e, 3); // BR
+            draw_list->PathArcTo(ImVec2(x1, p0.y + rounding), rounding, -arc1_e, -arc1_b); // TR
+            draw_list->PathArcTo(ImVec2(x1, p1.y - rounding), rounding, +arc1_b, +arc1_e); // BR
         }
     }
     draw_list->PathFillConvex(col);
 }
 
-void ImGui::RenderRectFilledWithHole(ImDrawList* draw_list, ImRect outer, ImRect inner, ImU32 col, float rounding)
+void ImGui::RenderRectFilledWithHole(ImDrawList* draw_list, const ImRect& outer, const ImRect& inner, ImU32 col, float rounding)
 {
     const bool fill_L = (inner.Min.x > outer.Min.x);
     const bool fill_R = (inner.Max.x < outer.Max.x);
@@ -4081,335 +4598,190 @@ static unsigned int stb_decompress(unsigned char *output, const unsigned char *i
 //-----------------------------------------------------------------------------
 // ProggyClean.ttf
 // Copyright (c) 2004, 2005 Tristan Grimmer
-// MIT license (see License.txt in http://www.upperbounds.net/download/ProggyClean.ttf.zip)
-// Download and more information at http://upperbounds.net
+// MIT license (see License.txt in http://www.proggyfonts.net/index.php?menu=download)
+// Download and more information at http://www.proggyfonts.net or http://upperboundsinteractive.com/fonts.php
 //-----------------------------------------------------------------------------
+
+#ifndef IMGUI_DISABLE_DEFAULT_FONT
+
 // File: 'ProggyClean.ttf' (41208 bytes)
-// Exported using misc/fonts/binary_to_compressed_c.cpp (with compression + base85 string encoding).
-// The purpose of encoding as base85 instead of "0x00,0x01,..." style is only save on _source code_ size.
-//-----------------------------------------------------------------------------
-static const char proggy_clean_ttf_compressed_data_base85[44050 + 1] =
-    "7])#######F;`vs'/###I),##bw9hLYqH##pQdL<cKEtn2<vLgP?'o/lExF>S@t8S(guH2@6YY#&]n42GXNZJw.>>#4LD21l%lj;j)8RGpPUV$#+3v56PV=B(g9*_(3NP&Id68%11XGH"
-    "1ml/$e.CG);nh'#xIk7D7(88Umqbf(GWus/(a(*HUYI%#.aDE-%H7u/+-0%J;LQfLcW+41@5a1^'/d<B)rqd&W'l?-W<oY-TT$=(Fq(($K*m<-1rEn/<_[FHtYcs3bduH2u@uu#T3JuB"
-    "j]0s)&IFrdr4kn/;K[^IB?lu#>gG<-$W+41+>00FAG[xk8['SeaMfn0f%S+HD?7dg#u#PfOV+_#xbFVC?8(W^7LC9MHb?+#`6Cl1@Z%32KIraAeI1=#E<5)MmLrCa3h]F%U`a7exASVQ"
-    "nc7R*PPYY#Z0Yh#[si^#i/;,#OX1xLOmW8$[cW3M<DT;-t/Xn/F5B2#=A+.#6k3n/-`($#&2>>#O.,d2FQFVHU*WV$<51G`Zo'##<,LF%']T:#)TIFMx3Js$.=Im/RP'##i;%##@*oJM"
-    "Sds_?_bHS7A+Hu#eJ/;-,p>wTSUN&#0N&F.XgFf_A0Eb.W=rKG&,2F%3+5F%x_'B#'jRvPXK+p%G%KlfAru-$,ltgLlCB4R9lL%M^C->#?9h'#6:Y`MnMpnLXw)$#/>r*MH46Y#_M?IM"
-    "+*C<.YZ4A=Twt-$OY.R3'J=gL6#T,M7`T;-h]goLa>*G#Uc9B#XwK=Q2VhlLQao(WSt4Vd)?gQa06'.$x'rr-q+DG2qDHJr1tS_&,.6;#]S#<-gi4sLY*9VmjO0#,x't.LY:2G`'0,:2"
-    "n8bi9P:u[tY+=R*Zp=;$>m;MB*]@5BmDHJrio8kO:W%>YYhJJrA>UF%a?+_SsmUfL'E[1g6Ml-$Aoq9;Sa%-#X7a'M^.I3#TQj-$JY)d*jtDpJ9ISlJ?g%j:EwNYdxW:m9?(-F.g2Q9i"
-    "Ax4;6Pj(,)W-u-$%4aV$`tm-$GPNG)xu;w^5A(^>ETK_&Yn(F7l`98.@S=%tPG,;n-P<KrPV0Yu_:;/16Ml-$$e.292-m59LWk:mC'PJrS@Uw9t#-_J[]l-$]P]1gRQs-$`kr-$e$s-$"
-    "HW,Da1m9_S2,KP8vW6^#0@W:/'8Oxu]DG)MK-;.M+aLD3wAVx^Wq](MLK'=#=`l[0B@_J#*1FA#ejxcN^g::#.aO.#Sc#]%[lhi0m'/T.0sE9#U<:H/?`s)#UJA_M7&0nLLKhE#h#_B#"
-    "A-wiLFcbjLm]Y&#sXajL(cYs-eo4wLaotjL0,O4#]&.8#0sF6#'W_@-dn,D-QM#<--).m/CQQ$v5ZL7#34`T.]`Q(#8@Rm/_<&=#kC*1#>4`T.Kig:#x9B,23]/fq1?pl&FO+,)v/hf("
-    "AIY]u?66R*#CGk4]EKk=ij$4vX*M$#Zv$8#H-[a..1?;#?2.b%qDPxkCY#E=Et$]tU#r-$1+>AXH1v-$CeY+#nC//.sj%nLUu'kLX1CkLOI-LM_O95#I####Sun+Me/ll&$D:vu2%78%"
-    "+xvo%)/pXu6=no%-e.T&`)Ke$]UNP&3946',2T=ufA^e$bq/2'8Nb2(d5Ke$f3gi':s#k(/59xtGKGJ(6a#K)hAKe$7W^e$ug(,)5?HD*jGKe$s)`c);8V)+lMKe$'B@D*8a`]+nSKe$"
-    ">m^e$&^w%+LFk^,68=%t^uW]+Bxj>-r`Ke$.89>,D4Kv-tfKe$CvKe$jSTS.:>x_si_5;-HXc8/woKe$?xlr-Bxll/#vKe$=:MS.JqhP0UTwm0>>A(svT.5/OBwM1',Le$Fnel/W#902"
-    "AA&cr(0FM0QZ&g2VpS,31oD_&OK'/1]Pld3DDaFr1d^f1X>lD4/DLe$W&?G2XD:&5siZjq85Zc2PdUY52MLe$_M;D3eCE?6IG*fq@fr%4a1Ev66YLe$b+`e$n+S]4UGjo78`Le$lC4>5"
-    "f_xS8:fLe$p[ku5l3(69OMI.qH@`e$uwKV6qHU2:>rLe$):-87]=_f:@xLe$'Rdo7oZmJ;B(Me$nIMe$4]v(<TPiLpb#al8s)/d<E1Me$8<AM9c*8A=G7Me$6Tx.:uA4&>$WbA>OtE_&"
-    "ApXf:gTku>KCMe$?2:G;&&$Z?MIMe$GJq(<jv,8@+AvV@U0F_&HfQ`<1x79A_VQ4o*(3A=-f7pAS[Me$P@jx=-l[PBidJWn1O/>>qlw.CVeMe$Whfu>3F0jCXkMe$b*GV?t79GDZqMe$"
-    "6Uae$aE(8@DTDHEg]U7nB^_o@:0D)F_'Ne$iv?PA@ZIaFj`:rmsjae$n;w1BEpw]Gc3Ne$xSWiB'F*;He9Ne$vl8JCC,9vHg?Ne$D*be$+2p+D+q]oIiENe$)JPcDHYlSJkKNe$1c1DE"
-    ".<u1KMuhPKs2G_&2(i%FSU*3Ltf#Ylj?I]FOC*jLq^Ne$:X*>GOINJMaqq&lqgEYG52j(NtgNe$A*';HU$#dNvmNe$KB^rH8S+AOxsNe$Xgbe$J^>SIg27BP&m']k,vu4J]d6#Q&*Oe$"
-    "R8VlJc8<ZQ)pb@k?&ce$WS7MKhMjVR*6Oe$bln.LAbr4S,<Oe$`.OfLf`+pS.BOe$g;ce$kI0GME6OiT0HOe$ibg(Nk7_MU2NOe$s$H`NHWg+V4TOe$nPce$r?)AO&Fs,W3vJ(jSW`xO"
-    "rwrcW8aOe$$q@YPxKxDX6#0ciTfce$)6x:Q'bOAY<mOe$-NXrQ)0h#Z9&kFief9SR%tgYZ@#Pe$&&de$<,q4SU:5S[B)Pe$:DQlS*KD8]D/Pe$D]2MTX[Ll]F5Pe$-;de$Cxi.U;YXm^"
-    "@)oIh%:JfU15XM_JAPe$KR+GV3G9/`LGPe$2DQe$4OAc`D/S.h0$(DW7lPGaOPPe$]<_%XcsX%bQVPe$ZT?]X9.V`bDhe&cH/sLg=pv=Y>Ue]cUcPe$d2WuY@hE>dWiPe$lJ8VZjiMrd"
-    "E-B;e`OI_&mfo7[KdYseN5<lfN(Po[GQYSf^%Qe$u@1P]GW(5gN#29fUOLl]q_Biga.Qe$&i-M^SV3NhS8[4f^*e._OD3/ie:Qe$POee$/FEf__@g,jV;@oeg^&G`TrfcjiFQe$7w](a"
-    "ZFlDkY>%Se7eee$<<>`a`[CAlmRQe$FTu@b'9KuloXQe$DmUxb^nZYmq_Qe$]nRe$TWc7n_ADrd)>Rucb<srnthQe$OV3Vdjs4TobD)Vd1oj7edTx4pijOPp(UJ_&_4Koe1PW.q$%Re$"
-    "]L,Pfk8hiq&+Re$eec1g4roFrpSdfr.hJ_&f*Digv4&HsiG-YcGB%Jhrx%)t,=Re$safe$o^[+i+uX&ulJh=cPv<ciwOX]u0IRe$w8tCj#]b&#U++GMla5;dZ2c'&dvrx+^>l'&qd''#"
-    "d[k,MR9ieMQUcdMJ=-##UE31#'PF&##KBL5/9A##:&/5#ib.-#YKa)#u9v3#]d/*#u+2,#EK;4#X[*9#(]U7#U0:/#M+c6#C=x-#]%),#dYN1#]Mh/#fj8*#R[u##9l:$#B:r$#JF.%#"
-    "Rke%#uQlf%l5TY,lBel/wpEM0%3'/1-pu(35>V`3:`R]4a2]i9[Tdo7c[%8ILE@M9w6FV?I.-AFlDq1K)YJcM1(,DN;k$>PRf-JU(gj4]AI@c`Y)m:dcPMrdi%f4f`5x.:ZW)585V#<?"
-    "/Mc##<xL$#gQk&#7&*)#F,3)#OoA*#`bY+#B6o-#B0f-#)A*1#);w0#E@T2#NF^2#T'Z3#X%.8#Xu$8#/Oi,#3=(7#(Q>+#8BU/#.2;,#u3<)#+[V&.HMNjLrZ2xLJ:$##Wr%VM+V>s-"
-    "/_ovL;bO)#iv%5#GL)uLCwXrLNQF&#m5u4J9##v#1(RS%lnPV-#Om(E9uo:Z*TRrZ11'5AT_Pg1&ld(#E7D,#qf60#Y#(/#xPD4#*-85#w<G##C6u6#D4i$#PXI%#Te[%#@93jLLK5s."
-    "+W#,2a$u1B76tCaQ*Wc;8LHl]I95MK`gS`<wIn(W#VM&5Z#wE7F(t9)awQY#CiAE#/$]H#r(eK#,Cno#%'Q7$,i9O-<Bx=-Nsk>-er?@-8Ig^-F*ft-pTa_tRle+MQKG&#NKWY.dt(G#"
-    "`&@A-''@A-q'@A-5e8;/96f=-YDOJM@h+GOW45GM)8?uuBl6mLbR`CaX`P=l9Jm[b^l6B5FE*##3nt6*kktL8SZn-$O64(V`r(iAx-x9)3wlx4nY+##32t4]c=2F%@_$@'/2$.$jDGq;"
-    "[HCi#%FI#M4dvu`1?A##9ol+#88D,#u<':#7Vr,#jj>3#&`W1#V]+6#aOi,#Y/?;#B4<)#N3m3#oic+#HrG3#'a^:#9$-;#(IY##8=G##0AP##Qf<9#?4i$#@(V$#9e`78,n4ZGk5=&#"
-    "kEX&#nd0'#$SK:#%K6(#+?$(#*/k9#pBU/#E&*)#MoA*#JPj)#]bY+#B$S-#B0f-#)/e0#);w0#7/92#M@T2#S'Z3#l[%-#0%.8#Voq7#$6H;#'Je8#'I9:#/Qp2#.np:#7<Q;#`[T=8"
-    "t]]8Sb-9MK0G@N0)DV,#xO>+#j_0;(l$t(We%_._E(W0;5/Ka</JM>#p;xQ#bd^6#>-d6#9;WPAhWZ6#;5Y>-r3GZ[imb$'Jv/kLJY$[-Bj8&$gcVZ[9uXH=ns`D-LZ$Y:#UgP9r/;9C"
-    ",f&KMCZ^40F2Q52G&Q]=mINe$m_t`-3I.g+>RtMC='^lLh=5,MLskkLVB-f?ri7,Eu8.F%`vN/2%&IW%m7W0;sKN5/v2cC?_6rd+]P[^?Kpb>-*=)u<1&8+9hpo`?F6@v$4vC']DEqk*"
-    "/Ba;%+?Nv$e3S>-usL90kA6g7H]IV?evMk=qnTA.UrbNO+O3uLTOD6Mc5Z6#N^;X-ohA>(pHG=(Wk%v#CBi=/I_'6_xv&oLqcl8.3c$V[Qep;.aAxiL4_3v8Otms%FmtC?k-h%1v?k'#"
-    "]T`i04_D>##oT^#`3l6#(],<-G2p,2l7p*#1qB'#<####lerCa@IA5BO.Lj_*P:;$-)'kLCdG598]&@0?d2>5E=.F%$gFV-B/g._PZ8>GtL[w'`(no%1KJi^hl%)*@-w.::&0REdouu#"
-    "$J^]+5fYY#WIQlL]RG,2e6+gL*ecgL,qugLDt$29eWCG2''d6#?g*s6@mr6M`X61MgBJFOg-w1Mnm4GOi932Mi932MgGv6#P6P0.7;OGM3W.(#rh__%]:SC#8alk0%e75/$L8[#'K8f3"
-    "Y-fI*'kRP/]=@8%UA@d)PJ))3=0w)4QD1@0hl:[0A4vr-g7+gLbS8f3-u9C4ZFWH*'#mP&)jv?$#w'<-2m.T&H^ev,<x_V$5x6s$#dYP&ETOcMlt=u%UExo%rp.T%9_N?#cZm5/CDh(a"
-    "7+.<$T,=s67%rV$>BGYuW:IL(I1mYu';G>#8VcY#+LWb%AZY+%o?]p%)DlY#=dc##eu&58e<=F+rD@lf*c68%jr6onwQho7g/]p&,`fr6@?Fs-[xefLMHj$#(eDB%1q^3_ku]&?Ow'02"
-    "tT35/ow;<-U1v<-(rLq7T/B,3pcB,3QI1j_3xqr$=#t/`?(?>#Sw;;$VxS8/[B:WANqb/2_V8f34^N.)lp?70Scf^+D8vm8<ANj;5Jxk$DO_cDvUTp7^aP&#auN$%UM22'fCq/2b0JiT"
-    "JMF_#'G:;$gB=8%93CG)9Vk2_U@D0_Hn[&M=Y@k_k9IP/b(Sh(0D^]+]^I21_j[21)B7ZR^&[12-2w%4v6<<-e1v<-lFv<-l1v<-sFv<-n1v<-QQ6i$au>>#%CxBJNYd'&bCw'&.Nc'&"
-    "5dc'&n:SC#nGUv-[5MG)*)TF4Pm(u$wAOZ6m('J3n9<78LiiR'$M0+*$]gb*j+es.o%[s.=vh2D6B1m&p%]L((J9+*Wh=n0Yo%Q0AH*ig.#m88#vW>-EI.<-8tJ0%Uq%##jhVVHU+PV-"
-    "6[OiKJJ`22I?;mLi*gfj2%###XYDX(fTY6#Loq-$/dd6#7:)=-,4)=->4)=-+M#<-<M#<-bV>W-E`@dOVEU02#-gi0L>oj2IYb/MeY^s75e^_,)SUV$a^93_h'aK_/M>>#Q71m0;&dG*"
-    "guYL21n6l1t3vr-;`tw5AB:a#Y%Xx'q]b1)2L-L,Z%.L,UgAb.w35N'dL0+*qM%d)21-@,@jcB&@9tR/9>r_&e%_w6.YQIbK[P:=^Kr0([*YJ(n+2K_81GM(u*TK()-g@#?CoT%jNrs6"
-    "1^'#=Cg/2B;*wX&54cI)@iCv#h6i@,]i###g%'58rtbuY19:A4xUw6#%s[fL.&0j0wE<m'bh;m'rRc;%3UZ;%tJE2_=0A3k&#eEn+Ec'&3MnEn1DXI),gVEed1taeuk9'f.Hrc)M7%s$"
-    "ikkj1:3O7/YA[L(/x]fLKeCE4x]DD3h:F`WLaRB5jaO=AiY2v-Oj_:%UV:v#^49+*-4ZG*Nt1hL@2A.*.G]p&K4Mv#.j0s$&rXi(a_258I68C+V+Mv#HLsP&`m(0('nA[u<S+',^v:0("
-    "@@D6jeBO,*R<j&>o;$7#2rpk.mk.j0I/fu-`_kgLnom6#Ske%#*r+@5NYL0(Rbmtff^bvIB/x.M,r5DOq9,,MXF?##q,^o%Bc*=(l@cvItJ#4M&^YkMqDH/(;[u##'[b6#BY5<-V`5<-"
-    ":Y5<-o-^g1H5sG)x3vr-&wA%6eB7lLI7NT/Cu6=7UPBs73%O&-dCXI)C7r?#jUKF*9M487Y+'9&,Xm_+ahiZ#2-Mj;]XFw$Ru-%-sB=g1nc>:&nIBJ)[^k9%x$vM9kaQ/2JRj5&qa4x#"
-    "bihV$j`1'#tR0^#8J1&&tu[o@+:E/2*/wiLSG^S87=0?-Y(b`*htbP8Dio2DD4o.2iF^]+Op=<-A1v<-sxE_$2``K_);>>#;fec)=3Os-tqLP8Hc5g)xUB%%SKTZ7^JsR's,2H24.nR/"
-    "Y7)ZulOc$,i2$'=4EmX$oe>,Mf(6m#gLb&#RiYY,5H4Ze?&]iLJSNn8TDvV%fH%W%xE-^#.((^#BlrM09),##mk.j0gB=gL(/VHM$*^fLD2oiLg5eh2K^9Z-kUFb3rfUC,LXqm8fpJe$"
-    "[uxfL+<T@#>lfI_+()/:2s/xt=Ls^MMh`V$,cLP/E4<6&)_-TeGsOn*G&>uu[@1_]#B6_#.`kgLgad##cn]N-A',)N#d%)*80HcMAR,lLK,+JM>^-lLHbC`jg%5F%7gnD_=xGhMOl'0M"
-    "Aq.>-LV>W-K%Hk2R5+/M/x>DO3jI.MG#+fME(1kLLX?LMI-fiL6f'KM2a.iL^$wLMBN)J)T2^m(k$)U:O3PPT<H51:Pg+&u]wgp7Yt`D+oq)<-]^AS'1O=G2L*#7#]RV=-Ul[Q-@#Kg1"
-    "Ye%j0md^3(v3Pof$0&/:fApAZ:(Ar%rtMs-[-L8:BM^v-K1HP/O9pDcg/p%#JF3w7TmL]$si&f)cl'1&j^t>-aZrM%eF19'Ghu-&XO_hL2Fe+#*R4m#a(+&#<Qif(njkG*%m5j([r+Z$"
-    "1,dp.A3pL_uL)jr:Hr-MSHnq7GG;s%o4qP'n$tD+ZPAb7mC@b2/]`F(*)4I)93]58,1oJj6e5:&+3n<&1'uMi<^veqHF(gLAIC&v1aqn#2'*)#D^SY5Ffou5uIO&#f3^gLhk*mfgEO,M"
-    "5fG<-7fG<->C%q.`4h'#kb;9BPa%jL%@+jL:<&C%51[<_fG$9gE+,s6pJW]4jHeJ2GS#T&hC[2V#.gfLur1'#miNs.XY)6hJXHM9gSWv6Bc``3,1h#5WQSeAAbO=A'+P=.MdU:%V`U;$"
-    "/,$w-&QOk%TWFB,]kD@&*18NT,CDBH46oX-r]dj09-3-*X+36/7A###K9g20#CL/#_6i8_q)sjtCjk-$32Kb_WQE-vi+Zj)];d6#>_@U.oCa6#5LM=-`5=k%t#Yg:p>FQ'''d6#Mp@n$"
-    "vb9'#Zk.j0@8_s79h0wgT0fs-,p?79BkL?[i)T@#Ek=:&2:A6&[VafL6O@q.G$pi'HptVfFc0xt/@$Z$16%B#eRI3bm<S9`oSSY,oVg;-Tln$8@d.(S3#gb4l9,OFfECF@W:.T.#)>>#"
-    "c[c</DD6_#M_rn8K#L#v[=(7#]LOgL?^n7$eR@%#7ZD1`%7=dt@.a:%IV6o8IksJ2&-BbcI,'COIx:.9Fk;s%hF+3M3rJfLEFx_sVSmiq'OV_]/^=_]oYI+M%%6wLZ)<$#=_AN-O=3Z'"
-    "*5?n8wx:_]Qj^g:Yl5g)0sF<%Wl[qVhh:hL#Z-##0Q]X#PAL/#SHSs7O5`D+2b001,3pL_+Muu#u7f6#=8v9%0Dh8.Fc7C#xE(E#FjE.3DfWF3Us1T%sJ))3_TPK+4;=q0KGn;%TP(Z#"
-    "^&DK(Rst^,#i=:&CN7H+Q0'7/IZ-d)cRpB+9-3-*`1@6&JZsJjs[8+MM3D'#iOho7hHb2_N+D0_;R>j`(=5,Mv1aJ:x9?v$2L?v$xo+?.g5eh22DXI)$--$$H7Gm''c><-G(^0%PGEF3"
-    ",.U_4]CYI);N:j0+.jP&%h-k$(eE)<xVI&4$bGMpov/w#Hjxi'74IW$[QAW$l#2KN*)bIho5vx47x_;$iIcY#otc9'(GLS.3N70:=P0dkf;d6#FC4o&^vO/:+VE/2x3vcM1'pbi>iQd+"
-    ">%'v5gYSV-C[]6#-^Z6#Fc1p.dTY6#0oq-$5dd6#w#%Grq)ChL:3DhLWD4jLXN'cju5UhLR)>M((,e6#]9S>-O3S>-sh6m%FNXb+'R^p7O_[A,Ir[A,eMTK21Lo8%=;.$$>iim/AS<F3"
-    ",50J3X&Ht$dvlu>B$Xt$2Bp5&Wrpj17wt2$aE=gL;n5:&>#p>#`gjhu[r8c0/pHo@$=.Z#MxOwLI`@/95ar)+_W^6#<O/N-;G5s-U[;$M@.MP-rh)M-04)=-%F:S-9er=-9er=-abHm%"
-    "N?wcM2l)V(>Kf58Dn[kt$9Ks-M&G)OXPg@#t&B%6mAT@#@ISt%t@qV$bgwB2fe82'f#CH2FU[W$)ql%+Z%cZ$uT'Poj+]?R1<R7$ld''#u9-5.m;k$M`P)7#;pKWfi#K%#c*V8_8a0q`"
-    "I&l-$(XXe+MotjL[.fiLkB=/2U*[DNagb/2q978.u)(-;(0q#$t1]6#`FJV%?,d'&X`>>#1IJV%],19.w6rI3^dKq.wLg$,fN0:B8vgR/1kTT9vLB$-(2q*+>LnR/o?smLwcZI%sA'[6"
-    "KfKwg*GKq#fYI%#&K`@_mjq^fl7m-$)kiwg;93wgfb1wgj$Vwg2&[`3m[jV70#.E<AGvE5Ml'0M8X;EO=6k(&wv]/:88RKu=Ssx4bMIV6:`.H;3O[A,>;Ls-1YajL*Sr'#'[b6#xTC2:"
-    "qEhM:jc%g)-=<:.#VQi&V-J,;[m>g)ApT*YiT/[#Kiv[-B7]v7d.JS@x?\?L,o&h207D[lJs_I7nXD,_d^^=T%O2EA+/QK5)?n=6&Bf%N0^[mp.l^401H]SgL4[TjKx@fL(:xCvuTA@^$"
-    "/B6_#j9F&#*Mc##eGY##kQBDN-,&)*<FGS7Dhx6#H/5##3l.j0<6Dt-jEqhL8O_:-eLZ@nM[*(&;C'01&j;5(N#x%#'[b6#VY5<-)r3W+JPY58AKqfD+[&=-p55i,DT9X-`H6TTfKUX%"
-    "#Ns22?V[#8H7(r&(#7A4P6#7#>/5##)l.j0<6Dt-`_kgL]5Z6#b-,w$0bMW%`DXS%,Cgw'noYb+OF1:8'[&Q_sp/O&5WCG2TJif([;*O8GYw],D3Oj9I@4K3*A`m9RmOPTI2vl9mZ+?."
-    "t8R>%(.[0#Z^''#vB%9_,<u0;AD:&5U?bp.%UY6#Roq-$1dd6#rr[fL^@+jLduuP9*FHT0ZJ3v%h]Yb+OXH3:(WrS&pq)<-4)^7.D@gD=^ce%%=Pr`3>U^:/*s*Q'hqc$,/fWF3BMj0E"
-    "B4&5J?ePL2jG,B,GWFB,/@;8.GdT7/U(D;$3PY>#MOCE'TaalET5I9%6gPS/v8TM#snYm8j(U^#CeWT%HHeF'WhKW/XDK886*dGa;/uF`@gZ,2iBL/#X^''#e[NP/3ejl/3W,g)UC[p."
-    "iTY6#Goq-$5dd6#8$%Gr(hPm88X'3(''d6#GI=8&L++=(b<]w@OJha<-8O2(q?Em8n@(0Edc]+4G,m]#fsT,;Jv]G3f0Ud2$*=x/o'[(+9P^mKqb4:&X_bki+'wJ&VOI8+.i*9/H>V.;"
-    "JwVEe7RpCWfH,/L4L$29N0#7#JU.:.fk.j0g,%Z>LdF59.uF&#>V=2_BqH9ivTI9i5W,F%w6Z?gOmMliE,0(%Fv+68P9=2_2`2-Od:;69>P@&,]M:X-$@94r`N?p-gbYWSd>6N'x-,Q'"
-    ".vKW$i>=j1N]/D$7Zx?&LXRx,hkmp.bUUw,QVuj)>mFf*@nWT%>Top&d.&[>%4mp^u$?K),<$7&C0CH2)Ngr.NMub+XF)v#%n-<&$99W$cQ4K1jRYm:AOMm$#BG2r%=Yp#R)V$#%%(C_"
-    ")BwmsA/3`-dB],(:8<A4lvJM0iHw<1i,M*M2%vW-;ONF%n]Gs-nm'hLE^&c$@,dG*QidG*:O@R*[j4j9EwdM3xQD#&%T>N9]<;H*''d6#3>jF&AdK=-IN#M*8J'f)4X75/EsLT/S]Od="
-    "R4r='EVt#5)'ME#mT3?#`miMKqb4:&JS_=A3fKb*/jF@&>+,b#5rU;$@=;v#jZr;6K@MB+8b'U%.5G>#Iugo.a/>MTAuBM9j#_6#]WjU-lc1p.3UY6#Woq-$&%Y<<A.C2:CvX6'8s/20"
-    "(k`H_wHLk+Ma=_/K=_r0[5Z6#OfG<-rX`=-*.;.MhNEmL)tXs8`Y1E4''d6#j/l@&lIEj0wx38_#[aK_$,>>#.+R2(G=T;.q[`M2BS+Q'eL0+*qSID*ig'u$J><j1#7[=7kiE.32=C#$"
-    "/x%Q/Yq[P/iB7f3Uj-U%TbSGj81GM(AMHT84ao/=)Rlr/lD-_#.PuY#qtPC+H>-o/2[3:..9=?6gqQj<5aDJ<^v0H2aeQM95tv,*L@5i(@DGu@J?S_+U+Mv#?JuY#[gTq%96NH*E<j`+"
-    "<P%Q0%.W$@Q^98/@_R@#6pwiLmj?>#;l###g^SVH&`bo7<]Cv>QLx/3c%'w%OINp.wx38_&*aRUcPZ6#fCa6#eujh2[[aqg?9pg1t-iI37BT@#&x+B&?9m,MLKEJ:**[<&d<@L&buI9&"
-    "C&5LWEN;m$1Hsu,KX-`m*M1`jHS)rTgYd6#($%GrAa+/(GCM(=Lbvu8c]^,.Aul'=1:2($jMl]#`A,W-Gf-F%>ELj0#5NK(F68x,97PM(/qxR1,9NK&sdII*qJ_*<2U6X/q'+O:u-NqK"
-    "3N'j0pM6A4%`w6#J/5##qk.j0erc;-9iiv-gMls-PbdN:MAMkD,I#E:VooDXBOlc<:U%G:L,cAu@Q?&@R_r;r3+@5/:PtH:<[,:r-+&/15:x6#*33U-%93U-1Y5<-1#AT@hb0^#*nd/:"
-    "]SDN;T/&N%d52/(W(b#>#sBX8XXhI:G,5DkYTbN`3fLd1-xmo%1KJi^_g$&+19k^6)<#,2MR)##5B6B=vMILaZgdh2Q+8+/Ri[:/`PN3XOS<F3Kl-F%*.YI)@%);$]6av#nrKH2po1g$"
-    "@f9H2=:w8%:/xd#5F39%$&g=u5MG>#R3n0#ab+/(cWerQqXHM0(hceFb6eA/w?#29:2+8@VG3=(-DGHM>)N?#;.Xa+kiE.3)Mdh-2))C&6[6H2;FeS%+D4GM*NHT.^NEL#lTNZ#hDQ;$"
-    "5XSM'_Ik(Nn'-E3?IET%G&7oun%MZ#M3;i1Jgd%+mr9?#@TH`*BSEgLQC-##=^v%+)BvV[q_di0?^X=/Jp:-/43pL_ElaIF<,#6Bl#1H2PcW%$CiC%6ZM.)*t?(E#KmE.3VO`v#?R4m#"
-    "umEZ#K2Rs$78JW6ajBaSvT:v%3S4U%nfL8%V6FSR?.eS%ucXQ%'`;T%SOml/YAvv$x&mip&^+q$2lL;$ff55)4KI*N(,g%#VN3thM`qr$._jm8Jp&K2e&;_=eE)fQYS^-QZ7E5&b[ol#"
-    "A_4QJ,4EuIs#kZ#._fRnQ)*&+o#X;$5f-S%1Ei6NH5>##FC_$$Hf1$#mP?(#];'&+;H,Q/`k<2(W)?lfMBE/26;FM_Zw(_#?4'&+Njpl&Xsk&=(]r(vB+,s6AUto%1<I#$<RC2_EjNw9"
-    ">.#HP?7UnfV4GI)?]d8/K)'J3c&KCO?JhlSQ]t9+%x>c*]aZFW&P^b*&c,(+o'w1/BP4(+G0Rh,JH[.Mep][uO+%I1FEX&#[#Bi#c4=&#ngU-/93pL_M_hWJL7[^&xX9tqot60u.q>:9"
-    "=J$9%qct1)eCC;0NIw[-0qB:%V*bY$dgS@#e]:rZ&KSt#pC@6&n,kZ#m>`/qIqWT%K]F;-;_&6&LlYW-:<9C&I5YY#jKeER:2%Abp(fr6_[6am%&;'#CbUd-=gO#oet&d<-7Z;%_QVp/"
-    "Np52'<Ko5'9Fl+Mp;hH%Sh5R*iQ6R*umAw@`3*2McE=)#1Qkn%=S*=(-S1P2mMv6#xlRfL^%0j0dv+W-Xw?0uS#90uP`d'&om8tqxBFA#4(XD#WcJD*04vr-o`qk),fG<-MlP<-sT9S/"
-    "Yc7C#(36N'nPCgCY@u)4vcMD3,CS@#]@(4+S2?o/#chl8emXT%i`d7&S6IB5lK4MMkAru5O(,2(;VuY#<$,o/0wX=AuGV)+qK1^><6>6&5PBJ)TD=K3RJ/<&#PVG+],.)*T1lZ,GV]S:"
-    "eu&58HN?_#fe''#[####C`*GkxRO&#DmpO0__ho.)]0S[*sZiL`9x(#;PG$MU@6##//cp7Y$U^#Yd`Y#BeWr$[Q9T.+UY6#VrL*%F5-F%_de--g3u9)t*F_&T0_5D7+d42J86A=,f@H;"
-    "f$u&#$/]6#rBf>-Mft_$0:@>#F>NqMip2EQv`5oL,Ehp9Sc]/Ng/Ag<f'wf;M2M[-5%A-Y4?cw7hjfZp'A^+ra'[]Fe&q%4=b($#Te%j02XD>#dk%v#%gRv>;j&:'Bn3R/Ij::%C7[=7"
-    "?FpD3E'/w#mB*t&wSft#FO_GD8+%W$HS1<-092U%GRmp'G*>%vvHfP#M0`$#iRq/#JD=8%r-7G;d#60`+Pd'&&<u'&HHg'&5dc'&SO)##Md=<-NocW-Rg?:)g*2r0>a472b^RcD'NB<-"
-    "K2v<-DuV-D0fpT9k,K3MC-Gw7C(8)=T#Ps-+#eiLJ]tJMi&h6(E_'<J?-lrLipA%#'[b6#XPf3%8a,F%]vUg8p+`a4=UKu.+',)<x6K%6Mu#J*H2Cv-tX_[,m1pb4stC.3q%hc$_]d8/"
-    "u2Y`<:`Uv[7UkD#b,Av$Ik*X-j<(L577?c42Pr_,6<X`<NKSu-$p^@6hd)&+90<-*8(,2(=djm82i)P&80EH*0dMk'V_VM0Njn^5Ot:7'e[Mv#/-T30?3,89<@TD&e7`/)&FmAmDQ3_5"
-    "UaaL)S:;v#SkGd3(Pdb+$HV)+*L1^>kk9DN87PM(8*3-*u&(-2.Nf.*dj?d+[vhc)U4lZ,lp,R&3.Uf)c]=K3bj;;&I^b^,@[)n8&RI&,@O[Q/rI^'+r9k]-WB$e2Jqn%#:xK?`9rYY#"
-    "U'<;$E=F[''_p%4+YM<-@:*7%ElRE+r<BA+9Ecf1r'gS8jefS8LaPq.13pL_bEkW82n(-M?W<BOlqQ6%XfTjBAU0R`S4M&&8&@D33Xfi'fxA2_34W9LY5Z6#pu19.RtqFrPb<n815-Au"
-    "6;$<-p?-G2^pKb?;0810J,'58wG$s?dQ,,)b,bxF78`6#'_Z6#;6T;-C/pg%KEx;-I5)=-n1C[%4#%@',3av<>JJ886ZgJ)#*<,<qg;,<K5&j:*,hY?*,hY?3&dp.o3pL_*K/TK$:RE("
-    "$I#01>c.-#3)]-#aPZ6#Jk)O;Cs481d^j$#'[b6#4[c6#Rmq&41[q,3/]NT/)3qB#[5MG)*AWD#6&(-4%(YI)Bcor6+@GI)M):=-#12iL[d#9%/feT.KG>c4wDoH=-o?dDQ6FA#(cK+*"
-    "d'eK#(?f^5-^]Q(I<Ax,MiC[,&dgw6p1F^44P)6/EVke)LpU0(l72$-KLUL(*S+M(+j5X7mUOd,.SJp&u*qf)D:IW$#-+D%YfsE*)_+=$ueJ5J-M;x-$ZKW7Cl<X(,c5P]<Iui(Kv'<7"
-    "8>XW65]FY%xS%L(#J9f)U-/G*3v3.)RA@L(Ofcv6kqHj<DQ3P(NXes$`Cl?,u7kI)mJSX%;<WH*D#(,+XoIfL9t)j9urH(YI2<A+Qx`r?>V%7#G/5##9l.j06fsjLNuBKMPA-^=%?`D+"
-    "TC.<-GOZ&%wx_Wf0?jb$:o4;63)#E=T76A=p>cp.)4pL_trB<AR.L0M?LN-Ext9/`:+b_7,RGgL69iHM1PEmLAvRiL]5Z6#]qRm%&7f'&9X@>#2Br%%ljK=-ic^:1=ZGq.TddD*,(X[A"
-    "PTER8ESUj(s/Dk'V.RT.R^Qe)#j0(%a&#B,g(@w-=)4wI%ZmN'_mq</VWO&#OCdl/,qZo[a60/(-0ZlA6H*]t@o@-#7;x-#dcv6#tY5<-3`5<-=D&g%$1f'&3Ev9)w678.cll;-vr:T."
-    "nCa6#eQk,%JA-F%#JCq'xi2>(+SZb+dmNW8Fn5,EA*6,Elbjk9LjfwSYeLq7JJ?$$wCx6#w),##l8XJ-x7jU%EoAtLB7oOrDP',NMu'kL:[`=-SM#<-X'oB&fSi34)uU;oa@`m9i?<Z6"
-    "Q16J*,rF$>q$S?n1LXD#$9qs.stC.34^0I$<2'J3mNi2%Rg(Z>Y_,g)+dls-C_,M;E%[C#Ra,J*+3q6&*4mMT5A;6&?W(C&5c4:&#HXh#53oU7f?66';`:v#BR8<$fovV%WW4?-JlZl$"
-    "D5Xi(&]b.)aQ^M'ZaGS/?;;6&=WS@YNov[bwxnr6NI5s.6j[R9U'fx,omtc2]'Nv#JW,R&mFn92OK2uL$3rF&TqCC+uu,U;I5YY#'&1I$`U'/L7#DV?gqa6#f^Z6#(ZlS.+oj6#U7`a%"
-    ",#<X(ljF0_ZN]&M22%O_Jj)4+/j$@'&+`+$I^A0:sPUA5hkF59DcZp.s3pL_@Px]m%vc4M2`wIOwWj3&PRk>>VsT#$g_v9'0?cw7Pm<#-qss;-$M#<-Y'rH-to^K-8M#<-N(m<-VY#<-"
-    "mxS,M/UNmLw%LFE<fsJ2-RnVo?k'E#N:ZDOTu1e$K/#q7%'e,*?+Lp7J+SEb97nS%-Q+',;Tw<&3lRV.u-Df)>#X,'?-+?#eNs;-(O,U,-_J8%A<d1%1o#/CC?Sf_.p98%?#QM'7(%1M"
-    "wBh0MOGGA#:k;RUeif+4V7Gm's1v)4#&AA41Zb*.oLrI36N.)*r3lD#DiC%6urGA#1SEF3)$fJMN-%&%3wZEnHKtV$aMLpLMi_6&k3'U%4p[)$BEC,)E:6C%3w2`#@]1Z#4mb;$h036/"
-    "E@iv#8sFv#coAIEPUZC%-bti$tSP5&M..p%7nJ,2u$p&$P[)Z#ZPZ$$bE=,2`,/?$:P^P8W>/&GZJA&Gii_$'CB3/Mm@h0Mk4U0Mi:$##MHxnLi92f#QsC$#bMi;;'d[a+d#60`R<q2`"
-    "cB3mLuYGOM4A2pLZb6lLaAZ6#NTY6#10-e%Kw]-;hvA,3r`Ls-Pk%d<HnA,3Z,p;-4r:T.pCa6#CM#<-T77Q/A[c6#StqFr2Gh;-Jvav%&(4w7B/Y:.af6<.#AC8.TekD#vcMD3NTk-$"
-    "ARa8.jx/+*SbSp.x)Qv$2Pnw'p%d8.DX)P(w0f--<x]fL,Fl>%l:d?-_`L?-$SY&%nCdY#l?%],m[?3)C%g1(bq@w#Zf@l'X>dn&vt2'6D=D99'_Lk'k=KN2vFMU83AVb%]?-5A_VlB,"
-    "Jf%T%I$#B#37668FCk11e-bp%BwoM',$r**Ps=W4.%g_u6(Yp';)%M1SY^Y,%)h*+SAI2h&9###J94<-8%<^%f86(Ms-[Y#kN%##@AUVHu+/;6%W_6#H^Z6#]5T;-78m`%:$GOWbJd6#"
-    "%$%GrW9JRhX5Z6#@n7Y-ZONF%T`-F%W.ippK2@`G4ci'6.+:W&:5GB?YaTHk7c#>@-H%a+6Hb2(h;<xB.nHwBgEw][qpj7%KWLD3vu.&4%r.[#s*Rp7T/G)4;>dX$jWD.3TQp8.ZxalA"
-    "w+ET%FZ58/?T4',k$0M1]Od_+kfQV%e%/9&o/>9%R)VK(,Kep0ca^I;+AHa3FXFB,4gPS/q2I51XEuJ(-AS9&ExP?&(1F3'+#.i1DI@>#to+##)VmrH`<AJ1515##Cu)Y$_B@rgI@[kC"
-    ";TY8/ss.a$BNg@#2J$t-'Z/xt(4Hv$VXDe$[GbE$uUBp7,-=r/$(,>Yb?KJ(/RSY>lg662@Jtrfexl12l'*)#([b6#?;w&$@t/2'nMZ#8*e#tL^%buLQ1oo@RMu2(q9Qaj2^WG<@eU#$"
-    "t3&c%dM$c%m#@D*YaV#$Tw[b%luED*A39$.Lp`uL_1oo@og[caKtGb%a;_b%gJif(P0&6'd'VV-R9I21F3o;->Ww1%#_,x'vn.F%IK^d+%uP42H&U`<;$=<-32v<-wf+U@ajE/2mGF/2"
-    "M,R^=%mv$$wCx6#H),##&l.j0s+mU99CpV.2^t;-6P%:.3tqFrr$j;-ihKF@C&Ne-75V6CxxYoL&7252gCj30P/NG)Q(P)4ESLe$c.giB%R/'HSq9a#ae_F**YwM0I>WD#'YYfC:5H1:"
-    "MZm?$vd6<&bQTa<oiGP9Q3lF++jKE+2pw-)SP3.)bnR:Rv1FW6aC=d2:s.5'?-96&hi20(fEiX6OI$tJ;2;t.eu&5'ci[1(N9K6&$,>>#nUPi9ZPB`jruHJ(>b($#5.`$#a%_._Ow60u"
-    "6=<:.d.<9/hlwU/,INh#_Y1E4&,]]4<Ze>%&@2<%?1[s$5BFQ'`qh[,cr7T@x@qB#2_6Y6-#@r%4iofL;4I1*505o/G4=S&krvV%#1.x,(+$g)nkCW-QgvG&'V7R9^a/p&Ai1v#]6Nv#"
-    "K^5R&C=I^9>,E8&`XjP&*9K;.#Jt>-W_W5&HeLN(77fiLp-S8%?HcPB;6,pArd0?6UDv6#8NYO-RSjb0YF[1($LuofgB=gLOjfqfMxY5'gVEs.DhvxL;8Uv-6Nhv6kS@l1i5Em.ae_F*"
-    "_4Xj.XXR@#CEW'1elU,+JQhG)q5;o&b]AT/:oCW-`R6T&2&$kk2%mG*T]7+Mob-R&@.`&9B8W8&v0%B2jkU<-x,,7/t6A<$I*N>Z?]Cm'idm5.J9[iLRb;H.igYn&ZQSBfO),##v%gE#"
-    "Z_T:#X]@Q-RY@Q-Hu<N.Ilec)R?+<-P>o3%V_k[$EXS)</s>g)+)D_&a%dY#HUp,MV%#=&2(Qp[jRFGMg%/9&#j^N&vVjxBajjMa$bIq$6stNFDXrP'C=nwBAK]58Yf__&$f9j:gdNh#"
-    "cdVwB)&O#$M]DqLvp-##O:/X#Psk.#(wp3_'j_3_qPk-$N@s'MS1;*%1&[w'8;[w'*gZw'd*t'M)vSk9wasJ2nBI5`n8^e>%6YD44QCW-$7n62$7YN1a@uv,Laf=-D=`Z#)GAq/-3:6&"
-    "3$f],^v'hleL5k:=WW`EScmi'tV=$M9vd##b7?f_2cuu#EFe@Bm3YD#,CS@##k@B$;MDI$gmA@6](.j),$lB6OHB'5GM@JLp.`c2r;-aZV:JW?+.oP'4orM9QftlVquV0(sasuHc$iP0"
-    ".`*0:JpM+Pm1sk'&/%N9%E8N0x]DD3=j$5JLaRB5Q:W#ANX180nG-_#8UsP&x@+M(8(,2(80EH*A]@tHK_8]?DG-C?$>&p&A_R@#UJ71(+aGS/*/n_=<tVEe-b$JqPF?AFLg(,)GH.%#"
-    ",6G>>/q&K2n@:gC(0k#-J^D.3T6cg$j0KU%H9M($2^Pg10h]c20#AT&wfFU$CGc;$qqx]$Buh*%%xoE@MA8D*lF[xb$`,P]YO=42XDonL;eRajLme%#([b6#*oq-$M4n;-.fG<-2rG<-"
-    "0fG<-44`T.:UY6#Z9pg13jm6#m^''#7r+@5(_6WA;J>RC4j=%&NdXb+B0`$#]Z<T@7v)@]7x+s6`k,[$]o>>#)q;Q0(iou5I=T;.k$cP9$>-<-m*ed$ej/88XXHdFi^B7&KLTfLMY)0."
-    "21N,+&*m<Im-ZK)%ZmR&=O$+>vnFm0X=+b32lh;$=kIT.%d6t-_x?w7KI.(#':f1vsxv(#E-4&#oX)##60c20JZI%#AhFJ(HB4F571-of=DFl9bFe;:^;d6##,0_+0t]s$IXj;-4VX3."
-    "c?:;I]m=&>0Hl[M'U*,#pFMk#S)V$#UF^99gk(9/d#60`xa@2&U*F0_RhD'Sxs+F%C8QF%OP-F%gM^G3sxi6/CTjP24JrU8^b(*4DDXI)I:>JCx`3dXk[Zx6[iWv%Ws]'/1s6T%=-Tv-"
-    ";GEF3tcMD3a8GQ%pr`O'p(&5'=bP2Bjx&'+eC#(+[3(O1fYXjL0H/m(q7d200chV$m/$R&a+O.);`L;$m'90(S#4FN3(GM(LX7s$$.s;$,);6&w17W$7<Fh:Y441;S*0Q&,02u7ZF6T."
-    "j^?)*[Uu_+T%5/&R,Ce;#f?>QZ.Ms-k8#GEF/[ddjb^iB5H<X?,x-(#^#mx4Zp4MTFxQP&l#Yc2JMc;-BrvT%8ZnD_GlC0_[@49#g>(39Q(4m'q`kJ2P?^k&QHvF#d@C3,0[r%,1k7A,"
-    "EeNj0>h7A,/b%&,Zb_[,[0CC,@,>>#wOi4Jo+*8@]4pu,OKi0>[0l6#0AP##vH4uf6W[*Nqb/[#CY@C#?D,c4MSoGPBN<$6[TBOT&G/p&6x_Z#X2?7&>?t)<P^[#6$nY/(0]Cv#?F#2("
-    "'m:6&kS74;*MV'#]nl+#l.VV-x9`8&3B*/`+x'^#`kn;-c@;=-vb1I&08Ya.%v6*&'DI<-VZlO-eU*B-Gp8_%eKbK_Se?>#hHho7kwas-k>LI;JdQH+W1CkL.P.#%icMD3-6Jf3dI]7&"
-    "9)tI3;4K)<$=s20^f&m$?dfE+xN+'6>452(KO)Z#[7g'+RRoQ0(/+M(7YC;$I)'s]3ADI$nFf.2mP<E07s0cNivD+lK2w)*gl9H4as=T'Xe.<$D'B2'4aB$-4]1R'vuB`jt<JE5)/mr8"
-    "Z8lv6YArL1V%vr-#vKe*#$d;/%/5##TI+m#bb+6#hJ6(#5k$)3>s?D3;J[A,;a0<-pi1K*cMd6#$$%Gr1&,>>ViL_&IxDs-4#t)<2m__&UooD_f<mvI3kpnJ^eis%wCx6#o>MX%Ex`3r"
-    "UcX0&f>_e;.-s209jE.3:>`:%jpB:%oY)w$A`E<%[=8C#OM>c4PdMoel'X]-nf^*+HS6F%<0T[u$V@6:DF@2CU/1I$a52t8l$^,2&]0f)ZwRo[l`T*+lt<A-6@8^5hK1kL:e489'V#F-"
-    "PTaZ5].g>.]o#2CC####^uv(#f`Gj#XM7%#Fx3T<:3W;79a@^$BUgD<53N;7%<c,*e$`$0Lk`H__U+wpaD>_/E1Tq)1mb&d2(00%[Kkp.?3pL_M,tEcJSX/MRf9gM'k5I<sApV.ZxpDN"
-    "x:#gLR]-lLbqZ12=P>RAG]p;.q8c`<R)WqK5]2Y$V<X`<cQZ*3emXT%S/`K(u#S#6U&vO04j-F<6YjJ2=x3g(_6>6&sQ#R&8,;l0q-ID.U&r:%f(sS&0Or*%m>+;-.gprHP3>`W<Ad5/"
-    "dk.j01dEd;6k%9&r>MJ(]'o;-9rG<-freQ-U:#-Mju'kLg1Z98C=`D+R'[8@Hva=(lDOe-qH7/=YX61MgBJFOfX=9@-(W[$t1]6#qZc6#ssqFrs5UhL([FIDkJXV/1BGA#'*lk0):X%$"
-    "D-;o0q>Tv-&wA%6Cd0YAC*[#6llE.3)8@)&$[sS%T'xs$VKtT%&b/p%&V`k#pj+01E=VZ#,%uA#_#5R*,E?4oPsQD*@*([-Oa;4+Jmf5'Z3n0#1sao7x[bA>88$adoVG&#aPZ6#Fq$:&"
-    "6jV'6tAE8A6iL_&BB(kb<?_3_'iG<-CfG<-GrG<-VfG<-e:#-M;%[lLeHs.N;m0o%@5GB?4qA02wp/20bO;<-Y1v<-aFv<-j1v<-qFv<-o1v<-^oFq@?ZvZ$wCx6#u),##6TYO-)T5,%"
-    "se.F%`TCwK-i^-uY5Z6#%+0k0Hvjh23mqB#On?g)uDFp7k1&NM.?GA#-'6B,WPId)os#*&JL/p%Jkj5&*^#2T91VZ#/F?v$[$sq7u0sw$sucj#Wi;3'S-JA&?mVuLQ4U0Mru41<WEIhL"
-    "k-jv#N8X$BT/5##`Pn8#dAw0#Kqn%#^F33&0]qd4?pIiL-BVhL%`..2.B@g:C'0auCXcs6B_95&h.BP85e7e*En%v#IC@b2_p4f*#/9c3MHXI)x=OI)_Lj9/oLEt.YPe]4Pq1Kadq[<."
-    "cb4n0D####Nwmg#N[?g#7g1$#8D&6_#^_3_mDk-$tkD'S+,h;-Qc=?-2qchL8ecgLdPs$#xuKk)j+?20g8l^n5dLD3*%rH',5ZqJ5Z(>c;RNP&MDW]+G+H$MY@6##[%$`%(7$OE4x#of"
-    "M4p&#*]qr$H1:/`j`c'&<)v'&3^c'&0Tc'&$+'u.tp41:c[Ps.&um`OZkJcV6RHG*xAYA#j-:n#wIACM?Ba@,)e;,*6R6,*=tRQ2FUDC&:?4-vS54l:Q6+Da<d52'YdE]F47x6#G/5##"
-    "Avb;-UpN^%>*g'&,vW-Z-TG0_W5nD_#P#<-LM#<-N361%jtbP9-a4&>I@ev?W&Y6#_X?']/XD.3x?7f3aGUv-=M`=.kmqc)n&PA#*v#J*=<7.M)56N'H,]j%Lljj1g_(5%..sE4;E6C#"
-    "/W8f3'[U&$%9#t-Rm,+<lD3j1]Vo]%0nPV%%Sf1(-N(:%0Dl?,u=tI))eb,2OHkN34JXi(]>)8&F9=:.)I&N0/fhV$./[r%i6rD+9rlm'37YgLI?/A,%/W4''N_V%=E3e)=cbs6*Ngr."
-    "Of;P0u<_V&3eQg)/2oh(e,qm&c%`O38`[s$T+1W-do7p&BNL,)d*SW$A@`V$f'S8%.muN';8E1;NEo>-L5-T/>:es$j&L:%aL[O(S=)$#D>eS#FD?_#FsC$#18N+&U0l6#VnEs-HAf`*"
-    "nVfZ5-q6G*04-G*xLG;-(f'J)1u5c*7####Ch%nL0;1M#>h1$#jBYK(EeX9.Hj=:&=pk:&4kpF&//5##SQ]X#(rq7#m%*)#ktf2&.HAdbOP3AHAMDH*(k`H_);r?[*oAK%<_De-D2PWo"
-    "_vQ12,)[`3^7;<-_q3R/:g*s6F-QM'Nm0<-6Mql%s=QtTWjHl$R6x;-.IQA+dc``3EG>k%_uWb<@shP0BEc20&FTL;(Pdb+>v*$SuQ/s$&rXi(l2B1,qJ:c+VDdxu/fMY$n.Lf#VsI-#"
-    ")GY##)4o*%$PBDN#d%)*EmO`<:ZJ$M86Np$>Ncf1kC#29a^93_XID0_#SZ&Mak)*%6sC_&]kt9)a@`)La<mGGRct0&YSd20$>05`IF?>#*01I?nt8W(fTNmL<[<1D[_W0=:xlX&Ci.7C"
-    ">pUx7750CQ`G0i^u9O?-5;l`%V-Z&H?V[#8-Qxp&1I?M9H/K$M'vH[$)IRS.a>iu5di2q.fTY6#b90Q3JC5p-m]Bp7gwK.;PgT/`?(?>#c,:h$T$T,?[nHlLbr,t7FXDr9p8&lB4(jAd"
-    "7O)0CO:c`OuBk?-_fJ/&o3'[-qt<vKr5K%#LUG+#=%U`<],q%=ndVG<<Jdp.<UY6#[oq-$_:*<-sRx#%.B,F%X0v3+e/v20p9E)#fDlR(v3o92p_N;72^WG<n?Lm9P]=G;QSv2VE),8("
-    "<Zp4&+*KM0Zm7j%d]@DegZWmLm;,&#VNv<CuXDM07bh0>kwK.;:.xP'jR>O%t[-2&KvK/)WH=W-43vLsj@U%6D,jhL:[o8%mAic)xU,@,mOO^'Dkl4KlVZ4(G9Ax,94GM(6AS(-+_+v#"
-    "A,$u@7:J9A70e-36S=B,Z96I6$Nu;-dg?<%ET5o/++tH?PpXCjtK@5;rFB;0OQq80EI&?AE<TW7@$]k9muA9r@8^CsLR+/L/an+DvWs)#0f1$#aPZ6#LTY6#kCa6#dM#<-[TS_%cPkcQ"
-    "Hj./&'pls-AR,lLM%[lLJmm6#n+3)#`r+@5X@R1(ZmBB>l42(v^B/[#rqMp7N,hI;NU3R2VGBs7l1*$o.m)7:]Tg-%i09>.$j#33dx#:AEXrA5bYMH%],$w-GQ+',3aGS/?8;6&'8c5;"
-    "#E0$-w`mN':VuY#:rf2'un0U@R8`Q9876:7eBO=A&G/p&Ae[@#`*[=-lb[,*[Xf34.&/9&8'*-*<mo,4aPnH)$####7@%%#WUl>#2f1$#U+sqg>$NJ:/f,K)TwtYH^mv$$Rlk7.n%$Ak"
-    "w[@6&.:h)Nj9CloxpVB#TVr:6S=s=cc#s^#t=;SIYg-2BNg#H*6ReLGllec)Gc-<-owCH-hL`T.U)0Zu0`#`-M[YF%5C=6&H.FdVS6SBfN/5##w*j<#70trLl*^%#s:'&+?j0j(uV[Y%"
-    "gJC@e1/M-29&3B=cQCW-'BqB#UA%&4qJ))3xmk7,2k@A,9^gr.;UEp%uSCH2YE-r^<=s(&4$BP&xIvHH<)'58dvY%XPM62'mp&-3B$M$#E?q+ZvqJfL,UucM%c[`Eqw9WJEXPs6GBMJ("
-    "IC@b2W$VhLVh*P(2FoHH+00>GpB>tR(]fd);U3T%j*;[,d)GW1]&?6&*bT+&qQ./:#6qTVUjRiL)Z-##L,>>#(.[0#%Pg3EA-D)+M/A2_;DkX&:^.iL]c#98>M)c<C'x[@:+,s6ChTP&"
-    "6i.T.md^3(=Zwm/'[b6#[Ca6#<?f6%-?,F%m#O^2)/Us-9_Cs?t/N*es1mJCpN[F4KjE.3jpB:%TTOT%BZj$6Z5n,M:8CS%^cwI2CR]@#$<+?#1CsZ@V'ms.@1&^-,tq2s%@GGMSpMxL"
-    "cnr'#NuJ*#_pou5guao7W:b2=`Gv6#^@;=-IwAo%aOFx[>G-5&Z5Yb+X&)8Acj+p8q',p8;_vV%4_vV%TN=<-^1v<-(Pie$s[?>#2]T?$_b`Y#O#QM'P:L216ZgJ)qH1q8+.lr6IC@b2"
-    "okh6;LD#d$We;gCDtNcsjQTN0dP^w6MdH)*;_qhLKgGx:Mxwa+%1vC+cTx@#%Kou%8*:6&&pUG+?TZZ$CQ:0(,GCjC#-Nl((5oh(Vo###%0GY>0)-Da(*qx4I=^E70`1`jN#x%#XYDX("
-    "ol<s.s.bs.>m$)3kjea*([g<HQ^i^6qcY&#aPZ6#]8wh%RT.N%x*'u.#)Yv)ec``3baK.;O9H+<=I3$6,R(f)>#t/=wsv%(YaV?%RQPE&l_X:&2:A6&w_a2WeW$Ht.oSH)kU(@,E[m,*"
-    ",<$7&rf:6&$1PvcrtjX8sa),WNpFd390REKfj0i:_5>)47Sa>-7Sa>-2&.a+#>[;o@2oiLs@)U8t;(0*i=9w%[k]T.$2+8_+eTE#t.w6#6),##jk.j0s2?4(:Ul##'[b6#:^^s$4T,F%"
-    "?q,4iw`8pANj;N;m(,G4Qh%i)VPHH2&a,Q84>g,3=*$E&<UoGl9+09&04Z038/JfLi2=%viAa^#<d/*#%-sQWsX`i0v+DT.bCa6#>B-&'/NF&OlSY,%8k*LWDbI8B?*$Z$#L'a+`k.<-"
-    "Zc..%W1VtoUU$lL(7YS*I#mP3<$(E#*^B.*tB:a#sWSQ8'f?#6s<6a$io6XKoAeL2C4A@#<c:Z#p#,o/#1_nDrgIE+juO9'HlcY#3.PJ(HIxtHg%/9&tN]`9AeS8%T>mv$%gPS/ui?QM"
-    "Y<)c-_lE%$.85##%/5##G,>>##CL/#YvK'#KIRS.$+FT.fTY6#_G]3%tb?2&E/?p%)njl/9I/<-o&l?-O&l?-1M#<-3p]R.NDn;%WOJp.Yglk0ZSt*cCG:Z-^n4D#*T'i)QFf20r(Vv#"
-    "f^]#c)l?0*Lx0xt<Fsl&IWQgL<X<N0]nln$r%8?5?W)UM1OFD#sg(Zurm]r0BM=%t]]=m0Dp*'%WxUV$gK=<-:7#4+:#gb4v>Tv-<J0YIqxlW.O,)S&,Ml>#)Gp;-0Ce208]JMB3oLZ#"
-    "T3n0#>'mx4]n<]bAv52'W'QfCHu%7#Ws[fL+-0j0:0qQ;sI9/`dMc'&aO7DI&.gfL]5Z6#D4ju$]PC&5S3m<-gr:T.K^Z6#iq.>-,Z:a%nNiE[Y49x.',v4M4l3JOX.L0M1M`'#&>05`"
-    "P@Uu&A&]iL0l7QMZa4nKEWZJ;=&-0)'h`H_cE%RE-F%RE;q%RE3kF_&boAL2mHRF4=4/+%M]WF3lJ3<?9Ac)4.R(f)>]DT.XC[x6MS-=.xH:a#`eMgt5h9a#L^Z[$)Fh&4#0Tv-6&Ad)"
-    "=xKP8FBa)+dqKv-.XIG>b0U?5$)X/2mor.2qm5n&j)_U%hec(+*).M1cXCN(pxKc$5v>X7k99U%8n+J.FsKv-&KuA#OtIJ5C0*39In*H;B2OK3DX(j(AW/e*$)8-)`rFZ,runL(Q>8#,"
-    ";BbB,c,I51&4IX-m8:6&R4[P1Q-1,)q9a$#L:dl/&tVl]N?O]=p5_6#`^Z6#)D*j0enj6#)$%Grx?cofBmb2(2%dfXY;d6#]RM=-[4)=-b)Qt$p8q)<XM&FGkAZ6#$2+8_nq_D(H`ms-"
-    "EkPlLoJA(#aPZ6#.[c6#?tqFriK@K)]::8.[6r`$4R7lLNqkj1*SYmBxjNj1q:Rv$.g_eD_7@fPw(jc)nY]H*9RbT%$24E*$xcG*;jAc$JdPS/YmD;&::XW8Rk4J2F^'<7`MQ<.3lLv#"
-    "YEt$:A^42C'E+U&S;hV.gW,R&Ji6n9+/s20C<K7/gd;22eG:6&wu:6&DPOW6'GZb+'?DW/WccF+/]:v#&iF`4['XKluHZ+rd/X]Fe&q%4515##mG$i$JUP)',2Lc*h#(X-PX2o(EQ+)<"
-    "3WF&#)=-C#GqBD*Usu:d_:pu,=h8,MJRwa$)A49#<rGc%XU>L2/=Js$j/q5/=29f3?ql&>WG_s-UES@#QUaP$:eJ2'KSxu,h(mXl;=@w#/Jc>#8e:,^oT$.MfZGi$,+KAXKVZg)@p;-&"
-    "65N34^uv(#x_;W#RT@%##BO:_9J`3_8+vwn5$@a$/5XsphPd/($qMbjVM/'F++4m'1-4m'vfF/2`meM1O1]A,D=qA7O+:kLRJ=jL/P'NBUaAFc>^.iLls[.MVAVhLZI.&4x9%J3-_pi'"
-    "SiWI)@IY;)U+wo%FJ_c`._`W%n$3W$slJ(Mo.]O$2ux(N4pg]&B2I^4l0oP&m(CF$4eGgDeW/w#$,HhL?XZY#$E3GD?ro9rT*I;rQ(h'`5(rr$]oRh((3Xb$u?[5'/HEv$@Bt;-W=WU%"
-    ">Fho7daBj_t#BJ1Owx34oo$<-bpX?-Fa,t$i)IpIs()d*<ZhE+.+'u.v;Tv-;0d4*22.&41Y7%-:u?:Ro8mf(rW')NJ9jv#s9@DjUxY-2`Un^Nd4&X%D#.W$l_;N0hBa#Peb?>#o#3GD"
-    "G(<]bTYW]+4k:p.We%j07*Q9ilIG(H4>,*8FMe5L-rJfLm[WmLA_IIMS)$HN04=s'(n@vn5.g)*rncil>0:j0@AUVHw_RlJ83g028p5g:lAeM1L[Bj0xcd6#+$%Grt'>of34[58X<sqg"
-    "P'102u^NP/+Hcg:]lK/)PJL/)0]`5/jZc6#]lRfLS/)h*mqk#>k[Gmqm)ug$9)TF4k7soIc(&dWf4R^=HYaJ2wT1K1iR#(+eaUS0Z-96&fNkW8>pVFr#No#5Hq<9%rKT>.%/5##);/X#"
-    "hsk.#Lww%#?m7i$3[;3t$/j^oRe@3k*NC_&Ut%<-.Om=M0KrM%_2^'/QjV[ET[gJ)_(iJ)1Is;-Dx(t-^n_l8-tnP'E,13(r2=1)eC];q>mneM2v?A4m2hh)q*2k%Z@qo.]3aZ#,M+gL"
-    "fN&W$SVP>#++iv#H(@T%rtSkN$rJfLQ[-##g6u6#M(5>#S4Rh_3U?Z$LX+e<%Ru`4DYd;-[s.B.EL@D&=UeAcrh=:&o23U-5W$x-ir,tLEtJ%#.qpl&&>NE<1gk&#$/]6#KTf7(a&_Q/"
-    "WZc6#(tqFrDQxjBv5;8C#%l.)pHj;-MA9c$B[Yq^N=Q:vu<6kOJx_]FWXt1B/X)<%#pXxF&o9^#TdSe$<G_]F[Clr-*.5b-M#g(%HJa41DD/PiX2(*<`89Y]Gr`FV(h-#v<KY)Mi_3s#"
-    "'&*M-$v)M-#[`=-X8Af.G_R%#[`-Q%Ub`Y#M%ET.70xr$o.NGY6lo[+[_rm'''d6#4_XTq/qh]RGbZf=x_hx9MWfS8xeT*,EZ8$MFjQuu#R@%#;/[0#[EX&#sTwa$oVc_d=X$29Tr:;-"
-    "RJ[>-O3'0:S16Z$Y>k0,gZc6#jk01jqiZI%i>$T..QB%6oP25'k?nH*E6OaE]rP*RAUg)3D%8D,#TZZ$BK10(sYuA#t*-68ac?C#kN%##HYUVHYk9MBhLY(F'>0XU`.Gv>B9g*[+=Gi="
-    "'&VlMAV@C#+TVU)c49d2N^?d)Oq>YYvT:v%f#.W$SW8WAjsJW$Vi@^4Z*w,$:.Dv#og%5%K#P(9U<h^u1juuY7%`;$SaCv#f:X_$=CLo*g@)=@=+L^#C))$#GCX,20>2O#^#x%#Xh`Y#"
-    "<+vu#VB(K1dCa6#m1_._pA_3_e,k-$%c<O:09d;%5Nck-V'&9(),MT/1v4c49jE.3/;;k#fT7P%Pj#Z$:.V;$F=oUdh;;>51cLv#ZrYe$NK>i$-4g]X2iU;$H<<P]tX_2^+5###Ke60#"
-    "E.@S#wBP##j2.^$MJ:;$7$F$M+xSfLn[0j0x(.<.%G3]-n-fBuY`:$[V]4t_ArrM0uxKf_wo:2'OdrmL:_XjLR)102L:VuPC,fB#Om*)*F^R##<nP<-D@pV-t.o3+FR(4+IWcofca$#Q"
-    "gFXw0N/qw0p-$PfhW$x0Z.*SVHk<^ML#5$M[3&Gr*uQ2(0P$<-LcPW-1;&:)-&mM9-g?7;i,e12.;<A4FF@<-m1v<-?F:f/:5GB?Piwp_**1T9<Q@&,E/k$K9fou5cx?#6<nTx*=Yv=-"
-    "Elc)%s/$JE+O?_#Pj=:&/@Lj(-r=M(>dKj(Hn1hL=Qop.H3>j'.<=^,<f'f)Tfje).p=Z6R#6t$P:YM(8tdg)*FA6&ta_hL+RD[,FJRGXlI+q&br/b*$VK+*<8V11-;$##^*;YPLL#/C"
-    "#`@3DMXHM9e$1B#_/pI&vX0^#n:@T%sAw4vQs=u#PWt&#,%Y6#1j@>%>wn;-QJcveuY+iC>$wU7jkBN_*>>>#7AMJ($=Cp$Zo7g1u,AS'dL0+*KG>c4Eq,,Mjxt_5C&9KW3s8U':]d8/"
-    ".Vg/)uMc;$&MLA?_Cgg<Qd0^#H0TQ&D2PN)h(3U8M-DTT-#dt-h51mCD,`ZuB0W8&(2a%$D&p5/Bsu]uDC':#2tll$IciO#^xK'#7+gi0`iO217qN/'$./L*C%f3'Q4Dm8xO5s.-P=s."
-    "_FE?-90D,3XUxB->709&I?#R&IM$<.E2)M:$P(<-4Z>6&nBT6&7,;l00MZY#^L^CseE,/L1n7G;hs^6#_?EU-m5T;->VjU%c>=3tsRpD_N:&O_1YYY#JBRS.4$8p&D%r;-m&l?-sj[aE"
-    "Z%cP9[LkP9T'(9Im8?0`6c>>#dQ<;$MtDM9pD6t-)mRfLquTb*4=Qa**)t8@80dG*;14n/AP/v5AB:a#@JNQhT:_0M_b6lLAMm]#oD?W(F0s[,8+52(8'*-*FWFB,(W]j<qNlr/UFEp."
-    "WcNe)BIGR*n-#N'(q7a+x/I51]+&c,Rt$#SC.lh<;2EKrI68C+W.Mv#>EY>>W?CW-vI^6&9/Dl0sc84;RB'[6G####kUci9tIE`W]`B5/Co%=(bJqCa-'^,2Qb%/1,oH8%WwJJ(9;pCj"
-    "?LWp.74pL_Lq,61HHL8MU2aMOa`E:MhIYOOdra:Mk[uOOntH6%-xNa<05R>65FS>6*GDp.$2+8_J0,=(VRlY/qV5&#J^''#aPZ6#:xpd%,HnD_$q</4'@,gL6?VhL?E`hLDVOjLc<a.N"
-    "qSY0N<g>oL7E`hL9G;pL:T:vfe>``3C-;o0VBs?#giWI)&9G=7oO<]'F:p6*6JWX(V)>)4+cv`4)`_Y(q%ZD4@WLF.g]@[@fl@d)U?d*QJ@q[/L7[P&u#ur-,R2<%6ET5&sH5-2uF<5&"
-    ")37w%`dxo%)@ff1siB,3XZ*N1<xPLMQ-?>%UKXP&jC%q.Le9)32)C@0_*1@0;RN*4MNFVH/(wo%(8afL;)KvPYt?K#3k<n/L+$p.>9hJ%,S,<-K_g`OF6]Y-@(KR*,$UYZH*;^#09m-6"
-    "657`&>L-L,c*.jB.Q;h)P1]o@1_&020SWjLYl>T8&u(9/^L##,JnL5/maTP&]>*O8)-tH=0Ys/%<I5F#h%4a*NL*<-*U.EE-k#cE#s*^,T7i5)LN*i<V4?u/dp8lBQqJGN)$l20mHI5;"
-    "gH)j*FT?\?.IuN//h+C5/6?<*H5G`'#7j^7`&xT^#>7;;$hC+j$M#9*HM>+jLUg;kBX=Ma4''d6#'F_9&][+=(j;aZ%8OIoB2ZaJ2)OAb%NK]j)<.O<B4Wgb%w]j.&&Hrc)Eime+j&Yp7"
-    "#6h-O2fFv%cWWkB$$s22po7:&WFfP#RN7%#W#S-#^&;;-UO]V%/Qc'&E6=;$OBVn*^E$)*3242_B4nX$,k'L3-1m42KAQ]=cR;<-52v<-r&n?>?bJQCf7G4%_Sd<-[#bZ%)+qqhe>Z/("
-    "TgPr@igA,3j'(m998%a+2AU>?`tM7)(n6l1rCn;%GhOvKaW^;%kh@8%kpC[.h6t(&('PA#cAUE%&:6Y),W*M(oD^O9k4W&b%'+ZuTqMM0+^^q'[Xjl0h)u=$$9b:.f:W#A?*4H*Qn]2'"
-    "C1xQ01w/q796MIN87PM(8D@<$u&(-2o:*D#Pwji*+VWT%qpLK(p.b**E1A:;`p[-)]c&b*r9k]-^+Dul>,QY>9'cf(R;v6#(3g+%Ca_6/ETjP2195CFd0,H3m&l]#0YNj)BhBH)Q,;L1"
-    "c`rO'hgeL&K#Te*2'bb*K4DZ#<xOfCrExp&xMu(36NJ$MQR6##`k.j0$N$iLXjkjLl8N<3RYS(v9td5(RqJ<-H28Y%JMd'&Pg^04;091*SL3R8EX4U(u_U2)H####qwjrLV)Qm#iXt&#"
-    "fCAZ$jKu_-(304&F&;Q/$Da6##vjh293>T.r37+4/L)NVWirr?Xm+u[d97L&S:[T%s6>B$F#<&+u[RH%H*Xn/gwmp.5.B]X?h.Y-7-Vk+V_S5&dI@6&%/5##(>WD#c-[0#juv(#RBY0&"
-    "s0Mb_HIZY#&R)##Xa.u-Z20AFK6XM_nefq)2teXJFw&x:LFLlMIikjLEbPE=,X9dkf)[12-2w%4$QGc%4-4-v%7rr-R?3L#/_93_^i0X:C&O&`RGw%+PJRh(J/w%4[to/1MJUv-[5MG)"
-    "RJ))3hukL<-IYQ'6$r@%jx[]4GF;8.&3coL)m?'7K]B.*pQYS@nr@1(+AJp&/[UB+lBWU.UBdH345Kd#jpW^,j_`;$N#?;%?dfE+ee&DaTv,R&+_r%,at/n&pr/f)O[R5/:7R],vtDZ#"
-    "EUj5&FFhT7[/5##%ddC#4gbNFNK$6/ocf],XZ]],[0xa5vBSE5YT,p%XAPB,F;J60OKgv70'Pu73%DP8&=_B#L*V$#xP?(#dgFb$*uLkL1`8Y%&kc]AUU$lLh.Nej4^@k9&whv@mUH##"
-    "'[b6#EWts-;;kXIMn%.*t?(E#nGUv-G0'u$;-rhL?h9a#lEn'(8J65/8(,2(?rUv#Rd@W$NuC8%3H,o/0kTT9b^aD#Y]J2'8*3-*<_QV%uEEW%h]kY#6C3p%9-3-*4HKN9K1=2CaBfs-"
-    "R1RfLTh6##5@bA#.5l6#u7E)#<@#S8CZ`p/*gjl/8.wQ%2s$@'Aw9ZfRYFo$`tt9)e#b]/O7Rt$.&Zj97EEUK;:pu%FtZx%5AW]4/P-<-)H?e%=+Es-d0xfL)gpX9))dH3hCh8.lwkj1"
-    "hg6r@HsnA,DP3*GW=GZIeN141ETZV%j?+9%/<1d;de',H.cGK3pHuJ(FTn_slh9DN]#%h1$),##1I'^#a@L/#MImN</1T;.I=R<-^)FCRw[K@%$rr9(LpJp7))oP'l^aGM-x=2(I)&jK"
-    "#gpU@Umpk1Bc``35IL,3`&)8&v[u/Ch8t$30d<Q1A+pF#0X.L&Ch/6&qg0kb./f9&sZ#Z.LM/?&G&M6BmgeY#w)wu,Y)1-O?td29_f;r7$P7+43=[x6QFVC,M^5N'Fp?d)L<<r7R%<r7"
-    "Cr;r7[q0^#^j.K<SWiR[tujZ%x@'DN]HF/Mf;$##g<6eMAOP,2nYPwB0J1gL'h+G4(/[78.u5Q8ae_F*Q%dY#diCg*7o_;$$8=E*$o5g)OPsa*Wlxp&'kx=-YPdZ$BHuj'tiL^#n]&p&"
-    "Al1v##Cvv,[QL*#Sb`i07LReaSR32'h<*20NQ[i9m6'7#_97I-4:7I-<6Dt-cwTHM+F5gLRPbJM,>>6Bgm5g)JU0K%SO)##$2Zp7U3p,3''d6#rSl@&ah+=(bsSq1V5+/M'V3,<fqMF5"
-    "V#^e*tF%6/Z`''#V4FGM,Y%iLb6wlL]5Z6#^58D$RLrg*$p(<-JRi-'5D*A'X^^<-IE2E'RT<M,JXho*s[gF*>*5@l.%:B#f-pQ0PApV-+O6Kk/dXVN-4Q'(tTV0Ct7]1(.qfC&]fHE/"
-    "buu2C.d%T]1Y(?#CV_s$8$V7*A84$gvS*fqg8P]=5/=A%PSd>>XD;s%>7>h%P8hW-(r]^/Vc9C%aHI_8Sc($#r*cXTeS+V&*clf)..CJ)=G8;62=UJ)q##&#Uh`i0#ufxXtWXm/L%T*#"
-    "2-oH#ldL]$RQfER<O'=(s-E<-aF;=-R-0o%2[f'&L@0:)GDd'&+Ff'&ncec))xOV6oEie$&BC_&lhE_&#@ME>@`Qt$Oc[@[5#Z,%4p+E=''d6#tq%?&YR+=(S5w2;Hl)63g-w1M)n4GO"
-    "%@<2Mq)PGO0>;5M0>;5MgGv6#W-]v&s)O$^e$EZ@bUkIFpmB#$L6C#-7#^8&xSp;-Yiu8.avjh28+*88JFT;.TgB68&Q[x0+(st-W&n68MdIP^>'gY-)),KWpa#J(=(^0%RgpY-PtFp^"
-    "1]i'#hxaT#[Mb&#/<k#&c^TP&XuED*fac20und._lGZ0`m]C7)L8xiLRcKnfe(2NCO@7m0eExX$;-Ow&?nXD#>**Mg>^>6&OnY#Y4.Gb%-:8^kFePhLQAtFN_h$##Le60#[5[o#b5>##"
-    "/GS2`kCWt(lgb;-^Lm)%+9,F%$249#U4?p/$####dcv6#gugK-T*Wg:sOV8&0E*Z$Kj8p&8w([-FcYV-<BF:.RK4L#Yk'>c$ESJ:$%&m&F#6_uU)_H2aE*/:./OY2:Z2:1&@bA#t4l6#"
-    "wCW)#@NA)ZVxKdQPAkb$;(R29l=%a+Y<<a*8FsdDp)*eFI1E,Yk+54%aGQd;7l&g2Xp+<-_8G`%kv]dMZGs7).XH4ERha=.a35N'&AlMCan$iNP]DH2H-#N'[Ge-)egZp0B;`11ehUN("
-    "_lZ/:0?[_ui2D?#RQ#R&It<9%s[&^-x*.p0cGk'%S5YY#^.+fqa9,/LqC'58nBt5/wk.j0s#:hLe+:kL]5Z6#=(918s9pV.<?cs-$a?iLo,EQ.Qq:;-nCRp.33pL_Z>h-O%]RmM0ecgL"
-    "c`@(#'K4a*:.#-2#,m]#]q.[#Ps$d)wCXI)+(fs-Z4fIE*+?v$eAcW-V-e(%crV<%'/h*+D8uB,vS?7&gU]X%;/5',>/8L(P2-o/1ElX$U_VM0Lde^5QXPL%NKNJ:s^5v.a/^&,f('+*"
-    "ahnS%MacN'WPBM)2K';.BWFB,p;(Y$AFV;$&rXi(xK;)#O8WD#O:I8#:8E)#kj_c2]pP]4d#60`(Gd'&/Qc'&ObxP/-$%GrnX]nfMBE/2YekLW@?MM%bCMs-+X#mD$4Z;%E0#_5w([`3"
-    "IC@b2$w[9_TTv)4H_[1MgH`)ER;FQ';@i?#xsbg$kHuD#MaGx#QW[J&;(:S[JZ[^5t#P=Ajl)P0^eE5&lqJ2'V4xI2=L9U/sirg(@]C;$KVOI).POI)Y8Y;$'7LJ)C[Kr8vR#c*h-Fp%"
-    "aI,(+B$*)+Mhkn0P,V6&M%Q>#]sIA,0e7A,)Laf1O#_B#<;At#UsC$#CdwqJ.R@&,=/(<-RAV.M8#SiLPN'cj=MBI;4^'^#/3L#G,0dG*Ktb6BE<Kq%%;W^4LchS%>kaj0=?xFi$5dj#"
-    "$KBPS5U$(#FBkxuTw+>#Df[%#pRai*eZ5q.fCa6#K5$H577`7BBlL500JwR8dsG,*cG-<-@9]>-mPU@-3M#<-+6*2%%QO^2cqhb*St7<-x0%HbD;0(OGe9a#,HC8Ko`v7&4lLZ#eA$n&"
-    "+nq;&9mYC+>=3p%Npc3'vaFU%k^%B5sZ>j'0]Cv#C8e7&LTZa3g#og)>+Dv#m^<u-6cat(PkwjkB$m7e#S3DWxx2>5:WG^5Ffou5XPq]5jWbs-g<4gLepchLY56djRRcV$8_CJ,bMm6#"
-    "<####X]F'%FVrLNO1CkL;^.iL-i?lLNq'+*qcHJ8^H[qh8h9a#YCpGPd86N'j.2@Gp0*Z6LvVk+63=L#@mR#$Sn1a1qoDS&^daL#D=M?#:-F0lHV30(kL#$$e>gi#Eu<N.r<49%x9E)4"
-    "3,Vh)?7%s$M<B6&];?V%S-dhLXouA#v3cu#Icf/.Pk8-8V8rXSn]p>G&3p&Z/bl,M]cm#>389v-NI9v-W[pV.P[pV.oCsR8na*1>U*um/ITY6#iha6#tU$.'J;f,=Lu'kLKH&qf/*+78"
-    "m)kd*MrCv#s=K58<rT3(at%w#?kA2'mh.?7HIB;6e^.0)<u1v#(DI60/7u:&i>a&5#9am1&=:/)>w$(#$),##nD[8#MWD4#vbuc*2H1<-04'L(3geJsj_.()pJ=IM5$vA#I)wg#bf[%#"
-    "pDA^$U$o@@#47g-x]tp7v32N;A`I<(<_7q7xT9tUM),##wTN1#+CCpL7w>DOm6[f(V.7S8W9,N`Pk2u0s]*9#j`$0#R%I-`#f9^#WBHekN^an8/xQpgqgf+%,)Hf_F>HY>M<cjBq#c*?"
-    "T(_1&%<F&O=/D-2F9T*I5sx]?97xM0qsqFr]Gmlf#^H.M[s?L271<:.[GUv-i)9_IJrsu5mAT@#jd_,)5Q+',+]X)3k-V`+wZwp.asOB&$Z58/FV=fCb1#-3lGU:%^kumsl,sx+gwK`N"
-    "DF/_JhLGS7U-7ci;4TkL/0'j0WSk&#,$5F%$>[c2``hA5NX.F%E0&/:+pR5'i#6T.t]Z6#hT`IP]c^._%iw<(;Qk-$@LnE5`Z,=(jinZpM+Gj`4OUA(KSGp7fcvf;F5xf;XCM>?/2L>?"
-    "E7q/`b9@>#np<;$TS'N1OjCnW`fgHQR41F_KwoaPB1Xb3B4vr-C(Am/eXlI)]]WI)-QD]$BY@C#Nlf$7#x'f)C$2C>vakL:S?<Z6CH:a#=C0T%eWCO'xI:<-li;s%R&*&+F0Xt$F[7s$"
-    "[6TQ&>ovD,*i]:9B1eOM3?ND+m[]?$-G?F+6gZp.--?h(#;jg(PW:0(@o(Z#]9*Z#mUSx$oA:6&klnA,lkgk;SE9I$3T*Q1k`p<7>jPb%6ZTw6I####&.JP#eTYb#-n:$#1^v4_`h[n9"
-    "*6`D+T'+<-)Qde%]3xr$+nrR8DMt2(d#60`]?Hh%HXQ2,.:`d*XHB9.pUx21u5.Q'wUfQ0F,>>#Hc]CsqU[xbTk*JUQU7<->4+,%[J%O_(eBwK>=LS7;?AT&9,gi0*jS2BU8=2_2QkL:"
-    "f*AT&gBRS.Y2tS&iiGd36([`3srwV.[Tt;-`Zgo%CZk8(U>l;-%a2n:l:dH.4&QM'Apuc%1aQv$$`^F*x]:%GXGavSb]]+4]u;%G[jMj9vl-L2H&OQ1OM`'-i2=-*Vk2v#Gghg(0Oiw,"
-    "dBN91T19%>8IM&5:=n5//iqV$/vuA#jb4#-ks_g(pDbV7jbI],IBC,):o8g1av&M))ZPo/7Rwn(@k:HMOdAx,%5YY#.x8D*gK,/LQQaxF8w@t*ph.<-`)+k%86,[GOFkM_.PYY#ig9H*"
-    "wjuu,APq;-m?cc%[`c;-6F`.MTb:m;+WpfD<nPGE8nPGE,t]p.24pL_Leb@.v$-&%@##^?LN@9(FH.%#/AAF-RY5<-iu19.3nQd3G*Bp.jUKF*X3%p_ow1s-I6u%no1WO'E5CI;^uq[G"
-    "h(^,3A.ikL97$c*YqoT.x?7f3prbP8Tu;Q/M7%s$ikkj1o@@PJAZMJ<gZ&r.x1AZ5;w_,)v8Q/*D@fJ;;R#R&:;i)+;e>31%(5g15IaP&HIIW$C^s-*Q-V-Mxvr&5smG3'.](p.&9;W/"
-    "mXaC=2ou>>s)ZPTT,:7/Y]vo/S=RW$9p(B#knBI*1Df1(Z#h-+vB]w#(#250v/7p02kex,LTqc)N/`0(d_c$,JK9V.'vIh(%.t=.;xx1(T(5_+qs*?6FYr[GCs>g)s3n0#-(x+27Z0MT"
-    "UT?A+7ICP8VN#N0gk.j0Aa+/(YX8b*DR/q.UTY6#&@O+<Nb>W.B5SY,*pSa*>US>-=g<;&4DfZ(;YXI)0c0+*GH]kVVnAa)W0]Y-9c^E[Wg?S@3^+J_k(lo.'tWmV*M1`j&8tWUEMl58"
-    "2rO3bW<1Msn2L-%lVhp.23pL_Y(Go1-*<d*%Fjs-`2n`*dRWQ/.QYx6Cc``3aVNT%+AHw)0$@d3Ji=:&Lcq$-T9i/)2i)P&,9w<&C#T<7k&c:.)lSD&m<$E4O1ue)eY(C,/xmp.ZNk6)"
-    "M^q*#bLx+;WT=G;i6$j:qq)<-8cSv$U[#?%Ulc;-R)Qt$PS-F%#in92LQ]'/i@nv*A8Nv-<I$h*</(<-'ihl%GDd'&*x?>#+*]V$LE5v6],Zv6.+'u.#WkJCII5H3jAqB#bIGCf8#7e%"
-    "Oj'T.wR,@,-'.i(SCs>AYuoJjY04,%`aT7/^[IW$p0IX-hpn>6C*t=*2sr0(/vjP03'G9.a)F_?F,r;%kv6-)5*Ne-^)D3'nrl_FxRbA#)v37'o77kLvOW=IOq&K2q6T;I+&g*%YL3T%"
-    "E6$30,%wo%1KJi^M:m[P;=K%6t2'G`(J:;$S)=ciD:?J:XN#7#J6*^%^Y692wqJfLt?8v7XR;l*KF['&qxYb+eP6(>ZP[A,G;WW1uX*mJVu]G3*hgNaU>Grf@fgI;B.9v-Z&mV7Go[A,"
-    "n<:Q9i4=1)?E@l$2AfvRU4xo@j,bh<nGGA#?hec;?%N&dl[Zx6RM$Im-&V@Q.Wis/c2XH*Yt2v#Hp6-)=)i-2gTw<&8ZXU&?J9as;mh7@5lWj1,?)8&'+_B#4cNm14bI],<d#V`b8nP1"
-    "f-Y208j,G*Nn&6&,eNh#7gr^4MO9[fe#LM'oVf=uewHP/HHVZ/a?]f$[c<*ejECW/.ij/%)_;QA*Yje+Tq)$#0(T#%894-vDol2aYT:o0/XkD#F,pn$Il[I*pxJ+*^`4$,RDw7&5+<D%"
-    "eL7'ML4rU%dI2?#W8b?69V@6&fLR5&h+EM-@[1l%R,>>#`R^CsUn+/L1gn+D]7`8.nk.j0n2g;-1_'-%&&2:`-YZb+i>^T9IuB#$/1C#$ngj;-;IKC-1OFU%MvqKcV3bK_7ud'&Umt(<"
-    "mEel/S%:SKDn(IP)YR_#;sKW-bHkZ0[B/[#<)ga*vIV9.KBS(-ix?m//fhV$qwYC+?YWX%Y8;6&oT4',4jco/.(-C+S)6B=*P9$-2a/12uVMU<1*Md%uGrk't#eg1+Y(@,15X**+0_q%"
-    "N2?B=dK_s-`5Mn/8$M,)=G$##;LH`ES@T`N]fgl/ZPm6#;R@%#RYHY>2)%gs%4Y2(k%24&7ADs-HP-+<N>^;.bLS7&hJE.3x@^Y,sq-x6Lf^I*fK'N'/:2[,,>=i(Za^6&7CE5&$DEj1"
-    "q4=e)'IYgLMNct6ps3Z#f%J1(cKKq%@4I8%0SuY#0q:0(G6gm&[lIfLO:K@#JKOe#_XI%#ho+n_4CNP&&x5j_Xr8>,R?[213]-F%U$Y6#+%-42TNq02JX[[>L*-g)H8O,M]YlrfC4K[>"
-    "Y9-g)D*<#&(DC8.GH5<.P:`a*x<7gL$CitQ]a96&m/Te$9t`/h2[Z?$Nt7<$Pk.W$@QG-2m1W[$`KO,2D@`Z#%Ud&O9TOU&?<-G&3/Q9%*oV20UBJ3MX;C&=2N7`$#k<7%14,/LvVf%F"
-    "DwclL$3nlL/(``jWYt&#&CeNk'c@hlOQdKjLcD':cB%a+`;^G3l`^G3u4`p.'3pL_GOgDl=Z7.Mt)K%#x+OS_5`>>#n>n&#m#KM0`JpK2Pdp_,Tg'u$++di9)55H3?sGA#Y4Ve$h1f]4"
-    "R%tU%Eq]W7_;6<.wW(g2clC;$DjfI_H6i&5lX&Y.7gPS/Ux;p/AVuY#l7])*S]D^#$C'[61t0+,=3J=-oRT9&g):6&pv]J3Hkwt-FI_+*BRr<-TKhc)V=1w,8[N9`<NIV6i;p1T^s/20"
-    ";C]6#,Dh[SVXTiBmDvV%DAl;-No93%@T$O_mX*2''``T.$2+8_@[+S&q*RKuRD>>#DbYY,<`;aEEEdv$C]R_#,Krg%EWLD3)7p['bYfvLr1,9%?1^G3ro^*+x1NK(>C_F*Pt1hLi/:6&"
-    "xFSH)fiZEn`tJ6&iff-:2p-@'E)P:vJ2]^#fe''#l,$P.[8c.sxX$,ZDlq1TU9()*(&G]F<4TkLse[N:Ul9^#>4e'&8]SY5VP/^#cu/^#crl;-6fG<-?S4Vh5=ih&&%x<-.WjU-6^jU-"
-    "=8gbD/)D:q<>Uv-*?ET',e``HMAwuQ^&uIDDd4Au^uT:/l?7K3?V[#8I%cq&(cVoIZ`''#D3=&#i$(fF4@[kCi#6m'6bC^=pG:*6qx`0(6xO3)`(?t7vvgI;VPk,4I%SXH=ujudvk4YH"
-    "_UG^?o_$##lW(fqprS+i%pPP&-/>$Mq%4a*T[$3BDBXM_5N4l9UfsZ6?-YD#L$/L&/gNh#4D@6&(lOgL3Y?>#/G###+JLf_#RgRJ*@+<%=;.$$CMh;-pXT5sa`;<%KtiM0.@fl#iT8s$"
-    ".J3L#kdjZ#5o$s$&C.Z#8'nO]+&6T%0?vTM^'(,)vWa`<+^T)4^=ew7HvI3%U,CQ8lA$tL=+drDDhRq.83pL_u4C,H)fnv$CT(T/GN><.l>l'&VouhMrel]#YNU&$px_eNC17l)ShR@#"
-    "vH6T.pJ6I2.UWu-#(IT.Z9*L#%)ej'ldx[#*JfL('>*0(pp+]###sk'maN?#u+o;6eJs7LY1*?##:G>#,vBVKKw^K>N#UrK0_Vs%V1=GMETs$#'n,tLqV&e*G2FuHO.8p&[R;p77>`_Z"
-    "Zgdh2F*_i>6p$&4Ju86*giZ_#]CYI)IXR@#:XV^4C;uV$C(?_%CVFGM?XDB4DG:s$B%6_%=;]fLA7wS%Rn'gLT*NZ#quDZc2'ThV)+fh$OIfuc.),##wX[@#sIl0.,0c2=N]O&#Z$)t-"
-    "c%`rHop^N_SkZY#1aTP&0Gcf1r$XT.BZc6#Mkr=-F9qd%S_T,&jsT)<OsG*nND2U2Xc>>#2N;v-5=Ml%'WO^2]hin8'EYd3x9%J34C3qKATi2%E%?29623s@?vU&&`)hZ-:152(H9pQ&"
-    "fCTb*g#@51rb2J'1gGx@m>Mg1rttM(JR=:ILq<9%0+Z29N/P&#6%sY$Qa%-#pM+K0hC&:`l^[Y#Q^57MTI-LM$rJfL6RcGM0ecgL63DhLaAZ6#qTY6#)g%V%Z/Yb+Msn%#-8.e%R:Za*"
-    "V/Xa*oTOt->JOl9=0=2_k1Z&@Y5Z6#71&Nk]Beq77MPYda-11(bbZ#@W#@>8'PN.L,j*41Q2h'#N+'q#:D,+#V+_D*j7q1&A=b/1$>05`oa@>#)M:;$=F[q$>)d'&`1R.;oD$j:P-o;-"
-    "Gr:T.?Da6#<M#<-dCI',?#LW-*'@'$+nvc*ts=<-WU.X$oDwU&6**Mg3<>6&Z`.KUXtoGNtoYj#9jvo&^9pcNQ8qs.<g;@&S1dh#5':6&bxmp.<x$s$F[rV$K@/n35XJ7n`C=gLR0J>-"
-    "#lhl/J^''#SE<L#n0ZQ<YV>x)=S(i3B;-ZuhrMigP%^I&ot0V&^lhP&m/96&3JY>#f8+,M82jv#H(c<M66$##u[OlX-6w##331n#VA%%#A0vU9xPr)+''d6#X<Ql$;5GB?&pd.MOc#DO"
-    "xwrdcIEf>-Z7B^$9+C[%nO;;$n2=1)B(b3lg5bW#I#*a*)$%Z-gO]IVmfl&#J'6lf[gZYQkQJn'b57YYmwv(#_XbgLF@Z6#MTY6#uqQQ%@2Qg):Lsx4itE$'kdIq@]3I1E7<`-M6?[q7"
-    "viu_FZq[A,ZO]A,D.*T.-),##[q$*.<4TkL9:rRBS?.60'h`H_O/DwK#D`K_C[&@'T:SC#?T0i:D;<Z6qL>c4*j6N0a=7[#'K8f34x+M;NG#cEWfC_&L=w[-I6CD3u5OSR$rwD&,^hr?"
-    "C#jH&Go?E<hWjZ#AG>?#`o_E8xpjV$EuYYu01[S%sXo%HnLs5&jeD<$km1?#<Jta$Y6B4TM5[ihlqK&4@qn%#IcNp#a(+&#tER5`GFZY#=PDa6[UV*%dqep.H3pL_436B$`0qmA6w]G3"
-    "kQ+<-EY5<-+W/7.4dIk9/e7p&O<eM1_XCs?Up`mL>q9a#T#)u$Q4fN'O(8j0/I-AO:3<-*fNIW?TU*nK:7PM(.YQIb4jjJM[NQ:=%d9.Z0m(-2lZxN(32wR&30G?#q=*=(,VV8AJ4n0#"
-    "MAuu#(OUrZ<0xG3j;>U(wCv?Gc/bJ2SlA]J$DE5*h8ZJ(qJ))3dLmG36%V+v$vZJ(iHL,3GEdG&C5$q%NaB#$:X/m&wQY'$]T<X%R&?v$5IW5&sBG'$&#_:&+YQ<$SLjP&1cU;$A8qo."
-    "2Y?&M^q`;$rs2J3dwUFr7GP:v?G]CsA-fM0wpai0?AT<%_]mOo7n`Y#e]hB&#>AS@(S^w%m@m[PsaijrD<FbjC6i$#([b6#]Kx>-v`bk%^`Mp.$>05`<A+&%]Gv6#6:.6/mk.j0HAf`*"
-    "t?_6/RR(f)3Pto75J(Z[p3&v7f]HC#XhPS/#:=6&S[FB,PRnXA2a.-&;t5:&dSD5*,6q6&&Rc$,p3ncAT3I51W#3H&ExP?&+<+$##)>>#4,>>#/u&kL>qdLMoNX%vK,O$MT>+jL?;_.$"
-    "]X`=-*j*c3W+?;#715##Z2MG#K<u6#-Mc##3#c,4]5Z6#q'd4%#w+F%ro39#Pf'W.Qe%j0RfF?-,.r5/Wh`8.u?.lL_Mic)UPlo.ppWrLteW*@)9XF=eT_+rfdcc)B'Ei^tA*72s6[qL"
-    "N?`q:S#8T&G,M*MA4)=-L[#hOi'B)=n-42_%WpvG]61UqR)#rfA@ns?Po__&,0v9)Cus9)*7/F%'ZT.40b`52S4+8@Mhem8H1q#$wCx6#SJwe%SO',&hXq[I`AZ6#H[c6#lVjj$W<d01"
-    "vCXI)N^?d)t(]L([Xf.%anW@G`*wY6PM9;']K[+4gDf;%cn;bR0$&],]nH6%s-r(EFP2:%SaGS/>T4',m@Q;$'a&QA9#aj*ks_T%bx_;$uo$W$5oL;$Ma/b*HW=b+D%Dv#m=f)*?GLs7"
-    "#ekX$mwxA$G.jxb87PM(vNRoh<PZS/*ZK@MhCF@$bXPc*0Q]$@`21e*>>NT%b-4w#kqxM'0]Cv#k%@s$l4g^+Yshc)U:1w,)MOM(jJQ$$),>>#to+##s0WVHM0IPjLZNR8BG6?$''d6#"
-    "Xt7f$qv1K(,1EW-<rJD7x^+W8OCW<%DrBH2>%`;$h?eE.)oui9.s9dkTSmu>'9>e80>?\?$8xCv#L:X,kcb?>#^Bpf(.'758;?_c)+38f.Re%j0t8>(&n:SC#GG2^#K/:n#ZE6I2ejNoR"
-    "Ga%8[h,PP&tV=$MWOP,MPV);8)`HC#`W^:%Zk_a4Eg,]#Ud%jo%Y0^#g.Q<-Su6A-'F(a3kGU/#@Vs)#nR^/`2^]Y#u/=;$Ipgm<+?D)+Bu0j_D(S]4?Z@2_]v.(m[5Z6#B+D9..Da6#"
-    "Qx]-&:1DD($>Zb+[9I;8KR-uQU_)s@E=*s@NOaSA6r`SA?.A5B8.A5BFmK/)?mK/)*jfa*)j9d*bKUd;A/<+NZZ'NCi7^l8m+O&#Z);N0ZZc6#(tqFros0hLc*8qLN[7tfc,))38DNb&"
-    "(?0W-/jq[G^0>)4h5;j0]AqB#/W8f3BgdC#i6X<-FwU,b>;Cx&?+[=7oBUT%36?E3I5fL(F34#-0nWs$WQ#12kM5',wi`4'E#NA+rvj:.s)4/G=mTp77:I,`#U($%W[D20,DlY#BDjlA"
-    "@LRs$)/YfCniV11`2)o&3Ih+*I9'u$jME*4>9]&,'ddn&7rC;$S^g6&-+fC=4]O]uP1C<.?F-p.t6#6/,?YY>I[kRe/5###qn:J:cTRVQRInl&2YNY5Eh0)*:J`,#+3:0E==Ab.3^m6#"
-    "6E-(#`PZ6#4B1&*=I#UIseY2Vh,Hw$ZAhp.(4pL_l7]^$l,Hw$Hx-v?Bx-v?782g*@Po5J['C#$pGu;-nj2m.-*,##dlls-rDrd*?o2t-2kTm;MlYQ:wnXI)T-xe*NkxQ/Q(P)4uwC.3"
-    "rZj;-SP?h':bVa4YVc>#%b;mJpwIg1Tv,v$+C%?#SOvv$'Y4Au%7r7/#r`v#(ehV$T-Js$LXNh#UW->mhar4%5[qs&...##os4Y#d@L/##%t.`E@ZY#2i:;$`6u6#bE)2%Jl`8.^ujh2"
-    "?fd=-Hwok&,4_Y,P#Ys$xrLv#VnZ>#:C@[#F7W2''nU?%2.Rs$DSYYuW2-$$;%2v#/Z.H#9H?0%)####.frgXi,=AFVPb1^4_Zv$H@g+:W:Lm9=UF`W)GVg)QO.MTGWI:IYmQ7A5$.B5"
-    "''d6#&%qG&a8;>-c)HT%CD>x.TOr_,#LgRJ2#bJ2_V&h1kIIW$SNYj'%f^b*nXa`FQi./lNqC58&Tbi&O?5N'xM:l0[(KfLO_H##Q>uu#voL^8$M'SKah&7#a/5##Nl.j0=Ic7(bgJvf"
-    "DwclLbD=s:/[4ZePG:82lccuG3>5_.+*,##d2H-.Z>fnL#XxV8#p0$HP'ZiB)$A*`L,Yw0sBUh(V:WU82q.Z$EWjVTiJE.3?Dsu5u'7]6%-q)=>6R@'uN3^Iv%Jd)Zk3x#ew#X%iGXJ3"
-    "5wi)+R<bx#MV&b*;mYo/Dls<%D]HS/;c0+*MouY#EB0>$0hm,*7@IA6N:LP8aeDfsH/nj'@VY>#Qv6h(7u,(+g<0u$,5t&+=I1-M('K8%,dZa3I$8I*oTMH*$,>>#H`J(sj:elJjRIY>"
-    "aD_5/kk.j0j-nXHQKF&#a+3v6rhi/:wQ9/`L<$I6x7i;-GY5<-oiq@-+c/v$FU-58c_18.<D>p72MlD4O)>^?oDoH#s.1M)4cAP'E1H>#7efM'/=D@,nFfi1&ZK_,R_UJ)e3Jw#D)j]+"
-    "wG#8/n+Qx6MNlA#HeDV&N=2?#7i(v#00AE+*8wv$+hn&,)R$0)BR82'AWh,)QH;M2$a>]#I#&iLH*&(#E^9^#&L6(#Ek$)3>s?D3&(q#$.nuu,BG=,Q<EI4([s^s-osKHM;D*J%FKk<-"
-    "Por-%f:Nq2PlD_&?(*R<HsNq@fR9/`<vV6NIX,hOtcY&#%7lh2[eK>2YQM84OG4i(KEX>-9<'9%fpYL2sicB,&,8P'F2/#,v>^r.DSIN4Sw?O(g`I-).?Uu$KkRs$5Pr(,E<j`+kq@w#"
-    "<([8%P@MvuDSg(%7,C5/D3*##>pN'%_Q29/Run+M-P8R*X)NR*I2v'Mjw.p%EM3S[o^7##)P7GVS_JYc#rWMK&#oA+GIsfU@aY5JZg*#u:p1Z>8A*aWdFq/:3;_Ak'+f#>jb.<HpT'n&"
-    "ECSgU2Z>01J-S6/.h4tHXM6U%-R(hLtCcasv5dHV0`t<6Rax$#Gc,U[qpr<Zc$Wn]+RrhCt8Au6bt/oSnk?iCD:C]5u1wI`-IP]>Y)s=dH2ID=wNeV7Z_-d*6=icN0JlPB3EbDO3Qc]u"
-    "P5`8SCCGjUg7J&lXO#9J#_dd3M<<EXl4C9AE8Y^Y,*_9/Q5(X7((Jq84M,F49MJe<qv/@6JhN-sUu$@Zo6[X@k]Qkhwe+r/uZrqJv*+`,j[@@Z.2k:&0DTr&<J>:ot=L.W(*ir/316fa"
-    "b;C`Y%torA4X^S9?'sS'%uq(cvRM;AX#&aG@s`S^4CSg*NNm`u=krs&`T[/a`:Fmhn:7<AJ/as]W^9Tph_BNi.o.O)GJEb,cd0[@O0n0<7&7C6NR&+5_;%CZ>sRU9,X,OrM]3CZg:QUT"
-    "H&BIk+Y5%Rw,VCZg$f=JA)I7q%bW]%m?ci*^x;VK0wj1aJ%%^%I7HV^7oY8:4ALJki<+##OR/YcXv+F%ojrc<:b__&S4NP&gc[R*NVUV$fmk_&4g*87k&l_&]tFJ(T:n_&[efi'fnn_&"
-    "u4@k=?Fo_&xokr-KZ&v#1:<p%oV^JVQ2q_&_B$)*Gfm_&S.35&^Rn_&tJ2MKhqn_&nckr-;=j_&kASY,^Nk_&nV4;-&Tl_&QM^l8@DpmBuYRdF>M_oD2<XG-Q]#,4da$^42vnHF3>;MF"
-    "'>ZhF*LeF-rr4VC_0iTCf(,^GO#=SMIvX>-^meF-3wI%H9CM*H,,lVCi/SdF*v#pDU5U*>3[0O=p>.>Brrg*70opbG24%$?`(7$6gqX>-++]#68'rk1kk&%6@E@L2F^&+4;fC`5M2ki2"
-    "3g_<.pkn+H$o]>-+O4.-aqhM1I;8_^/k9'#ZqB'#1c/*#Xst.#e)1/#I<x-#-#krL4]7(#XD>8.03h'#_Gu`4$kqM:/uOk+Rq@_/k2w1B8bpfDj2n'&MoOk+YlxE7s]8JC%Jo3+0I/F%"
-    ";Ch]G7.l`F6/xX1goUw0HdJ`E<`W>-[E.#HM,f]Go@,#H=Ww]GwpNe$-G`f1'TwDFRt@VHT5rER8Mix=%$[J;q%:&><7cDF0`8R*SWEqDq*r?9)'v9)<n/F%pYdu>[>NDF6H>#6B9d>-"
-    "nW^$.g2TkLMC_kLQ,T,M71x(#^@;=-[Gg;-TTIu/6pm(#<^Q(#WSGs-)ax-Wt5;PM])crL<)m.#81uDP@r0*#wbo3k'ilM1ECd,F5;$##T(+GMAqKxXQD&(&m3N;n&;cY#W>O%$MH?MB"
-    "4XYiBL*no.Xtp.CsWel/hwj@de]i7ewpEM0%3'/1iuIoem7+Pf)K^f1[>d5]/K6(#gQ?(#Ob39#]=x-#3;K2#[XH(#7dZ(#;pm(#0#X9#bC+.#3(*)#C2<)#q6u6#Oi8*#MTF.#sZO.#"
-    ".O=.#Efb.#qm@-#SKb&#+pA*#ma.-#7h7-#LPj)#1TE1#Kr#;#r`^:#+<':#O(V$#mC17#B4n0#j;w0#k%Y6#]RK:#C-^*#[)1/#^#(/#?+85#4Wx5#G;G##f2g*#QaR%#6e`4#L<(7#"
-    "L_W1#2@O&#x&/5#LPC7#Nfg:#*C,+#dAU/#f;L/#jO>+#<4=&#oflF#i],3#;xw%#LHY##DSq/#qf60#amp:#]G.%#`3m3#Bm?0#TXN1#:l:$#==.@#C#.8#pD^2#DFX&#vBP##Hd46#"
-    ":pF6#Joq7#-$),#6ZT:#UL<1#[ke%#N:r$#sG31#;S@%#4ss1#;6D,#x([0#$#R0#j<M,#.I`,#:1l6#mUr,#ZQk&#HMm;#@0?;#RZ)<#HHd;#G*6;#Y#W<#dA/=#P6H;#_G8=#`/j<#"
-    "Rp7p$LXvlEe5S=B,SvLF$42eGoN;tB&jXVC`[`-#SxefLLN6##4,Guu&iG<--4)=-hoYD/hOQ`E?^7rL:4pfL,rJfL7xSfL^k^iBOgIrLW1$##+iO&#*Y#<-*M#<-]q9S-hpdT-iNP</"
-    "_om(#b#F$M)%S(#w6t9#(9_W.^D-(#8$J>/-wox=d`piLjY2E-M>:@-fbQiMhf6##bu.>Bc<5cEUOD-#H(`5/<V+;C[^6R9G3_^#&8YY#[/,f$Ol68%Xgq>-3>+XC#X@M9xDtr$=k$Z$"
-    "1fDW@nu.GMAr+eZH,>>#McUF%8N&.-Uh-S[f@^.hRr*r)jTOF%lE4OMNEH>#mvP)/7ix.Cj9n-$&?c3=uQj-$6`fq)FIw(<s=$)<Kj&:)7]A:)$FQS7nBl_/ST0/1.Sx.6=Df`*;wT:)"
-    "prTS.,oQS%,Od?$?/^Y#OYB>#%(tX(H#@X(%,$v#4U?v$<Sw],Zg@v$.uO&#IM40MJtJfLxa?##,JY##]+,##Kfdp/n,j<#H+,###hrt-6qf(MGR<$#PC,+#1`($#Oke%#QL/(M$LD/#"
-    "NY]_M;f_[M>MU<NgGm6#jt[fL5rugLOD?##$RM]ll[7L,Cmb2(<PTw94((Pf3:l'&6o%(&o:dl/(1ik4j'9L>B6m+MDH4v-h:eqL0&@3#.Mx>-K>:@-+.;t-,1tZMnn>WM@9CSM9f_[M"
-    "6SC[M9_4rLVw)$#(aErLpK12#u%Y6#t7b$M1g3^Ms**MM_CTVMnBdwL#.gfL/#<7#I+,##^uv(#eQUV$LDaR'$%###";
-
-
-
-static const char* GetDefaultCompressedFontDataTTFBase85()
+// Exported using binary_to_compressed_c.exe -u8 "ProggyClean.ttf" proggy_clean_ttf
+static const unsigned int proggy_clean_ttf_compressed_size = 9583;
+static const unsigned char proggy_clean_ttf_compressed_data[9583] =
 {
-    return proggy_clean_ttf_compressed_data_base85;
+    87,188,0,0,0,0,0,0,0,0,160,248,0,4,0,0,55,0,1,0,0,0,12,0,128,0,3,0,64,79,83,47,50,136,235,116,144,0,0,1,72,130,21,44,78,99,109,97,112,2,18,35,117,0,0,3,160,130,19,36,82,99,118,116,
+    32,130,23,130,2,33,4,252,130,4,56,2,103,108,121,102,18,175,137,86,0,0,7,4,0,0,146,128,104,101,97,100,215,145,102,211,130,27,32,204,130,3,33,54,104,130,16,39,8,66,1,195,0,0,1,4,130,
+    15,59,36,104,109,116,120,138,0,126,128,0,0,1,152,0,0,2,6,108,111,99,97,140,115,176,216,0,0,5,130,30,41,2,4,109,97,120,112,1,174,0,218,130,31,32,40,130,16,44,32,110,97,109,101,37,89,
+    187,150,0,0,153,132,130,19,44,158,112,111,115,116,166,172,131,239,0,0,155,36,130,51,44,210,112,114,101,112,105,2,1,18,0,0,4,244,130,47,32,8,132,203,46,1,0,0,60,85,233,213,95,15,60,
+    245,0,3,8,0,131,0,34,183,103,119,130,63,43,0,0,189,146,166,215,0,0,254,128,3,128,131,111,130,241,33,2,0,133,0,32,1,130,65,38,192,254,64,0,0,3,128,131,16,130,5,32,1,131,7,138,3,33,2,
+    0,130,17,36,1,1,0,144,0,130,121,130,23,38,2,0,8,0,64,0,10,130,9,32,118,130,9,130,6,32,0,130,59,33,1,144,131,200,35,2,188,2,138,130,16,32,143,133,7,37,1,197,0,50,2,0,131,0,33,4,9,131,
+    5,145,3,43,65,108,116,115,0,64,0,0,32,172,8,0,131,0,35,5,0,1,128,131,77,131,3,33,3,128,191,1,33,1,128,130,184,35,0,0,128,0,130,3,131,11,32,1,130,7,33,0,128,131,1,32,1,136,9,32,0,132,
+    15,135,5,32,1,131,13,135,27,144,35,32,1,149,25,131,21,32,0,130,0,32,128,132,103,130,35,132,39,32,0,136,45,136,97,133,17,130,5,33,0,0,136,19,34,0,128,1,133,13,133,5,32,128,130,15,132,
+    131,32,3,130,5,32,3,132,27,144,71,32,0,133,27,130,29,130,31,136,29,131,63,131,3,65,63,5,132,5,132,205,130,9,33,0,0,131,9,137,119,32,3,132,19,138,243,130,55,32,1,132,35,135,19,131,201,
+    136,11,132,143,137,13,130,41,32,0,131,3,144,35,33,128,0,135,1,131,223,131,3,141,17,134,13,136,63,134,15,136,53,143,15,130,96,33,0,3,131,4,130,3,34,28,0,1,130,5,34,0,0,76,130,17,131,
+    9,36,28,0,4,0,48,130,17,46,8,0,8,0,2,0,0,0,127,0,255,32,172,255,255,130,9,34,0,0,129,132,9,130,102,33,223,213,134,53,132,22,33,1,6,132,6,64,4,215,32,129,165,216,39,177,0,1,141,184,
+    1,255,133,134,45,33,198,0,193,1,8,190,244,1,28,1,158,2,20,2,136,2,252,3,20,3,88,3,156,3,222,4,20,4,50,4,80,4,98,4,162,5,22,5,102,5,188,6,18,6,116,6,214,7,56,7,126,7,236,8,78,8,108,
+    8,150,8,208,9,16,9,74,9,136,10,22,10,128,11,4,11,86,11,200,12,46,12,130,12,234,13,94,13,164,13,234,14,80,14,150,15,40,15,176,16,18,16,116,16,224,17,82,17,182,18,4,18,110,18,196,19,
+    76,19,172,19,246,20,88,20,174,20,234,21,64,21,128,21,166,21,184,22,18,22,126,22,198,23,52,23,142,23,224,24,86,24,186,24,238,25,54,25,150,25,212,26,72,26,156,26,240,27,92,27,200,28,
+    4,28,76,28,150,28,234,29,42,29,146,29,210,30,64,30,142,30,224,31,36,31,118,31,166,31,166,32,16,130,1,52,46,32,138,32,178,32,200,33,20,33,116,33,152,33,238,34,98,34,134,35,12,130,1,
+    33,128,35,131,1,60,152,35,176,35,216,36,0,36,74,36,104,36,144,36,174,37,6,37,96,37,130,37,248,37,248,38,88,38,170,130,1,8,190,216,39,64,39,154,40,10,40,104,40,168,41,14,41,32,41,184,
+    41,248,42,54,42,96,42,96,43,2,43,42,43,94,43,172,43,230,44,32,44,52,44,154,45,40,45,92,45,120,45,170,45,232,46,38,46,166,47,38,47,182,47,244,48,94,48,200,49,62,49,180,50,30,50,158,
+    51,30,51,130,51,238,52,92,52,206,53,58,53,134,53,212,54,38,54,114,54,230,55,118,55,216,56,58,56,166,57,18,57,116,57,174,58,46,58,154,59,6,59,124,59,232,60,58,60,150,61,34,61,134,61,
+    236,62,86,62,198,63,42,63,154,64,18,64,106,64,208,65,54,65,162,66,8,66,64,66,122,66,184,66,240,67,98,67,204,68,42,68,138,68,238,69,88,69,182,69,226,70,84,70,180,71,20,71,122,71,218,
+    72,84,72,198,73,64,0,36,70,21,8,8,77,3,0,7,0,11,0,15,0,19,0,23,0,27,0,31,0,35,0,39,0,43,0,47,0,51,0,55,0,59,0,63,0,67,0,71,0,75,0,79,0,83,0,87,0,91,0,95,0,99,0,103,0,107,0,111,0,115,
+    0,119,0,123,0,127,0,131,0,135,0,139,0,143,0,0,17,53,51,21,49,150,3,32,5,130,23,32,33,130,3,211,7,151,115,32,128,133,0,37,252,128,128,2,128,128,190,5,133,74,32,4,133,6,206,5,42,0,7,
+    1,128,0,0,2,0,4,0,0,65,139,13,37,0,1,53,51,21,7,146,3,32,3,130,19,32,1,141,133,32,3,141,14,131,13,38,255,0,128,128,0,6,1,130,84,35,2,128,4,128,140,91,132,89,32,51,65,143,6,139,7,33,
+    1,0,130,57,32,254,130,3,32,128,132,4,32,4,131,14,138,89,35,0,0,24,0,130,0,33,3,128,144,171,66,55,33,148,115,65,187,19,32,5,130,151,143,155,163,39,32,1,136,182,32,253,134,178,132,7,
+    132,200,145,17,32,3,65,48,17,165,17,39,0,0,21,0,128,255,128,3,65,175,17,65,3,27,132,253,131,217,139,201,155,233,155,27,131,67,131,31,130,241,33,255,0,131,181,137,232,132,15,132,4,138,
+    247,34,255,0,128,179,238,32,0,130,0,32,20,65,239,48,33,0,19,67,235,10,32,51,65,203,14,65,215,11,32,7,154,27,135,39,32,33,130,35,33,128,128,130,231,32,253,132,231,32,128,132,232,34,
+    128,128,254,133,13,136,8,32,253,65,186,5,130,36,130,42,176,234,133,231,34,128,0,0,66,215,44,33,0,1,68,235,6,68,211,19,32,49,68,239,14,139,207,139,47,66,13,7,32,51,130,47,33,1,0,130,
+    207,35,128,128,1,0,131,222,131,5,130,212,130,6,131,212,32,0,130,10,133,220,130,233,130,226,32,254,133,255,178,233,39,3,1,128,3,0,2,0,4,68,15,7,68,99,12,130,89,130,104,33,128,4,133,
+    93,130,10,38,0,0,11,1,0,255,0,68,63,16,70,39,9,66,215,8,32,7,68,77,6,68,175,14,32,29,68,195,6,132,7,35,2,0,128,255,131,91,132,4,65,178,5,141,111,67,129,23,165,135,140,107,142,135,33,
+    21,5,69,71,6,131,7,33,1,0,140,104,132,142,130,4,137,247,140,30,68,255,12,39,11,0,128,0,128,3,0,3,69,171,15,67,251,7,65,15,8,66,249,11,65,229,7,67,211,7,66,13,7,35,1,128,128,254,133,
+    93,32,254,131,145,132,4,132,18,32,2,151,128,130,23,34,0,0,9,154,131,65,207,8,68,107,15,68,51,7,32,7,70,59,7,135,121,130,82,32,128,151,111,41,0,0,4,0,128,255,0,1,128,1,137,239,33,0,
+    37,70,145,10,65,77,10,65,212,14,37,0,0,0,5,0,128,66,109,5,70,123,10,33,0,19,72,33,18,133,237,70,209,11,33,0,2,130,113,137,119,136,115,33,1,0,133,43,130,5,34,0,0,10,69,135,6,70,219,
+    13,66,155,7,65,9,12,66,157,11,66,9,11,32,7,130,141,132,252,66,151,9,137,9,66,15,30,36,0,20,0,128,0,130,218,71,11,42,68,51,8,65,141,7,73,19,15,69,47,23,143,39,66,81,7,32,1,66,55,6,34,
+    1,128,128,68,25,5,69,32,6,137,6,136,25,32,254,131,42,32,3,66,88,26,148,26,32,0,130,0,32,14,164,231,70,225,12,66,233,7,67,133,19,71,203,15,130,161,32,255,130,155,32,254,139,127,134,
+    12,164,174,33,0,15,164,159,33,59,0,65,125,20,66,25,7,32,5,68,191,6,66,29,7,144,165,65,105,9,35,128,128,255,0,137,2,133,182,164,169,33,128,128,197,171,130,155,68,235,7,32,21,70,77,19,
+    66,21,10,68,97,8,66,30,5,66,4,43,34,0,17,0,71,19,41,65,253,20,71,25,23,65,91,15,65,115,7,34,2,128,128,66,9,8,130,169,33,1,0,66,212,13,132,28,72,201,43,35,0,0,0,18,66,27,38,76,231,5,
+    68,157,20,135,157,32,7,68,185,13,65,129,28,66,20,5,32,253,66,210,11,65,128,49,133,61,32,0,65,135,6,74,111,37,72,149,12,66,203,19,65,147,19,68,93,7,68,85,8,76,4,5,33,255,0,133,129,34,
+    254,0,128,68,69,8,181,197,34,0,0,12,65,135,32,65,123,20,69,183,27,133,156,66,50,5,72,87,10,67,137,32,33,0,19,160,139,78,251,13,68,55,20,67,119,19,65,91,36,69,177,15,32,254,143,16,65,
+    98,53,32,128,130,0,32,0,66,43,54,70,141,23,66,23,15,131,39,69,47,11,131,15,70,129,19,74,161,9,36,128,255,0,128,254,130,153,65,148,32,67,41,9,34,0,0,4,79,15,5,73,99,10,71,203,8,32,3,
+    72,123,6,72,43,8,32,2,133,56,131,99,130,9,34,0,0,6,72,175,5,73,159,14,144,63,135,197,132,189,133,66,33,255,0,73,6,7,70,137,12,35,0,0,0,10,130,3,73,243,25,67,113,12,65,73,7,69,161,7,
+    138,7,37,21,2,0,128,128,254,134,3,73,116,27,33,128,128,130,111,39,12,0,128,1,0,3,128,2,72,219,21,35,43,0,47,0,67,47,20,130,111,33,21,1,68,167,13,81,147,8,133,230,32,128,77,73,6,32,
+    128,131,142,134,18,130,6,32,255,75,18,12,131,243,37,128,0,128,3,128,3,74,231,21,135,123,32,29,134,107,135,7,32,21,74,117,7,135,7,134,96,135,246,74,103,23,132,242,33,0,10,67,151,28,
+    67,133,20,66,141,11,131,11,32,3,77,71,6,32,128,130,113,32,1,81,4,6,134,218,66,130,24,131,31,34,0,26,0,130,0,77,255,44,83,15,11,148,155,68,13,7,32,49,78,231,18,79,7,11,73,243,11,32,
+    33,65,187,10,130,63,65,87,8,73,239,19,35,0,128,1,0,131,226,32,252,65,100,6,32,128,139,8,33,1,0,130,21,32,253,72,155,44,73,255,20,32,128,71,67,8,81,243,39,67,15,20,74,191,23,68,121,
+    27,32,1,66,150,6,32,254,79,19,11,131,214,32,128,130,215,37,2,0,128,253,0,128,136,5,65,220,24,147,212,130,210,33,0,24,72,219,42,84,255,13,67,119,16,69,245,19,72,225,19,65,3,15,69,93,
+    19,131,55,132,178,71,115,14,81,228,6,142,245,33,253,0,132,43,172,252,65,16,11,75,219,8,65,219,31,66,223,24,75,223,10,33,29,1,80,243,10,66,175,8,131,110,134,203,133,172,130,16,70,30,
+    7,164,183,130,163,32,20,65,171,48,65,163,36,65,143,23,65,151,19,65,147,13,65,134,17,133,17,130,216,67,114,5,164,217,65,137,12,72,147,48,79,71,19,74,169,22,80,251,8,65,173,7,66,157,
+    15,74,173,15,32,254,65,170,8,71,186,45,72,131,6,77,143,40,187,195,152,179,65,123,38,68,215,57,68,179,15,65,85,7,69,187,14,32,21,66,95,15,67,19,25,32,1,83,223,6,32,2,76,240,7,77,166,
+    43,65,8,5,130,206,32,0,67,39,54,143,167,66,255,19,82,193,11,151,47,85,171,5,67,27,17,132,160,69,172,11,69,184,56,66,95,6,33,12,1,130,237,32,2,68,179,27,68,175,16,80,135,15,72,55,7,
+    71,87,12,73,3,12,132,12,66,75,32,76,215,5,169,139,147,135,148,139,81,12,12,81,185,36,75,251,7,65,23,27,76,215,9,87,165,12,65,209,15,72,157,7,65,245,31,32,128,71,128,6,32,1,82,125,5,
+    34,0,128,254,131,169,32,254,131,187,71,180,9,132,27,32,2,88,129,44,32,0,78,47,40,65,79,23,79,171,14,32,21,71,87,8,72,15,14,65,224,33,130,139,74,27,62,93,23,7,68,31,7,75,27,7,139,15,
+    74,3,7,74,23,27,65,165,11,65,177,15,67,123,5,32,1,130,221,32,252,71,96,5,74,12,12,133,244,130,25,34,1,0,128,130,2,139,8,93,26,8,65,9,32,65,57,14,140,14,32,0,73,79,67,68,119,11,135,
+    11,32,51,90,75,14,139,247,65,43,7,131,19,139,11,69,159,11,65,247,6,36,1,128,128,253,0,90,71,9,33,1,0,132,14,32,128,89,93,14,69,133,6,130,44,131,30,131,6,65,20,56,33,0,16,72,179,40,
+    75,47,12,65,215,19,74,95,19,65,43,11,131,168,67,110,5,75,23,17,69,106,6,75,65,5,71,204,43,32,0,80,75,47,71,203,15,159,181,68,91,11,67,197,7,73,101,13,68,85,6,33,128,128,130,214,130,
+    25,32,254,74,236,48,130,194,37,0,18,0,128,255,128,77,215,40,65,139,64,32,51,80,159,10,65,147,39,130,219,84,212,43,130,46,75,19,97,74,33,11,65,201,23,65,173,31,33,1,0,79,133,6,66,150,
+    5,67,75,48,85,187,6,70,207,37,32,71,87,221,13,73,163,14,80,167,15,132,15,83,193,19,82,209,8,78,99,9,72,190,11,77,110,49,89,63,5,80,91,35,99,63,32,70,235,23,81,99,10,69,148,10,65,110,
+    36,32,0,65,99,47,95,219,11,68,171,51,66,87,7,72,57,7,74,45,17,143,17,65,114,50,33,14,0,65,111,40,159,195,98,135,15,35,7,53,51,21,100,78,9,95,146,16,32,254,82,114,6,32,128,67,208,37,
+    130,166,99,79,58,32,17,96,99,14,72,31,19,72,87,31,82,155,7,67,47,14,32,21,131,75,134,231,72,51,17,72,78,8,133,8,80,133,6,33,253,128,88,37,9,66,124,36,72,65,12,134,12,71,55,43,66,139,
+    27,85,135,10,91,33,12,65,35,11,66,131,11,71,32,8,90,127,6,130,244,71,76,11,168,207,33,0,12,66,123,32,32,0,65,183,15,68,135,11,66,111,7,67,235,11,66,111,15,32,254,97,66,12,160,154,67,
+    227,52,80,33,15,87,249,15,93,45,31,75,111,12,93,45,11,77,99,9,160,184,81,31,12,32,15,98,135,30,104,175,7,77,249,36,69,73,15,78,5,12,32,254,66,151,19,34,128,128,4,87,32,12,149,35,133,
+    21,96,151,31,32,19,72,35,5,98,173,15,143,15,32,21,143,99,158,129,33,0,0,65,35,52,65,11,15,147,15,98,75,11,33,1,0,143,151,132,15,32,254,99,200,37,132,43,130,4,39,0,10,0,128,1,128,3,
+    0,104,151,14,97,187,20,69,131,15,67,195,11,87,227,7,33,128,128,132,128,33,254,0,68,131,9,65,46,26,42,0,0,0,7,0,0,255,128,3,128,0,88,223,15,33,0,21,89,61,22,66,209,12,65,2,12,37,0,2,
+    1,0,3,128,101,83,8,36,0,1,53,51,29,130,3,34,21,1,0,66,53,8,32,0,68,215,6,100,55,25,107,111,9,66,193,11,72,167,8,73,143,31,139,31,33,1,0,131,158,32,254,132,5,33,253,128,65,16,9,133,
+    17,89,130,25,141,212,33,0,0,93,39,8,90,131,25,93,39,14,66,217,6,106,179,8,159,181,71,125,15,139,47,138,141,87,11,14,76,23,14,65,231,26,140,209,66,122,8,81,179,5,101,195,26,32,47,74,
+    75,13,69,159,11,83,235,11,67,21,16,136,167,131,106,130,165,130,15,32,128,101,90,24,134,142,32,0,65,103,51,108,23,11,101,231,15,75,173,23,74,237,23,66,15,6,66,46,17,66,58,17,65,105,
+    49,66,247,55,71,179,12,70,139,15,86,229,7,84,167,15,32,1,95,72,12,89,49,6,33,128,128,65,136,38,66,30,9,32,0,100,239,7,66,247,29,70,105,20,65,141,19,69,81,15,130,144,32,128,83,41,5,
+    32,255,131,177,68,185,5,133,126,65,97,37,32,0,130,0,33,21,0,130,55,66,195,28,67,155,13,34,79,0,83,66,213,13,73,241,19,66,59,19,65,125,11,135,201,66,249,16,32,128,66,44,11,66,56,17,
+    68,143,8,68,124,38,67,183,12,96,211,9,65,143,29,112,171,5,32,0,68,131,63,34,33,53,51,71,121,11,32,254,98,251,16,32,253,74,231,10,65,175,37,133,206,37,0,0,8,1,0,0,107,123,11,113,115,
+    9,33,0,1,130,117,131,3,73,103,7,66,51,18,66,44,5,133,75,70,88,5,32,254,65,39,12,68,80,9,34,12,0,128,107,179,28,68,223,6,155,111,86,147,15,32,2,131,82,141,110,33,254,0,130,15,32,4,103,
+    184,15,141,35,87,176,5,83,11,5,71,235,23,114,107,11,65,189,16,70,33,15,86,153,31,135,126,86,145,30,65,183,41,32,0,130,0,32,10,65,183,24,34,35,0,39,67,85,9,65,179,15,143,15,33,1,0,65,
+    28,17,157,136,130,123,32,20,130,3,32,0,97,135,24,115,167,19,80,71,12,32,51,110,163,14,78,35,19,131,19,155,23,77,229,8,78,9,17,151,17,67,231,46,94,135,8,73,31,31,93,215,56,82,171,25,
+    72,77,8,162,179,169,167,99,131,11,69,85,19,66,215,15,76,129,13,68,115,22,72,79,35,67,113,5,34,0,0,19,70,31,46,65,89,52,73,223,15,85,199,33,95,33,8,132,203,73,29,32,67,48,16,177,215,
+    101,13,15,65,141,43,69,141,15,75,89,5,70,0,11,70,235,21,178,215,36,10,0,128,0,0,71,207,24,33,0,19,100,67,6,80,215,11,66,67,7,80,43,12,71,106,7,80,192,5,65,63,5,66,217,26,33,0,13,156,
+    119,68,95,5,72,233,12,134,129,85,81,11,76,165,20,65,43,8,73,136,8,75,10,31,38,128,128,0,0,0,13,1,130,4,32,3,106,235,29,114,179,12,66,131,23,32,7,77,133,6,67,89,12,131,139,116,60,9,
+    89,15,37,32,0,74,15,7,103,11,22,65,35,5,33,55,0,93,81,28,67,239,23,78,85,5,107,93,14,66,84,17,65,193,26,74,183,10,66,67,34,143,135,79,91,15,32,7,117,111,8,75,56,9,84,212,9,154,134,
+    32,0,130,0,32,18,130,3,70,171,41,83,7,16,70,131,19,84,191,15,84,175,19,84,167,30,84,158,12,154,193,68,107,15,33,0,0,65,79,42,65,71,7,73,55,7,118,191,16,83,180,9,32,255,76,166,9,154,
+    141,32,0,130,0,69,195,52,65,225,15,151,15,75,215,31,80,56,10,68,240,17,100,32,9,70,147,39,65,93,12,71,71,41,92,85,15,84,135,23,78,35,15,110,27,10,84,125,8,107,115,29,136,160,38,0,0,
+    14,0,128,255,0,82,155,24,67,239,8,119,255,11,69,131,11,77,29,6,112,31,8,134,27,105,203,8,32,2,75,51,11,75,195,12,74,13,29,136,161,37,128,0,0,0,11,1,130,163,82,115,8,125,191,17,69,35,
+    12,74,137,15,143,15,32,1,65,157,12,136,12,161,142,65,43,40,65,199,6,65,19,24,102,185,11,76,123,11,99,6,12,135,12,32,254,130,8,161,155,101,23,9,39,8,0,0,1,128,3,128,2,78,63,17,72,245,
+    12,67,41,11,90,167,9,32,128,97,49,9,32,128,109,51,14,132,97,81,191,8,130,97,125,99,12,121,35,9,127,75,15,71,79,12,81,151,23,87,97,7,70,223,15,80,245,16,105,97,15,32,254,113,17,6,32,
+    128,130,8,105,105,8,76,122,18,65,243,21,74,63,7,38,4,1,0,255,0,2,0,119,247,28,133,65,32,255,141,91,35,0,0,0,16,67,63,36,34,59,0,63,77,59,9,119,147,11,143,241,66,173,15,66,31,11,67,
+    75,8,81,74,16,32,128,131,255,87,181,42,127,43,5,34,255,128,2,120,235,11,37,19,0,23,0,0,37,109,191,14,118,219,7,127,43,14,65,79,14,35,0,0,0,3,73,91,5,130,5,38,3,0,7,0,11,0,0,70,205,
+    11,88,221,12,32,0,73,135,7,87,15,22,73,135,10,79,153,15,97,71,19,65,49,11,32,1,131,104,121,235,11,80,65,11,142,179,144,14,81,123,46,32,1,88,217,5,112,5,8,65,201,15,83,29,15,122,147,
+    11,135,179,142,175,143,185,67,247,39,66,199,7,35,5,0,128,3,69,203,15,123,163,12,67,127,7,130,119,71,153,10,141,102,70,175,8,32,128,121,235,30,136,89,100,191,11,116,195,11,111,235,15,
+    72,39,7,32,2,97,43,5,132,5,94,67,8,131,8,125,253,10,32,3,65,158,16,146,16,130,170,40,0,21,0,128,0,0,3,128,5,88,219,15,24,64,159,32,135,141,65,167,15,68,163,10,97,73,49,32,255,82,58,
+    7,93,80,8,97,81,16,24,67,87,52,34,0,0,5,130,231,33,128,2,80,51,13,65,129,8,113,61,6,132,175,65,219,5,130,136,77,152,17,32,0,95,131,61,70,215,6,33,21,51,90,53,10,78,97,23,105,77,31,
+    65,117,7,139,75,24,68,195,9,24,64,22,9,33,0,128,130,11,33,128,128,66,25,5,121,38,5,134,5,134,45,66,40,36,66,59,18,34,128,0,0,66,59,81,135,245,123,103,19,120,159,19,77,175,12,33,255,
+    0,87,29,10,94,70,21,66,59,54,39,3,1,128,3,0,2,128,4,24,65,7,15,66,47,7,72,98,12,37,0,0,0,3,1,0,24,65,55,21,131,195,32,1,67,178,6,33,4,0,77,141,8,32,6,131,47,74,67,16,24,69,3,20,24,
+    65,251,7,133,234,130,229,94,108,17,35,0,0,6,0,141,175,86,59,5,162,79,85,166,8,70,112,13,32,13,24,64,67,26,24,71,255,7,123,211,12,80,121,11,69,215,15,66,217,11,69,71,10,131,113,132,
+    126,119,90,9,66,117,19,132,19,32,0,130,0,24,64,47,59,33,7,0,73,227,5,68,243,15,85,13,12,76,37,22,74,254,15,130,138,33,0,4,65,111,6,137,79,65,107,16,32,1,77,200,6,34,128,128,3,75,154,
+    12,37,0,16,0,0,2,0,104,115,36,140,157,68,67,19,68,51,15,106,243,15,134,120,70,37,10,68,27,10,140,152,65,121,24,32,128,94,155,7,67,11,8,24,74,11,25,65,3,12,83,89,18,82,21,37,67,200,
+    5,130,144,24,64,172,12,33,4,0,134,162,74,80,14,145,184,32,0,130,0,69,251,20,32,19,81,243,5,82,143,8,33,5,53,89,203,5,133,112,79,109,15,33,0,21,130,71,80,175,41,36,75,0,79,0,83,121,
+    117,9,87,89,27,66,103,11,70,13,15,75,191,11,135,67,87,97,20,109,203,5,69,246,8,108,171,5,78,195,38,65,51,13,107,203,11,77,3,17,24,75,239,17,65,229,28,79,129,39,130,175,32,128,123,253,
+    7,132,142,24,65,51,15,65,239,41,36,128,128,0,0,13,65,171,5,66,163,28,136,183,118,137,11,80,255,15,67,65,7,74,111,8,32,0,130,157,32,253,24,76,35,10,103,212,5,81,175,9,69,141,7,66,150,
+    29,131,158,24,75,199,28,124,185,7,76,205,15,68,124,14,32,3,123,139,16,130,16,33,128,128,108,199,6,33,0,3,65,191,35,107,11,6,73,197,11,24,70,121,15,83,247,15,24,70,173,23,69,205,14,
+    32,253,131,140,32,254,136,4,94,198,9,32,3,78,4,13,66,127,13,143,13,32,0,130,0,33,16,0,24,69,59,39,109,147,12,76,253,19,24,69,207,15,69,229,15,130,195,71,90,10,139,10,130,152,73,43,
+    40,91,139,10,65,131,37,35,75,0,79,0,84,227,12,143,151,68,25,15,80,9,23,95,169,11,34,128,2,128,112,186,5,130,6,83,161,19,76,50,6,130,37,65,145,44,110,83,5,32,16,67,99,6,71,67,15,76,
+    55,17,140,215,67,97,23,76,69,15,77,237,11,104,211,23,77,238,11,65,154,43,33,0,10,83,15,28,83,13,20,67,145,19,67,141,14,97,149,21,68,9,15,86,251,5,66,207,5,66,27,37,82,1,23,127,71,12,
+    94,235,10,110,175,24,98,243,15,132,154,132,4,24,66,69,10,32,4,67,156,43,130,198,35,2,1,0,4,75,27,9,69,85,9,95,240,7,32,128,130,35,32,28,66,43,40,24,82,63,23,83,123,12,72,231,15,127,
+    59,23,116,23,19,117,71,7,24,77,99,15,67,111,15,71,101,8,36,2,128,128,252,128,127,60,11,32,1,132,16,130,18,141,24,67,107,9,32,3,68,194,15,175,15,38,0,11,0,128,1,128,2,80,63,25,32,0,
+    24,65,73,11,69,185,15,83,243,16,32,0,24,81,165,8,130,86,77,35,6,155,163,88,203,5,24,66,195,30,70,19,19,24,80,133,15,32,1,75,211,8,32,254,108,133,8,79,87,20,65,32,9,41,0,0,7,0,128,0,
+    0,2,128,2,68,87,15,66,1,16,92,201,16,24,76,24,17,133,17,34,128,0,30,66,127,64,34,115,0,119,73,205,9,66,43,11,109,143,15,24,79,203,11,90,143,15,131,15,155,31,65,185,15,86,87,11,35,128,
+    128,253,0,69,7,6,130,213,33,1,0,119,178,15,142,17,66,141,74,83,28,6,36,7,0,0,4,128,82,39,18,76,149,12,67,69,21,32,128,79,118,15,32,0,130,0,32,8,131,206,32,2,79,83,9,100,223,14,102,
+    113,23,115,115,7,24,65,231,12,130,162,32,4,68,182,19,130,102,93,143,8,69,107,29,24,77,255,12,143,197,72,51,7,76,195,15,132,139,85,49,15,130,152,131,18,71,81,23,70,14,11,36,0,10,0,128,
+    2,69,59,9,89,151,15,66,241,11,76,165,12,71,43,15,75,49,13,65,12,23,132,37,32,0,179,115,130,231,95,181,16,132,77,32,254,67,224,8,65,126,20,79,171,8,32,2,89,81,5,75,143,6,80,41,8,34,
+    2,0,128,24,81,72,9,32,0,130,0,35,17,0,0,255,77,99,39,95,65,36,67,109,15,24,69,93,11,77,239,5,95,77,23,35,128,1,0,128,24,86,7,8,132,167,32,2,69,198,41,130,202,33,0,26,120,75,44,24,89,
+    51,15,71,243,12,70,239,11,24,84,3,11,66,7,11,71,255,10,32,21,69,155,35,88,151,12,32,128,74,38,10,65,210,8,74,251,5,65,226,5,75,201,13,32,3,65,9,41,146,41,40,0,0,0,9,1,0,1,0,2,91,99,
+    19,32,35,106,119,13,70,219,15,83,239,12,137,154,32,2,67,252,19,36,128,0,0,4,1,130,196,32,2,130,8,91,107,8,32,0,135,81,24,73,211,8,132,161,73,164,13,36,0,8,0,128,2,105,123,26,139,67,
+    76,99,15,34,1,0,128,135,76,83,156,20,92,104,8,67,251,30,24,86,47,27,123,207,12,24,86,7,15,71,227,8,32,4,65,20,20,131,127,32,0,130,123,32,0,71,223,26,32,19,90,195,22,71,223,15,84,200,
+    6,32,128,133,241,24,84,149,9,67,41,25,36,0,0,0,22,0,88,111,49,32,87,66,21,5,77,3,27,123,75,7,71,143,19,135,183,71,183,19,130,171,74,252,5,131,5,89,87,17,32,1,132,18,130,232,68,11,10,
+    33,1,128,70,208,16,66,230,18,147,18,130,254,223,255,75,27,23,65,59,15,135,39,155,255,34,128,128,254,104,92,8,33,0,128,65,32,11,65,1,58,33,26,0,130,0,72,71,18,78,55,17,76,11,19,86,101,
+    12,75,223,11,89,15,11,24,76,87,15,75,235,15,131,15,72,95,7,85,71,11,72,115,11,73,64,6,34,1,128,128,66,215,9,34,128,254,128,134,14,33,128,255,67,102,5,32,0,130,16,70,38,11,66,26,57,
+    88,11,8,24,76,215,34,78,139,7,95,245,7,32,7,24,73,75,23,32,128,131,167,130,170,101,158,9,82,49,22,118,139,6,32,18,67,155,44,116,187,9,108,55,14,80,155,23,66,131,15,93,77,10,131,168,
+    32,128,73,211,12,24,75,187,22,32,4,96,71,20,67,108,19,132,19,120,207,8,32,5,76,79,15,66,111,21,66,95,8,32,3,190,211,111,3,8,211,212,32,20,65,167,44,34,75,0,79,97,59,13,32,33,112,63,
+    10,65,147,19,69,39,19,143,39,24,66,71,9,130,224,65,185,43,94,176,12,65,183,24,71,38,8,24,72,167,7,65,191,38,136,235,24,96,167,12,65,203,62,115,131,13,65,208,42,175,235,67,127,6,32,
+    4,76,171,29,114,187,5,32,71,65,211,5,65,203,68,72,51,8,164,219,32,0,172,214,71,239,58,78,3,27,66,143,15,77,19,15,147,31,35,33,53,51,21,66,183,10,173,245,66,170,30,150,30,34,0,0,23,
+    80,123,54,76,1,16,73,125,15,82,245,11,167,253,24,76,85,12,70,184,5,32,254,131,185,37,254,0,128,1,0,128,133,16,117,158,18,92,27,38,65,3,17,130,251,35,17,0,128,254,24,69,83,39,140,243,
+    121,73,19,109,167,7,81,41,15,24,95,175,12,102,227,15,121,96,11,24,95,189,7,32,3,145,171,154,17,24,77,47,9,33,0,5,70,71,37,68,135,7,32,29,117,171,11,69,87,15,24,79,97,19,24,79,149,23,
+    131,59,32,1,75,235,5,72,115,11,72,143,7,132,188,71,27,46,131,51,32,0,69,95,6,175,215,32,21,131,167,81,15,19,151,191,151,23,131,215,71,43,5,32,254,24,79,164,24,74,109,8,77,166,13,65,
+    176,26,88,162,5,98,159,6,171,219,120,247,6,79,29,8,99,169,10,103,59,19,65,209,35,131,35,91,25,19,112,94,15,83,36,8,173,229,33,20,0,88,75,43,71,31,12,65,191,71,33,1,0,130,203,32,254,
+    131,4,68,66,7,67,130,6,104,61,13,173,215,38,13,1,0,0,0,2,128,67,111,28,74,129,16,104,35,19,79,161,16,87,14,7,138,143,132,10,67,62,36,114,115,5,162,151,67,33,16,108,181,15,143,151,67,
+    5,5,24,100,242,15,170,153,34,0,0,14,65,51,34,32,55,79,75,9,32,51,74,7,10,65,57,38,132,142,32,254,72,0,14,139,163,32,128,80,254,8,67,158,21,65,63,7,32,4,72,227,27,95,155,12,67,119,19,
+    124,91,24,149,154,72,177,34,97,223,8,155,151,24,108,227,15,88,147,16,72,117,19,68,35,11,92,253,15,70,199,15,24,87,209,17,32,2,87,233,7,32,1,24,88,195,10,119,24,8,32,3,81,227,24,65,
+    125,21,35,128,128,0,25,76,59,48,24,90,187,9,97,235,12,66,61,11,91,105,19,24,79,141,11,24,79,117,15,24,79,129,27,90,53,13,130,13,32,253,131,228,24,79,133,40,69,70,8,66,137,31,65,33,
+    19,96,107,8,68,119,29,66,7,5,68,125,16,65,253,19,65,241,27,24,90,179,13,24,79,143,18,33,128,128,130,246,32,254,130,168,68,154,36,77,51,9,97,47,5,167,195,32,21,131,183,78,239,27,155,
+    195,78,231,14,201,196,77,11,6,32,5,73,111,37,97,247,12,77,19,31,155,207,78,215,19,162,212,69,17,14,66,91,19,80,143,57,78,203,39,159,215,32,128,93,134,8,24,80,109,24,66,113,15,169,215,
+    66,115,6,32,4,69,63,33,32,0,101,113,7,86,227,35,143,211,36,49,53,51,21,1,77,185,14,65,159,28,69,251,34,67,56,8,33,9,0,24,107,175,25,90,111,12,110,251,11,119,189,24,119,187,34,87,15,
+    9,32,4,66,231,37,90,39,7,66,239,8,84,219,15,69,105,23,24,85,27,27,87,31,11,33,1,128,76,94,6,32,1,85,241,7,33,128,128,106,48,10,33,128,128,69,136,11,133,13,24,79,116,49,84,236,8,24,
+    91,87,9,32,5,165,255,69,115,12,66,27,15,159,15,24,72,247,12,74,178,5,24,80,64,15,33,0,128,143,17,77,89,51,130,214,24,81,43,7,170,215,74,49,8,159,199,143,31,139,215,69,143,5,32,254,
+    24,81,50,35,181,217,84,123,70,143,195,159,15,65,187,16,66,123,7,65,175,15,65,193,29,68,207,39,79,27,5,70,131,6,32,4,68,211,33,33,67,0,83,143,14,159,207,143,31,140,223,33,0,128,24,80,
+    82,14,24,93,16,23,32,253,65,195,5,68,227,40,133,214,107,31,7,32,5,67,115,27,87,9,8,107,31,43,66,125,6,32,0,103,177,23,131,127,72,203,36,32,0,110,103,8,155,163,73,135,6,32,19,24,112,
+    99,10,65,71,11,73,143,19,143,31,126,195,5,24,85,21,9,24,76,47,14,32,254,24,93,77,36,68,207,11,39,25,0,0,255,128,3,128,4,66,51,37,95,247,13,82,255,24,76,39,19,147,221,66,85,27,24,118,
+    7,8,24,74,249,12,76,74,8,91,234,8,67,80,17,131,222,33,253,0,121,30,44,73,0,16,69,15,6,32,0,65,23,38,69,231,12,65,179,6,98,131,16,86,31,27,24,108,157,14,80,160,8,24,65,46,17,33,4,0,
+    96,2,18,144,191,65,226,8,68,19,5,171,199,80,9,15,180,199,67,89,5,32,255,24,79,173,28,174,201,24,79,179,50,32,1,24,122,5,10,82,61,10,180,209,83,19,8,32,128,24,80,129,27,111,248,43,131,
+    71,24,115,103,8,67,127,41,78,213,24,100,247,19,66,115,39,75,107,5,32,254,165,219,78,170,40,24,112,163,49,32,1,97,203,6,65,173,64,32,0,83,54,7,133,217,88,37,12,32,254,131,28,33,128,
+    3,67,71,44,84,183,6,32,5,69,223,33,96,7,7,123,137,16,192,211,24,112,14,9,32,255,67,88,29,68,14,10,84,197,38,33,0,22,116,47,50,32,87,106,99,9,116,49,15,89,225,15,97,231,23,70,41,19,
+    82,85,8,93,167,6,32,253,132,236,108,190,7,89,251,5,116,49,58,33,128,128,131,234,32,15,24,74,67,38,70,227,24,24,83,45,23,89,219,12,70,187,12,89,216,19,32,2,69,185,24,141,24,70,143,66,
+    24,82,119,56,78,24,10,32,253,133,149,132,6,24,106,233,7,69,198,48,178,203,81,243,12,68,211,15,106,255,23,66,91,15,69,193,7,100,39,10,24,83,72,16,176,204,33,19,0,88,207,45,68,21,12,
+    68,17,10,65,157,53,68,17,6,32,254,92,67,10,65,161,25,69,182,43,24,118,91,47,69,183,18,181,209,111,253,12,89,159,8,66,112,12,69,184,45,35,0,0,0,9,24,80,227,26,73,185,16,118,195,15,131,
+    15,33,1,0,65,59,15,66,39,27,160,111,66,205,12,148,111,143,110,33,128,128,156,112,24,81,199,8,75,199,23,66,117,20,155,121,32,254,68,126,12,72,213,29,134,239,149,123,89,27,16,148,117,
+    65,245,8,24,71,159,14,141,134,134,28,73,51,55,109,77,15,105,131,11,68,67,11,76,169,27,107,209,12,102,174,8,32,128,72,100,18,116,163,56,79,203,11,75,183,44,85,119,19,71,119,23,151,227,
+    32,1,93,27,8,65,122,5,77,102,8,110,120,20,66,23,8,66,175,17,66,63,12,133,12,79,35,8,74,235,33,67,149,16,69,243,15,78,57,15,69,235,16,67,177,7,151,192,130,23,67,84,29,141,192,174,187,
+    77,67,15,69,11,12,159,187,77,59,10,199,189,24,70,235,50,96,83,19,66,53,23,105,65,19,77,47,12,163,199,66,67,37,78,207,50,67,23,23,174,205,67,228,6,71,107,13,67,22,14,66,85,11,83,187,
+    38,124,47,49,95,7,19,66,83,23,67,23,19,24,96,78,17,80,101,16,71,98,40,33,0,7,88,131,22,24,89,245,12,84,45,12,102,213,5,123,12,9,32,2,126,21,14,43,255,0,128,128,0,0,20,0,128,255,128,
+    3,126,19,39,32,75,106,51,7,113,129,15,24,110,135,19,126,47,15,115,117,11,69,47,11,32,2,109,76,9,102,109,9,32,128,75,2,10,130,21,32,254,69,47,6,32,3,94,217,47,32,0,65,247,10,69,15,46,
+    65,235,31,65,243,15,101,139,10,66,174,14,65,247,16,72,102,28,69,17,14,84,243,9,165,191,88,47,48,66,53,12,32,128,71,108,6,203,193,32,17,75,187,42,73,65,16,65,133,52,114,123,9,167,199,
+    69,21,37,86,127,44,75,171,11,180,197,78,213,12,148,200,81,97,46,24,95,243,9,32,4,66,75,33,113,103,9,87,243,36,143,225,24,84,27,31,90,145,8,148,216,67,49,5,24,84,34,14,75,155,27,67,
+    52,13,140,13,36,0,20,0,128,255,24,135,99,46,88,59,43,155,249,80,165,7,136,144,71,161,23,32,253,132,33,32,254,88,87,44,136,84,35,128,0,0,21,81,103,5,94,47,44,76,51,12,143,197,151,15,
+    65,215,31,24,64,77,13,65,220,20,65,214,14,71,4,40,65,213,13,32,0,130,0,35,21,1,2,0,135,0,34,36,0,72,134,10,36,1,0,26,0,130,134,11,36,2,0,14,0,108,134,11,32,3,138,23,32,4,138,11,34,
+    5,0,20,134,33,34,0,0,6,132,23,32,1,134,15,32,18,130,25,133,11,37,1,0,13,0,49,0,133,11,36,2,0,7,0,38,134,11,36,3,0,17,0,45,134,11,32,4,138,35,36,5,0,10,0,62,134,23,32,6,132,23,36,3,
+    0,1,4,9,130,87,131,167,133,11,133,167,133,11,133,167,133,11,37,3,0,34,0,122,0,133,11,133,167,133,11,133,167,133,11,133,167,34,50,0,48,130,1,34,52,0,47,134,5,8,49,49,0,53,98,121,32,
+    84,114,105,115,116,97,110,32,71,114,105,109,109,101,114,82,101,103,117,108,97,114,84,84,88,32,80,114,111,103,103,121,67,108,101,97,110,84,84,50,48,48,52,47,130,2,53,49,53,0,98,0,121,
+    0,32,0,84,0,114,0,105,0,115,0,116,0,97,0,110,130,15,32,71,132,15,36,109,0,109,0,101,130,9,32,82,130,5,36,103,0,117,0,108,130,29,32,114,130,43,34,84,0,88,130,35,32,80,130,25,34,111,
+    0,103,130,1,34,121,0,67,130,27,32,101,132,59,32,84,130,31,33,0,0,65,155,9,34,20,0,0,65,11,6,130,8,135,2,33,1,1,130,9,8,120,1,1,2,1,3,1,4,1,5,1,6,1,7,1,8,1,9,1,10,1,11,1,12,1,13,1,14,
+    1,15,1,16,1,17,1,18,1,19,1,20,1,21,1,22,1,23,1,24,1,25,1,26,1,27,1,28,1,29,1,30,1,31,1,32,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0,10,0,11,0,12,0,13,0,14,0,15,0,16,0,17,0,18,0,19,0,20,0,21,0,
+    22,0,23,0,24,0,25,0,26,0,27,0,28,0,29,0,30,0,31,130,187,8,66,33,0,34,0,35,0,36,0,37,0,38,0,39,0,40,0,41,0,42,0,43,0,44,0,45,0,46,0,47,0,48,0,49,0,50,0,51,0,52,0,53,0,54,0,55,0,56,0,
+    57,0,58,0,59,0,60,0,61,0,62,0,63,0,64,0,65,0,66,130,243,9,75,68,0,69,0,70,0,71,0,72,0,73,0,74,0,75,0,76,0,77,0,78,0,79,0,80,0,81,0,82,0,83,0,84,0,85,0,86,0,87,0,88,0,89,0,90,0,91,0,
+    92,0,93,0,94,0,95,0,96,0,97,1,33,1,34,1,35,1,36,1,37,1,38,1,39,1,40,1,41,1,42,1,43,1,44,1,45,1,46,1,47,1,48,1,49,1,50,1,51,1,52,1,53,1,54,1,55,1,56,1,57,1,58,1,59,1,60,1,61,1,62,1,
+    63,1,64,1,65,0,172,0,163,0,132,0,133,0,189,0,150,0,232,0,134,0,142,0,139,0,157,0,169,0,164,0,239,0,138,0,218,0,131,0,147,0,242,0,243,0,141,0,151,0,136,0,195,0,222,0,241,0,158,0,170,
+    0,245,0,244,0,246,0,162,0,173,0,201,0,199,0,174,0,98,0,99,0,144,0,100,0,203,0,101,0,200,0,202,0,207,0,204,0,205,0,206,0,233,0,102,0,211,0,208,0,209,0,175,0,103,0,240,0,145,0,214,0,
+    212,0,213,0,104,0,235,0,237,0,137,0,106,0,105,0,107,0,109,0,108,0,110,0,160,0,111,0,113,0,112,0,114,0,115,0,117,0,116,0,118,0,119,0,234,0,120,0,122,0,121,0,123,0,125,0,124,0,184,0,
+    161,0,127,0,126,0,128,0,129,0,236,0,238,0,186,14,117,110,105,99,111,100,101,35,48,120,48,48,48,49,141,14,32,50,141,14,32,51,141,14,32,52,141,14,32,53,141,14,32,54,141,14,32,55,141,
+    14,32,56,141,14,32,57,141,14,32,97,141,14,32,98,141,14,32,99,141,14,32,100,141,14,32,101,141,14,32,102,140,14,33,49,48,141,14,141,239,32,49,141,239,32,49,141,239,32,49,141,239,32,49,
+    141,239,32,49,141,239,32,49,141,239,32,49,141,239,32,49,141,239,32,49,141,239,32,49,141,239,32,49,141,239,32,49,141,239,32,49,141,239,45,49,102,6,100,101,108,101,116,101,4,69,117,114,
+    111,140,236,32,56,141,236,32,56,141,236,32,56,141,236,32,56,141,236,32,56,141,236,32,56,141,236,32,56,141,236,32,56,141,236,32,56,141,236,32,56,141,236,32,56,141,236,32,56,141,236,
+    32,56,141,236,32,56,141,236,32,56,65,220,13,32,57,65,220,13,32,57,141,239,32,57,141,239,32,57,141,239,32,57,141,239,32,57,141,239,32,57,141,239,32,57,141,239,32,57,141,239,32,57,141,
+    239,32,57,141,239,32,57,141,239,32,57,141,239,32,57,141,239,32,57,141,239,35,57,102,0,0,5,250,72,249,98,247,
+};
+
+static const char* GetDefaultCompressedFontDataTTF(int* out_size)
+{
+    *out_size = proggy_clean_ttf_compressed_size;
+    return (const char*)proggy_clean_ttf_compressed_data;
 }
+#endif // #ifndef IMGUI_DISABLE_DEFAULT_FONT
 
 #endif // #ifndef IMGUI_DISABLE

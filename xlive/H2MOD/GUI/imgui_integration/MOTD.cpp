@@ -172,7 +172,7 @@ namespace ImGuiHandler
 			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
 			if (ImGui::Begin("##motd", NULL, window_flags))
 			{
-				ImTextureID texId = ImGuiHandler::GetTexture(patch_notes);
+				ImTextureID texId = (ImTextureID)ImGuiHandler::GetTexture(patch_notes);
 				ImGui::Image(texId, ImGui::GetIO().DisplaySize);
 
 				for (uint16 gamepad_index = 0; gamepad_index < k_number_of_users; gamepad_index++)
@@ -190,9 +190,9 @@ namespace ImGuiHandler
 				}
 				else
 				{
-					for (int i = 0; i < ARRAYSIZE(io.KeysDown); i++)
+					for (int32 i = ImGuiKey_NamedKey_BEGIN; i < ImGuiKey_NamedKey_END; ++i)
 					{
-						if (ImGui::IsKeyPressed(i))
+						if (ImGui::IsKeyPressed((ImGuiKey)i))
 						{
 							ImGuiHandler::ToggleWindow(k_motd_window_name);
 							break;
