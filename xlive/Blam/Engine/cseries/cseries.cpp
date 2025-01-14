@@ -89,31 +89,23 @@ void* csmemcpy(void* destination, const void* source, size_t size)
 	return memcpy(destination, source, size);
 }
 
-int32 vsprintf(char* buffer, size_t size, const char* format, ...)
+int32 vsprintf(char* buffer, size_t size, const char* format, va_list va_args)
 {
-	va_list va_args;
-	va_start(va_args, format);
-
 	CSERIES_ASSERT(buffer);
 	CSERIES_ASSERT(format);
 	CSERIES_ASSERT(size > 0);
 
-	const int32 result = (int32)_vsnprintf_s(buffer, size, UINT_MAX, format, va_args);
-	va_end(va_args);
+	const int32 result = (int32)_vsnprintf_s(buffer, size, _TRUNCATE, format, va_args);
 	return result;
 }
 
-int32 vsnprintf(char* buffer, size_t size, size_t max_count, const char* format, ...)
+int32 vsnprintf(char* buffer, size_t size, size_t max_count, const char* format, va_list va_args)
 {
-	va_list va_args;
-	va_start(va_args, format);
-
 	CSERIES_ASSERT(buffer);
 	CSERIES_ASSERT(format);
 	CSERIES_ASSERT(size > 0);
 
 	const int32 result = (int32)_vsnprintf_s(buffer, size, max_count, format, va_args);
-	va_end(va_args);
 	return result;
 }
 
@@ -121,7 +113,7 @@ const char* csprintf(char* buffer, size_t size, const char* format, ...)
 {
 	va_list va_args;
 	va_start(va_args, format);
-	(void)vsprintf(buffer, size, format, &va_args);
+	(void)vsprintf(buffer, size, format, va_args);
 	va_end(va_args);
 	return buffer;
 }
@@ -130,7 +122,7 @@ const char* csnprintf(char* buffer, size_t size, size_t max_count, const char* f
 {
 	va_list va_args;
 	va_start(va_args, format);
-	(void)vsnprintf(buffer, size, max_count, format, &va_args);
+	(void)vsnprintf(buffer, size, max_count, format, va_args);
 	va_end(va_args);
 	return buffer;
 }

@@ -199,13 +199,13 @@ void* csmemset(void* destination, int32 val, size_t size);
 
 void* csmemcpy(void* destination, const void* source, size_t size);
 
-int32 vsprintf(char* buffer, size_t size, const char* format, ...);
+int32 vsprintf(char* buffer, size_t size, const char* format, va_list va_args);
 
 /* 
 * NOTES:
 * size_t max_count was added in vista to this function call
 */
-int32 vsnprintf(char* buffer, size_t size, size_t max_count, const char* format, ...);
+int32 vsnprintf(char* buffer, size_t size, size_t max_count, const char* format, va_list va_args);
 
 
 const char* csprintf(char* buffer, size_t size, const char* format, ...);

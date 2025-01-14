@@ -209,7 +209,7 @@ void discord_interface_set_difficulty(int16 difficulty)
 	
 	// Convert difficulty to string
 	char number_string[2];
-	csnprintf(number_string, 1, sizeof(number_string), "%hd", difficulty);
+	csprintf(number_string, sizeof(number_string), "%hd", difficulty);
 
 	// Create image name we select for the difficulty
 	c_static_string<16> difficulty_image_name;
