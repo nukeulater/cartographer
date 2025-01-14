@@ -99,7 +99,7 @@ namespace ImGuiHandler
 		{
 			ImGuiIO& io = ImGui::GetIO();
 			io.ClearInputKeys();
-			io.ClearMouseInput();
+			io.ClearInputMouse();
 			io.ClearInputCharacters();
 			release_motd_texture();
 			last_frame_update = false;
