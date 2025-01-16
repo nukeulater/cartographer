@@ -48,7 +48,7 @@ public:
 		return VALID_INDEX(bit, k_count);
 	}
 
-	// Checks if current value set for the bitflag is valud
+	// Checks if current value set for the bitflag is valid
 	bool valid(void) const
 	{
 		return !TEST_FLAG(m_storage, ~MASK(k_count));
@@ -132,7 +132,7 @@ public:
 	}
 
 protected:
-	t_storage_type m_storage : k_count;
+	t_storage_type m_storage;
 };
 
 template<typename t_type, typename t_storage_type, size_t k_count>
