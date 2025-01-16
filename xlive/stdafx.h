@@ -41,6 +41,7 @@ static_assert(EXECUTABLE_TYPE <= 7 && EXECUTABLE_TYPE >= 0, "EXECUTABLE_TYPE VAL
 // Windows Header Files:
 #include <windows.h>
 #include <WinSock2.h>
+#include <Ws2tcpip.h>
 #include <shellapi.h>
 #include <shlwapi.h>
 #include <wincrypt.h>

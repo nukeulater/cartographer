@@ -10,29 +10,126 @@
 #define SOCK_UDP_MIN_SEND_BUFFER (SOCK_UDP_MIN_SEND_BUFFER_K_UNITS * SOCK_K_UNIT)
 #define SOCK_UDP_MIN_RECV_BUFFER (SOCK_UDP_MIN_RECV_BUFFER_K_UNITS * SOCK_K_UNIT)
 
-#define COMPILE_WITH_STD_SOCK_FUNC 1
+#define XSOCK_USING_STANDARD_APIS 1
 
-#define MAX_PACKETS_TO_READ_PER_RECV_CALL 20
+#define SOCK_MAX_RECV_PAYLOADS_TO_READ_PER_CALL 20
 
-struct XSocket
+// 239.255.0.1
+#define XSOCK_MUTICAST_ADDR  0xefff0001
+#define XSOCK_MULTICAST_PORT 56011
+
+struct XVirtualSocket;
+
+class XSocketManager
 {
+	bool m_initialized = false;
+
+	class XBroadcastSocket
+	{
+		friend class XSocketManager;
+
+		WORD m_port = 0;
+		SOCKET m_systemSockHandle = INVALID_SOCKET;
+		bool m_multicast;
+
+		void Dispose()
+		{
+			if (m_systemSockHandle != INVALID_SOCKET)
+			{
+				if (m_multicast)
+				{
+					ip_mreq mreq;
+
+					// localhost only
+					mreq.imr_interface.s_addr = htonl(INADDR_LOOPBACK);
+					mreq.imr_multiaddr.s_addr = htonl(XSOCK_MUTICAST_ADDR);
+
+					setsockopt(
+						m_systemSockHandle, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char*)&mreq, sizeof(mreq)
+					);
+				}
+
+				closesocket(m_systemSockHandle);
+
+			}
+			m_systemSockHandle = INVALID_SOCKET;
+			m_port = 0;
+		}
+	};
+
+	XBroadcastSocket m_broadcastLANSock;
+	XBroadcastSocket m_broadcastLocalhostSock;
+
+public:
+	void Initialize();
+	bool SystemLinkSocketInitialize(WORD port);
+	bool SystemLinkSocketReset(WORD port);
+	void SystemLinkDispose();
+
+	bool CreateSocket(XBroadcastSocket* sock, WORD port, bool multicast);
+
+	WORD SystemLinkGetPort()
+	{
+		return m_broadcastLANSock.m_port;
+	}
+
+	SOCKET SystemLinkGetLANSystemSockHandle()
+	{
+		return m_broadcastLANSock.m_systemSockHandle;
+	}
+
+	SOCKET SystemLinkGetSystemSockHandle(int index)
+	{
+		switch (index)
+		{
+		case 0:
+			return m_broadcastLANSock.m_systemSockHandle;
+		case 1:
+			return m_broadcastLocalhostSock.m_systemSockHandle;
+		}
+
+		return INVALID_SOCKET;
+	}
+
+	bool SystemLinkAvailable()
+	{
+		for (int i = 0; i < 2; i++)
+		{
+			if (SystemLinkGetSystemSockHandle(i) != INVALID_SOCKET)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	static void SocketsDisposeAll();
+	static std::vector<XVirtualSocket*> sockets;
+};
+
+struct XVirtualSocket
+{
+	SOCKET winSockHandle;
 	int identifier;
 	int protocol;
-	bool isVoiceSocket;
-	SOCKET winSockHandle;
 	sockaddr_in name;
+	bool isBroadcast;
+	bool isVoiceProtocol;
 
-	XSocket(int _protocol, bool _isVoiceSocket)
+	XVirtualSocket(int _protocol, bool _isVoiceSocket)
 	{
 		identifier = 'XSOC';
 		protocol = _protocol;
-		isVoiceSocket = _isVoiceSocket;
+		isVoiceProtocol = _isVoiceSocket;
 		winSockHandle = INVALID_SOCKET;
+		isBroadcast = false;
 		memset(&name, 0, sizeof(name));
 	}
 
 	bool IsTCP() const { return protocol == IPPROTO_TCP; }
 	bool IsUDP() const { return protocol == IPPROTO_UDP; }
+
+	bool IsBroadcast() const { return isBroadcast; }
 
 	/* VDP uses UDP, and some encryption (done at network transport layer, not game layer) */
 	bool IsVDP() const { return protocol == IPPROTO_UDP; }
@@ -62,17 +159,15 @@ struct XSocket
 
 	int UdpSend(const char* buf, int len, int flags, sockaddr *to, int tolen);
 
-	static void SocketsDisposeAll();
-
-	static std::vector<XSocket*> Sockets;
-
 	// dwBufferCount > 1 is unsupported/unimplemented
 	int sock_read(LPWSABUF lpBuffers, DWORD dwBufferCount, LPDWORD lpNumberOfBytesRecvd, LPDWORD lpFlags, struct sockaddr* lpFrom, LPINT lpFromlen, LPWSAOVERLAPPED lpOverlapped, LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine);
 
 private:
-	int winsock_read_socket(LPWSABUF lpBuffers, DWORD dwBufferCount, LPDWORD lpNumberOfBytesRecvd, LPDWORD lpFlags, struct sockaddr* lpFrom, LPINT lpFromlen, LPWSAOVERLAPPED lpOverlapped, LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine, bool* winApiError);
+	int read_system_socket(LPWSABUF lpBuffers, DWORD dwBufferCount, LPDWORD lpNumberOfBytesRecvd, LPDWORD lpFlags, struct sockaddr* lpFrom, LPINT lpFromlen, LPWSAOVERLAPPED lpOverlapped, LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine, bool* winApiError);
 };
 
 void WINAPI XSocketWSASetLastError(int iError);
 SOCKET WINAPI XSocketCreate(int af, int type, int protocol);
 int WINAPI XSocketSendTo(SOCKET s, const char* buf, int len, int flags, sockaddr *to, int tolen);
+
+extern XSocketManager g_XSockMgr;

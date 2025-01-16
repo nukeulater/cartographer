@@ -176,7 +176,7 @@ void XnIpManager::LogConnectionsErrorDetails(const sockaddr_in* address, int err
 	}
 }
 
-int XnIpManager::HandleRecvdPacket(XSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBuffers, DWORD dwBufferCount, LPDWORD lpBytesRecvdCount)
+int XnIpManager::HandleRecvdPacket(XVirtualSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBuffers, DWORD dwBufferCount, LPDWORD lpBytesRecvdCount)
 {
 	// check first if the packet received has the size bigger or equal to the XNet packet header first
 	if (*lpBytesRecvdCount >= sizeof(XNetPacketHeader))
@@ -252,7 +252,7 @@ int XnIpManager::HandleRecvdPacket(XSocket* xsocket, sockaddr_in* lpFrom, WSABUF
 
 // Outputs the connection identifier
 // Returns error if connection is not found or connected
-int XnIpManager::GetEstablishedConnectionIdentifierByRecvAddr(XSocket* xsocket, const sockaddr_in* fromAddr, IN_ADDR* outConnectionIdentifier) const
+int XnIpManager::GetEstablishedConnectionIdentifierByRecvAddr(XVirtualSocket* xsocket, const sockaddr_in* fromAddr, IN_ADDR* outConnectionIdentifier) const
 {
 	outConnectionIdentifier->s_addr = 0;
 
@@ -358,7 +358,7 @@ void XnIpManager::UnregisterLocalConnectionInfo()
 	ZeroMemory(&m_ipLocal, sizeof(m_ipLocal));
 }
 
-void XnIpManager::HandleXNetRequestPacket(XSocket* xsocket, const XNetRequestPacket* reqPacket, const sockaddr_in* recvAddr, LPDWORD lpBytesRecvdCount)
+void XnIpManager::HandleXNetRequestPacket(XVirtualSocket* xsocket, const XNetRequestPacket* reqPacket, const sockaddr_in* recvAddr, LPDWORD lpBytesRecvdCount)
 {
 	IN_ADDR connectionIdentifier;
 	connectionIdentifier.s_addr = 0;
@@ -371,7 +371,7 @@ void XnIpManager::HandleXNetRequestPacket(XSocket* xsocket, const XNetRequestPac
 	{
 		// TODO: get rid of H2v only sockets
 
-		if (connectionIdentifier.s_addr == XnIp_LOOPBACK_ADDR_NL)
+		if (connectionIdentifier.s_addr == htonl(INADDR_LOOPBACK))
 			return;
 
 		XnIp* xnIp = GetConnection(connectionIdentifier);
@@ -535,7 +535,7 @@ int XnIpManager::CreateOrGetXnIpIdentifierFromPacket(const XNADDR* pxna, const X
 			__FUNCTION__,
 			ByteToHexStr(localConnectionInfo->m_xnaddr.abEnet, 6),
 			ByteToHexStr(pxna->abEnet, 6));
-		outIpIdentifier->s_addr = XnIp_LOOPBACK_ADDR_NL;
+		outIpIdentifier->s_addr = htonl(INADDR_LOOPBACK);
 		return 0;
 	}
 
@@ -723,7 +723,7 @@ int XnIp::GetConnectionIndex(IN_ADDR connectionId)
 	return (int)(connectionId.s_addr >> 24);
 }
 
-void XnIp::SaveNatInfo(XSocket* xsocket, const sockaddr_in* addr)
+void XnIp::SaveNatInfo(XVirtualSocket* xsocket, const sockaddr_in* addr)
 {
 	LOG_TRACE_NETWORK("{} - socket: {}, connection index: {}, identifier: {:X}", __FUNCTION__,
 		xsocket->winSockHandle, XnIp::GetConnectionIndex(GetConnectionId()), GetConnectionId().s_addr);
@@ -758,7 +758,7 @@ void XnIp::SaveNatInfo(XSocket* xsocket, const sockaddr_in* addr)
 void XnIp::SendXNetRequestAllSockets(eXnip_ConnectRequestType reqType)
 {
 	// send for each UDP socket, the other side may not have the NAT data
-	for (auto sockIt : XSocket::Sockets)
+	for (auto sockIt : XSocketManager::sockets)
 	{
 		// connect only UDP sockets
 		if (sockIt->IsUDP())
@@ -776,7 +776,7 @@ void XnIp::SendXNetRequestAllSockets(eXnip_ConnectRequestType reqType)
 	return;
 }
 
-void XnIp::SendXNetRequest(XSocket* xsocket, eXnip_ConnectRequestType reqType)
+void XnIp::SendXNetRequest(XVirtualSocket* xsocket, eXnip_ConnectRequestType reqType)
 {
 	sockaddr_in sendToAddr;
 	ZeroMemory(&sendToAddr, sizeof(sockaddr_in));
@@ -829,7 +829,7 @@ void XnIp::SendXNetRequest(XSocket* xsocket, eXnip_ConnectRequestType reqType)
 	);
 }
 
-void XnIp::HandleConnectionPacket(XSocket* xsocket, const XNetRequestPacket* reqPacket, const sockaddr_in* recvAddr, LPDWORD lpBytesRecvdCount)
+void XnIp::HandleConnectionPacket(XVirtualSocket* xsocket, const XNetRequestPacket* reqPacket, const sockaddr_in* recvAddr, LPDWORD lpBytesRecvdCount)
 {
 	switch (reqPacket->data.reqType)
 	{
@@ -912,7 +912,7 @@ void XnIp::HandleConnectionPacket(XSocket* xsocket, const XNetRequestPacket* req
 	} // switch (reqPacket->data.reqType)
 }
 
-void XnIp::HandleDisconnectPacket(XSocket* xsocket, const XNetRequestPacket* disconnectReqPck, const sockaddr_in* recvAddr)
+void XnIp::HandleDisconnectPacket(XVirtualSocket* xsocket, const XNetRequestPacket* disconnectReqPck, const sockaddr_in* recvAddr)
 {
 	// TODO: implement graceful connection disconnect
 }
@@ -934,7 +934,7 @@ INT WINAPI XNetCleanup()
 {
 	LOG_TRACE_NETWORK("XNetCleanup()");
 
-	XSocket::SocketsDisposeAll();
+	g_XSockMgr.SocketsDisposeAll();
 
 	return 0;
 }
@@ -1060,7 +1060,7 @@ int WINAPI XNetGetConnectStatus(const IN_ADDR ina)
 		return XNET_CONNECT_STATUS_LOST;
 	}
 	
-	// ### TODO FIXME the case described bellow is disabled (needs more research or proper implementation)
+	// ### TODO FIXME the case described below is disabled (needs more research or proper implementation)
 	// check if we're either connected
 	// or not attempting to reconnect and STATUS PENDING
 	// this will prevent the game from recreating secure connections when the time out is reached

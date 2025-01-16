@@ -16,9 +16,6 @@ extern const char broadcastStrHdr[XNIP_MAX_PCK_STR_HDR_LEN];
 
 #define XnIp_ConnectionTimeOut (15 * 1000) // msec
 
-// Network long LOOPBACK address
-#define XnIp_LOOPBACK_ADDR_NL (htonl(INADDR_LOOPBACK)) // 127.0.0.1
-
 #define XNIP_FLAG(_bit) (1<<(_bit))
 #define XNIP_SET_BIT(_flags, _bit, _value) ((_value) ? ((_flags) |= XNIP_FLAG((_bit))) : ((_flags) &= ~(XNIP_FLAG(_bit))))
 #define XNIP_TEST_BIT(_flags, _bit) (((_flags) & XNIP_FLAG((_bit))) != 0)
@@ -59,12 +56,14 @@ struct XBroadcastPacket
 		pckHeader.intHdr = 'BrOd';
 		strncpy(pckHeader.HdrStr, broadcastStrHdr, XNIP_MAX_PCK_STR_HDR_LEN);
 		ZeroMemory(&data, sizeof(data));
+		data.titleId = -1;
 		data.name.sin_addr.s_addr = INADDR_BROADCAST;
 	};
 
 	XNetPacketHeader pckHeader;
 	struct
 	{
+		DWORD titleId;
 		sockaddr_in name;
 	} data;
 };
@@ -373,13 +372,13 @@ public:
 
 	static int GetConnectionIndex(IN_ADDR connectionId);
 
-	void SaveNatInfo(XSocket* xsocket, const sockaddr_in* addr);
-	void HandleConnectionPacket(XSocket* xsocket, const XNetRequestPacket* reqPacket, const sockaddr_in* recvAddr, LPDWORD lpBytesRecvdCount);
-	void HandleDisconnectPacket(XSocket* xsocket, const XNetRequestPacket* disconnectReqPck, const sockaddr_in* recvAddr); // TODO:
+	void SaveNatInfo(XVirtualSocket* xsocket, const sockaddr_in* addr);
+	void HandleConnectionPacket(XVirtualSocket* xsocket, const XNetRequestPacket* reqPacket, const sockaddr_in* recvAddr, LPDWORD lpBytesRecvdCount);
+	void HandleDisconnectPacket(XVirtualSocket* xsocket, const XNetRequestPacket* disconnectReqPck, const sockaddr_in* recvAddr); // TODO:
 	void UpdateNonceKeyFromPacket(const XNetRequestPacket* reqPacket);
 
 	/* sends a request over the socket to the other socket end, with the same identifier */
-	void SendXNetRequest(XSocket* xsocket, eXnip_ConnectRequestType reqType);
+	void SendXNetRequest(XVirtualSocket* xsocket, eXnip_ConnectRequestType reqType);
 
 	/* sends a request to all open sockets */
 	void SendXNetRequestAllSockets(eXnip_ConnectRequestType reqType);
@@ -405,7 +404,7 @@ public:
 
 	// Connection data getters 
 	XnIp* GetConnection(const IN_ADDR ina) const;
-	int GetEstablishedConnectionIdentifierByRecvAddr(XSocket* xsocket, const sockaddr_in* addr, IN_ADDR* outConnectionIdentifier) const;
+	int GetEstablishedConnectionIdentifierByRecvAddr(XVirtualSocket* xsocket, const sockaddr_in* addr, IN_ADDR* outConnectionIdentifier) const;
 
 	// Miscellaneous
 	void ClearLostConnections();
@@ -419,9 +418,9 @@ public:
 	void UpdatePacketReceivedCounters(IN_ADDR ipIdentifier, unsigned int bytesRecvdCount);
 	
 	// Packet handlers
-	int HandleRecvdPacket(XSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBuffers, DWORD dwBufferCount, LPDWORD bytesRecvdCount);
-	void HandleXNetRequestPacket(XSocket* xsocket, const XNetRequestPacket* reqPaket, const sockaddr_in* recvAddr, LPDWORD lpBytesRecvdCount);
-	void HandleDisconnectPacket(XSocket* xsocket, const XNetRequestPacket* disconnectReqPck, const sockaddr_in* recvAddr);
+	int HandleRecvdPacket(XVirtualSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBuffers, DWORD dwBufferCount, LPDWORD bytesRecvdCount);
+	void HandleXNetRequestPacket(XVirtualSocket* xsocket, const XNetRequestPacket* reqPaket, const sockaddr_in* recvAddr, LPDWORD lpBytesRecvdCount);
+	void HandleDisconnectPacket(XVirtualSocket* xsocket, const XNetRequestPacket* disconnectReqPck, const sockaddr_in* recvAddr);
 
 	// XnIp handling function
 	XnIp* XnIpLookup(const XNADDR* pxna, const XNKID* xnkid) const;
