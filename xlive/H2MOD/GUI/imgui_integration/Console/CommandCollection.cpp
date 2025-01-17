@@ -1008,17 +1008,17 @@ int CommandCollection::SetAddressLANIpv4(const std::vector<std::string>& tokens,
 {
 	TextOutputCb* outputCb = ctx.outputCb;
 
+	if (gXnIpMgr.GetLocalUserXn()->m_valid)
+	{
+		outputCb(StringFlag_None, "Set the LAN address override before LOGIN, during the \"PRESS ANY KEY\" dialog, when signed-out!");
+		return -1;
+	}
+
 	if (network_life_cycle_in_squad_session(NULL))
 	{
 		outputCb(StringFlag_None, "LAN address override cannot be updated during a game session!");
 		return -1;
 	}
 
-	int result = SetAddressIpv4HandlerCmd(tokens, ctx);
-	if (!result)
-	{
-		gXnIpMgr.UpdateLANAddress(H2Config_ip_lan);
-	}
-
-	return result;
+	return SetAddressIpv4HandlerCmd(tokens, ctx);
 }
