@@ -383,7 +383,10 @@ bool HandleGuiLogin(char* ltoken, char* identifier, char* password, int* out_mas
 			RtlGetVersionPtr rtlGetVersionPtr = (RtlGetVersionPtr)::GetProcAddress(hntdll, "RtlGetVersion");
 			rtlGetVersionPtr(&osvi);
 		} else {
+#pragma warning( push )
+#pragma warning( disable : 4996)
 			GetVersionEx(&osvi);
+#pragma warning( pop ) 
 		}
 
 		os_string_buflen = 512;

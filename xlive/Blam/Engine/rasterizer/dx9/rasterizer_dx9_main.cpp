@@ -1062,7 +1062,12 @@ static bool rasterizer_dx9_should_use_d3d9ex(void)
     // Possibly because it was changed as a part of the H2TOOLSET macro when PI studios was upgrading the Halo 2 Editing Kit
     OSVERSIONINFOW version_information;
     version_information.dwOSVersionInfoSize = sizeof(version_information);
+
+#pragma warning( push )
+#pragma warning( disable : 4996)
     if (GetVersionEx(&version_information))
+#pragma warning( pop ) 
+
     {
         if (version_information.dwMajorVersion < 6)
         {
