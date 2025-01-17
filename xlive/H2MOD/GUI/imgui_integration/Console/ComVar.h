@@ -229,10 +229,10 @@ public:
 
 	std::string AsString() const override
 	{
-		return std::string(std::to_string(*m_var_ptr & 0x000000FF)) + '.'
-			+ std::string(std::to_string((*m_var_ptr & 0x0000FF00)  >> 8))  + '.'
-			+ std::string(std::to_string((*m_var_ptr & 0x00FF0000) >> 16))  + '.'
-			+ std::string(std::to_string((*m_var_ptr & 0xFF000000) >> 24));
+		return std::to_string(*m_var_ptr & 0x000000FF)			+ '.'
+			+ std::to_string((*m_var_ptr & 0x0000FF00) >>  8)	+ '.'
+			+ std::to_string((*m_var_ptr & 0x00FF0000) >> 16)	+ '.'
+			+ std::to_string((*m_var_ptr & 0xFF000000) >> 24);
 	}
 
 	bool SetFromStr(const std::string& str, std::string& potentialException = empty)
