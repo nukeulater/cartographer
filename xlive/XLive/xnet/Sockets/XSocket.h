@@ -68,17 +68,17 @@ public:
 
 	bool CreateSocket(XBroadcastSocket* sock, WORD port, bool multicast);
 
-	WORD SystemLinkGetPort()
+	WORD SystemLinkGetPort() const
 	{
 		return m_broadcastLANSock.m_port;
 	}
 
-	SOCKET SystemLinkGetLANSystemSockHandle()
+	SOCKET SystemLinkGetLANSystemSockHandle() const
 	{
 		return m_broadcastLANSock.m_systemSockHandle;
 	}
 
-	SOCKET SystemLinkGetSystemSockHandle(int index)
+	SOCKET SystemLinkGetSystemSockHandle(int index) const
 	{
 		switch (index)
 		{
@@ -91,7 +91,7 @@ public:
 		return INVALID_SOCKET;
 	}
 
-	bool SystemLinkAvailable()
+	bool SystemLinkAvailable() const
 	{
 		for (int i = 0; i < 2; i++)
 		{

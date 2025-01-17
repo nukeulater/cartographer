@@ -35,10 +35,7 @@ std::string cartographerURL = "https://cartographer.online";
 std::string cartographerMapRepoURL = "http://www.h2maps.net/Cartographer/CustomMaps";
 
 unsigned short H2Config_base_port = 2000;
-char H2Config_str_wan[16] = { "" };
-char H2Config_str_lan[16] = { "" };
-unsigned long H2Config_ip_wan = 0;
-unsigned long H2Config_ip_lan = 0;
+unsigned long H2Config_ip_lan = INADDR_ANY;
 _H2Config_language H2Config_language = { -1, 0 };
 bool H2Config_custom_labels_capture_missing = false;
 bool H2Config_skip_intro = false;
@@ -135,7 +132,7 @@ set_config_entry(CSimpleIniA* simple_ini, const char* section_key, const char* c
 
 	try
 	{
-		value_as_string = ComVar(value).GetValStr();
+		value_as_string = ComVar(value).AsString();
 	}
 	catch (...)
 	{
@@ -424,8 +421,8 @@ void SaveH2Config() {
 		CONFIG_SET(&ini, "h2portable", &H2Portable);
 		CONFIG_SET(&ini, "base_port", &H2Config_base_port);
 
-		CONFIG_SET(&ini, "wan_ip", H2Config_str_wan);
-		CONFIG_SET(&ini, "lan_ip", H2Config_str_lan);
+		ComVarAddrIpv4 address_lan(&H2Config_ip_lan);
+		CONFIG_SET(&ini, "lan_ip", address_lan.AsString().c_str());
 
 		CONFIG_SET(&ini, "upnp", &H2Config_upnp_enable);
 
@@ -599,24 +596,13 @@ void ReadH2Config() {
 			CONFIG_GET(&ini, "debug_log_level", "2", &H2Config_debug_log_level);
 			CONFIG_GET(&ini, "debug_log_console", "false", &H2Config_debug_log_console);
 
-			const char* ip_wan = nullptr;
-			CONFIG_GET(&ini, "wan_ip", "", &ip_wan);
-			if (ip_wan
-				&& strnlen_s(ip_wan, 15) >= 7
-				&& inet_addr(ip_wan) != INADDR_NONE)
-			{
-				strncpy(H2Config_str_wan, ip_wan, 15);
-				H2Config_ip_wan = inet_addr(H2Config_str_wan);
-			}
-
 			const char* ip_lan = nullptr;
 			CONFIG_GET(&ini, "lan_ip", "", &ip_lan);
 			if (ip_lan
 				&& strnlen_s(ip_lan, 15) >= 7
 				&& inet_addr(ip_lan) != INADDR_NONE)
 			{
-				strncpy(H2Config_str_lan, ip_lan, 15);
-				H2Config_ip_lan = inet_addr(H2Config_str_lan);
+				H2Config_ip_lan = inet_addr(ip_lan);
 			}
 
 			// client only

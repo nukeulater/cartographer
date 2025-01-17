@@ -95,7 +95,7 @@ public:
     {
         if (SetsVariable())
         {
-            strncpy(outVar, m_var_ptr->GetValStr().c_str(), outSize - 1);
+            strncpy(outVar, m_var_ptr->AsString().c_str(), outSize - 1);
         }
     }
 

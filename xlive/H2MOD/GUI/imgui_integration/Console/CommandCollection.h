@@ -15,6 +15,9 @@ namespace CommandCollection
 	void InitializeCommands();
 
 	// commands
+	int BoolVarHandlerCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
+	int SetAddressIpv4HandlerCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx);
+
 	int RumbleScaleCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
 	int NetworkMetricsCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
 	int SetD3D9ExStateCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
@@ -35,7 +38,7 @@ namespace CommandCollection
 	int KickPeerCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
 	int SpawnCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
 	int InjectTagCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
-	int BoolVarHandlerCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
+	
 	int Crash(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
 	int map_name(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
 	int game_difficulty(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
