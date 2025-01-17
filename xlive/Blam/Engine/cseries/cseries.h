@@ -127,8 +127,8 @@ Memory::GetAddress<_type>(_addr_client, _addr_server)(__VA_ARGS__)
 /// Add an anonymous 128-bit (16 byte) field to a structure.
 #define PAD128 unsigned __int64 : 64; unsigned __int64 : 64;
 
-/// Use this for setting up enum bitfields
-#define FLAG(bit)( 1<<(bit) )
+// Use this for setting up enum bitfields
+#define FLAG(bit) ( (unsigned)1 << (unsigned)(bit) )
 #define TEST_BIT(flags, bit)( ((flags) & FLAG(bit)) != 0 )
 #define TEST_FLAG(flag, flags)( ((flag) & (flags)) != 0 )
 #define SET_FLAG(flags, bit, value)( (value) ? ((flags) |= FLAG(bit)) : ((flags) &= ~FLAG(bit)) )
@@ -140,8 +140,11 @@ Memory::GetAddress<_type>(_addr_client, _addr_server)(__VA_ARGS__)
 #define BIT_VECTOR_TEST_FLAG(BIT_VECTOR, BIT) (TEST_BIT(BIT_VECTOR[(BIT) / LONG_BITS], ((BIT) & (LONG_BITS - 1))))
 #define BIT_VECTOR_SET_FLAG(BIT_VECTOR, BIT, ENABLE) (SET_FLAG(BIT_VECTOR[(BIT) / LONG_BITS], ((BIT) & (LONG_BITS - 1)), ENABLE))
 
-/// Creates a mask out of a count number of flags
-#define MASK(count) ( (unsigned)FLAG(count) - (unsigned)1 )
+// Creates a bitmask that sets every bit between (bit) - 1 and bit 0 to 1
+// It does this by taking the FLAG value of bit - 1 and using logical OR on it with one of two choices:
+// 0 if the bit passed is less than or equal to 1, otherwise 1 minus the FLAG value of bit - 1
+// Ex. MASK(12) sets bit 11 to bit 0 to 1
+#define MASK(bit) ( (FLAG(bit-1)) | (bit <= 1 ? 0 : ( (FLAG(bit-1) - 1) )) )
 
 #define ASSERT_STRUCT_SIZE(STRUCT, _SIZE)\
 static_assert (sizeof(STRUCT) == (_SIZE), "Invalid size for struct ("#STRUCT") expected size (" #_SIZE")");
@@ -179,7 +182,7 @@ ASSERT_EXCEPTION(STATEMENT, true);	\
 (void)0
 
 #else
-#define ASSERT_EXCEPTION()									(void)(0)
+#define ASSERT_TRIGGER_EXCEPTION()							(void)(0)
 #define DISPLAY_ASSERT_EXCEPTION(STATEMENT, IS_EXCEPTION)   (void)(#STATEMENT)
 #define DISPLAY_ASSERT(STATEMENT)                           (void)(#STATEMENT)
 #define ASSERT_EXCEPTION(STATEMENT, IS_EXCEPTION)           (void)(#STATEMENT)
