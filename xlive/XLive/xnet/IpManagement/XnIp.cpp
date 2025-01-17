@@ -311,8 +311,8 @@ void XnIpManager::SetupLocalConnectionInfo(unsigned long xnaddr, unsigned long l
 	}
 
 	// override what GetBestIpToIpRoute found if lanaddr is different than INADDR_ANY
-	if (lanaddr != ntohl(INADDR_NONE)
-		|| lanaddr != ntohl(INADDR_ANY))
+	if (lanaddr != htonl(INADDR_NONE)
+		|| lanaddr != htonl(INADDR_ANY))
 	{
 		m_ipLocal.m_xnaddr.ina.s_addr = lanaddr; // check if the lanaddr is specified already
 		LOG_TRACE_NETWORK("{} - lanaddr already specified: {}", __FUNCTION__, inet_ntoa(m_ipLocal.m_xnaddr.ina));

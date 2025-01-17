@@ -35,7 +35,7 @@ std::string cartographerURL = "https://cartographer.online";
 std::string cartographerMapRepoURL = "http://www.h2maps.net/Cartographer/CustomMaps";
 
 unsigned short H2Config_base_port = 2000;
-unsigned long H2Config_ip_lan = INADDR_ANY;
+unsigned long H2Config_ip_lan = htonl(INADDR_NONE);
 _H2Config_language H2Config_language = { -1, 0 };
 bool H2Config_custom_labels_capture_missing = false;
 bool H2Config_skip_intro = false;
@@ -422,7 +422,8 @@ void SaveH2Config() {
 		CONFIG_SET(&ini, "base_port", &H2Config_base_port);
 
 		ComVarAddrIpv4 address_lan(&H2Config_ip_lan);
-		CONFIG_SET(&ini, "lan_ip", address_lan.AsString().c_str());
+		bool lanaddr_override_valid = H2Config_ip_lan != INADDR_NONE && H2Config_ip_lan != INADDR_ANY;
+		CONFIG_SET(&ini, "lan_ip", lanaddr_override_valid ? address_lan.AsString().c_str() : "");
 
 		CONFIG_SET(&ini, "upnp", &H2Config_upnp_enable);
 
@@ -598,11 +599,18 @@ void ReadH2Config() {
 
 			const char* ip_lan = nullptr;
 			CONFIG_GET(&ini, "lan_ip", "", &ip_lan);
-			if (ip_lan
-				&& strnlen_s(ip_lan, 15) >= 7
-				&& inet_addr(ip_lan) != INADDR_NONE)
+			H2Config_ip_lan = INADDR_NONE;
+			if (ip_lan)
 			{
-				H2Config_ip_lan = inet_addr(ip_lan);
+				bool lanaddr_override_valid = 
+					strnlen_s(ip_lan, 15) >= 7 && 
+					(inet_addr(ip_lan) != INADDR_NONE
+					|| inet_addr(ip_lan) != INADDR_ANY);
+
+				if (lanaddr_override_valid)
+				{
+					H2Config_ip_lan = inet_addr(ip_lan);
+				}
 			}
 
 			// client only
