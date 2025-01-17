@@ -47,7 +47,7 @@ ComVarFromPtr(debug_render_horizontal_splitscreen, bool, &g_debug_render_horizon
 	"var_debug_render_horizontal_splitscreen", "force horizontal spliscreen split", 0, 1, CommandCollection::BoolVarHandlerCmd);
 
 ComVarFromPtrIpv4(h2config_set_lan_ipv4_address, &H2Config_ip_lan,
-	"var_lan_ip_address_override", "", 1, 1, CommandCollection::SetAddressIpv4HandlerCmd);
+	"var_lan_ip_address_override", "", 1, 1, CommandCollection::SetAddressLANIpv4);
 
 // don't forget to add '_cmd' after the name, 
 // if you add a variable command created using `DECL_ComVarCommandPtr` macro
@@ -183,10 +183,12 @@ int CommandCollection::SetAddressIpv4HandlerCmd(const std::vector<std::string>& 
 	TextOutputCb* outputCb = ctx.outputCb;
 
 	auto address = ctx.consoleCommand->GetVar<ComVarAddrIpv4>();
+	int result = -1;
 
 	std::string exception;
 	if (address->SetFromStr(tokens[1], exception))
 	{
+		result = 0;
 	}
 	else
 	{
@@ -194,7 +196,7 @@ int CommandCollection::SetAddressIpv4HandlerCmd(const std::vector<std::string>& 
 		outputCb(StringFlag_None, "	%s", exception.c_str());
 	}
 
-	return 0;
+	return result;
 }
 
 int CommandCollection::RumbleScaleCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
@@ -1000,4 +1002,23 @@ int CommandCollection::_screenshot_cubemap(const std::vector<std::string>& token
 	ImGuiHandler::ToggleWindow("console");	// Close the console window so it doesn't appear in the cubemap screenshot
 	screenshot_cubemap(tokens[1].c_str());
 	return 0;
+}
+
+int CommandCollection::SetAddressLANIpv4(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
+{
+	TextOutputCb* outputCb = ctx.outputCb;
+
+	if (network_life_cycle_in_squad_session(NULL))
+	{
+		outputCb(StringFlag_None, "LAN address override cannot be updated during a game session!");
+		return -1;
+	}
+
+	int result = SetAddressIpv4HandlerCmd(tokens, ctx);
+	if (!result)
+	{
+		gXnIpMgr.UpdateLANAddress(H2Config_ip_lan);
+	}
+
+	return result;
 }

@@ -331,6 +331,14 @@ void XnIpManager::SetupLocalConnectionInfo(unsigned long xnaddr, unsigned long l
 	m_ipLocal.m_valid = true;
 }
 
+void XnIpManager::UpdateLANAddress(unsigned long lanaddr)
+{
+	if (m_ipLocal.m_valid)
+	{
+		m_ipLocal.m_xnaddr.ina.s_addr = lanaddr;
+	}
+}
+
 void XnIpManager::ClearLostConnections()
 {
 	int lostConnectionsCount = 0;
