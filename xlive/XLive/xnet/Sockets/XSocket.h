@@ -45,7 +45,7 @@ class XSocketManager
 					mreq.imr_multiaddr.s_addr = htonl(XSOCK_MUTICAST_ADDR);
 
 					setsockopt(
-						m_systemSockHandle, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char*)&mreq, sizeof(mreq)
+						m_systemSockHandle, IPPROTO_IP, IP_DROP_MEMBERSHIP, (char*)&mreq, sizeof(mreq)
 					);
 				}
 
