@@ -124,7 +124,7 @@ int WINAPI XSocketIOCTLSocket(SOCKET s, long cmd, u_long* argp)
 			xsocket->SetBufferSize(SO_SNDBUF, gXnIpMgr.GetMinSockSendBufferSizeInBytes());
 			xsocket->SetBufferSize(SO_RCVBUF, gXnIpMgr.GetMinSockRecvBufferSizeInBytes());
 
-			// remove last error even if we didn't successfuly increased the recv/send buffer size
+			// remove last error even if we didn't successfully increased the recv/send buffer size
 			WSASetLastError(0);
 		}
 	}
@@ -206,10 +206,7 @@ int WINAPI XSocketConnect(SOCKET s, const struct sockaddr* name, int namelen)
 	LOG_TRACE_NETWORK("XSocketConnect  (socket = {0:x}, name = {1:p}, namelen = {2})",
 		xsocket->winSockHandle, (void*)name, namelen);
 
-	if (xsocket->IsTCP())
-		return connect(xsocket->winSockHandle, name, namelen);
-	else
-		return SOCKET_ERROR;
+	return connect(xsocket->winSockHandle, name, namelen);
 }
 
 
@@ -407,7 +404,7 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 			lpCompletionRoutine);
 	}
 
-	// check if we have to send a broadcast packet
+	// check if the title attempts to send broadcast/systemlink data
 	if ((inTo->sin_addr.s_addr == INADDR_BROADCAST
 		|| inTo->sin_addr.s_addr == INADDR_ANY)
 		&& xsocket->IsBroadcast())
@@ -426,7 +423,7 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 			broadcastAddresses[0].sin_addr.s_addr = INADDR_BROADCAST;
 			broadcastAddresses[0].sin_port = g_XSockMgr.SystemLinkGetPort();
 
-			// also send message to localhost mutlicast group
+			// also send message to localhost multicast group
 			broadcastAddresses[1].sin_family = AF_INET;
 			broadcastAddresses[1].sin_addr.s_addr = htonl(XSOCK_MUTICAST_ADDR);
 			broadcastAddresses[1].sin_port = htons(XSOCK_MULTICAST_PORT);
@@ -855,10 +852,14 @@ bool XSocketManager::CreateSocket(XBroadcastSocket* sock, WORD port, bool multic
 {
 	bool success = false;
 
-	IN_ADDR interface_addr; 
+	IN_ADDR interfaceAddr; 
 
 	// ### TODO FIXME: allow choosing the network interface
-	interface_addr.s_addr = INADDR_ANY;
+	interfaceAddr.s_addr = INADDR_ANY;
+	if (multicast)
+	{
+		interfaceAddr.s_addr = htonl(INADDR_LOOPBACK);
+	}
 
 	SOCKET s;
 	do
@@ -895,7 +896,7 @@ bool XSocketManager::CreateSocket(XBroadcastSocket* sock, WORD port, bool multic
 		int name_len = sizeof(name);
 		memset(&name, 0, sizeof(sockaddr_in));
 		name.sin_family = AF_INET;
-		name.sin_addr = interface_addr;
+		name.sin_addr = interfaceAddr;
 		name.sin_port = port;
 
 		if (bind(s, (const sockaddr*)&name, sizeof(name)) == SOCKET_ERROR)

@@ -76,7 +76,7 @@ void XnIpManager::LogConnectionsToConsole(TextOutputCb* outputCb) const
 {
 	if (!(GetRegisteredKeyCount() > 0))
 	{
-		const char* err_message = "cannot log XNet connections when no keys are registerd (you need to host/be in a game)";
+		const char* err_message = "cannot log XNet connections when no keys are registered (you need to host/be in a game)";
 		LOG_CRITICAL_NETWORK(err_message);
 		if (outputCb)
 			outputCb(StringFlag_None, "# %s", err_message);
@@ -306,12 +306,12 @@ void XnIpManager::SetupLocalConnectionInfo(unsigned long xnaddr, unsigned long l
 	else
 	{
 		// fall back to localhost if what GetBestIpToIpRoute found is not a private/local host ip address (maybe we are not under a NAT gateway)
-		LOG_TRACE_NETWORK("{} - GetBestIpToIpRoute() returned public IP address, maybe we are not under a NAT device, falling back to localhost IP address!", __FUNCTION__);
+		LOG_TRACE_NETWORK("{} - GetBestIpToIpRoute() returned public IP address, likely not under a NAT, falling back to localhost IP address!", __FUNCTION__);
 		m_ipLocal.m_xnaddr.ina.s_addr = inet_addr("127.0.0.1");
 	}
 
-	// override what GetBestIpToIpRoute found if lanaddr is different than 0
-	if (lanaddr != 0)
+	// override what GetBestIpToIpRoute found if lanaddr is different than INADDR_ANY
+	if (lanaddr != INADDR_ANY)
 	{
 		m_ipLocal.m_xnaddr.ina.s_addr = lanaddr; // check if the lanaddr is specified already
 		LOG_TRACE_NETWORK("{} - lanaddr already specified: {}", __FUNCTION__, inet_ntoa(m_ipLocal.m_xnaddr.ina));
@@ -892,9 +892,9 @@ void XnIp::HandleConnectionPacket(XVirtualSocket* xsocket, const XNetRequestPack
 		switch (GetConnectStatus())
 		{
 		case XNET_CONNECT_STATUS_PENDING:
-			LOG_TRACE_NETWORK("{} - connection id: {:X} successfuly connected", __FUNCTION__, GetConnectionId().s_addr);
+			LOG_TRACE_NETWORK("{} - connection id: {:X} successfully connected", __FUNCTION__, GetConnectionId().s_addr);
 			SendXNetRequest(xsocket, XnIp_ConnectionDeclareConnected);
-			// reset the flag if we succesfully re-connected
+			// reset the flag if we successfully re-connected
 			XNIP_SET_BIT(m_flags, XnIp_ReconnectionAttempt, false);
 			SetConnectStatus(XNET_CONNECT_STATUS_CONNECTED);
 			break;
@@ -1065,7 +1065,7 @@ int WINAPI XNetGetConnectStatus(const IN_ADDR ina)
 	// or not attempting to reconnect and STATUS PENDING
 	// this will prevent the game from recreating secure connections when the time out is reached
 	// and the connection was never established, causing XNET_CONNECT_STATUS_LOST status to be issued
-	// basically creating a connection/endpoint unreacheable case (to note just for Halo 2)
+	// basically creating a connection/endpoint unreachable case (to note just for Halo 2)
 	// while preventing connections from stalling after a failed attempt to recover connection
 	// from a previous successful connection that has been discarded in the meantime due to various reasons
 	if (xnIp->ConnectStatusConnected()

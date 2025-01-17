@@ -73,13 +73,20 @@ bool Ipv4AddressIsReservedOrLocalhost(const IN_ADDR ipv4Addr)
 		{ inet_addr("10.0.0.0"),    inet_addr("255.0.0.0")   },
 		{ inet_addr("172.16.0.0"),  inet_addr("255.240.0.0") },
 		
-		// local host
+		// localhost
 		{ inet_addr("127.0.0.0"),  inet_addr("255.0.0.0") },
 	};
 
 	for (auto& entry : privateIPv4Entries)
 	{
-		//LOG_TRACE_NETWORK("{} - 0x{:X} == 0x{:X}, 0x{:X} - 0x{:X}", __FUNCTION__, (ipv4Addr.s_addr & entry.addressMask.s_addr), (entry.address.s_addr & entry.addressMask.s_addr), ipv4Addr.s_addr, entry.addressMask.s_addr);
+		//LOG_TRACE_NETWORK("{} - 0x{:X} == 0x{:X}, 0x{:X} - 0x{:X}", 
+		// __FUNCTION__, 
+		// (ipv4Addr.s_addr & entry.addressMask.s_addr), 
+		// (entry.address.s_addr & entry.addressMask.s_addr), 
+		// ipv4Addr.s_addr, 
+		// entry.addressMask.s_addr
+		// );
+
 		if ((ipv4Addr.s_addr & entry.addressMask.s_addr) == (entry.address.s_addr & entry.addressMask.s_addr))
 			return true;
 	}

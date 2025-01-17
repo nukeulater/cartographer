@@ -2,14 +2,14 @@
 
 #include "NIC.h"
 
-// TODO:
+// ### FIXME
 IP_ADAPTER_ADDRESSES* CNic::GetNetworkAdapterWithGateway()
 {
-	return nullptr;
+	return NULL;
 
 #define MAX_ITERATIONS 3
 
-	IP_ADAPTER_ADDRESSES* result = nullptr;
+	IP_ADAPTER_ADDRESSES* result = NULL;
 	DWORD dwRetVal = 0;
 	// Set the flags to pass to GetAdaptersAddresses.
 	ULONG flags = 0;
@@ -76,16 +76,16 @@ IN_ADDR CNic::GetBestInterfaceRouteAddressFromIp(const char* ipToTest)
 
 	if (GetBestInterface(inet_addr(ipToTest), &dwIfIndex) == NO_ERROR)
 	{
-		auto ipAddrTable = (MIB_IPADDRTABLE *)HeapAlloc(GetProcessHeap(), 0, sizeof(MIB_IPADDRTABLE));
+		MIB_IPADDRTABLE* ipAddrTable = (MIB_IPADDRTABLE *)HeapAlloc(GetProcessHeap(), 0, sizeof(MIB_IPADDRTABLE));
 
-		DWORD size = 0;
+		DWORD size = sizeof(MIB_IPADDRTABLE);
 		if (GetIpAddrTable(ipAddrTable, &size, 0) == ERROR_INSUFFICIENT_BUFFER)
 		{
 			HeapFree(GetProcessHeap(), 0, ipAddrTable);
 			ipAddrTable = (MIB_IPADDRTABLE *)HeapAlloc(GetProcessHeap(), 0, size);
 		}
 
-		if (ipAddrTable == 0
+		if (ipAddrTable == NULL
 			|| GetIpAddrTable(ipAddrTable, &size, 0) != NO_ERROR)
 		{
 			HeapFree(GetProcessHeap(), 0, ipAddrTable);
@@ -99,8 +99,8 @@ IN_ADDR CNic::GetBestInterfaceRouteAddressFromIp(const char* ipToTest)
 				address.S_un.S_addr = (ULONG)ipAddrTable->table[i].dwAddr;
 				LOG_TRACE_NETWORK("{} - found interface with IPv4 address: {} to route from: {} (0 = INADDR_ANY)", __FUNCTION__, inet_ntoa(address), ipToTest);
 
-				HeapFree(GetProcessHeap(), 0, ipAddrTable);
-				return address;
+				// address found
+				break;
 			}
 		}
 
