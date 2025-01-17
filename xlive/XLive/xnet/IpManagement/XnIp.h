@@ -57,7 +57,7 @@ struct XBroadcastPacket
 		strncpy(pckHeader.HdrStr, broadcastStrHdr, XNIP_MAX_PCK_STR_HDR_LEN);
 		ZeroMemory(&data, sizeof(data));
 		data.titleId = -1;
-		data.name.sin_addr.s_addr = INADDR_BROADCAST;
+		data.name.sin_addr.s_addr = htonl(INADDR_BROADCAST);
 	};
 
 	XNetPacketHeader pckHeader;

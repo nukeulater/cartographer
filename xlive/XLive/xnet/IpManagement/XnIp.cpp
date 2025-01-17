@@ -189,7 +189,7 @@ int XnIpManager::HandleRecvdPacket(XVirtualSocket* xsocket, sockaddr_in* lpFrom,
 			XBroadcastPacket* broadcastPck = reinterpret_cast<XBroadcastPacket*>(lpBuffers[0].buf);
 			if (*lpBytesRecvdCount >= sizeof(XBroadcastPacket)
 				&& strncmp(broadcastPck->pckHeader.HdrStr, broadcastStrHdr, XNIP_MAX_PCK_STR_HDR_LEN) == 0
-				&& broadcastPck->data.name.sin_addr.s_addr == INADDR_BROADCAST)
+				&& broadcastPck->data.name.sin_addr.s_addr == htonl(INADDR_BROADCAST))
 			{
 				if (*lpBytesRecvdCount > sizeof(XBroadcastPacket))
 				{

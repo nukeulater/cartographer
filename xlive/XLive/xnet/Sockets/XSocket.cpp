@@ -405,8 +405,8 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 	}
 
 	// check if the title attempts to send broadcast/systemlink data
-	if ((inTo->sin_addr.s_addr == INADDR_BROADCAST
-		|| inTo->sin_addr.s_addr == INADDR_ANY)
+	if ((inTo->sin_addr.s_addr == htonl(INADDR_BROADCAST)
+		|| inTo->sin_addr.s_addr == htonl(INADDR_ANY))
 		&& xsocket->IsBroadcast())
 	{
 		if (g_XSockMgr.SystemLinkAvailable())
@@ -420,7 +420,7 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 			memset(broadcastAddresses, 0, sizeof(broadcastAddresses));
 
 			broadcastAddresses[0].sin_family = AF_INET;
-			broadcastAddresses[0].sin_addr.s_addr = INADDR_BROADCAST;
+			broadcastAddresses[0].sin_addr.s_addr = htonl(INADDR_BROADCAST);
 			broadcastAddresses[0].sin_port = g_XSockMgr.SystemLinkGetPort();
 
 			// also send message to localhost multicast group
@@ -855,7 +855,7 @@ bool XSocketManager::CreateSocket(XBroadcastSocket* sock, WORD port, bool multic
 	IN_ADDR interfaceAddr; 
 
 	// ### TODO FIXME: allow choosing the network interface
-	interfaceAddr.s_addr = INADDR_ANY;
+	interfaceAddr.s_addr = htonl(INADDR_ANY);
 	if (multicast)
 	{
 		interfaceAddr.s_addr = htonl(INADDR_LOOPBACK);

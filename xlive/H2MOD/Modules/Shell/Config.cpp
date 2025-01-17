@@ -422,7 +422,7 @@ void SaveH2Config() {
 		CONFIG_SET(&ini, "base_port", &H2Config_base_port);
 
 		ComVarAddrIpv4 address_lan(&H2Config_ip_lan);
-		bool lanaddr_override_valid = H2Config_ip_lan != INADDR_NONE && H2Config_ip_lan != INADDR_ANY;
+		bool lanaddr_override_valid = H2Config_ip_lan != htonl(INADDR_NONE) && H2Config_ip_lan != htonl(INADDR_ANY);
 		CONFIG_SET(&ini, "lan_ip", lanaddr_override_valid ? address_lan.AsString().c_str() : "");
 
 		CONFIG_SET(&ini, "upnp", &H2Config_upnp_enable);
@@ -599,13 +599,12 @@ void ReadH2Config() {
 
 			const char* ip_lan = nullptr;
 			CONFIG_GET(&ini, "lan_ip", "", &ip_lan);
-			H2Config_ip_lan = INADDR_NONE;
+			H2Config_ip_lan = htonl(INADDR_NONE);
 			if (ip_lan)
 			{
 				bool lanaddr_override_valid = 
-					strnlen_s(ip_lan, 15) >= 7 && 
-					(inet_addr(ip_lan) != INADDR_NONE
-					|| inet_addr(ip_lan) != INADDR_ANY);
+					strnlen_s(ip_lan, 15) >= 7 
+					&& (inet_addr(ip_lan) != htonl(INADDR_NONE) || inet_addr(ip_lan) != htonl(INADDR_ANY));
 
 				if (lanaddr_override_valid)
 				{
