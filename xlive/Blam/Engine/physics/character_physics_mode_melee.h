@@ -7,15 +7,19 @@
 #define k_deceleration_ticks_real 4.0f
 #define k_deceleration_ticks ((int)k_deceleration_ticks_real)
 
-enum
+struct alignas(4) s_melee_animation_datum
 {
-	_melee_flag_deceleration_unk = 4,
-	_melee_flag_max_deceleration_ticks_reached,
-	_melee_flag_end
+	DWORD field_0;
+	DWORD melee_flags;
+	BYTE gap_8[36];
+	int melee_type_string_id;
+	char field_30;
+	char field_31;
+	BYTE melee_animation_update;
+	BYTE animation_action_index;
+	char unk;
+	BYTE max_animation_range;
 };
-
-#define melee_flags_mask 0xF0 // use first 4 bits of the 1 byte variable as flags
-#define melee_deceleration_tick_count_mask 0xFF000000
 
 struct s_character_physics_output
 {
@@ -72,6 +76,8 @@ struct alignas(4) c_character_physics_mode_melee_datum
 	void update_melee_parameters();
 	void update_melee_deceleration();
 	void __thiscall update_internal(s_character_physics_output* a2, bool a3, real32 distance_world_units, const real_vector3d* target_translational_velocity, const real_point3d* target_origin, const real_vector3d* aiming_vector, const real_vector3d* translational_velocity, const real_point3d* object_origin);
+
+	static void apply_hooks();
 };
 ASSERT_STRUCT_SIZE(c_character_physics_mode_melee_datum, 0x88);
 

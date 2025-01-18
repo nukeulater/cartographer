@@ -13,6 +13,7 @@
 #include "effects/contrails.h"
 #include "effects/effects.h"
 #include "effects/particle_update.h"
+#include "physics/character_physics_mode_melee.h"
 #include "tag_files/files_windows.h"
 #include "game/aim_assist.h"
 #include "game/cheats.h"
@@ -85,7 +86,6 @@
 #include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
 #include "H2MOD/Modules/DirectorHooks/DirectorHooks.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
-#include "H2MOD/Modules/GamePhysics/Patches/MeleeFix.h"
 #include "H2MOD/Modules/GamePhysics/Patches/ProjectileFix.h"
 #include "H2MOD/Modules/HaloScript/HaloScript.h"
 #include "H2MOD/Modules/Input/KeyboardInput.h"
@@ -827,6 +827,9 @@ void bipeds_physics_apply_patches()
 	// fixes edge drop fast fall when using higher tickrates than 30
 	PatchCall(Memory::GetAddress(0x1082B4, 0xFA5D4), biped_ground_mode_update_to_stdcall);
 	Codecave(Memory::GetAddress(0x106E23, 0xF9143), update_biped_ground_mode_physics_constant, 3);
+
+	// melee physics mode hooks
+	c_character_physics_mode_melee_datum::apply_hooks();
 }
 
 void H2MOD::player_position_increase_client_position_margin_of_error(bool enable)
@@ -1181,7 +1184,6 @@ void H2MOD::Initialize()
 	CommandCollection::InitializeCommands();
 	CustomVariantHandler::RegisterCustomVariants();
 	CustomVariantSettings::Initialize();
-	MeleeFix::Initialize();
 	MapSlots::Initialize();
 	HaloScript::Initialize();
 	ProjectileFix::ApplyPatches();

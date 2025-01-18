@@ -31,11 +31,8 @@ namespace CustomVariantSettings
 	}
 	bool __cdecl DecodeVariantSettings(c_bitstream* stream, int a2, s_variant_settings* data)
 	{
-		real32 gravity, gamespeed;
-		stream->read_raw_data("gravity", &gravity, sizeof(gravity) * CHAR_BIT);
-		data->gravity = gravity;
-		stream->read_raw_data("game speed", &gamespeed, sizeof(gamespeed) * CHAR_BIT);
-		data->gameSpeed = gamespeed;
+		stream->read_raw_data("gravity", &data->gravity, sizeof(data->gravity) * CHAR_BIT);
+		stream->read_raw_data("game speed", &data->gameSpeed, sizeof(data->gameSpeed) * CHAR_BIT);
 		
 		data->infiniteAmmo = stream->read_bool("infinite ammo");
 		data->explosionPhysics = stream->read_bool("explosion physics");
