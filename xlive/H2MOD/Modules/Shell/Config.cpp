@@ -36,6 +36,7 @@ std::string cartographerMapRepoURL = "http://www.h2maps.net/Cartographer/CustomM
 
 unsigned short H2Config_base_port = 2000;
 unsigned long H2Config_ip_lan = htonl(INADDR_NONE);
+unsigned long H2Config_ip_broadcast_override = htonl(INADDR_BROADCAST);
 _H2Config_language H2Config_language = { -1, 0 };
 bool H2Config_custom_labels_capture_missing = false;
 bool H2Config_skip_intro = false;
@@ -425,6 +426,10 @@ void SaveH2Config() {
 		bool lanaddr_override_valid = H2Config_ip_lan != htonl(INADDR_NONE) && H2Config_ip_lan != htonl(INADDR_ANY);
 		CONFIG_SET(&ini, "lan_ip", lanaddr_override_valid ? address_lan.AsString().c_str() : "");
 
+		ComVarAddrIpv4 address_broadcast(&H2Config_ip_broadcast_override);
+		bool broadcast_override_valid = H2Config_ip_broadcast_override != htonl(INADDR_ANY);
+		CONFIG_SET(&ini, "broadcast_ip", broadcast_override_valid ? address_broadcast.AsString().c_str() : "255.255.255.255");
+
 		CONFIG_SET(&ini, "upnp", &H2Config_upnp_enable);
 
 		if (!Memory::IsDedicatedServer()) {
@@ -602,13 +607,28 @@ void ReadH2Config() {
 			H2Config_ip_lan = htonl(INADDR_NONE);
 			if (ip_lan)
 			{
-				bool lanaddr_override_valid = 
+				bool lan_addr_override_valid = 
 					strnlen_s(ip_lan, 15) >= 7 
 					&& (inet_addr(ip_lan) != htonl(INADDR_NONE) || inet_addr(ip_lan) != htonl(INADDR_ANY));
 
-				if (lanaddr_override_valid)
+				if (lan_addr_override_valid)
 				{
 					H2Config_ip_lan = inet_addr(ip_lan);
+				}
+			}
+
+			const char* ip_broadcast = nullptr;
+			CONFIG_GET(&ini, "broadcast_ip", "255.255.255.255", &ip_broadcast);
+			H2Config_ip_broadcast_override = htonl(INADDR_BROADCAST);
+			if (ip_broadcast)
+			{
+				bool broadcast_addr_override_valid =
+					strnlen_s(ip_broadcast, 15) >= 7
+					&& inet_addr(ip_broadcast) != htonl(INADDR_ANY);
+
+				if (broadcast_addr_override_valid)
+				{
+					H2Config_ip_broadcast_override = inet_addr(ip_broadcast);
 				}
 			}
 

@@ -421,6 +421,8 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 
 			broadcastAddresses[0].sin_family = AF_INET;
 			broadcastAddresses[0].sin_addr.s_addr = htonl(INADDR_BROADCAST);
+			if (H2Config_ip_broadcast_override != htonl(INADDR_ANY))
+				broadcastAddresses[0].sin_addr.s_addr = H2Config_ip_broadcast_override;
 			broadcastAddresses[0].sin_port = g_XSockMgr.SystemLinkGetPort();
 
 			// also send message to localhost multicast group

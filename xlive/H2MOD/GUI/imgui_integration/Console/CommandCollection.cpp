@@ -47,7 +47,10 @@ ComVarFromPtr(debug_render_horizontal_splitscreen, bool, &g_debug_render_horizon
 	"var_debug_render_horizontal_splitscreen", "force horizontal spliscreen split", 0, 1, CommandCollection::BoolVarHandlerCmd);
 
 ComVarFromPtrIpv4(h2config_set_lan_ipv4_address, &H2Config_ip_lan,
-	"var_lan_ip_address_override", "", 1, 1, CommandCollection::SetAddressLANIpv4);
+	"var_lan_ip_address_override", "sets the LAN override address of the local machine", 1, 1, CommandCollection::SetAddressLANIpv4);
+
+ComVarFromPtrIpv4(h2config_set_broadcast_ipv4_address, &H2Config_ip_broadcast_override,
+	"var_broadcast_ip_address_override", "sets the broadcast override address", 1, 1, CommandCollection::SetAddressBroadcastIpv4);
 
 // don't forget to add '_cmd' after the name, 
 // if you add a variable command created using `DECL_ComVarCommandPtr` macro
@@ -64,6 +67,7 @@ void CommandCollection::InitializeCommands()
 	InsertCommand(new ConsoleCommand(rumble_var_cmd));
 	InsertCommand(new ConsoleCommand(debug_render_horizontal_splitscreen));
 	InsertCommand(new ConsoleCommand(h2config_set_lan_ipv4_address));
+	InsertCommand(new ConsoleCommand(h2config_set_broadcast_ipv4_address));
 	InsertCommand(new ConsoleCommand("help", "outputs all commands, 0 - 1 parameter(s): <string>(optional): command name", 0, 1, CommandCollection::HelpCmd));
 	InsertCommand(new ConsoleCommand("log_peers", "logs all peers to console, 0 parameter(s)", 0, 0, CommandCollection::LogPeersCmd));
 	InsertCommand(new ConsoleCommand("log_players", "logs all players to console, 0 parameter(s)", 0, 0, CommandCollection::LogPlayersCmd));
@@ -1010,13 +1014,26 @@ int CommandCollection::SetAddressLANIpv4(const std::vector<std::string>& tokens,
 
 	if (gXnIpMgr.GetLocalUserXn()->m_valid)
 	{
-		outputCb(StringFlag_None, "Set the LAN address override before LOGIN, during the \"PRESS ANY KEY\" dialog, when signed-out!");
+		outputCb(StringFlag_None, "# set the LAN address override before LOGIN, during the \"PRESS ANY KEY\" dialog, when signed-out!");
 		return -1;
 	}
 
 	if (network_life_cycle_in_squad_session(NULL))
 	{
-		outputCb(StringFlag_None, "LAN address override cannot be updated during a game session!");
+		outputCb(StringFlag_None, "# LAN address override cannot be updated during a game session!");
+		return -1;
+	}
+
+	return SetAddressIpv4HandlerCmd(tokens, ctx);
+}
+
+int CommandCollection::SetAddressBroadcastIpv4(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
+{
+	TextOutputCb* outputCb = ctx.outputCb;
+
+	if (network_life_cycle_in_squad_session(NULL))
+	{
+		outputCb(StringFlag_None, "# broadcast address override cannot be updated during a game session!");
 		return -1;
 	}
 
