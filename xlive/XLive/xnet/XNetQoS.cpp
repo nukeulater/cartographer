@@ -324,7 +324,7 @@ void CXNetQoS::Listener()
 		ZeroMemory(&serverAddr, sizeof(serverAddr));
 
 		serverAddr.sin_family = AF_INET;
-		serverAddr.sin_addr.s_addr = INADDR_ANY; // anyone can connect
+		serverAddr.sin_addr.s_addr = htonl(INADDR_ANY); // anyone can connect
 		serverAddr.sin_port = htons(H2Config_base_port + 10);
 
 		DWORD dwBytes = 0;

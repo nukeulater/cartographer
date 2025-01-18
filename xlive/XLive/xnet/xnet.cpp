@@ -2,6 +2,9 @@
 
 #include "xnet.h"
 
+#include "XLive/xnet/IpManagement/XnIp.h"
+#include "XLive/xnet/Sockets/XSocket.h"
+
 // #58: XNetServerToInAddr
 INT   WINAPI XNetServerToInAddr(const IN_ADDR ina, DWORD dwServiceId, IN_ADDR * pina)
 {
@@ -125,17 +128,38 @@ int WINAPI XNetGetXnAddrPlatform(in_addr *a1, int a2)
 }
 
 // #83
-int WINAPI XNetGetSystemLinkPort(DWORD *a1)
+int WINAPI XNetGetSystemLinkPort(WORD* pwSystemLinkPort)
 {
 	LOG_TRACE_NETWORK("XNetGetSystemLinkPort()");
-	if (a1)
-		*a1 = 3074;
-	return 0;
+
+	if (g_XSockMgr.SystemLinkAvailable())
+	{
+		if (pwSystemLinkPort)
+		{
+			*pwSystemLinkPort = g_XSockMgr.SystemLinkGetPort();
+		}
+
+		return 0;
+	}
+
+	return WSANOTINITIALISED;
 }
 
 // #84: XNetSetSystemLinkPort
-DWORD WINAPI XNetSetSystemLinkPort(DWORD a1)
+DWORD WINAPI XNetSetSystemLinkPort(WORD wSystemLinkPort)
 {
-	LOG_TRACE_NETWORK("XNetSetSystemLinkPort  (a1 = {:x})", a1);
-	return 0;
+	LOG_TRACE_NETWORK("XNetSetSystemLinkPort  (a1 = {:x})", ntohs(wSystemLinkPort));
+
+	if (wSystemLinkPort == 0)
+	{
+		g_XSockMgr.SystemLinkDispose();
+		return 0;
+	}
+	
+	if (!g_XSockMgr.SystemLinkSocketInitialize(wSystemLinkPort))
+	{
+		return WSAEADDRINUSE;
+	}
+
+	 return 0;
 }

@@ -3,8 +3,6 @@
 #include "ComVar.h"
 #include "CommandHandler.h"
 
-
-
 namespace CommandCollection
 {
 	extern std::vector<ConsoleCommand*> commandTable;
@@ -15,6 +13,9 @@ namespace CommandCollection
 	void InitializeCommands();
 
 	// commands
+	int BoolVarHandlerCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
+	int SetAddressIpv4HandlerCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx);
+
 	int RumbleScaleCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
 	int NetworkMetricsCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
 	int SetD3D9ExStateCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
@@ -35,7 +36,7 @@ namespace CommandCollection
 	int KickPeerCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
 	int SpawnCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
 	int InjectTagCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
-	int BoolVarHandlerCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
+	
 	int Crash(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
 	int map_name(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
 	int game_difficulty(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
@@ -48,6 +49,8 @@ namespace CommandCollection
 	int change_player_team(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx);
 	int quit(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
 	int _screenshot_cubemap(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx);
+	int SetAddressLANIpv4(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx);
+	int SetAddressBroadcastIpv4(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx);
 
 	// misc
 	void ObjectSpawn(datum object_idx, int count, const real_point3d* position, const real_vector3d* rotation, float randomMultiplier, bool sameTeam);

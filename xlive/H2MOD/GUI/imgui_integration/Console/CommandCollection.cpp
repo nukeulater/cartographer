@@ -19,6 +19,7 @@
 #include "H2MOD.h"
 #include "H2MOD/GUI/imgui_integration/imgui_handler.h"
 #include "H2MOD/Modules/MapManager/MapManager.h"
+#include "H2MOD/Modules/Shell/Config.h"
 
 // for XNet connection logging
 #include "tag_files/tag_loader/tag_injection.h"
@@ -44,6 +45,12 @@ ComVarFromPtr(rumble_var_cmd, real32, &g_rumble_factor,
 ComVarFromPtr(debug_render_horizontal_splitscreen, bool, &g_debug_render_horizontal_splitscreen,
 	"var_debug_render_horizontal_splitscreen", "force horizontal spliscreen split", 0, 1, CommandCollection::BoolVarHandlerCmd);
 
+ComVarFromPtrIpv4(h2config_set_lan_ipv4_address, &H2Config_ip_lan,
+	"var_lan_ip_address_override", "sets the LAN override address of the local machine", 1, 1, CommandCollection::SetAddressLANIpv4);
+
+ComVarFromPtrIpv4(h2config_set_broadcast_ipv4_address, &H2Config_ip_broadcast_override,
+	"var_broadcast_ip_address_override", "sets the broadcast override address", 1, 1, CommandCollection::SetAddressBroadcastIpv4);
+
 // don't forget to add '_cmd' after the name, 
 // if you add a variable command created using `DECL_ComVarCommandPtr` macro
 std::vector<ConsoleCommand*> CommandCollection::commandTable;
@@ -58,6 +65,8 @@ void CommandCollection::InitializeCommands()
 	InsertCommand(new ConsoleCommand(og_frame_limiter_var_cmd));
 	InsertCommand(new ConsoleCommand(rumble_var_cmd));
 	InsertCommand(new ConsoleCommand(debug_render_horizontal_splitscreen));
+	InsertCommand(new ConsoleCommand(h2config_set_lan_ipv4_address));
+	InsertCommand(new ConsoleCommand(h2config_set_broadcast_ipv4_address));
 	InsertCommand(new ConsoleCommand("help", "outputs all commands, 0 - 1 parameter(s): <string>(optional): command name", 0, 1, CommandCollection::HelpCmd));
 	InsertCommand(new ConsoleCommand("log_peers", "logs all peers to console, 0 parameter(s)", 0, 0, CommandCollection::LogPeersCmd));
 	InsertCommand(new ConsoleCommand("log_players", "logs all players to console, 0 parameter(s)", 0, 0, CommandCollection::LogPlayersCmd));
@@ -170,6 +179,27 @@ int CommandCollection::BoolVarHandlerCmd(const std::vector<std::string>& tokens,
 		outputCb(StringFlag_None, "	%s", exception.c_str());
 	}
 	return 0;
+}
+
+int CommandCollection::SetAddressIpv4HandlerCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
+{
+	TextOutputCb* outputCb = ctx.outputCb;
+
+	auto address = ctx.consoleCommand->GetVar<ComVarAddrIpv4>();
+	int result = -1;
+
+	std::string exception;
+	if (address->SetFromStr(tokens[1], exception))
+	{
+		result = 0;
+	}
+	else
+	{
+		outputCb(StringFlag_None, command_error_bad_arg);
+		outputCb(StringFlag_None, "	%s", exception.c_str());
+	}
+
+	return result;
 }
 
 int CommandCollection::RumbleScaleCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
@@ -721,7 +751,7 @@ int CommandCollection::SpawnCmd(const std::vector<std::string>& tokens, ConsoleC
 
 	ObjectSpawn(objectDatum, count, pPosition, pRotation, 1.0f, sameTeam);
 
-	// outputCbFmt(StringFlag_None, "# spawned: %s, near player: %s with rotation: %i", objectName.c_str(), nearPlayerSpawn.GetValStr().c_str(), withRotation);
+	// outputCbFmt(StringFlag_None, "# spawned: %s, near player: %s with rotation: %i", objectName.c_str(), nearPlayerSpawn.AsString().c_str(), withRotation);
 
 	return 0;
 }
@@ -975,4 +1005,36 @@ int CommandCollection::_screenshot_cubemap(const std::vector<std::string>& token
 	ImGuiHandler::ToggleWindow("console");	// Close the console window so it doesn't appear in the cubemap screenshot
 	screenshot_cubemap(tokens[1].c_str());
 	return 0;
+}
+
+int CommandCollection::SetAddressLANIpv4(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
+{
+	TextOutputCb* outputCb = ctx.outputCb;
+
+	if (gXnIpMgr.GetLocalUserXn()->m_valid)
+	{
+		outputCb(StringFlag_None, "# set the LAN address override before LOGIN, during the \"PRESS ANY KEY\" dialog, when signed-out!");
+		return -1;
+	}
+
+	if (network_life_cycle_in_squad_session(NULL))
+	{
+		outputCb(StringFlag_None, "# LAN address override cannot be updated during a game session!");
+		return -1;
+	}
+
+	return SetAddressIpv4HandlerCmd(tokens, ctx);
+}
+
+int CommandCollection::SetAddressBroadcastIpv4(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
+{
+	TextOutputCb* outputCb = ctx.outputCb;
+
+	if (network_life_cycle_in_squad_session(NULL))
+	{
+		outputCb(StringFlag_None, "# broadcast address override cannot be updated during a game session!");
+		return -1;
+	}
+
+	return SetAddressIpv4HandlerCmd(tokens, ctx);
 }

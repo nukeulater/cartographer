@@ -1,12 +1,14 @@
 #include "stdafx.h"
-#include "XSocket.h"
 
+#include "XSocket.h"
+#include "XLive/xnet/upnp.h"
+#include "XLive/xnet/IpManagement/XnIp.h"
 #include "H2MOD/Modules/Shell/Config.h"
 
-#include "XLive/xnet/IpManagement/XnIp.h"
 #include "XLive/xnet/net_utils.h"
 
-std::vector<XSocket*> XSocket::Sockets;
+XSocketManager g_XSockMgr;
+std::vector<XVirtualSocket*> XSocketManager::sockets;
 
 // #5310: XOnlineStartup
 int WINAPI XOnlineStartup()
@@ -41,7 +43,7 @@ SOCKET WINAPI XSocketCreate(int af, int type, int protocol)
 	// TODO: add TCP support
 	if (protocol != IPPROTO_UDP
 		&& protocol != IPPROTO_VDP)
-		return SOCKET_ERROR; 
+		return SOCKET_ERROR;
 
 	bool isVoice = false;
 	if (protocol == IPPROTO_VDP)
@@ -51,9 +53,9 @@ SOCKET WINAPI XSocketCreate(int af, int type, int protocol)
 	}
 
 	// TODO: use an array of sockets rather than allocating the memory on heap
-	XSocket* newXSocket = new XSocket(protocol, isVoice);
+	XVirtualSocket* newXSocket = new XVirtualSocket(protocol, isVoice);
 
-#if COMPILE_WITH_STD_SOCK_FUNC
+#if XSOCK_USING_STANDARD_APIS
 	SOCKET ret = socket(af, type, protocol);
 #else
 	SOCKET ret = WSASocket(af, type, protocol, 0, 0, 0);
@@ -69,9 +71,9 @@ SOCKET WINAPI XSocketCreate(int af, int type, int protocol)
 	LOG_TRACE_NETWORK("XSocketCreate() - Socket created with descriptor: {}.", ret);
 	newXSocket->winSockHandle = ret;
 
-	if (newXSocket->isVoiceSocket)
+	if (newXSocket->isVoiceProtocol)
 	{
-		LOG_TRACE_NETWORK("XSocketCreate() - Socket: {} was set to VDP", ret);
+		LOG_TRACE_NETWORK("XSocketCreate() - Socket: {} is VDP protocol", ret);
 	}
 
 	// disable SIO_UDP_CONNRESET
@@ -88,7 +90,10 @@ SOCKET WINAPI XSocketCreate(int af, int type, int protocol)
 		LOG_TRACE_NETWORK("XSocketCreate() - disabled SIO_UDP_CONNRESET");
 	}*/
 
-	XSocket::Sockets.push_back(newXSocket);
+	XSocketManager::sockets.push_back(newXSocket);
+
+	/*newXSocket->SetBufferSize(SO_SNDBUF, gXnIpMgr.GetMinSockSendBufferSizeInBytes());
+	newXSocket->SetBufferSize(SO_RCVBUF, gXnIpMgr.GetMinSockRecvBufferSizeInBytes());*/
 
 	return (SOCKET)newXSocket;
 }
@@ -97,14 +102,14 @@ SOCKET WINAPI XSocketCreate(int af, int type, int protocol)
 int WINAPI XSocketShutdown(SOCKET s, int how)
 {
 	LOG_TRACE_NETWORK("XSocketShutdown");
-	XSocket* xsocket = (XSocket*)s;
+	XVirtualSocket* xsocket = (XVirtualSocket*)s;
 	return shutdown(xsocket->winSockHandle, how);
 }
 
 // #6: XSocketIOCTLSocket
-int WINAPI XSocketIOCTLSocket(SOCKET s, long cmd, u_long *argp)
+int WINAPI XSocketIOCTLSocket(SOCKET s, long cmd, u_long* argp)
 {
-	XSocket* xsocket = (XSocket*)s;
+	XVirtualSocket* xsocket = (XVirtualSocket*)s;
 
 	LOG_TRACE_NETWORK("XSocketIOCTLSocket() - cmd: {}", IOCTLSocket_cmd_string(cmd).c_str());
 	int ret = ioctlsocket(xsocket->winSockHandle, cmd, argp);
@@ -112,14 +117,14 @@ int WINAPI XSocketIOCTLSocket(SOCKET s, long cmd, u_long *argp)
 	if (ret == NO_ERROR)
 	{
 		if (cmd == FIONBIO
-			&& *argp)
+			&& *argp == TRUE)
 		{
 			LOG_TRACE_NETWORK("XSocketIOCTLSocket() - setting default buffer size for non-blocking socket.");
 			// set socket send/recv buffers size, but only if the socket isn't blocking
 			xsocket->SetBufferSize(SO_SNDBUF, gXnIpMgr.GetMinSockSendBufferSizeInBytes());
 			xsocket->SetBufferSize(SO_RCVBUF, gXnIpMgr.GetMinSockRecvBufferSizeInBytes());
 
-			// remove last error even if we didn't successfuly increased the recv/send buffer size
+			// remove last error even if we didn't successfully increased the recv/send buffer size
 			WSASetLastError(0);
 		}
 	}
@@ -128,9 +133,9 @@ int WINAPI XSocketIOCTLSocket(SOCKET s, long cmd, u_long *argp)
 }
 
 // #7: XSocketSetSockOpt
-int WINAPI XSocketSetSockOpt(SOCKET s, int level, int optname, const char *optval, int optlen)
+int WINAPI XSocketSetSockOpt(SOCKET s, int level, int optname, const char* optval, int optlen)
 {
-	XSocket* xsocket = (XSocket*)s;
+	XVirtualSocket* xsocket = (XVirtualSocket*)s;
 
 	LOG_TRACE_NETWORK("XSocketSetSockOpt  (socket = {:x}, level = {}, optname = {},  optlen = {})",
 		xsocket->winSockHandle, level, sockOpt_string(optname), optlen);
@@ -140,6 +145,12 @@ int WINAPI XSocketSetSockOpt(SOCKET s, int level, int optname, const char *optva
 	{
 		int bufferSize = *(int*)(optval);
 		return xsocket->SetBufferSize(optname, bufferSize);
+	}
+
+	if (optname == SO_BROADCAST)
+	{
+		xsocket->isBroadcast = *(bool*)optval;
+		return 0;
 	}
 
 	int ret = setsockopt(xsocket->winSockHandle, level, optname, optval, optlen);
@@ -153,26 +164,33 @@ int WINAPI XSocketSetSockOpt(SOCKET s, int level, int optname, const char *optva
 }
 
 // #8: XSocketGetSockOpt
-int WINAPI XSocketGetSockOpt(SOCKET s, int level, int optname, char *optval, int *optlen)
+int WINAPI XSocketGetSockOpt(SOCKET s, int level, int optname, char* optval, int* optlen)
 {
 	LOG_TRACE_NETWORK("XSocketGetSockOpt()");
-	XSocket* xsocket = (XSocket*)s;
+	XVirtualSocket* xsocket = (XVirtualSocket*)s;
+
+	if (optname == SO_BROADCAST)
+	{
+		*(bool*)(optval) = xsocket->IsBroadcast();
+		return 0;
+	}
+
 	return getsockopt(xsocket->winSockHandle, level, optname, optval, optlen);
 }
 
 // #9: XSocketGetSockName
-int WINAPI XSocketGetSockName(SOCKET s, struct sockaddr *name, int *namelen)
+int WINAPI XSocketGetSockName(SOCKET s, struct sockaddr* name, int* namelen)
 {
 	LOG_TRACE_NETWORK("XSocketGetSockName()");
-	XSocket* xsocket = (XSocket*)s;
+	XVirtualSocket* xsocket = (XVirtualSocket*)s;
 	return getsockname(xsocket->winSockHandle, name, namelen);
 }
 
 // #10
-int WINAPI XSocketGetPeerName(SOCKET s, struct sockaddr *name, int *namelen)
+int WINAPI XSocketGetPeerName(SOCKET s, struct sockaddr* name, int* namelen)
 {
 	LOG_TRACE_NETWORK("XSocketGetPeerName()");
-	XSocket* xsocket = (XSocket*)s;
+	XVirtualSocket* xsocket = (XVirtualSocket*)s;
 
 	if (xsocket->IsTCP())
 		return getpeername(xsocket->winSockHandle, name, namelen);
@@ -182,23 +200,20 @@ int WINAPI XSocketGetPeerName(SOCKET s, struct sockaddr *name, int *namelen)
 
 
 // #12: XSocketConnect
-int WINAPI XSocketConnect(SOCKET s, const struct sockaddr *name, int namelen)
+int WINAPI XSocketConnect(SOCKET s, const struct sockaddr* name, int namelen)
 {
-	XSocket* xsocket = (XSocket*)s;
+	XVirtualSocket* xsocket = (XVirtualSocket*)s;
 	LOG_TRACE_NETWORK("XSocketConnect  (socket = {0:x}, name = {1:p}, namelen = {2})",
 		xsocket->winSockHandle, (void*)name, namelen);
 
-	if (xsocket->IsTCP())
-		return connect(xsocket->winSockHandle, name, namelen);
-	else
-		return SOCKET_ERROR;
+	return connect(xsocket->winSockHandle, name, namelen);
 }
 
 
 // #13: XSocketListen
 int WINAPI XSocketListen(SOCKET s, int backlog)
 {
-	XSocket* xsocket = (XSocket*)s;
+	XVirtualSocket* xsocket = (XVirtualSocket*)s;
 	LOG_TRACE_NETWORK("XSocketListen  (socket = {0:x}, backlog = {1:x})",
 		xsocket->winSockHandle, backlog);
 
@@ -207,19 +222,19 @@ int WINAPI XSocketListen(SOCKET s, int backlog)
 
 
 // #14: XSocketAccept
-SOCKET WINAPI XSocketAccept(SOCKET s, struct sockaddr *addr, int *addrlen)
+SOCKET WINAPI XSocketAccept(SOCKET s, struct sockaddr* addr, int* addrlen)
 {
-	XSocket* xsocket = (XSocket*)s;
-	
+	XVirtualSocket* xsocket = (XVirtualSocket*)s;
+
 	LIMITED_LOG(35, LOG_TRACE_NETWORK, "XSocketAccept  (socket = {0:x}, addr = {1:p}, addrlen = {2})",
-			xsocket->winSockHandle, (void*)addr, *addrlen);
+		xsocket->winSockHandle, (void*)addr, *addrlen);
 
 	return accept(xsocket->winSockHandle, addr, addrlen);
 }
 
 
 // #15: XSocketSelect
-int WINAPI XSocketSelect(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, const struct timeval *timeout)
+int WINAPI XSocketSelect(int nfds, fd_set* readfds, fd_set* writefds, fd_set* exceptfds, const struct timeval* timeout)
 {
 	LIMITED_LOG(35, LOG_TRACE_NETWORK, "XSocketSelect()");
 
@@ -229,7 +244,7 @@ int WINAPI XSocketSelect(int nfds, fd_set *readfds, fd_set *writefds, fd_set *ex
 // #16
 BOOL WINAPI XSocketWSAGetOverlappedResult(SOCKET s, LPWSAOVERLAPPED lpOverlapped, LPDWORD lpcbTransfer, BOOL fWait, LPDWORD lpdwFlags)
 {
-	XSocket* xsocket = (XSocket*)s;
+	XVirtualSocket* xsocket = (XVirtualSocket*)s;
 	LOG_TRACE_NETWORK("XSocketWSAGetOverlappedResult  (socket = {0:x}, lpWSAOverlapped = {1:p}, lpcbTransfer = {2:p}, fWait = {3}, lpdwFlags = {4:p})",
 		xsocket->winSockHandle, (void*)lpOverlapped, (void*)lpcbTransfer, fWait, (void*)lpdwFlags);
 
@@ -243,8 +258,8 @@ BOOL WINAPI XSocketWSACancelOverlappedIO(HANDLE hFile)
 	return CancelIo(hFile);
 }
 
-int XSocket::winsock_read_socket(
-	LPWSABUF lpBuffers, 
+int XVirtualSocket::read_system_socket(
+	LPWSABUF lpBuffers,
 	DWORD dwBufferCount,
 	LPDWORD lpNumberOfBytesRecvd,
 	LPDWORD lpFlags,
@@ -270,12 +285,44 @@ int XSocket::winsock_read_socket(
 			lpCompletionRoutine);
 	}
 
-#if COMPILE_WITH_STD_SOCK_FUNC
+#if XSOCK_USING_STANDARD_APIS
 	int result = ::recvfrom(this->winSockHandle, lpBuffers->buf, lpBuffers->len, *lpFlags, lpFrom, lpFromlen);
 	*lpNumberOfBytesRecvd = result;
 #else
 	int result = WSARecvFrom(this->winSockHandle, lpBuffers, dwBufferCount, lpNumberOfBytesRecvd, lpFlags, lpFrom, lpFromlen, lpOverlapped, lpCompletionRoutine);
 #endif
+
+	if (this->IsBroadcast())
+	{
+		// check if there's an error
+		// and if that error is WSAEWOULDBLOCK
+		// prioritize other type of data over broadcast
+		if (result == SOCKET_ERROR
+			&& WSAGetLastError() == WSAEWOULDBLOCK)
+		{
+			// read the broadcast data, if system-link is properly initialized
+			if (g_XSockMgr.SystemLinkAvailable())
+			{
+				for (int i = 0; i < 2; i++)
+				{
+					if (g_XSockMgr.SystemLinkGetSystemSockHandle(i) != INVALID_SOCKET)
+					{
+#if XSOCK_USING_STANDARD_APIS
+						result = ::recvfrom(g_XSockMgr.SystemLinkGetSystemSockHandle(i), lpBuffers->buf, lpBuffers->len, *lpFlags, lpFrom, lpFromlen);
+						*lpNumberOfBytesRecvd = result;
+#else
+						result = WSARecvFrom(g_XSockMgr.SystemLinkGetSystemSockHandle(i), lpBuffers, dwBufferCount, lpNumberOfBytesRecvd, lpFlags, lpFrom, lpFromlen, lpOverlapped, lpCompletionRoutine);
+#endif
+						if (result != SOCKET_ERROR)
+						{
+							break;
+						}
+					}
+				}
+			}
+		}
+	}
+
 	if (result == SOCKET_ERROR)
 	{
 		*lpNumberOfBytesRecvd = 0;
@@ -288,26 +335,26 @@ int XSocket::winsock_read_socket(
 	return result;
 }
 
-int XSocket::sock_read(LPWSABUF lpBuffers,
+int XVirtualSocket::sock_read(LPWSABUF lpBuffers,
 	DWORD dwBufferCount,
-	LPDWORD lpNumberOfBytesRecvd, 
+	LPDWORD lpNumberOfBytesRecvd,
 	LPDWORD lpFlags,
-	struct sockaddr* lpFrom, 
-	LPINT lpFromlen, 
-	LPWSAOVERLAPPED lpOverlapped, 
+	struct sockaddr* lpFrom,
+	LPINT lpFromlen,
+	LPWSAOVERLAPPED lpOverlapped,
 	LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine)
 {
-	// loop MAX_PACKETS_TO_READ_PER_RECV_CALL times until we get a valid packet
+	// loop SOCK_MAX_RECV_PAYLOADS_TO_READ_PER_CALL times until we get a valid packet
 	// unless Winsock API returns an error
-	for (int i = 0; i < MAX_PACKETS_TO_READ_PER_RECV_CALL; i++)
+	for (int i = 0; i < SOCK_MAX_RECV_PAYLOADS_TO_READ_PER_CALL; i++)
 	{
-		bool errorByRecvAPI = false;
+		bool errorByAPI = false;
 
-		int result = winsock_read_socket(lpBuffers, dwBufferCount, lpNumberOfBytesRecvd, lpFlags, lpFrom, lpFromlen, lpOverlapped, lpCompletionRoutine, &errorByRecvAPI);
+		int result = read_system_socket(lpBuffers, dwBufferCount, lpNumberOfBytesRecvd, lpFlags, lpFrom, lpFromlen, lpOverlapped, lpCompletionRoutine, &errorByAPI);
 
 		if (result == SOCKET_ERROR)
 		{
-			if (errorByRecvAPI)
+			if (errorByAPI)
 			{
 				if (WSAGetLastError() != WSAEWOULDBLOCK)
 					LOG_ERROR_NETWORK("{} - socket error: {}", __FUNCTION__, WSAGetLastError());
@@ -333,16 +380,16 @@ int XSocket::sock_read(LPWSABUF lpBuffers,
 }
 
 // #21
-int WINAPI XSocketWSARecvFrom(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, LPDWORD lpNumberOfBytesRecvd, LPDWORD lpFlags, struct sockaddr *lpFrom, LPINT lpFromlen, LPWSAOVERLAPPED lpOverlapped, LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine)
+int WINAPI XSocketWSARecvFrom(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, LPDWORD lpNumberOfBytesRecvd, LPDWORD lpFlags, struct sockaddr* lpFrom, LPINT lpFromlen, LPWSAOVERLAPPED lpOverlapped, LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine)
 {
-	XSocket* socket = (XSocket*)s;
+	XVirtualSocket* socket = (XVirtualSocket*)s;
 	return socket->sock_read(lpBuffers, dwBufferCount, lpNumberOfBytesRecvd, lpFlags, lpFrom, lpFromlen, lpOverlapped, lpCompletionRoutine);
 }
 
 // #25
-int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, LPDWORD lpNumberOfBytesSent, DWORD dwFlags, sockaddr *lpTo, int iTolen, LPWSAOVERLAPPED lpOverlapped, LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine)
+int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, LPDWORD lpNumberOfBytesSent, DWORD dwFlags, sockaddr* lpTo, int iTolen, LPWSAOVERLAPPED lpOverlapped, LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine)
 {
-	XSocket* xsocket = (XSocket*)s;
+	XVirtualSocket* xsocket = (XVirtualSocket*)s;
 	sockaddr_in* inTo = (sockaddr_in*)lpTo;
 
 	if (xsocket->IsTCP() || inTo == NULL)
@@ -357,28 +404,56 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 			lpCompletionRoutine);
 	}
 
-	// check if we have to send a broadcast packet
-	if (inTo->sin_addr.s_addr == INADDR_BROADCAST
-		|| inTo->sin_addr.s_addr == INADDR_ANY)
+	// check if the title attempts to send broadcast/systemlink data
+	if ((inTo->sin_addr.s_addr == htonl(INADDR_BROADCAST)
+		|| inTo->sin_addr.s_addr == htonl(INADDR_ANY))
+		&& xsocket->IsBroadcast())
 	{
-		XBroadcastPacket* packet = (XBroadcastPacket*)_alloca(sizeof(XBroadcastPacket) + lpBuffers->len);
-		new (packet) XBroadcastPacket();
-
-		memcpy((char*)packet + sizeof(XBroadcastPacket), lpBuffers->buf, lpBuffers->len);
-
-		int portOffset = H2Config_base_port % 1000;
-
-		// TODO: properly implement this broadcast BS
-		for (int i = 2000; i <= 5000; i += 1000)
+		if (g_XSockMgr.SystemLinkAvailable())
 		{
-			inTo->sin_port = ntohs(i + portOffset + 1);
-			int result = sendto(xsocket->winSockHandle, (const char*)packet, sizeof(XBroadcastPacket) + lpBuffers->len, dwFlags, (sockaddr*)inTo, iTolen);
-			if (result == SOCKET_ERROR) {
-				return SOCKET_ERROR;
+			XBroadcastPacket* packet = (XBroadcastPacket*)_alloca(sizeof(XBroadcastPacket) + lpBuffers->len);
+			new (packet) XBroadcastPacket();
+
+			memcpy((char*)packet + sizeof(XBroadcastPacket), lpBuffers->buf, lpBuffers->len);
+
+			sockaddr_in broadcastAddresses[2];
+			memset(broadcastAddresses, 0, sizeof(broadcastAddresses));
+
+			broadcastAddresses[0].sin_family = AF_INET;
+			broadcastAddresses[0].sin_addr.s_addr = htonl(INADDR_BROADCAST);
+			if (H2Config_ip_broadcast_override != htonl(INADDR_ANY))
+				broadcastAddresses[0].sin_addr.s_addr = H2Config_ip_broadcast_override;
+			broadcastAddresses[0].sin_port = g_XSockMgr.SystemLinkGetPort();
+
+			// also send message to localhost multicast group
+			broadcastAddresses[1].sin_family = AF_INET;
+			broadcastAddresses[1].sin_addr.s_addr = htonl(XSOCK_MUTICAST_ADDR);
+			broadcastAddresses[1].sin_port = htons(XSOCK_MULTICAST_PORT);
+
+			int result = SOCKET_ERROR;
+			WSASetLastError(WSAEINVAL);
+
+			for (int i = 0; i < 2; i++)
+			{
+				if (g_XSockMgr.SystemLinkGetSystemSockHandle(i) != INVALID_SOCKET)
+				{
+					// send LAN broadcast packet
+					result = sendto(g_XSockMgr.SystemLinkGetSystemSockHandle(i),
+						(const char*)packet,
+						sizeof(XBroadcastPacket) + lpBuffers->len,
+						dwFlags,
+						(const sockaddr*)&broadcastAddresses[i], sizeof(sockaddr_in));
+				}
 			}
+
+			packet->~XBroadcastPacket();
+			return result;
 		}
-		packet->~XBroadcastPacket();
-		return 0;
+		else
+		{
+			WSASetLastError(WSAEINVAL);
+			return SOCKET_ERROR;
+		}
 	}
 
 	/*
@@ -435,7 +510,7 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 		DWORD pckSent = 0;
 		DWORD dwNumberOfBytesSent = 0;
 
-#if COMPILE_WITH_STD_SOCK_FUNC
+#if XSOCK_USING_STANDARD_APIS
 		for (DWORD i = 0ul; i < dwBufferCount; i++)
 		{
 			result = sendto(xsocket->winSockHandle, lpBuffers[i].buf, lpBuffers[i].len, dwFlags, (const sockaddr*)&sendToAddr, sizeof(sendToAddr));
@@ -447,7 +522,7 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 		}
 #else
 		result = WSASendTo(xsocket->winSockHandle, lpBuffers, dwBufferCount, &dwNumberOfBytesSent, dwFlags, (const sockaddr*)&sendToAddr, sizeof(sendToAddr), lpOverlapped, lpCompletionRoutine);
-#endif // if COMPILE_WITH_STD_SOCK_FUNC
+#endif // if XSOCK_USING_STANDARD_APIS
 
 		if (result == SOCKET_ERROR)
 		{
@@ -460,14 +535,14 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 		}
 		else
 		{
-#if !COMPILE_WITH_STD_SOCK_FUNC
+#if !XSOCK_USING_STANDARD_APIS
 			pckSent = dwBufferCount;
 #endif
 			xnIp->m_pckStats.PckSendStatsUpdate(pckSent, dwNumberOfBytesSent);
 			gXnIpMgr.GetLocalUserXn()->m_pckStats.PckSendStatsUpdate(pckSent, dwNumberOfBytesSent);
 			if (lpNumberOfBytesSent)
 				*lpNumberOfBytesSent = dwNumberOfBytesSent;
-			
+
 			return 0;
 		}
 
@@ -475,7 +550,7 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 	}
 	else
 	{
-		LOG_TRACE_NETWORK("XSocketSendTo() - Tried to send packet to unknown connection, connection index: {}, connection identifier: {:x}", 
+		LOG_TRACE_NETWORK("XSocketSendTo() - Tried to send packet to unknown connection, connection index: {}, connection identifier: {:x}",
 			XnIp::GetConnectionIndex(inTo->sin_addr), inTo->sin_addr.s_addr);
 		XSocketWSASetLastError(WSAEHOSTUNREACH);
 		return SOCKET_ERROR;
@@ -483,7 +558,7 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 }
 
 // #26: XSocketInet_Addr
-LONG WINAPI XSocketInet_Addr(const char *cp)
+LONG WINAPI XSocketInet_Addr(const char* cp)
 {
 	LOG_TRACE_NETWORK("XSocketInet_Addr()");
 	return inet_addr(cp);
@@ -542,14 +617,14 @@ BOOL WINAPI XSocketWSAResetEvent(HANDLE hEvent)
 }
 
 // #33
-DWORD WINAPI XSocketWSAWaitForMultipleEvents(DWORD cEvents, HANDLE *lphEvents, BOOL fWaitAll, DWORD dwTimeout, BOOL fAlertable)
+DWORD WINAPI XSocketWSAWaitForMultipleEvents(DWORD cEvents, HANDLE* lphEvents, BOOL fWaitAll, DWORD dwTimeout, BOOL fAlertable)
 {
 	LOG_TRACE_NETWORK("XSocketWSAWaitForMultipleEvents()");
 	return WSAWaitForMultipleEvents(cEvents, lphEvents, fWaitAll, dwTimeout, fAlertable);
 }
 
 // #34
-int WINAPI XSocketWSAFDIsSet(SOCKET fd, fd_set *a2)
+int WINAPI XSocketWSAFDIsSet(SOCKET fd, fd_set* a2)
 {
 	LOG_TRACE_NETWORK("XSocketWSAFDIsSet()");
 	return __WSAFDIsSet(fd, a2);
@@ -558,7 +633,7 @@ int WINAPI XSocketWSAFDIsSet(SOCKET fd, fd_set *a2)
 // #35
 int WINAPI XSocketWSAEventSelect(SOCKET s, HANDLE hEventObject, __int32 lNetworkEvents)
 {
-	XSocket* xsocket = (XSocket*)s;
+	XVirtualSocket* xsocket = (XVirtualSocket*)s;
 	LOG_TRACE_NETWORK("XSocketWSAEventSelect()");
 	return WSAEventSelect(xsocket->winSockHandle, hEventObject, lNetworkEvents);
 }
@@ -566,16 +641,16 @@ int WINAPI XSocketWSAEventSelect(SOCKET s, HANDLE hEventObject, __int32 lNetwork
 // #4
 int WINAPI XSocketClose(SOCKET s)
 {
-	XSocket* xsocket = (XSocket*)s;
+	XVirtualSocket* xsocket = (XVirtualSocket*)s;
 	LOG_TRACE_NETWORK("XSocketClose() - socket: {}", xsocket->winSockHandle);
 
 	int ret = closesocket(xsocket->winSockHandle);
 
-	for (auto i = XSocket::Sockets.begin(); i != XSocket::Sockets.end(); ++i)
+	for (auto i = XSocketManager::sockets.begin(); i != XSocketManager::sockets.end(); ++i)
 	{
 		if (*i == xsocket)
 		{
-			XSocket::Sockets.erase(i);
+			XSocketManager::sockets.erase(i);
 			break;
 		}
 	}
@@ -586,9 +661,9 @@ int WINAPI XSocketClose(SOCKET s)
 }
 
 // #11: XSocketBind
-SOCKET WINAPI XSocketBind(SOCKET s, const struct sockaddr *name, int namelen)
+SOCKET WINAPI XSocketBind(SOCKET s, const struct sockaddr* name, int namelen)
 {
-	XSocket* xsocket = (XSocket*)s;
+	XVirtualSocket* xsocket = (XVirtualSocket*)s;
 
 	// copy socket ip/port
 	memcpy(&xsocket->name, name, sizeof(sockaddr_in));
@@ -613,7 +688,7 @@ SOCKET WINAPI XSocketBind(SOCKET s, const struct sockaddr *name, int namelen)
 		break;
 	}
 
-	LOG_TRACE_NETWORK("XSocketBind() - replaced virtual socket port - {} with: {}", 
+	LOG_TRACE_NETWORK("XSocketBind() - replaced virtual socket port - {} with: {}",
 		ntohs(virtual_port), ntohs(((struct sockaddr_in*)name)->sin_port));
 
 	int ret = bind(xsocket->winSockHandle, name, namelen);
@@ -651,7 +726,7 @@ int WINAPI XSocketSend(SOCKET s, const char* buf, int len, int flags)
 }
 
 // #24: XSocketSendTo
-int WINAPI XSocketSendTo(SOCKET s, const char* buf, int len, int flags, sockaddr *to, int tolen)
+int WINAPI XSocketSendTo(SOCKET s, const char* buf, int len, int flags, sockaddr* to, int tolen)
 {
 	WSABUF wsaBuf;
 	wsaBuf.len = len;
@@ -679,7 +754,7 @@ int WINAPI XSocketRecv(SOCKET s, char* buf, int len, int flags)
 }
 
 // #20
-int WINAPI XSocketRecvFrom(SOCKET s, char* buf, int len, int flags, sockaddr *from, int *fromlen)
+int WINAPI XSocketRecvFrom(SOCKET s, char* buf, int len, int flags, sockaddr* from, int* fromlen)
 {
 	WSABUF wsaBuf[1];
 	wsaBuf[0].len = len;
@@ -716,7 +791,7 @@ u_short WINAPI XSocketHTONS(u_short hostshort)
 	return htons(hostshort);
 }
 
-int XSocket::SetBufferSize(int optname, INT bufSize)
+int XVirtualSocket::SetBufferSize(int optname, INT bufSize)
 {
 	if (optname != SO_SNDBUF && optname != SO_RCVBUF)
 	{
@@ -757,16 +832,145 @@ int XSocket::SetBufferSize(int optname, INT bufSize)
 	return 0;
 }
 
-int XSocket::UdpSend(const char* buf, int len, int flags, sockaddr *to, int tolen)
+int XVirtualSocket::UdpSend(const char* buf, int len, int flags, sockaddr* to, int tolen)
 {
 	return XSocketSendTo((SOCKET)this, buf, len, flags, to, tolen);
 }
 
-void XSocket::SocketsDisposeAll()
+void XSocketManager::SocketsDisposeAll()
 {
-	for (auto xsocket : Sockets)
+	for (auto xsocket : sockets)
 	{
 		XSocketClose((SOCKET)xsocket);
 	}
-	Sockets.clear();
+	sockets.clear();
+}
+
+void XSocketManager::Initialize()
+{
+}
+
+bool XSocketManager::CreateSocket(XBroadcastSocket* sock, WORD port, bool multicast)
+{
+	bool success = false;
+
+	IN_ADDR interfaceAddr; 
+
+	// ### TODO FIXME: allow choosing the network interface
+	interfaceAddr.s_addr = htonl(INADDR_ANY);
+	if (multicast)
+	{
+		interfaceAddr.s_addr = htonl(INADDR_LOOPBACK);
+	}
+
+	SOCKET s;
+	do
+	{
+		s = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+		if (s == INVALID_SOCKET)
+		{
+			break;
+		}
+
+		unsigned long mode = 1;
+		if (ioctlsocket(s, FIONBIO, &mode) == SOCKET_ERROR)
+		{
+			break;
+		}
+
+		int optval_broadcast = 1;
+		if (setsockopt(s, SOL_SOCKET, SO_BROADCAST, (const char*)&optval_broadcast, sizeof(optval_broadcast)) == SOCKET_ERROR)
+		{
+			break;
+		}
+
+		if (multicast)
+		{
+			// allow same addr to be used
+			int optval_reuseaddr = 1;
+			if (setsockopt(s, SOL_SOCKET, SO_REUSEADDR, (char*)&optval_reuseaddr, sizeof(optval_reuseaddr)) == SOCKET_ERROR)
+			{
+				break;
+			}
+		}
+
+		sockaddr_in name;
+		int name_len = sizeof(name);
+		memset(&name, 0, sizeof(sockaddr_in));
+		name.sin_family = AF_INET;
+		name.sin_addr = interfaceAddr;
+		name.sin_port = port;
+
+		if (bind(s, (const sockaddr*)&name, sizeof(name)) == SOCKET_ERROR)
+		{
+			break;
+		}
+
+		if (multicast)
+		{
+			ip_mreq mreq;
+
+			// localhost only
+			mreq.imr_interface.s_addr = htonl(INADDR_LOOPBACK);
+			mreq.imr_multiaddr.s_addr = htonl(XSOCK_MUTICAST_ADDR);
+
+			if (setsockopt(s, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char*)&mreq, sizeof(mreq)))
+			{
+				break;
+			}
+		}
+
+		if (getsockname(s, (struct sockaddr*)&name, &name_len) == SOCKET_ERROR)
+		{
+			break;
+		}
+
+		if (name.sin_port != port)
+		{
+			// failed to use the configured port, likely was already in USE!
+			break;
+		}
+
+		success = true;
+
+	} while (0);
+
+	if (success)
+	{
+		sock->m_systemSockHandle = s;
+		sock->m_port = port;
+		sock->m_multicast = multicast;
+	}
+	else
+	{
+		sock->m_systemSockHandle = INVALID_SOCKET;
+		sock->m_port = 0;
+		sock->m_multicast = false;
+	}
+
+	return success;
+}
+
+bool XSocketManager::SystemLinkSocketInitialize(WORD port)
+{
+	bool success = CreateSocket(&m_broadcastLANSock, port, false);
+	success |= CreateSocket(&m_broadcastLocalhostSock, htons(XSOCK_MULTICAST_PORT), true);
+
+	// ### FIXME return error code??
+	return success;
+}
+
+bool XSocketManager::SystemLinkSocketReset(WORD port)
+{
+	SystemLinkDispose();
+	return SystemLinkSocketInitialize(port);
+}
+
+void XSocketManager::SystemLinkDispose()
+{
+	if (SystemLinkAvailable())
+	{
+		m_broadcastLANSock.Dispose();
+		m_broadcastLocalhostSock.Dispose();
+	}
 }

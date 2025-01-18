@@ -35,10 +35,8 @@ std::string cartographerURL = "https://cartographer.online";
 std::string cartographerMapRepoURL = "http://www.h2maps.net/Cartographer/CustomMaps";
 
 unsigned short H2Config_base_port = 2000;
-char H2Config_str_wan[16] = { "" };
-char H2Config_str_lan[16] = { "" };
-unsigned long H2Config_ip_wan = 0;
-unsigned long H2Config_ip_lan = 0;
+unsigned long H2Config_ip_lan = htonl(INADDR_NONE);
+unsigned long H2Config_ip_broadcast_override = htonl(INADDR_BROADCAST);
 _H2Config_language H2Config_language = { -1, 0 };
 bool H2Config_custom_labels_capture_missing = false;
 bool H2Config_skip_intro = false;
@@ -135,7 +133,7 @@ set_config_entry(CSimpleIniA* simple_ini, const char* section_key, const char* c
 
 	try
 	{
-		value_as_string = ComVar(value).GetValStr();
+		value_as_string = ComVar(value).AsString();
 	}
 	catch (...)
 	{
@@ -424,8 +422,13 @@ void SaveH2Config() {
 		CONFIG_SET(&ini, "h2portable", &H2Portable);
 		CONFIG_SET(&ini, "base_port", &H2Config_base_port);
 
-		CONFIG_SET(&ini, "wan_ip", H2Config_str_wan);
-		CONFIG_SET(&ini, "lan_ip", H2Config_str_lan);
+		ComVarAddrIpv4 address_lan(&H2Config_ip_lan);
+		bool lanaddr_override_valid = H2Config_ip_lan != htonl(INADDR_NONE) && H2Config_ip_lan != htonl(INADDR_ANY);
+		CONFIG_SET(&ini, "lan_ip", lanaddr_override_valid ? address_lan.AsString().c_str() : "");
+
+		ComVarAddrIpv4 address_broadcast(&H2Config_ip_broadcast_override);
+		bool broadcast_override_valid = H2Config_ip_broadcast_override != htonl(INADDR_ANY);
+		CONFIG_SET(&ini, "broadcast_ip", broadcast_override_valid ? address_broadcast.AsString().c_str() : "255.255.255.255");
 
 		CONFIG_SET(&ini, "upnp", &H2Config_upnp_enable);
 
@@ -599,24 +602,34 @@ void ReadH2Config() {
 			CONFIG_GET(&ini, "debug_log_level", "2", &H2Config_debug_log_level);
 			CONFIG_GET(&ini, "debug_log_console", "false", &H2Config_debug_log_console);
 
-			const char* ip_wan = nullptr;
-			CONFIG_GET(&ini, "wan_ip", "", &ip_wan);
-			if (ip_wan
-				&& strnlen_s(ip_wan, 15) >= 7
-				&& inet_addr(ip_wan) != INADDR_NONE)
-			{
-				strncpy(H2Config_str_wan, ip_wan, 15);
-				H2Config_ip_wan = inet_addr(H2Config_str_wan);
-			}
-
 			const char* ip_lan = nullptr;
 			CONFIG_GET(&ini, "lan_ip", "", &ip_lan);
-			if (ip_lan
-				&& strnlen_s(ip_lan, 15) >= 7
-				&& inet_addr(ip_lan) != INADDR_NONE)
+			H2Config_ip_lan = htonl(INADDR_NONE);
+			if (ip_lan)
 			{
-				strncpy(H2Config_str_lan, ip_lan, 15);
-				H2Config_ip_lan = inet_addr(H2Config_str_lan);
+				bool lan_addr_override_valid = 
+					strnlen_s(ip_lan, 15) >= 7 
+					&& (inet_addr(ip_lan) != htonl(INADDR_NONE) || inet_addr(ip_lan) != htonl(INADDR_ANY));
+
+				if (lan_addr_override_valid)
+				{
+					H2Config_ip_lan = inet_addr(ip_lan);
+				}
+			}
+
+			const char* ip_broadcast = nullptr;
+			CONFIG_GET(&ini, "broadcast_ip", "255.255.255.255", &ip_broadcast);
+			H2Config_ip_broadcast_override = htonl(INADDR_BROADCAST);
+			if (ip_broadcast)
+			{
+				bool broadcast_addr_override_valid =
+					strnlen_s(ip_broadcast, 15) >= 7
+					&& inet_addr(ip_broadcast) != htonl(INADDR_ANY);
+
+				if (broadcast_addr_override_valid)
+				{
+					H2Config_ip_broadcast_override = inet_addr(ip_broadcast);
+				}
 			}
 
 			// client only

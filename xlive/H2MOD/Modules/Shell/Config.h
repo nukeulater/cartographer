@@ -42,10 +42,8 @@ extern unsigned short H2Config_master_port_relay;
 extern bool H2Portable;
 extern bool H2Config_isConfigFileAppDataLocal;
 extern unsigned short H2Config_base_port;
-extern char H2Config_str_wan[16];
-extern char H2Config_str_lan[16];
-extern unsigned long H2Config_ip_wan;
 extern unsigned long H2Config_ip_lan;
+extern unsigned long H2Config_ip_broadcast_override;
 
 extern _H2Config_language H2Config_language;
 extern bool H2Config_custom_labels_capture_missing;
