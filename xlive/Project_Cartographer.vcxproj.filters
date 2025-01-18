@@ -1902,6 +1902,7 @@
     <ClInclude Include="Blam\Engine\rasterizer\dx9\vertex_shaders_dx9\preprocessed_hlsl_from_tool\compiled\weather_plate_world.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\vertex_shaders_dx9\preprocessed_hlsl_from_tool\compiled\_compiled_shader_table.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\vertex_shaders_dx9\preprocessed_hlsl_from_tool\compiled\debug_screenspace_world.h" />
+    <ClInclude Include="H2MOD\GUI\imgui_integration\imgui_ProdigyCleanTTF.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

@@ -12,6 +12,8 @@
 #include "Console/ImGui_ConsoleImpl.h"
 #include "ImGui_NetworkStatsOverlay.h"
 
+#include "imgui_ProdigyCleanTTF.h"
+
 
 const char* k_advanced_settings_window_name = "advanced_settings";
 const char* k_weapon_offsets_window_name = "Weapon Offsets";
@@ -57,6 +59,8 @@ namespace ImGuiHandler
 	}
 
 	int						g_network_stats_overlay = _network_stats_display_none;
+
+	ImFont*					g_im_font_ProdigyClean = NULL;
 
 	bool ImGuiShouldHandleInput()
 	{
@@ -109,6 +113,8 @@ namespace ImGuiHandler
 		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();
 
+		ImGui::PushFont(g_im_font_ProdigyClean);
+
 		static bool display_network_stats = false;
 		display_network_stats = g_network_stats_overlay == _network_stats_display_complete;
 		ShowNetworkStatsOverlay(&display_network_stats);
@@ -121,6 +127,8 @@ namespace ImGuiHandler
 				window->renderFunc(&should_render);
 			}
 		}
+
+		ImGui::PopFont();
 
 		// Rendering
 		ImGui::Render();
@@ -190,7 +198,10 @@ namespace ImGuiHandler
 
 		ImFontConfig fontConfig;
 		fontConfig.SizePixels = 13.0f * 1.5f;
-		ImFont* font1 = io.Fonts->AddFontDefault(&fontConfig);
+		g_im_font_ProdigyClean = io.Fonts->AddFontFromMemoryCompressedBase85TTF(
+			proggy_clean_ttf_compressed_data_base85,
+			fontConfig.SizePixels,
+			&fontConfig);
 
 		ImGui_ImplDX9_Init(rasterizer_dx9_device_get_interface());
 
