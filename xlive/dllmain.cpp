@@ -1,6 +1,8 @@
 #include "stdafx.h"
 
 #include "cartographer/discord/discord_interface.h"
+#include "interface/new_hud_draw.h"
+#include "tag_files/tag_loader/tag_injection.h"
 
 #include "H2MOD/Modules/Shell/Startup/Startup.h"
 #include "H2MOD/Modules/Shell/Config.h"
@@ -117,6 +119,8 @@ void initialize_instance(void)
 void exit_instance(void)
 {
 	discord_dispose();
+	tag_injection_deinitialize();
+	new_hud_draw_deinitialize();
 
 #ifndef NO_TRACE
 	EnterCriticalSection(&log_section);
