@@ -133,6 +133,9 @@ void exit_instance(void)
 	LeaveCriticalSection(&log_section);
 	DeleteCriticalSection(&log_section);
 #endif
+#if CARTOGRAPHER_HEAP_DEBUG
+	_CrtDumpMemoryLeaks();
+#endif
 	TerminateProcess(GetCurrentProcess(), 0);
 	return;
 }
