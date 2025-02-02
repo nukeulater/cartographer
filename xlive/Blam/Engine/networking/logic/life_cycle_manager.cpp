@@ -105,7 +105,7 @@ void c_game_life_cycle_manager::request_state_change(e_game_life_cycle requested
 	this->m_update_requested = true;
 	this->m_entry_data_size = entry_data_size;
 	csmemset(m_entry_data, 0, sizeof(m_entry_data));
-	if (m_entry_data > 0)
+	if (m_entry_data_size > 0)
 	{
 		csmemcpy(&m_entry_data, entry_data, this->m_entry_data_size);
 	}
