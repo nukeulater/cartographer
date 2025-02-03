@@ -240,8 +240,8 @@ public:
 		bool success = true;
 		try
 		{
-			std::string subip_address("");
-			size_t cur_offset = 0;
+			//std::string subip_address("");
+			//size_t cur_offset = 0;
 
 			unsigned long new_address = 0;
 

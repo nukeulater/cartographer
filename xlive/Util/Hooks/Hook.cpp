@@ -25,7 +25,7 @@ void *DetourFunc(BYTE *src, const BYTE *dst, const unsigned int len)
 	src[0] = 0xE9;
 	*(DWORD*)(src + 1) = (DWORD)(dst - src) - 5;
 
-	for (int i = 5; i < len; i++)
+	for (unsigned int i = 5; i < len; i++)
 		src[i] = 0x90;
 	);
 
@@ -67,7 +67,7 @@ void *DetourClassFunc(BYTE *src, const BYTE *dst, const unsigned int len)
 	src[3] = 0xE9;							// jmp
 	*(DWORD*)(src + 4) = (DWORD)(dst - (src + 3)) - 5;
 
-	for (int i = 8; i < len; i++)
+	for (unsigned int i = 8; i < len; i++)
 		src[i] = 0x90;
 	);
 

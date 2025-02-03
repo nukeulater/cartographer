@@ -594,7 +594,6 @@ int CartographerConsole::clear_cb(const std::vector<std::string>& tokens, Consol
 int CartographerConsole::set_opacity_cb(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
 {
 	TextOutputCb* console_output_cb = cbData.outputCb;
-	const ConsoleCommand* command_data = cbData.consoleCommand;
 	auto consoleOpacityVar = cbData.consoleCommand->GetVar<ComVar<float>>();
 
 	std::string exception;

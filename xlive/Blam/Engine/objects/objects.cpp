@@ -422,7 +422,6 @@ void free_object_memory(datum object_index)
 
 void object_initialize_for_interpolation(datum object_index)
 {
-	uint16 abs_object_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(object_index);
 	object_datum* object = object_get_fast_unsafe(object_index);
 	object_definition* object_def = (object_definition*)tag_get_fast(object->tag_definition_index);
 

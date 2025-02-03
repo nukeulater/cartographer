@@ -35,21 +35,13 @@ enum e_cartographer_error_id
 	_cartpgrapher_error_id_none = NONE,
 };
 
-/* structures */
-
-struct s_cartographer_error_globals
-{
-	wchar_t* header_text;
-	wchar_t* subheader_text;
-};
-
 /* classes */
 
 class c_cartographer_error_menu : protected c_screen_widget
 {
 protected:
 	e_cartographer_error_id m_error_id;
-	static void get_error_label(e_cartographer_error_id error_id, wchar_t** out_header_text, wchar_t** out_subheader_text);
+	static void get_error_label(e_cartographer_error_id error_id, const wchar_t** out_header_text, const wchar_t** out_subheader_text);
 
 public:
 	static void* load_by_error_id(e_cartographer_error_id error_id);

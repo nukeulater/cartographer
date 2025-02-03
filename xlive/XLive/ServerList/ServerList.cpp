@@ -5,7 +5,7 @@
 
 #include "cseries/cseries_strings.h"
 
-#include "H2MOD/Modules/OnScreenDebug/OnScreenDebug.h"
+#include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/Accounts/Accounts.h"
 

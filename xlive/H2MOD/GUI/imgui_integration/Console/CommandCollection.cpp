@@ -420,7 +420,6 @@ int CommandCollection::ReloadMapsCmd(const std::vector<std::string>& tokens, Con
 int CommandCollection::HelpCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
 	TextOutputCb* outputCb = ctx.outputCb;
-	const ConsoleCommand* command_data = ctx.consoleCommand;
 
 	const std::string* commandToHelp = nullptr;
 
@@ -468,7 +467,6 @@ int CommandCollection::HelpCmd(const std::vector<std::string>& tokens, ConsoleCo
 int CommandCollection::LogPlayersCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
 	TextOutputCb* outputCb = ctx.outputCb;
-	const ConsoleCommand* command_data = ctx.consoleCommand;
 
 	c_network_session* session = NULL;
 	if (!network_life_cycle_in_squad_session(&session))
@@ -511,7 +509,6 @@ int CommandCollection::LogPlayersCmd(const std::vector<std::string>& tokens, Con
 int CommandCollection::LogPeersCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
 	TextOutputCb* outputCb = ctx.outputCb;
-	const ConsoleCommand* command_data = ctx.consoleCommand;
 
 	c_network_session* session = NULL;
 	if (!network_life_cycle_in_squad_session(&session))

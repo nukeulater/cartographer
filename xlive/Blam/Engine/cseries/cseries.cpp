@@ -43,7 +43,7 @@ if (!(STATEMENT))					\
 	{											\
 		error(3, "%s", shell_get_version());	\
 		error(3, "%s at %s,#%d", "### ASSERTION FAILED: ", __FILE__, __LINE__);	\
-		error(3, "  %s", ##STATEMENT);			\
+		error(3, "  %s", #STATEMENT);			\
 	}											\
 	/* TODO: error callback call here */		\
 	if (!is_debugger_present())					\

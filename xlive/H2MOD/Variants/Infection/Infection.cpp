@@ -163,7 +163,6 @@ bool Infection::shouldEndGame()
 	player_iterator player_it;
 	while (player_it.get_next_active_player())
 	{
-		int currentPlayerIndex = player_it.get_current_player_index();
 		uint64 playerIdentifier = player_it.get_current_player_id();
 		bool isZombie = std::find(Infection::zombieIdentifiers.begin(), Infection::zombieIdentifiers.end(), playerIdentifier) != Infection::zombieIdentifiers.end();
 

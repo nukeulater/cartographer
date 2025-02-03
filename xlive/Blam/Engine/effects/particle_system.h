@@ -1,7 +1,6 @@
 #pragma once
 
 #include "particle_system_definition.h"
-#include "math/matrix_math.h"
 #include "memory/data.h"
 #include "objects/object_placement.h"
 
@@ -62,12 +61,12 @@ public:
 
 	c_particle_system_definition* get_definition() const;
 
-	bool get_ever_pulsed_or_frame_updated() const
+	bool get_ever_pulsed_or_frame_updated(void) const
 	{
 		return flags.test(_particle_system_bit_11) || flags.test(_particle_system_bit_9);
 	}
 
-	bool c_particle_system::get_in_sky(void) const
+	bool get_in_sky(void) const
 	{
 		return this->flags.test(_particle_system_scale_with_sky_render_model_bit);
 	}

@@ -8,13 +8,17 @@
 #include "interface/user_interface_utilities.h"
 #include "main/game_preferences.h"
 
-#include "H2MOD/Modules/CustomMenu/CustomMenuGlobals.h"
+/* structures */
 
-
+struct s_cartographer_error_globals
+{
+	const wchar_t* header_text;
+	const wchar_t* subheader_text;
+};
 
 /* constants */
 
-const s_cartographer_error_globals k_cartographer_error_globals[k_language_count][k_cartographer_error_id_count] = 
+const s_cartographer_error_globals k_cartographer_error_globals[k_language_count][k_cartographer_error_id_count] =
 {
 	{
 		{
@@ -122,7 +126,7 @@ const s_cartographer_error_globals k_cartographer_error_globals[k_language_count
 
 /* public code */
 
-void c_cartographer_error_menu::get_error_label(e_cartographer_error_id error_id, wchar_t** out_header_text, wchar_t** out_subheader_text)
+void c_cartographer_error_menu::get_error_label(e_cartographer_error_id error_id, const wchar_t** out_header_text, const wchar_t** out_subheader_text)
 {
 	*out_header_text = k_cartographer_error_globals[_language_english][error_id].header_text;
 	*out_subheader_text = k_cartographer_error_globals[_language_english][error_id].subheader_text;
@@ -220,8 +224,8 @@ void c_cartographer_error_menu::initialize(s_screen_parameters* screen_parameter
 
 	//update header and subheader labels
 
-	wchar_t* header_text = L"<unknown-error>";
-	wchar_t* subheader_text = L"<unknown-error-subheader>";
+	const wchar_t* header_text = L"<unknown-error>";
+	const wchar_t* subheader_text = L"<unknown-error-subheader>";
 
 	if (m_error_id != _cartpgrapher_error_id_none)
 	{

@@ -5,7 +5,7 @@
 
 #include "../net_utils.h"
 
-#include "H2MOD/GUI/ImGui_Integration/Console/CommandHandler.h"
+#include "H2MOD/GUI/imgui_integration/Console/CommandHandler.h"
 
 #define XNIP_MAX_PCK_STR_HDR_LEN 32
 #define XNIP_MAX_NET_STATS_SAMPLES 30
