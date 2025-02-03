@@ -125,8 +125,9 @@ object_cause_damage_t p_object_cause_damage;
 // Engine call to set damage applied on an object by a projectile
 void __cdecl projectile_collision_object_cause_damage(s_damage_data* damage_data, int damaged_object_indexes, __int16 a4, __int16 a5, __int16 a6, int a7)
 {
-	// Hook on call to prevent guardian glitching on Infection gametype
-	if (CustomVariantHandler::VariantEnabled(_id_infection)) {
+	// Hook on call to prevent guardian glitching
+	// Used to disable it in Infection only, became a bigger problem so now we have to disable it globally.....
+	if (/*CustomVariantHandler::VariantEnabled(_id_infection)*/ true) {
 		if (damage_data->creator_datum != NONE && damage_data->field_10 != NONE)
 		{
 			LOG_TRACE_GAME(
