@@ -12,7 +12,7 @@ jobs:
       PLATFORM: x86
     strategy:
       matrix:
-        BUILD_CONFIGURATION: [Debug, Release]
+        BUILD_CONFIGURATION: [debug_msvc, debug_llvm, release_msvc, release_llvm]
 
     runs-on: windows-2022
 
