@@ -89,9 +89,6 @@ void GunGame::OnMapLoad(ExecTime execTime, s_game_options* gameOptions)
 
 void GunGame::OnPlayerDeath(ExecTime execTime, datum playerIdx)
 {
-	int absPlayerIdx = DATUM_INDEX_TO_ABSOLUTE_INDEX(playerIdx);
-	datum playerUnitDatum = s_player::get_unit_index(playerIdx);
-
 	switch (execTime)
 	{
 	case ExecTime::_preEventExec:

@@ -12,8 +12,8 @@
 
 struct s_keyboard_custom_labels
 {
-	wchar_t* header_text;
-	wchar_t* subheader_text;
+	const wchar_t* header_text;
+	const wchar_t* subheader_text;
 };
 
 /* global constants */
@@ -45,7 +45,7 @@ const s_keyboard_custom_labels k_keyboard_custom_label_globals[k_language_count]
 bool g_vkbd_create_open_profile_config = true;
 
 // header & subheader
-static void get_keyboard_labels(e_vkbd_context_type context, wchar_t** out_header_text, wchar_t** out_subheader_text)
+static void get_keyboard_labels(e_vkbd_context_type context, const wchar_t** out_header_text, const wchar_t** out_subheader_text)
 {
 	ASSERT(context >= k_virtual_keyboard_custom_context_start);
 
@@ -154,8 +154,8 @@ void c_screen_virtual_keyboard::update_custom_labels(e_vkbd_context_type context
 {
 	if (IN_RANGE(context, k_virtual_keyboard_custom_context_start, k_virtual_keyboard_custom_context_end))
 	{
-		wchar_t* header_text = L"<unknown-title>";
-		wchar_t* subheader_text = L"<unknown-description>";
+		const wchar_t* header_text = L"<unknown-title>";
+		const wchar_t* subheader_text = L"<unknown-description>";
 
 		get_keyboard_labels(context, &header_text, &subheader_text);
 
@@ -211,7 +211,6 @@ t_load_player_profile_edit p_load_player_profile_edit;
 bool __thiscall c_screen_virtual_keyboard::load_player_profile_edit()
 {
 	bool result = true;
-
 	if (g_vkbd_create_open_profile_config)
 	{
 		result = p_load_player_profile_edit(this);

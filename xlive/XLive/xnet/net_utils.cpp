@@ -6,7 +6,7 @@
 case _case: \
 	return #_case; \
 
-std::string IOCTLSocket_cmd_string(long cmd)
+std::string IOCTLSocket_cmd_string(unsigned long cmd)
 {
 	switch (cmd)
 	{

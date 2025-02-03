@@ -50,6 +50,7 @@ void main_tag_fixes(void)
 	tag_fixes_environment();
 	tag_fixes_misty_rain();
 	tag_fixes_split_screen_hud();
+	sound_classes_fix_values();
 	return;
 }
 

@@ -17,7 +17,7 @@ struct c_particle_location
 
 	void frame_advance(c_particle_system* particle_system, c_particle_system_definition* particle_system_definition, real32 delta);
 
-	void c_particle_location::adjust_emitter_particle_intial_position(
+	void adjust_emitter_particle_intial_position(
 		c_particle_system* particle_system,
 		real32 dt,
 		const real_matrix4x3* matrix

@@ -24,9 +24,6 @@ static int InterpretMasterCreate(char* response_content) {
 
 	int tempint1 = -1;
 	char tempstr1[512] = { "" };
-	unsigned long long templlu1 = 0;
-	unsigned int tempuint1 = 0;
-	unsigned long tempulong = 0;
 
 	char* index_current = response_content;
 	char* index_next = 0;

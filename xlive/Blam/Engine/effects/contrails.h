@@ -3,7 +3,7 @@
 
 /* enums */
 
-enum e_contrail_render_type : int32
+enum e_contrail_render_type : uint32
 {
 	_contrail_render_type_vertical = 0x0,
 	_contrail_render_type_horizontal = 0x1,

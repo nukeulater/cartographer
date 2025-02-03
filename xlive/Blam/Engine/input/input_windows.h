@@ -53,8 +53,8 @@ public:
 	virtual void XInputClose(void) override;
 	virtual void XUpdateState(void) override;
 	virtual uint32 XGetState(XINPUT_STATE* state) override;
-	virtual void XSetState(XINPUT_VIBRATION* state) { return; };
-	virtual void XUpdateImmediate(void) { return; };
+	virtual void XSetState(XINPUT_VIBRATION* state) override { return; } ;
+	virtual void XUpdateImmediate(void) override { return; };
 };
 ASSERT_STRUCT_SIZE(dinput_device, 0x40);
 

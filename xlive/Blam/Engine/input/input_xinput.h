@@ -14,8 +14,8 @@ public:
 	uint32 get_port() const;
 	// xinput_device virtual functions
 
-	virtual void XInputOpen(void) { return; };
-	virtual void XInputClose(void) { return; };
+	virtual void XInputOpen(void) override { return; };
+	virtual void XInputClose(void) override { return; };
 	virtual void XUpdateState(void) override;
 	virtual uint32 XGetState(XINPUT_STATE* state) override;
 	virtual void XSetState(XINPUT_VIBRATION* state) override;
