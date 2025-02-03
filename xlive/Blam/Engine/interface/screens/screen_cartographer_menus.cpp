@@ -123,9 +123,9 @@ enum e_cartographer_update_notice_string_table
 	k_cartographer_update_notice_end,
 };
 
-static void get_guide_label(int32 label_id, wchar_t** out_label)
+static void get_guide_label(int32 label_id, const wchar_t** out_label)
 {
-	wchar_t* label_table[k_language_count][k_cartographer_guide_end] = {};
+	const wchar_t* label_table[k_language_count][k_cartographer_guide_end] = {};
 
 	label_table[_language_english][_cartographer_guide_text_header] = L"Project Cartographer Guide";
 	label_table[_language_english][_cartographer_guide_text_subheader] = L"Press the %S Key to open this guide from anywhere.";
@@ -137,9 +137,9 @@ static void get_guide_label(int32 label_id, wchar_t** out_label)
 	*out_label = label_table[_language_english][label_id];
 }
 
-static void get_credits_label(int32 label_id, wchar_t** out_label)
+static void get_credits_label(int32 label_id, const wchar_t** out_label)
 {
-	wchar_t* label_table[k_language_count][k_cartographer_credits_end] = {};
+	const wchar_t* label_table[k_language_count][k_cartographer_credits_end] = {};
 
 	label_table[_language_english][_cartographer_credits_text_header] = L"Credits";
 	label_table[_language_english][_cartographer_credits_text_subheader] = L"Praise the Following:";
@@ -163,9 +163,9 @@ static void get_credits_label(int32 label_id, wchar_t** out_label)
 	*out_label = label_table[_language_english][label_id];
 }
 
-static void get_update_label(int32 label_id, wchar_t** out_label)
+static void get_update_label(int32 label_id, const wchar_t** out_label)
 {
-	wchar_t* label_table[k_language_count][k_cartographer_update_text_end] = {};
+	const wchar_t* label_table[k_language_count][k_cartographer_update_text_end] = {};
 
 	label_table[_language_english][_cartographer_update_text_header] = L"Update!";
 	label_table[_language_english][_cartographer_update_text_subheader] = L"Update Project Cartographer";
@@ -181,9 +181,9 @@ static void get_update_label(int32 label_id, wchar_t** out_label)
 	*out_label = label_table[_language_english][label_id];
 }
 
-static void get_update_notice_label(int32 label_id, wchar_t** out_label)
+static void get_update_notice_label(int32 label_id, const wchar_t** out_label)
 {
-	wchar_t* label_table[k_language_count][k_cartographer_update_notice_end] = {};
+	const wchar_t* label_table[k_language_count][k_cartographer_update_notice_end] = {};
 
 	label_table[_language_english][_cartographer_update_notice_text_header] = L"Outdated Version!";
 	label_table[_language_english][_cartographer_update_notice_text_subheader] = L"You are using an outdated version of Project Cartographer! Would you like to go install the latest version?";
@@ -229,7 +229,7 @@ void c_cartographer_guide_edit_list::update_list_items(c_list_item_widget* item,
 	c_text_widget* text_widget = item->try_find_text_widget(_default_list_skin_text_main);
 	if (text_widget)
 	{
-		wchar_t* button_label = nullptr;
+		const wchar_t* button_label = nullptr;
 		get_guide_label(k_cartographer_guide_button_label_index_start + (int32)list_item_index, &button_label);
 
 		ASSERT(button_label != nullptr);
@@ -288,8 +288,8 @@ void c_cartographer_guide_menu::initialize(s_screen_parameters* screen_parameter
 
 	//update header and subheader labels
 
-	wchar_t* header_text = nullptr;
-	wchar_t* subheader_text = nullptr;
+	const wchar_t* header_text = NULL;
+	const wchar_t* subheader_text = NULL;
 	wchar_t text_buffer[512];
 
 	get_guide_label(_cartographer_guide_text_header, &header_text);
@@ -350,7 +350,7 @@ void c_cartographer_credits_edit_list::update_list_items(c_list_item_widget* ite
 	c_text_widget* text_widget = (c_text_widget*)item->try_find_text_widget(_default_list_skin_text_main);
 	if (text_widget)
 	{
-		wchar_t* button_label = nullptr;
+		const wchar_t* button_label = NULL;
 		get_credits_label(k_cartographer_credits_button_text_index + (int32)list_item_index, &button_label);
 
 		ASSERT(button_label != nullptr);
@@ -393,8 +393,8 @@ void c_cartographer_credits_menu::initialize(s_screen_parameters* screen_paramet
 {
 	c_screen_with_menu::initialize(screen_parameters);
 
-	wchar_t* header_text = nullptr;
-	wchar_t* subheader_text = nullptr;
+	const wchar_t* header_text = NULL;
+	const wchar_t* subheader_text = NULL;
 
 	get_credits_label(_cartographer_credits_text_header, &header_text);
 	get_credits_label(_cartographer_credits_text_subheader, &subheader_text);
@@ -467,7 +467,7 @@ void c_cartographer_update_edit_list::update_list_items(c_list_item_widget* item
 	c_text_widget* text_widget = (c_text_widget*)item->try_find_text_widget(_default_list_skin_text_main);
 	if (text_widget)
 	{
-		wchar_t* button_label = nullptr;
+		const wchar_t* button_label = NULL;
 
 		switch (list_item_index)
 		{
@@ -574,8 +574,8 @@ void c_cartographer_update_menu::initialize(s_screen_parameters* screen_paramete
 {
 	c_screen_with_menu::initialize(screen_parameters);
 
-	wchar_t* header_text = nullptr;
-	wchar_t* subheader_text = nullptr;
+	const wchar_t* header_text = nullptr;
+	const wchar_t* subheader_text = nullptr;
 
 	get_update_label(_cartographer_update_text_header, &header_text);
 	get_update_label(_cartographer_update_text_subheader, &subheader_text);
@@ -646,10 +646,10 @@ void c_cartographer_update_notice_edit_list::update_list_items(c_list_item_widge
 	c_text_widget* text_widget = (c_text_widget*)item->try_find_text_widget(_default_list_skin_text_main);
 	if (text_widget)
 	{
-		wchar_t* button_label = nullptr;
+		const wchar_t* button_label = NULL;
 		get_update_notice_label(k_cartographer_update_notice_button_label_index_start + (int32)list_item_index, &button_label);
 
-		ASSERT(button_label != nullptr);
+		ASSERT(button_label != NULL);
 		text_widget->set_text(button_label);
 	}
 }
@@ -689,13 +689,13 @@ void c_cartographer_update_notice_menu::initialize(s_screen_parameters* screen_p
 {
 	c_screen_with_menu::initialize(screen_parameters);
 
-	wchar_t* header_text = nullptr;
-	wchar_t* subheader_text = nullptr;
+	const wchar_t* header_text = NULL;
+	const wchar_t* subheader_text = NULL;
 
 	get_update_notice_label(_cartographer_update_notice_text_header, &header_text);
 	get_update_notice_label(_cartographer_update_notice_text_subheader, &subheader_text);
 
-	ASSERT(header_text != nullptr && subheader_text != nullptr);
+	ASSERT(header_text != NULL && subheader_text != NULL);
 
 	m_header_text.set_text(header_text);
 	c_text_widget* subheader_text_widget = get_screen_subheader_text();

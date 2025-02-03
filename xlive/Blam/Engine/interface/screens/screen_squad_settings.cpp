@@ -386,7 +386,7 @@ void c_squad_settings_list::handle_item_switch_to_coop(s_event_record** pevent)
 		screen_error_ok_dialog_with_custom_text(
 			_user_interface_channel_type_dialog,
 			_ui_error_generic, _window_4,
-			FLAG((*pevent)->controller), nullptr, nullptr, L"Access Denied", L"Coming Soon....");
+			FLAG((*pevent)->controller), NULL, NULL, L"Access Denied", L"Coming Soon....");
 	}
 	else
 	{

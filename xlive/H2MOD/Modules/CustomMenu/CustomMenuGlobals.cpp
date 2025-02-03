@@ -27,7 +27,7 @@ void* ui_custom_cartographer_load_menu(proc_ui_screen_load_cb_t p_ui_screen_proc
 		if (menu_wgit_type == 0) {
 			open_method = 3;
 		}
-		else if (lastOuterMenuFuncPtr > 0 && lastOuterMenuFuncPtr == p_ui_screen_proc_cb) {
+		else if (lastOuterMenuFuncPtr != 0 && lastOuterMenuFuncPtr == p_ui_screen_proc_cb) {
 			if (CurrentWgitID != menu_wgit_type) {
 				std::chrono::milliseconds difference = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - lastOuterMenuUse);
 				long long timeDiff = difference.count();
