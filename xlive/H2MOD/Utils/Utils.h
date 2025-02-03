@@ -8,7 +8,7 @@ void ReadIniFile(void* fileConfig, bool configIsFILE, const char* header, const 
 std::string GetVKeyCodeString(int vkey);
 void PadCStringWithChar(char* strToPad, size_t toFullLength, char c);
 int GetWidePathFromFullWideFilename(const wchar_t* filepath, wchar_t* rtnpath);
-LONG GetDWORDRegKey(HKEY hKey, wchar_t* strValueName, DWORD* nValue);
+LONG GetDWORDRegKey(HKEY hKey, const wchar_t* strValueName, DWORD* nValue);
 void pushHostLobby();
 ///FREE MEMOERY in returned char*
 char* custom_label_literal(char* label_escaped);

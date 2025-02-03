@@ -141,7 +141,7 @@ class c_flags : public c_flags_no_init<t_type, t_storage_type, k_count>
 public:
 	c_flags(void) 
 	{ 
-		clear();
+		this->clear();
 		return; 
 	}
 
@@ -216,7 +216,7 @@ public:
 	c_static_flags(void) = default;
 	c_static_flags(int32 count, uint8 value)
 	{
-		fill(count, value);
+		this->fill(count, value);
 		return;
 	}
 	~c_static_flags(void) = default;

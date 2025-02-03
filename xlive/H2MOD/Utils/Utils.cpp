@@ -199,7 +199,7 @@ int GetWidePathFromFullWideFilename(const wchar_t* filepath, wchar_t* rtnpath) {
 	return -1;
 }
 
-LONG GetDWORDRegKey(HKEY hKey, wchar_t* strValueName, DWORD* nValue) {
+LONG GetDWORDRegKey(HKEY hKey, const wchar_t* strValueName, DWORD* nValue) {
 	DWORD dwBufferSize(sizeof(DWORD));
 	DWORD nResult(0);
 	LONG nError = ::RegQueryValueExW(hKey,

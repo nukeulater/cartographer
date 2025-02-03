@@ -182,7 +182,7 @@ bool render_cartographer_achievement_message(const char *achivement_message)
 		wchar_t cheevo_message[256];
 		const int16 widget_total_height = get_text_size_from_font_cache(k_cheevo_title_font) + (get_text_size_from_font_cache(k_cheevo_message_font) * 2);
 		real_argb_color text_color = *global_real_argb_white;
-		text_color.alpha = (float)(x_cheevo_timer - time_now) / k_cheevo_display_lifetime;
+		text_color.alpha = (float)(x_cheevo_timer - time_now) / (real32)k_cheevo_display_lifetime;
 
 		utf8_string_to_wchar_string(achivement_message, cheevo_message, NUMBEROF(cheevo_message));
 		wchar_t* divider_position = wcschr(cheevo_message, '|');
