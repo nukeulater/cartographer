@@ -13,6 +13,7 @@ bool g_use_network_queue_storage = true;
 typedef void(__thiscall* t_process_incoming_event)(c_simulation_event_handler* thisx, e_simulation_event_type simulation_event_type, int32* entity_reference_indices, int32 block_count, s_replication_allocation_block* block);
 t_process_incoming_event p_process_incoming_event;
 
+CLASS_HOOK_DECLARE_LABEL(c_simulation_event_handler__process_incoming_event, c_simulation_event_handler::process_incoming_event);
 void c_simulation_event_handler::process_incoming_event(e_simulation_event_type simulation_event_type, int32* entity_reference_indices, int32 block_count, s_replication_allocation_block* payload_blocks)
 {
 	if (g_use_network_queue_storage)
@@ -61,7 +62,10 @@ void c_simulation_event_handler::process_incoming_event(e_simulation_event_type 
 	}
 }
 
-__declspec(naked) void jmp_c_simulation_event_handler_process_incoming_event() { __asm { jmp c_simulation_event_handler::process_incoming_event } }
+__declspec(naked) void jmp_c_simulation_event_handler_process_incoming_event()
+{
+	CLASS_HOOK_JMP(c_simulation_event_handler__process_incoming_event, c_simulation_event_handler::process_incoming_event);
+}
 
 void simulation_event_handler_apply_patches(void)
 {

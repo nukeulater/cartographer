@@ -208,6 +208,7 @@ void* ui_load_virtual_keyboard(wchar_t* out_keyboard_text, uint32 out_keyboard_t
 typedef bool(__thiscall* t_load_player_profile_edit)(c_screen_virtual_keyboard*);
 t_load_player_profile_edit p_load_player_profile_edit;
 
+CLASS_HOOK_DECLARE_LABEL(c_screen_virtual_keyboard__load_player_profile_edit, c_screen_virtual_keyboard::load_player_profile_edit);
 bool __thiscall c_screen_virtual_keyboard::load_player_profile_edit()
 {
 	bool result = true;
@@ -219,7 +220,10 @@ bool __thiscall c_screen_virtual_keyboard::load_player_profile_edit()
 	return result;
 }
 
-void __declspec(naked) jmp_c_screen_virtual_keyboard__load_player_profile_edit() { __asm jmp c_screen_virtual_keyboard::load_player_profile_edit }
+void __declspec(naked) jmp_c_screen_virtual_keyboard__load_player_profile_edit()
+{ 
+	CLASS_HOOK_JMP(c_screen_virtual_keyboard__load_player_profile_edit, c_screen_virtual_keyboard::load_player_profile_edit);
+}
 
 void c_screen_virtual_keyboard::apply_patches()
 {

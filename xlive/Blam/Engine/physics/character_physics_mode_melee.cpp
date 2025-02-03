@@ -106,6 +106,7 @@ void c_character_physics_mode_melee_datum::update_melee_deceleration()
 {
 }
 
+CLASS_HOOK_DECLARE_LABEL(c_character_physics_mode_melee_datum__update_internal, c_character_physics_mode_melee_datum::update_internal);
 void __thiscall c_character_physics_mode_melee_datum::update_internal
 (
 	s_character_physics_output* physics_output,
@@ -502,7 +503,10 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal
 	LOG_TRACE_MELEE("{} : end log for melee @ tick {} \n", __FUNCTION__, m_melee_tick - 1);
 }
 
-__declspec(naked) void call_character_melee_physics_input_update_internal() { __asm jmp c_character_physics_mode_melee_datum::update_internal }
+__declspec(naked) void call_character_melee_physics_input_update_internal()
+{
+	CLASS_HOOK_JMP(c_character_physics_mode_melee_datum__update_internal, c_character_physics_mode_melee_datum::update_internal);
+}
 
 void c_character_physics_mode_melee_datum::apply_hooks()
 {

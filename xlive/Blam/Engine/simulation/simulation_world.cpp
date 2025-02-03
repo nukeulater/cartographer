@@ -193,6 +193,7 @@ void c_simulation_world::queues_clear()
 typedef void(__thiscall* t_c_simulation_world__initialize_world)(c_simulation_world*, int32, int32, int32);
 t_c_simulation_world__initialize_world p_c_simulation_world__initialize_world;
 
+CLASS_HOOK_DECLARE_LABEL(c_simulation_world__initialize_world, c_simulation_world::initialize_world);
 void c_simulation_world::initialize_world(int32 a2, int32 a3, int32 a4)
 {
 	p_c_simulation_world__initialize_world(this, a2, a3, a4);
@@ -202,8 +203,10 @@ void c_simulation_world::initialize_world(int32 a2, int32 a3, int32 a4)
 	}
 }
 
-void __declspec(naked) jmp_initialize_world() { __asm { jmp c_simulation_world::initialize_world } }
-
+void __declspec(naked) jmp_initialize_world()
+{
+	CLASS_HOOK_JMP(c_simulation_world__initialize_world, c_simulation_world::initialize_world);
+}
 
 void c_simulation_world::delete_all_actors(void)
 {
@@ -225,6 +228,7 @@ void c_simulation_world::update_queue_reset(void)
 	return;
 }
 
+CLASS_HOOK_DECLARE_LABEL(c_simulation_world__reset_world, c_simulation_world::reset_world);
 void c_simulation_world::reset_world(void)
 {
 	m_time_immediate_update = false;
@@ -254,11 +258,15 @@ void c_simulation_world::reset_world(void)
 	return;
 }
 
-__declspec(naked) void jmp_reset_world() { __asm { jmp c_simulation_world::reset_world } }
+__declspec(naked) void jmp_reset_world()
+{
+	CLASS_HOOK_JMP(c_simulation_world__reset_world, c_simulation_world::reset_world);
+}
 
 typedef void(__thiscall* t_c_simulation_world__destroy_world)(c_simulation_world*);
 t_c_simulation_world__destroy_world p_c_simulation_world__destroy_world;
 
+CLASS_HOOK_DECLARE_LABEL(c_simulation_world__destroy_world, c_simulation_world::destroy_world);
 void c_simulation_world::destroy_world(void)
 {
 	// call orig
@@ -270,13 +278,17 @@ void c_simulation_world::destroy_world(void)
 	}
 }
 
-void __declspec(naked) jmp_destroy_world() { __asm{ jmp c_simulation_world::destroy_world } }
+void __declspec(naked) jmp_destroy_world()
+{
+	CLASS_HOOK_JMP(c_simulation_world__destroy_world, c_simulation_world::destroy_world);
+}
 
 void c_simulation_world::disconnect(void)
 {
 	return;
 }
 
+CLASS_HOOK_DECLARE_LABEL(c_simulation_world__send_player_acknowledgements_not_during_simulation_reset_in_progress, c_simulation_world::send_player_acknowledgements_not_during_simulation_reset_in_progress);
 void c_simulation_world::send_player_acknowledgements_not_during_simulation_reset_in_progress(bool a1)
 {
 	if (!simulation_reset_in_progress())
@@ -285,8 +297,9 @@ void c_simulation_world::send_player_acknowledgements_not_during_simulation_rese
 	}
 }
 
-void __declspec(naked) jmp_send_player_acknowledgements_not_during_simulation_reset_in_progress() { 
-	__asm { jmp c_simulation_world::send_player_acknowledgements_not_during_simulation_reset_in_progress } 
+void __declspec(naked) jmp_send_player_acknowledgements_not_during_simulation_reset_in_progress()
+{
+	CLASS_HOOK_JMP(c_simulation_world__send_player_acknowledgements_not_during_simulation_reset_in_progress, c_simulation_world::send_player_acknowledgements_not_during_simulation_reset_in_progress);
 }
 
 void c_simulation_world::queues_initialize()

@@ -1,8 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug LLVM|Win32">
+      <Configuration>Debug LLVM</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release LLVM|Win32">
+      <Configuration>Release LLVM</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Release|Win32">
@@ -24,9 +32,24 @@
     <WholeProgramOptimization>false</WholeProgramOptimization>
     <UseDebugLibraries>true</UseDebugLibraries>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug LLVM|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>ClangCL</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <UseDebugLibraries>true</UseDebugLibraries>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <PlatformToolset>v143</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release LLVM|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>ClangCL</PlatformToolset>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>Unicode</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -38,7 +61,15 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug LLVM|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
+  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release LLVM|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
   </ImportGroup>
@@ -54,7 +85,25 @@
     <LibraryPath>$(WindowsSDK_LibraryPath_x86);$(DXSDK_DIR)Lib\x86;3rdparty/directx/lib;3rdparty/discord/lib;3rdparty/libcurl/lib/nghttp2/;3rdparty/libcurl/lib/wolfssl/;3rdparty/libcurl/lib/curl/release;3rdparty/miniupnpc/lib/release;3rdparty/detours/lib.X86;$(LibraryPath)</LibraryPath>
     <ExternalIncludePath>$(ExternalIncludePath);$(DXSDK_DIR)Include</ExternalIncludePath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release LLVM|Win32'">
+    <OutDir>$(SolutionDir)Halo2\</OutDir>
+    <IntDir>.\Release\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(IncludePath)</IncludePath>
+    <LibraryPath>$(WindowsSDK_LibraryPath_x86);$(DXSDK_DIR)Lib\x86;3rdparty/directx/lib;3rdparty/discord/lib;3rdparty/libcurl/lib/nghttp2/;3rdparty/libcurl/lib/wolfssl/;3rdparty/libcurl/lib/curl/release;3rdparty/miniupnpc/lib/release;3rdparty/detours/lib.X86;$(LibraryPath)</LibraryPath>
+    <ExternalIncludePath>$(ExternalIncludePath);$(DXSDK_DIR)Include</ExternalIncludePath>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)Halo2\</OutDir>
+    <IntDir>.\Debug\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+    <LibraryPath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;.\libs;..\protobuf-2.6.1\vsprojects\Debug;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;.\;..\protobuf-2.6.1;$(IncludePath)</IncludePath>
+    <LibraryPath>$(WindowsSDK_LibraryPath_x86);$(DXSDK_DIR)Lib\x86;3rdparty/directx/lib;3rdparty/discord/lib;3rdparty/libcurl/lib/nghttp2/;3rdparty/libcurl/lib/wolfssl/;3rdparty/libcurl/lib/curl/debug/;3rdparty/miniupnpc/lib/debug;3rdparty/detours/lib.X86;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(IncludePath)</IncludePath>
+    <ExternalIncludePath>$(ExternalIncludePath);$(DXSDK_DIR)Include</ExternalIncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug LLVM|Win32'">
     <OutDir>$(SolutionDir)Halo2\</OutDir>
     <IntDir>.\Debug\</IntDir>
     <LinkIncremental>true</LinkIncremental>
@@ -119,6 +168,88 @@
       <ProgramDatabaseFile>.\Release/xlive.pdb</ProgramDatabaseFile>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention />
+      <ImportLibrary>.\Release/xlive.lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+      <ImageHasSafeExceptionHandlers>true</ImageHasSafeExceptionHandlers>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
+      <LinkStatus>
+      </LinkStatus>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <FullProgramDatabaseFile>true</FullProgramDatabaseFile>
+      <GenerateMapFile>true</GenerateMapFile>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+    </Link>
+    <Bscmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OutputFile>.\Release/xliveless.bsc</OutputFile>
+    </Bscmake>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
+    <PreBuildEvent>
+      <Command>CALL $(SolutionDir)GIT-VS-VERSION-GEN.bat "$(IntDir)" "$(SolutionDir)xlive\version_git.h"</Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release LLVM|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <TypeLibraryName>.\Release/xliveless.tlb</TypeLibraryName>
+      <HeaderFileName>
+      </HeaderFileName>
+    </Midl>
+    <ClCompile>
+      <Optimization>Full</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <PreprocessorDefinitions>WIN32;MINIUPNP_STATICLIB;NGHTTP2_STATICLIB;CURL_STATICLIB;NDEBUG;_CRT_SECURE_NO_WARNINGS;_WINDOWS;_USRDLL;LLVM;xliveless_EXPORTS;ERRORS_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <PrecompiledHeaderOutputFile>.\Release/xliveless.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>.\Release/</AssemblerListingLocation>
+      <ObjectFileName>.\Release/</ObjectFileName>
+      <ProgramDataBaseFileName>.\Release/</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+      <AdditionalIncludeDirectories>.\;.\3rdparty\;.\3rdparty\libcurl;.\3rdparty\imgui;.\3rdparty\spdlog\include;.\3rdparty\miniupnpc\include;.\3rdparty\detours\include;.\3rdparty\directx\include;.\3rdparty\zlib-1.1.4\src;.\3rdparty\discord\include;.\Blam/Engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <ControlFlowGuard>false</ControlFlowGuard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <DisableSpecificWarnings>
+      </DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <OmitFramePointers>true</OmitFramePointers>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <MinimalRebuild>false</MinimalRebuild>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <AdditionalOptions>/DPSAPI_VERSION=1 /utf-8 %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>iphlpapi.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;ws2_32.lib;odbc32.lib;odbccp32.lib;Winmm.lib;d3d9.lib;d3dx9.lib;psapi.lib;detours.lib;libminiupnpc.lib;wolfssl.lib;nghttp2.lib;libcurl.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+      <ModuleDefinitionFile>.\xlive.def</ModuleDefinitionFile>
+      <ProgramDatabaseFile>.\Release/xlive.pdb</ProgramDatabaseFile>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
       <ImportLibrary>.\Release/xlive.lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
       <ImageHasSafeExceptionHandlers>true</ImageHasSafeExceptionHandlers>
@@ -209,98 +340,212 @@
       <Command>CALL $(SolutionDir)GIT-VS-VERSION-GEN.bat "$(IntDir)" "$(SolutionDir)xlive\version_git.h"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug LLVM|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <TypeLibraryName>.\Debug/xliveless.tlb</TypeLibraryName>
+      <HeaderFileName>
+      </HeaderFileName>
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;MINIUPNP_STATICLIB;NGHTTP2_STATICLIB;CURL_STATICLIB;_CRT_SECURE_NO_WARNINGS;_DEBUG;_WINDOWS;_USRDLL;LLVM;xliveless_EXPORTS;ASSERTS_ENABLED;EVENTS_ENABLED;ERRORS_ENABLED;DEBUG_MEMORY_ENABLED;RASTERIZER_PROFILE_ENABLED;VALIDATE_REAL_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <PrecompiledHeaderOutputFile>.\Debug/xliveless.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>.\Debug/</AssemblerListingLocation>
+      <ObjectFileName>.\Debug/</ObjectFileName>
+      <ProgramDataBaseFileName>.\Debug/</ProgramDataBaseFileName>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <AdditionalIncludeDirectories>.\;.\3rdparty\;.\3rdparty\libcurl;.\3rdparty\imgui;.\3rdparty\spdlog\include;.\3rdparty\miniupnpc\include;.\3rdparty\detours\include;.\3rdparty\directx\include;.\3rdparty\zlib-1.1.4\src;.\3rdparty\discord\include;Blam\Engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <DisableSpecificWarnings>
+      </DisableSpecificWarnings>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <AdditionalOptions>/DPSAPI_VERSION=1 /utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <SupportJustMyCode>false</SupportJustMyCode>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>iphlpapi.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;ws2_32.lib;odbc32.lib;odbccp32.lib;Winmm.lib;d3d9.lib;d3dx9.lib;dxguid.lib;psapi.lib;detours.lib;libminiupnpc.lib;wolfssl.lib;nghttp2.lib;libcurl-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <ModuleDefinitionFile>.\xlive.def</ModuleDefinitionFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>./Debug/xlive.pdb</ProgramDatabaseFile>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+      <ImportLibrary>./Debug/xlive.lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
+      <GenerateMapFile>true</GenerateMapFile>
+    </Link>
+    <Bscmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OutputFile>.\Debug/xliveless.bsc</OutputFile>
+    </Bscmake>
+    <PreBuildEvent>
+      <Command>CALL $(SolutionDir)GIT-VS-VERSION-GEN.bat "$(IntDir)" "$(SolutionDir)xlive\version_git.h"</Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="3rdparty\imgui\backends\imgui_impl_dx9.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug LLVM|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release LLVM|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="3rdparty\imgui\backends\imgui_impl_win32.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug LLVM|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release LLVM|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="3rdparty\imgui\imgui.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug LLVM|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release LLVM|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="3rdparty\imgui\imgui_draw.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug LLVM|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release LLVM|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="3rdparty\imgui\imgui_tables.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug LLVM|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release LLVM|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="3rdparty\imgui\imgui_widgets.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug LLVM|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release LLVM|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="3rdparty\tinyxml\tinyxml2.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release LLVM|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug LLVM|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="3rdparty\zlib-1.1.4\src\adler32.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug LLVM|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release LLVM|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="3rdparty\zlib-1.1.4\src\compress.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug LLVM|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release LLVM|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="3rdparty\zlib-1.1.4\src\contrib\minizip\unzip.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug LLVM|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release LLVM|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="3rdparty\zlib-1.1.4\src\contrib\minizip\zip.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug LLVM|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release LLVM|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="3rdparty\zlib-1.1.4\src\crc32.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug LLVM|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release LLVM|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="3rdparty\zlib-1.1.4\src\deflate.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug LLVM|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release LLVM|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="3rdparty\zlib-1.1.4\src\gzio.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug LLVM|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release LLVM|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="3rdparty\zlib-1.1.4\src\infblock.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug LLVM|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release LLVM|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="3rdparty\zlib-1.1.4\src\infcodes.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug LLVM|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release LLVM|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="3rdparty\zlib-1.1.4\src\inffast.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug LLVM|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release LLVM|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="3rdparty\zlib-1.1.4\src\inflate.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug LLVM|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release LLVM|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="3rdparty\zlib-1.1.4\src\inftrees.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug LLVM|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release LLVM|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="3rdparty\zlib-1.1.4\src\infutil.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug LLVM|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release LLVM|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="3rdparty\zlib-1.1.4\src\trees.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug LLVM|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release LLVM|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="3rdparty\zlib-1.1.4\src\uncompr.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug LLVM|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release LLVM|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="3rdparty\zlib-1.1.4\src\zutil.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug LLVM|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release LLVM|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Blam\Engine\ai\actors.cpp" />
     <ClCompile Include="Blam\Engine\animations\animation_channel.cpp" />
@@ -930,7 +1175,9 @@
     <ClCompile Include="H2MOD\Variants\GraveRobber\GraveRobber.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug LLVM|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release LLVM|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Util\curl-interface.cpp" />
     <ClCompile Include="Util\log.cpp" />

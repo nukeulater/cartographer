@@ -200,7 +200,7 @@ void c_user_interface_widget::destroy_recursive()
 	while (child_widget != nullptr)
 	{
 		c_user_interface_widget* next_child = child_widget->m_child_widget;
-		child_widget->~c_user_interface_widget();
+		child_widget->destroy_recursive();
 
 		if (child_widget->m_allocated)
 		{
@@ -213,9 +213,10 @@ void c_user_interface_widget::destroy_recursive()
 }
 
 // c_user_interface_widget virtual functions
-c_user_interface_widget::~c_user_interface_widget()
+c_user_interface_widget::~c_user_interface_widget(void)
 {
 	destroy_recursive();
+	return;
 }
 
 int32 c_user_interface_widget::setup_children()

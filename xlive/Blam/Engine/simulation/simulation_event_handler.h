@@ -44,6 +44,8 @@ private:
     c_simulation_type_collection* m_event_type_collection;
     c_simulation_entity_database* m_entity_database;
 
+    // TODO: make public
+public:
     void process_incoming_event(e_simulation_event_type simulation_event_type, int32* entity_reference_indices, int32 block_count, s_replication_allocation_block* block);
 };
 
