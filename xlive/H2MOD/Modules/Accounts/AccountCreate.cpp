@@ -15,7 +15,7 @@
 
 const char k_user_name_string[] = "username=";
 
-const char k_cartographer_create_url[] = k_cartographer_url"/create1";
+const char k_cartographer_create_url[] = k_cartographer_url_https"/create1";
 
 // TODO (Carefully) Cleanup and move
 

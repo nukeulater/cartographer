@@ -7,8 +7,8 @@
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
 
-const char k_cartographer_unlock_url[] = k_cartographer_url"/achievement-api/unlock.php";
-const char k_cartographer_achivement_list_url[] = k_cartographer_url"/achievement-api/achievement_list.php?xuid=";
+const char k_cartographer_unlock_url[] = k_cartographer_url_https"/achievement-api/unlock.php";
+const char k_cartographer_achivement_list_url[] = k_cartographer_url_https"/achievement-api/achievement_list.php?xuid=";
 
 using namespace rapidjson;
 std::map<DWORD, bool> achievementList;

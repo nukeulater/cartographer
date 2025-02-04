@@ -18,7 +18,7 @@ const char k_login_token_string[] = "login_token=";
 const char k_login_username_string[] = "login_username=";
 const char k_login_ab_online_string[] = "login_abOnline=";
 
-const char k_cartographer_login_url[] = k_cartographer_url"/login2";
+const char k_cartographer_login_url[] = k_cartographer_url_https"/login2";
 
 int masterState = -1;
 char* masterStateStr = NULL;

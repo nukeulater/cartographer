@@ -77,7 +77,7 @@ static std::enable_if_t<!std::is_same_v<T, bool> && std::is_integral_v<T>, bool>
 {
 	bool result = false;
 	std::string exception;
-	std::string str_value = simple_ini->GetValue(section_key, config_name, default_setting);
+	const char* str_value = simple_ini->GetValue(section_key, config_name, default_setting);
 	if (ComVar(out_value).SetFromStr(str_value, 0, exception))
 	{
 		//CartographerConsole::LogToTab(_console_tab_logs, "config: success setting \"%s\"", config_name);
@@ -97,7 +97,7 @@ static std::enable_if_t<std::is_same_v<T, bool>, bool>
 {
 	bool result = false;
 	std::string exception;
-	std::string str_value = simple_ini->GetValue(section_key, config_name, default_setting);
+	const char* str_value = simple_ini->GetValue(section_key, config_name, default_setting);
 	if (ComVar(out_value).SetFromStr(str_value, exception))
 	{
 		//CartographerConsole::LogToTab(_console_tab_logs, "config: success setting \"%s\"", config_name);
