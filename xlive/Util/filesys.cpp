@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #include "filesys.h"
 
-#include "text/unicode.h"
-
 // ### TODO Remove
 
 std::wstring GetExeDirectoryWide()
@@ -23,11 +21,4 @@ std::wstring GetExeDirectoryWide()
 	{
 		return L"";
 	}
-}
-
-std::string GetExeDirectoryNarrow()
-{
-	utf8 string[MAX_PATH * 2];
-	wchar_string_to_utf8_string(GetExeDirectoryWide().c_str(), string, MAX_PATH * 2);
-	return std::string(string);
 }

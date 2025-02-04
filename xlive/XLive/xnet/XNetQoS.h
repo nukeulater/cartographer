@@ -1,5 +1,7 @@
 #pragma once
 
+#define k_xnet_qos_port_offset 10
+
 typedef struct _SOCKET_INFORMATION 
 {
 	WSAOVERLAPPED Overlapped;
@@ -13,7 +15,7 @@ class CXNetQoS
 {
 public:
 	void Listener();
-	bool IsListening();
+	bool IsListening() const;
 
 	SOCKET m_ListenSocket = INVALID_SOCKET;
 	// first is used to alert the thread it has to cleanup

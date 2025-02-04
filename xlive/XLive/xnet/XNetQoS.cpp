@@ -1,12 +1,10 @@
 #include "stdafx.h"
-#include "XLive/xnet/XNetQoS.h"
+#include "XNetQoS.h"
 
 #include <MSWSock.h>
 #include <WS2tcpip.h>
 #include "IpManagement/XnIp.h"
 #include "H2MOD/Modules/Shell/Config.h"
-
-using namespace std::chrono_literals;
 
 CXNetQoS XNetQoS;
 
@@ -32,13 +30,14 @@ void ClientQoSLookUp(UINT cxna, XNADDR* pxna, UINT cProbes, IN_ADDR aina[], XNQO
 			hints.ai_socktype = SOCK_STREAM;
 			hints.ai_protocol = IPPROTO_TCP;
 
-			std::string addr = inet_ntoa(xn->inaOnline);
-			std::string port = std::to_string(ntohs(xn->wPortOnline) + 10);
+			char port[8];
+			sprintf(port, "%d", ntohs(xn->wPortOnline) + k_xnet_qos_port_offset);
+			const char* addr = inet_ntoa(xn->inaOnline);
 
 			//	LOG_TRACE_NETWORK_N("[XNetQoSLookup] QoSLookup, addr={0}, port={1}", addr.c_str(), prt.c_str());
 
 			// Resolve the server address and port
-			iResult = getaddrinfo(addr.c_str(), port.c_str(), &hints, &result);
+			iResult = getaddrinfo(addr, port, &hints, &result);
 			if (iResult != 0) {
 				//	LOG_TRACE_NETWORK_N("[XnetQoSLookup] getaddrinfo failed with error: {}\n", iResult);
 
@@ -180,7 +179,7 @@ void ClientQoSLookUp(UINT cxna, XNADDR* pxna, UINT cProbes, IN_ADDR aina[], XNQO
 	delete[] pxna;
 }
 
-bool CXNetQoS::IsListening()
+bool CXNetQoS::IsListening(void) const
 {
 	return m_listenerThreadRunning;
 }
@@ -325,7 +324,7 @@ void CXNetQoS::Listener()
 
 		serverAddr.sin_family = AF_INET;
 		serverAddr.sin_addr.s_addr = htonl(INADDR_ANY); // anyone can connect
-		serverAddr.sin_port = htons(H2Config_base_port + 10);
+		serverAddr.sin_port = htons(H2Config_base_port + k_xnet_qos_port_offset);
 
 		DWORD dwBytes = 0;
 		GUID GuidAcceptEx = WSAID_ACCEPTEX;
