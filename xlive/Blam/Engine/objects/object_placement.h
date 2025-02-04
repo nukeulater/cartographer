@@ -2,6 +2,7 @@
 #include "damage.h"
 #include "emblems.h"
 #include "object_identifier.h"
+#include "object_location.h"
 
 #include "math/color_math.h"
 #include "tag_files/string_id.h"
@@ -11,13 +12,6 @@ enum e_bsp_policy : int8
 	_bsp_policy_default = 0,
 	_bsp_policy_always_placed = 1,
 	_bsp_policy_manual_bsp_placement = 2
-};
-
-struct s_location
-{
-	int32 leaf_index;
-	int16 cluster_index;
-	int16 bsp_index;
 };
 
 enum e_scenario_object_placement_flags : uint32

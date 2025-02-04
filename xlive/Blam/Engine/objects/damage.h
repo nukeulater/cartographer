@@ -1,4 +1,6 @@
 #pragma once
+#include "game/game_allegiance.h"
+#include "objects/object_location.h"
 #include "tag_files/string_id.h"
 #include "tag_files/tag_block.h"
 
@@ -13,14 +15,13 @@ ASSERT_STRUCT_SIZE(s_damage_owner, 12);
 
 struct s_damage_data
 {
-	DWORD damage_tag_index;			// 0x0
-	DWORD flags;					// 0x4
-	DWORD field_8;					// 0x8
-	datum creator_datum;			// 0xC
-	signed __int16 field_10;		// 0x10
-	BYTE gap_12[2];					// 0x12
-	int field_14;			// 0x14
-	int field_18;			// 0x18
+	datum definition_index;
+	uint32 flags;
+	datum owner_player_index;
+	datum owner_object_index;
+	e_game_team owner_team_index;
+	int16 pad;
+	s_location location;
 	int field_1C;					// 0x1C
 	BYTE gap_20[4];					// 0x20
 	DWORD field_24;					// 0x24
@@ -29,9 +30,9 @@ struct s_damage_data
 	DWORD field_30;					// 0x30
 	DWORD field_34;					// 0x34
 	DWORD field_38;					// 0x38
-	real_point3d field_3C;			// 0x3C
-	BYTE gap48[12];					// 0x48
-	real_point3d field_54;			// 0x54
+	real_point3d origin;
+	real_point3d epicenter;
+	real_point3d direction;
 	BYTE gap_60[24];				// 0x60
 	float field_78;					// 0x78
 	__int16 field_7C;				// 0x7C
@@ -60,3 +61,8 @@ struct s_damage_group_definition
 };
 ASSERT_STRUCT_SIZE(s_damage_group_definition, 16);
 
+/* prototypes */
+
+void damage_apply_patches(void);
+
+void __cdecl object_cause_damage(s_damage_data* damage_data, datum object_index, int16 node_index, int16 region_index, int16 material_index, real_vector3d* object_normal);
