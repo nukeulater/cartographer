@@ -32,7 +32,8 @@ enum H2Config_Experimental_Rendering_Mode : byte
 	_rendering_mode_original_game_frame_limit
 };
 
-#define k_cartographer_url "https://cartographer.online"
+#define k_cartographer_url_http "http://cartographer.online"
+#define k_cartographer_url_https "https://cartographer.online"
 extern const char* k_cartographer_map_repo_url;
 
 extern unsigned long H2Config_master_ip;

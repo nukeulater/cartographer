@@ -45,7 +45,7 @@ class ModuleUPnP
 {
 public:
 	ModuleUPnP();
-	Utils::UPnPResult UPnPForwardPort(bool tcp, int externalport, int internalport, const std::string & ruleName);
+	Utils::UPnPResult UPnPForwardPort(bool tcp, int externalport, int internalport, const char* ruleName);
 private:
 	int upnpDiscoverError;
 	UPNPDev* upnpDevice = nullptr;

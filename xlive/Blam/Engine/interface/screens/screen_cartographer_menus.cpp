@@ -248,7 +248,7 @@ void c_cartographer_guide_edit_list::handle_item_pressed_event(s_event_record** 
 	}
 	else if (button_id == _item_cartographer_guide_website) 
 	{
-		ShellExecuteA(NULL, "open", k_cartographer_url, NULL, NULL, SW_SHOWDEFAULT);
+		ShellExecuteA(NULL, "open", k_cartographer_url_https, NULL, NULL, SW_SHOWDEFAULT);
 	}
 	else if (button_id == _item_cartographer_guide_credits) 
 	{

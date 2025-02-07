@@ -23,7 +23,6 @@ public:
 	static void RefreshTogglexDelay();
 
 	static void player_position_increase_client_position_margin_of_error(bool enable);
-	static int get_player_index_from_unit_datum_index(datum unit_datum_index);
 	static void set_unit_speed_patch(bool hackit);
 	static void disable_score_announcer_sounds(int sound);
 	static void custom_sound_play(const wchar_t* soundName, int delay);

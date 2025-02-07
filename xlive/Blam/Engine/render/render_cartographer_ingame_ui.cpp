@@ -18,7 +18,7 @@
 #include "H2MOD/Modules/Accounts/AccountLogin.h"
 #include "H2MOD/Modules/Achievements/Achievements.h"
 #include "H2MOD/GUI/XLiveRendering.h"
-
+#include "H2MOD/Modules/Updater/Updater.h"
 #include "version_git.h"
 
 /* defines */
@@ -60,8 +60,6 @@ void render_cartographer_ingame_ui(void)
 
 	// defined in Modules\Updater\Updater.cpp
 	extern char* autoUpdateText;
-	extern long long sizeOfDownload;
-	extern long long sizeOfDownloaded;
 
 #ifdef ACHIVEMENT_RENDER_DEBUG_ENABLED
 	static bool x_test = false;

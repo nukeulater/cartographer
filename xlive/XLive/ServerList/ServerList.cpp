@@ -16,11 +16,11 @@
 
 #include "H2MOD/Utils/Utils.h"
 
-const char k_cartographer_add_server_url[] = k_cartographer_url"/live/add_server.php";
-const char k_cartographer_del_server_url[] = k_cartographer_url"/live/del_server.php";
-const char k_cartographer_server_list_url[] = k_cartographer_url"/live/server_list.php";
-const char k_cartographer_server_url[] = k_cartographer_url"/live/servers/";
-const char k_cartographer_dedi_count_url[] = k_cartographer_url"/live/dedicount.php";
+const char k_cartographer_add_server_url[] = k_cartographer_url_https"/live/add_server.php";
+const char k_cartographer_del_server_url[] = k_cartographer_url_https"/live/del_server.php";
+const char k_cartographer_server_list_url[] = k_cartographer_url_https"/live/server_list.php";
+const char k_cartographer_server_url[] = k_cartographer_url_https"/live/servers/";
+const char k_cartographer_dedi_count_url[] = k_cartographer_url_https"/live/dedicount.php";
 
 using namespace rapidjson;
 

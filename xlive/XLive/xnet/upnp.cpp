@@ -4,6 +4,7 @@
 #include <miniupnpc/miniupnpc.h>
 #include <miniupnpc/upnpcommands.h>
 
+#include "Xlive/xnet/XNetQoS.h"
 #include "H2MOD/Modules/Shell/Config.h"
 
 /* Ripped from ED thanks guys - PermaNull*/
@@ -12,7 +13,7 @@ ModuleUPnP::ModuleUPnP()
 	upnpDevice = upnpDiscover(2000, NULL, NULL, 0, 0, 2, &upnpDiscoverError);
 }
 
-Utils::UPnPResult ModuleUPnP::UPnPForwardPort(bool tcp, int externalport, int internalport, const std::string & ruleName)
+Utils::UPnPResult ModuleUPnP::UPnPForwardPort(bool tcp, int externalport, int internalport, const char* ruleName)
 {
 	struct UPNPUrls urls;
 	struct IGDdatas data;
@@ -28,7 +29,7 @@ Utils::UPnPResult ModuleUPnP::UPnPForwardPort(bool tcp, int externalport, int in
 
 	ret = UPNP_AddPortMapping(urls.controlURL, data.first.servicetype,
 		std::to_string(externalport).c_str(), std::to_string(internalport).c_str(),
-		lanaddr, ruleName.c_str(), tcp ? "TCP" : "UDP", NULL, NULL);
+		lanaddr, ruleName, tcp ? "TCP" : "UDP", NULL, NULL);
 
 	Utils::UPnPErrorType type = Utils::UPnPErrorType::None;
 	if (ret != UPNPCOMMAND_SUCCESS)
@@ -56,7 +57,7 @@ void ForwardPorts()
 	upnpResult = upnp.UPnPForwardPort(false, H2Config_base_port + 1, H2Config_base_port + 1, "Halo2_port1");
 	LOG_INFO_NETWORK("ForwardPorts() - Halo2 port forwarding result: {}", upnpResult.ErrorCode);
 
-	upnpResult = upnp.UPnPForwardPort(true, H2Config_base_port + 10, H2Config_base_port + 10, "Halo2_port_QoS");
+	upnpResult = upnp.UPnPForwardPort(true, H2Config_base_port + k_xnet_qos_port_offset, H2Config_base_port + k_xnet_qos_port_offset, "Halo2_port_QoS");
 	LOG_INFO_NETWORK("ForwardPorts() - Halo2 QoS forwarding result: {}", upnpResult.ErrorCode);
 
 	LOG_INFO_NETWORK("ForwardPorts() - Finished forwarding ports.");

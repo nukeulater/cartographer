@@ -1,6 +1,6 @@
 #include "stdafx.h"
-
 #include "Updater.h"
+
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Modules/Shell/Startup/Startup.h"
@@ -8,7 +8,7 @@
 
 #include "main/main.h"
 
-const char k_cartographer_update_ini_url[] = k_cartographer_url"/update1.ini";
+const char k_cartographer_update_ini_url[] = k_cartographer_url_http"/update1.ini";
 
 bool fork_cmd_elevate(const wchar_t* cmd, wchar_t* flags = 0) {
 	SHELLEXECUTEINFO shExInfo = { 0 };
@@ -411,7 +411,8 @@ bool DownloadUpdatedFiles() {
 			}
 			_wremove(existingfilepath);
 			
-			c_static_string<1024> download_url(k_cartographer_url);
+			c_static_string<1024> download_url(k_cartographer_url_http);
+			download_url.append("/");
 			download_url.append(UpdateFileEntries[i]->server_uri);
 			DownloadFile(download_url.get_string(), existingfilepath);
 		}

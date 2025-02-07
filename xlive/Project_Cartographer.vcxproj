@@ -414,6 +414,7 @@
     <ClCompile Include="Blam\Engine\interface\user_interface_widget_text_entry.cpp" />
     <ClCompile Include="Blam\Engine\interface\user_interface_widget_window.cpp" />
     <ClCompile Include="Blam\Engine\items\item_definitions.cpp" />
+    <ClCompile Include="Blam\Engine\items\projectiles.cpp" />
     <ClCompile Include="Blam\Engine\items\weapons.cpp" />
     <ClCompile Include="Blam\Engine\items\weapon_definitions.cpp" />
     <ClCompile Include="Blam\Engine\main\game_preferences.cpp" />
@@ -479,6 +480,7 @@
     <ClCompile Include="Blam\Engine\Networking\replication\replication_event_manager.cpp" />
     <ClCompile Include="Blam\Engine\networking\transport\transport.cpp" />
     <ClCompile Include="Blam\Engine\networking\transport\transport_qos.cpp" />
+    <ClCompile Include="Blam\Engine\objects\damage.cpp" />
     <ClCompile Include="Blam\Engine\objects\damage_effects.cpp" />
     <ClCompile Include="Blam\Engine\objects\lights.cpp" />
     <ClCompile Include="Blam\Engine\objects\object_early_movers.cpp" />
@@ -713,6 +715,7 @@
     <ClInclude Include="Blam\Engine\items\garbage.h" />
     <ClInclude Include="Blam\Engine\items\item_collection_definition.h" />
     <ClInclude Include="Blam\Engine\items\item_definitions.h" />
+    <ClInclude Include="Blam\Engine\items\projectiles.h" />
     <ClInclude Include="Blam\Engine\items\projectile_definition.h" />
     <ClInclude Include="Blam\Engine\items\vehicle_collection_definitions.h" />
     <ClInclude Include="Blam\Engine\items\weapon_definitions.h" />
@@ -1104,6 +1107,7 @@
     <ClInclude Include="Blam\Engine\objects\emblems.h" />
     <ClInclude Include="Blam\Engine\objects\lights.h" />
     <ClInclude Include="Blam\Engine\objects\light_definitions.h" />
+    <ClInclude Include="Blam\Engine\objects\object_location.h" />
     <ClInclude Include="Blam\Engine\objects\object_definition.h" />
     <ClInclude Include="Blam\Engine\objects\object_early_movers.h" />
     <ClInclude Include="Blam\Engine\objects\object_globals.h" />

@@ -116,48 +116,6 @@ std::unordered_map<const wchar_t*, bool&> GametypesMap
 	{ L"ogh2", g_xbox_tickrate_enabled },
 };
 
-#pragma region engine calls
-
-// Used to get damage on any object
-typedef void(__cdecl* object_cause_damage_t)(s_damage_data* damage_data, int damaged_object_indexes, __int16 a4, __int16 a5, __int16 a6, int a7);
-object_cause_damage_t p_object_cause_damage;
-
-// Engine call to set damage applied on an object by a projectile
-void __cdecl projectile_collision_object_cause_damage(s_damage_data* damage_data, int damaged_object_indexes, __int16 a4, __int16 a5, __int16 a6, int a7)
-{
-	// Hook on call to prevent guardian glitching
-	// Used to disable it in Infection only, became a bigger problem so now we have to disable it globally.....
-	if (/*CustomVariantHandler::VariantEnabled(_id_infection)*/ true) {
-		if (damage_data->creator_datum != NONE && damage_data->field_10 != NONE)
-		{
-			LOG_TRACE_GAME(
-				"{} {} {:X} {:X} {:X} {:X} {:X} {:X} {:X} {:X}",
-				__FUNCTION__,
-				damage_data->flags,
-				damage_data->damage_tag_index,
-				damage_data->creator_datum,
-				damage_data->field_10, //TODO reverse what field_10 is
-				damage_data->field_14,
-				damage_data->field_18,
-				damage_data->field_1C,
-				damage_data->field_24,
-				damage_data->field_28
-			);
-			p_object_cause_damage(damage_data, damaged_object_indexes, a4, a5, a6, a7);
-		}
-		else
-		{
-			LOG_TRACE_GAME("GUARDIAN GLITCH PREVENTED");
-		}
-	}
-	else
-	{
-		//Calls basic engine function when not in zombies game
-		p_object_cause_damage(damage_data, damaged_object_indexes, a4, a5, a6, a7);
-	}
-}
-#pragma endregion
-
 typedef int(__cdecl* show_error_screen_t)(int a1, int a2, int a3, __int16 a4, int a5, int a6);
 show_error_screen_t p_show_error_screen;
 
@@ -168,14 +126,6 @@ int __cdecl showErrorScreen(int a1, int widget_type, int a3, __int16 a4, int a5,
 		return 0;
 	}
 	return p_show_error_screen(a1, widget_type, a3, a4, a5, a6);
-}
-
-typedef int(__cdecl* wcsncpy_s_hook_t)(int a1, unsigned int a2, wchar_t* a3, int a4);
-wcsncpy_s_hook_t p_wcsncpy_s_hook;
-
-//lets you follow the call path of any string that is displayed (in a debugger)
-int __cdecl stringDisplayHook(int a1, unsigned int a2, wchar_t* a3, int a4) {
-	return p_wcsncpy_s_hook(a1, a2, a3, a4);
 }
 
 #pragma region PlayerFunctions
@@ -198,20 +148,6 @@ void call_give_player_weapon(int playerIndex, datum weaponId, bool resetLoadout)
 
 		unit_add_weapon_to_inventory(unit_datum, object_idx, _weapon_addition_method_one);
 	}
-}
-
-int H2MOD::get_player_index_from_unit_datum_index(datum unit_datum_index)
-{
-	player_iterator playersIt;
-	while (playersIt.get_next_active_player())
-	{
-		datum unit_datum_index_check = playersIt.get_current_player_data()->unit_index;
-		LOG_TRACE_FUNC("Checking datum: {0:x} - index: {1} against datum: {2:x}", unit_datum_index_check, playersIt.get_current_player_index(), unit_datum_index);
-
-		if (unit_datum_index == unit_datum_index_check)
-			return playersIt.get_current_player_index();
-	}
-	return NONE;
 }
 
 void H2MOD::set_unit_speed_patch(bool hackit) {
@@ -997,10 +933,6 @@ void H2MOD::ApplyHooks() {
 		NopFill(Memory::GetAddress(0x1922d9), 7);
 	}
 
-	//Guardian Patch
-	p_object_cause_damage = Memory::GetAddress<object_cause_damage_t>(0x17AD81, 0x1525E1);
-	PatchCall(Memory::GetAddress(0x147DB8, 0x172D55), projectile_collision_object_cause_damage);
-
 	cheats_apply_patches();
 	game_statborg_apply_patches();
 	simulation_game_objects_apply_patches();
@@ -1040,22 +972,7 @@ void H2MOD::ApplyHooks() {
 		// ### TODO dedi offset
 		Codecave(Memory::GetAddress(0x15E8DC, 0x0), object_function_value_adjust_primary_firing, 4);
 
-		//Shader display hook
-		//c_test_hook = Memory::GetAddress<p_test_hook*>(0x1A2AEE);
-		//PatchCall(Memory::GetAddress(0x1a10de), test_shader_hook);
-		//PatchCall(Memory::GetAddress(0x1a1324), test_hook);
-		//PatchCall(Memory::GetAddress(0x1A2FF6), test_shader_hook);
-		//PatchCall(Memory::GetAddress(0x1a316B), test_hook);
-
-		// DETOUR_ATTACH(p_load_wgit, Memory::GetAddress<load_wgit_t>(0x2106A2), OnWgitLoad);
-
-		DETOUR_ATTACH(p_show_error_screen, Memory::GetAddress<show_error_screen_t>(0x20E15A), showErrorScreen);
-
-		//TODO: expensive, use for debugging/searching
-		//string_display_hook_method = (string_display_hook)DetourFunc(Memory::GetAddress<BYTE*>(0x287AB5), (BYTE*)stringDisplayHook, 5);
-
-		//pResetRound = (ResetRounds)DetourFunc(Memory::GetAddress<BYTE*>(0x6B1C8), (BYTE*)OnNextRound, 7);
-		
+		DETOUR_ATTACH(p_show_error_screen, Memory::GetAddress<show_error_screen_t>(0x20E15A), showErrorScreen);		
 		DETOUR_ATTACH(p_user_interface_controller_set_desired_team_index, Memory::GetAddress<user_interface_controller_set_desired_team_index_t>(0x2068F2), user_interface_controller_set_desired_team_index_hook);
 
 		// hook the print command to redirect the output to our console
