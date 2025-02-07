@@ -14,7 +14,7 @@ struct s_user_interface_player_profile_storage
 class c_player_profile_list : public c_list_widget
 {
 public:
-	static void apply_instance_patches();
+	static void apply_instance_patches(void);
 
 
 	// c_player_profile_list virtual functions

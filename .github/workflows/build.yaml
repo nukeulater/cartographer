@@ -12,7 +12,9 @@ jobs:
       PLATFORM: x86
     strategy:
       matrix:
-        BUILD_CONFIGURATION: [debug_msvc, debug_llvm, release_msvc, release_llvm]
+        # Use this when we fix llvm builds
+        #BUILD_CONFIGURATION: [debug_msvc, debug_llvm, release_msvc, release_llvm]
+        BUILD_CONFIGURATION: [debug_msvc, release_msvc]
 
     runs-on: windows-2022
 

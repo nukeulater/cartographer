@@ -55,8 +55,10 @@ static_assert(sizeof(datum) == 4);
 #define SHORT_BITS SIZEOF_BITS(int16)
 #define LONG_BITS SIZEOF_BITS(int32)
 
-#if(!__INTEL_LLVM_COMPILER)
-#define IS_MSVC_COMPILER
+#ifdef LLVM
+#define LLVM_JMP_ERROR static_assert(false, "JUMPING TO VIRTUAL FUNCTIONS IS BROKEN WHEN COMPILING IN LLVM: WE CANNOT MAKE A PROPER BUILD WITHOUT FIXING THIS")
+#else
+#define LLVM_JMP_ERROR (void)0
 #endif
 
 /* globals */

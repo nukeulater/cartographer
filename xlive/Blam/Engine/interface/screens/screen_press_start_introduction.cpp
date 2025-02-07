@@ -38,11 +38,6 @@ void c_screen_press_start_introduction::initialize(s_screen_parameters* paramete
 	INVOKE_TYPE(0x23F180, 0x0, void(__thiscall*)(c_screen_press_start_introduction*, s_screen_parameters*), this, parameters);
 }
 
-__declspec(naked) void press_start_introduction_init()
-{
-	CLASS_HOOK_JMP(c_screen_press_start_introduction__initialize, c_screen_press_start_introduction::initialize);
-}
-
 void c_screen_press_start_introduction::sub_60EBC2(int32 a1)
 {
 	INVOKE_TYPE(0x23F011, 0x0, void(__thiscall*)(c_screen_press_start_introduction*, int32), this, a1);

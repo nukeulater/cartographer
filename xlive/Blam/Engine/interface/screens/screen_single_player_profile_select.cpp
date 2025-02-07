@@ -134,14 +134,16 @@ wchar_t* c_player_profile_list::unknown_function_3(int32 a1)
 	return INVOKE_TYPE(0x2372D6, 0x0, wchar_t*(__thiscall*)(c_player_profile_list*, int32 a1), this, a1);
 }
 
-void c_player_profile_list::apply_instance_patches()
+void c_player_profile_list::apply_instance_patches(void)
 {
+	LLVM_JMP_ERROR;
 	// c_player_profile_list vtable
 	WritePointer(Memory::GetAddress(0x3D284C), jmp_c_player_profile_list__update_displayed_profiles);
 	// c_player_profile_list_fancy vtable
 	WritePointer(Memory::GetAddress(0x3D01DC), jmp_c_player_profile_list__update_displayed_profiles);
-	// c_player_profile_list_basic vtanle
+	// c_player_profile_list_basic vtable
 	WritePointer(Memory::GetAddress(0x3CB834), jmp_c_player_profile_list__update_displayed_profiles);
+	return;
 }
 
 void* c_screen_single_player_profile_select_fancy::load(s_screen_parameters* parameters)
