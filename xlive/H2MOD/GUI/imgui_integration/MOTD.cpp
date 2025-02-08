@@ -43,6 +43,8 @@ namespace ImGuiHandler
 				fp = _wfopen(file_path, L"wb");
 				curl_easy_setopt(curl, CURLOPT_URL, k_motd_url);
 				curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, NULL);
+				curl_easy_setopt(curl, CURLOPT_TIMEOUT, 10);
+				curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 10);
 				curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
 				res = curl_easy_perform(curl);
 				if (res == CURLcode::CURLE_OK)
