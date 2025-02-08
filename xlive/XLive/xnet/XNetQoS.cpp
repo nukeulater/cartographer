@@ -345,18 +345,18 @@ void CXNetQoS::Listener()
 			break;
 		}
 
-		if (bind(m_ListenSocket, (sockaddr*)&serverAddr, sizeof(serverAddr)) == SOCKET_ERROR)
-		{
-			LOG_TRACE_NETWORK("{} - unable to bind listener socket!", __FUNCTION__);
-			break;
-		}
-
 		if (WSAIoctl(m_ListenSocket, SIO_GET_EXTENSION_FUNCTION_POINTER,
 			&GuidAcceptEx, sizeof(GuidAcceptEx),
 			&lpfnAcceptEx, sizeof(lpfnAcceptEx),
 			&dwBytes, NULL, NULL) == SOCKET_ERROR)
 		{
 			LOG_TRACE_NETWORK("{} - failed to get AcceptEx function pointer, WSAIoctl() error: {}", __FUNCTION__, WSAGetLastError());
+			break;
+		}
+
+		if (bind(m_ListenSocket, (sockaddr*)&serverAddr, sizeof(serverAddr)) == SOCKET_ERROR)
+		{
+			LOG_TRACE_NETWORK("{} - unable to bind listener socket!", __FUNCTION__);
 			break;
 		}
 
