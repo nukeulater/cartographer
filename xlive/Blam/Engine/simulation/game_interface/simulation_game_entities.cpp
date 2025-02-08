@@ -7,7 +7,7 @@
 
 bool simulation_object_index_valid(datum object_index)
 {
-	bool result = object_index != NONE && object_try_and_get_and_verify_type(object_index, NONE) != NULL;
+	bool result = object_index != NONE && object_try_and_get_and_verify_type(object_index, _object_mask_all) != NULL;
 	return result;
 }
 

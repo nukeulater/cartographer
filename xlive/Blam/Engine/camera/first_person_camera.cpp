@@ -31,7 +31,7 @@ void __cdecl first_person_camera_build_observer_command(datum player_unit_index,
 		object_get_velocities(player_unit_index, &observer_command->velocity, nullptr);
 		if(player_unit->object.parent_object_index)
 		{
-			unit_datum* vehicle_unit = (unit_datum*)object_try_and_get_and_verify_type(player_unit->object.parent_object_index, _object_type_vehicle);
+			unit_datum* vehicle_unit = (unit_datum*)object_try_and_get_and_verify_type(player_unit->object.parent_object_index, _object_mask_vehicle);
 			if(vehicle_unit)
 			{
 				struct vehicle_definition* vehicle_definition = (struct vehicle_definition*)tag_get_fast(vehicle_unit->object.tag_definition_index);

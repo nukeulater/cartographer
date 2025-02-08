@@ -166,7 +166,7 @@ object_datum* halo_interpolator_object_can_interpolate(datum object_index, uint3
     }
     else
     {
-        result =(object_datum*)object_try_and_get_and_verify_type(object_index, NONE);
+        result =(object_datum*)object_try_and_get_and_verify_type(object_index, _object_mask_all);
     }
     return result;
 }

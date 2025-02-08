@@ -902,7 +902,7 @@ int32 __cdecl object_get_skinning_matrices(datum object_index, int32 skinning_ma
 
 datum object_get_damage_owner(datum object_index)
 {
-	object_datum* object = (object_datum*)object_try_and_get_and_verify_type(object_index, NONE);
+	object_datum* object = (object_datum*)object_try_and_get_and_verify_type(object_index, _object_mask_all);
 	return object->damage_owner_object_index;
 }
 

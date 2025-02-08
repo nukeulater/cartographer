@@ -631,7 +631,7 @@ int CommandCollection::DestroyObjectCmd(const std::vector<std::string>& tokens, 
 		return 0;
 	}
 
-	void* object_data = (void*)object_try_and_get_and_verify_type(datumIdx, -1);
+	void* object_data = (void*)object_try_and_get_and_verify_type(datumIdx, _object_mask_all);
 	if (object_data != NULL)
 	{
 		DeleteObject(datumIdx);
