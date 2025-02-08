@@ -178,13 +178,17 @@ void c_network_observer::reset_network_observer_bandwidth_preferences()
 	SecureZeroMemory(Memory::GetAddress<void*>(0x47E9D8 + 0x1DC), k_network_preferences_size);
 }
 
+CLASS_HOOK_DECLARE_LABEL(c_network_observer__get_bandwidth_results, c_network_observer::get_bandwidth_results);
 bool __thiscall c_network_observer::get_bandwidth_results(int32 *out_throughput, real32 *out_satiation, int32 *a4)
 {
 	// let the game know we don't have any bandwidth measurements available to save
 	return false;
 }
 
-void __declspec(naked) jmp_get_bandwidth_results() { __asm jmp c_network_observer::get_bandwidth_results }
+void __declspec(naked) jmp_get_bandwidth_results()
+{
+	CLASS_HOOK_JMP(c_network_observer__get_bandwidth_results, c_network_observer::get_bandwidth_results);
+}
 
 // raw WinSock has a 28 bytes packet overhead for the packet header, unlike Xbox LIVE, which has 44 bytes (28 bytes + whatever LIVE packet header adds)
 int32 __cdecl transport_get_packet_overhead_hook(int32 protocol_type)
@@ -219,6 +223,7 @@ int32 __cdecl transport_get_packet_overhead_hook(int32 protocol_type)
 	return 0;
 }
 
+CLASS_HOOK_DECLARE_LABEL(c_network_observer__channel_should_send_packet_hook, c_network_observer::channel_should_send_packet_hook);
 bool __thiscall c_network_observer::channel_should_send_packet_hook(
 	int32 network_channel_index,
 	bool a3,
@@ -306,7 +311,10 @@ bool __thiscall c_network_observer::channel_should_send_packet_hook(
 	return ret;
 }
 
-static void __declspec(naked) jmp_network_observer_channel_should_send_packet_hook() { __asm jmp c_network_observer::channel_should_send_packet_hook }
+static void __declspec(naked) jmp_network_observer_channel_should_send_packet_hook()
+{
+	CLASS_HOOK_JMP(c_network_observer__channel_should_send_packet_hook, c_network_observer::channel_should_send_packet_hook);
+}
 
 void c_network_observer::apply_patches()
 {

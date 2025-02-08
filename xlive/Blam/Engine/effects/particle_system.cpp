@@ -85,18 +85,23 @@ void c_particle_system::change_parent_effect(datum* datum_1, datum* datum_2)
 typedef void(__thiscall* t_c_particle_system__update_position)(c_particle_system* particle_system, s_particle_system_update* particle_system_update, const real_matrix4x3* matrix, bool a4);
 t_c_particle_system__update_position p_update_position;
 
+CLASS_HOOK_DECLARE_LABEL(c_particle_system__update_position, c_particle_system::update_position);
 void __thiscall c_particle_system::update_position(
 	s_particle_system_update* particle_system_update,
 	const real_matrix4x3* matrix,
 	bool a4)
 {
+
 	// the index is updated in the original code, so get it early
 	c_particle_system_definition* particle_system_def = this->get_definition();
 	datum location_index = particle_system_update->particle_system_location_index;
 	p_update_position(this, particle_system_update, matrix, a4);
 }
 
-__declspec(naked) void jmp_c_particle_system_update_position() {__asm jmp c_particle_system::update_position}
+__declspec(naked) void jmp_c_particle_system_update_position()
+{
+	CLASS_HOOK_JMP(c_particle_system__update_position, c_particle_system::update_position);
+}
 
 typedef bool(__stdcall* c_particle_system_frame_advance_t)(c_particle_system* thisx, real32 dt);
 c_particle_system_frame_advance_t p_c_particle_system_frame_advance;

@@ -23,6 +23,19 @@ do \
 #define DETOUR_COMMIT() \
 	DetourTransactionCommit();
 
+#ifdef LLVM
+#define CLASS_HOOK_DECLARE_LABEL(name, member) static auto name = &member
+
+#else
+#define CLASS_HOOK_DECLARE_LABEL(name, member)
+#endif
+
+#ifdef LLVM
+#define CLASS_HOOK_JMP(name, member) __asm jmp (name)
+#else
+#define CLASS_HOOK_JMP(name, member) __asm jmp (member)
+#endif
+
 void *DetourFunc(BYTE *src, const BYTE *dst, const unsigned int len);
 void RetourFunc(BYTE *src, BYTE *restore, const unsigned int len);
 void *DetourClassFunc(BYTE *src, const BYTE *dst, const unsigned int len);
@@ -39,7 +52,7 @@ void ReadBytesProtected(DWORD address, BYTE* buf, BYTE count);
 
 inline void PatchCall(DWORD call_addr, void *new_function_ptr)
 {
-	PatchCall(call_addr, reinterpret_cast<DWORD>(new_function_ptr));
+	PatchCall(call_addr, (DWORD)(new_function_ptr));
 }
 
 inline void PatchCall(void *call_addr, void *new_function_ptr)

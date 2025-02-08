@@ -2,6 +2,7 @@
 #include "screen_network_squad_browser.h"
 
 #pragma region Live list fix for disappearing labels
+CLASS_HOOK_DECLARE_LABEL(c_screen_network_squad_browser__build_players_list_fix, c_screen_network_squad_browser::build_players_list_fix);
 void c_screen_network_squad_browser::build_players_list_fix(c_player_widget_representation* representations, int32 player_count)
 {
 	if (m_live_list)
@@ -14,7 +15,10 @@ void c_screen_network_squad_browser::build_players_list_fix(c_player_widget_repr
 	apply_new_representations_to_players(representations, player_count);
 }
 
-__declspec(naked) void jmp_build_player_list() { __asm jmp c_screen_network_squad_browser::build_players_list_fix }
+__declspec(naked) void jmp_build_player_list()
+{ 
+	CLASS_HOOK_JMP(c_screen_network_squad_browser__build_players_list_fix, c_screen_network_squad_browser::build_players_list_fix);
+}
 #pragma endregion
 
 void* c_screen_network_squad_browser::load(s_screen_parameters* parameters)

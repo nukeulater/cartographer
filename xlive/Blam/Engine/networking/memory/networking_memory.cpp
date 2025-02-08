@@ -61,6 +61,7 @@ void __cdecl network_heap_free_block(uint8* block)
 	// return INVOKE(0x1AC94A, 0x1ACB18, network_heap_free_block, block);
 }
 
+CLASS_HOOK_DECLARE_LABEL(c_network_heap__dispose, c_network_heap::dispose);
 void c_network_heap::dispose()
 {
 	g_network_heap_allocations.allocations = 0;
@@ -68,7 +69,10 @@ void c_network_heap::dispose()
 	return INVOKE_TYPE(0x381574, 0x32CCAE, void(__thiscall*)(c_network_heap*), this);
 }
 
-__declspec(naked) void jmp_c_network_heap__discard() { __asm { jmp c_network_heap::dispose } }
+__declspec(naked) void jmp_c_network_heap__discard()
+{
+	CLASS_HOOK_JMP(c_network_heap__dispose, c_network_heap::dispose);
+}
 
 void network_memory_apply_patches(void)
 {

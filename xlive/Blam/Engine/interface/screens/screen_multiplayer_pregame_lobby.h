@@ -79,11 +79,12 @@ protected:
 
 
 	void initialize_long_text_chat();
-	void update_protocol();
 	void update_chat_icons();
 	void update_favourites_icons();
 
 public:
+	void update_protocol();
+
 	static void apply_instance_patches();
 	static void apply_patches_on_map_load();
 };

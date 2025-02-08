@@ -102,13 +102,16 @@ c_main_menu_list::c_main_menu_list(int16 user_flags) :
 	}
 }
 
+CLASS_HOOK_DECLARE_LABEL(c_main_menu_list__c_main_menu_list_ctor, c_main_menu_list::c_main_menu_list_ctor);
 void c_main_menu_list::c_main_menu_list_ctor(int16 user_flags)
 {
 	new (this)c_main_menu_list(user_flags);
 }
 
-__declspec(naked) void jmp_c_main_menu_list() { __asm { jmp c_main_menu_list::c_main_menu_list_ctor } }
-
+__declspec(naked) void jmp_c_main_menu_list()
+{
+	CLASS_HOOK_JMP(c_main_menu_list__c_main_menu_list_ctor, c_main_menu_list::c_main_menu_list_ctor);
+}
 
 c_list_item_widget* c_main_menu_list::get_list_items()
 {

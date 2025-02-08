@@ -12,6 +12,7 @@ c_simulation_entity_database* simulation_get_entity_database()
     return &simulation_get_world()->get_distributed_world()->m_entity_database;
 }
 
+CLASS_HOOK_DECLARE_LABEL(c_simulation_entity_database__process_creation, c_simulation_entity_database::process_creation);
 bool c_simulation_entity_database::process_creation(int32 entity_index, e_simulation_entity_type type, uint32 update_mask, int32 block_count, s_replication_allocation_block* blocks)
 {
     bool result = false;
@@ -61,9 +62,12 @@ bool c_simulation_entity_database::process_creation(int32 entity_index, e_simula
     return result;
 }
 
-__declspec(naked) void jmp_c_simulation_entity_database__process_creation() { __asm { jmp c_simulation_entity_database::process_creation } }
+__declspec(naked) void jmp_c_simulation_entity_database__process_creation()
+{
+    CLASS_HOOK_JMP(c_simulation_entity_database__process_creation, c_simulation_entity_database::process_creation);
+}
 
-
+CLASS_HOOK_DECLARE_LABEL(c_simulation_entity_database__read_creation_from_packet, c_simulation_entity_database::read_creation_from_packet);
 uint32 c_simulation_entity_database::read_creation_from_packet(int32 entity_index, 
     e_simulation_entity_type* simulation_entity_type, 
     uint32* out_entity_initial_update_mask, 
@@ -232,8 +236,12 @@ uint32 c_simulation_entity_database::read_creation_from_packet(int32 entity_inde
     return result;
 }
 
-__declspec(naked) void jmp_c_simulation_entity_database__read_creation_from_packet() { __asm { jmp c_simulation_entity_database::read_creation_from_packet } }
+__declspec(naked) void jmp_c_simulation_entity_database__read_creation_from_packet()
+{
+    CLASS_HOOK_JMP(c_simulation_entity_database__read_creation_from_packet, c_simulation_entity_database::read_creation_from_packet);
+}
 
+CLASS_HOOK_DECLARE_LABEL(c_simulation_entity_database__process_update, c_simulation_entity_database::process_update);
 bool c_simulation_entity_database::process_update(int32 entity_index, uint32 update_mask, int32 block_count, s_replication_allocation_block* blocks)
 {
     bool result = false;
@@ -250,8 +258,12 @@ bool c_simulation_entity_database::process_update(int32 entity_index, uint32 upd
     return result;
 }
 
-__declspec(naked) void jmp_c_simulation_entity_database__process_update() { __asm { jmp c_simulation_entity_database::process_update } }
+__declspec(naked) void jmp_c_simulation_entity_database__process_update()
+{
+    CLASS_HOOK_JMP(c_simulation_entity_database__process_update, c_simulation_entity_database::process_update);
+}
 
+CLASS_HOOK_DECLARE_LABEL(c_simulation_entity_database__read_update_from_packet, c_simulation_entity_database::read_update_from_packet);
 int32 c_simulation_entity_database::read_update_from_packet(
     int32 entity_index, 
     uint32* out_update_mask, 
@@ -363,14 +375,21 @@ int32 c_simulation_entity_database::read_update_from_packet(
 	return result;
 }
 
-__declspec(naked) void jmp_c_simulation_entity_database__read_update_from_packet() { __asm { jmp c_simulation_entity_database::read_update_from_packet } }
+__declspec(naked) void jmp_c_simulation_entity_database__read_update_from_packet()
+{
+    CLASS_HOOK_JMP(c_simulation_entity_database__read_update_from_packet, c_simulation_entity_database::read_update_from_packet);
+}
 
+CLASS_HOOK_DECLARE_LABEL(c_simulation_entity_database__notify_mark_entity_for_deletion, c_simulation_entity_database::notify_mark_entity_for_deletion);
 void c_simulation_entity_database::notify_mark_entity_for_deletion(int32 entity_index)
 {
     this->entity_delete_gameworld(entity_index);
 }
 
-__declspec(naked) void jmp_c_simulation_entity_database__notify_mark_entity_for_deletion() { __asm { jmp c_simulation_entity_database::notify_mark_entity_for_deletion } }
+__declspec(naked) void jmp_c_simulation_entity_database__notify_mark_entity_for_deletion()
+{
+    CLASS_HOOK_JMP(c_simulation_entity_database__notify_mark_entity_for_deletion, c_simulation_entity_database::notify_mark_entity_for_deletion);
+}
 
 void c_simulation_entity_database::entity_delete_gameworld(int32 entity_index)
 {
@@ -388,6 +407,7 @@ void c_simulation_entity_database::entity_delete_gameworld(int32 entity_index)
     return;
 }
 
+CLASS_HOOK_DECLARE_LABEL(c_simulation_entity_database__notify_promote_to_authority, c_simulation_entity_database::notify_promote_to_authority);
 bool c_simulation_entity_database::notify_promote_to_authority(int32 entity_index)
 {
     s_simulation_game_entity* game_entity = this->entity_get(entity_index);
@@ -395,7 +415,10 @@ bool c_simulation_entity_database::notify_promote_to_authority(int32 entity_inde
     return true;
 }
 
-__declspec(naked) void jmp_c_simulation_entity_database__notify_promote_to_authority() { __asm { jmp c_simulation_entity_database::notify_promote_to_authority } }
+__declspec(naked) void jmp_c_simulation_entity_database__notify_promote_to_authority()
+{
+    CLASS_HOOK_JMP(c_simulation_entity_database__notify_promote_to_authority, c_simulation_entity_database::notify_promote_to_authority);
+}
 
 void c_simulation_entity_database::entity_delete_internal(int32 entity_index)
 {
@@ -467,6 +490,7 @@ void c_simulation_entity_database::entity_capture_creation_data(int32 entity_ind
 
 void simulation_entity_database_apply_patches(void)
 {
+    LLVM_JMP_ERROR;
 	WritePointer(Memory::GetAddress(0x3C6228, 0x381D10), jmp_c_simulation_entity_database__read_creation_from_packet);
 	WritePointer(Memory::GetAddress(0x3C622C, 0x381D14), jmp_c_simulation_entity_database__process_creation);
     // allow the creation of turrets by increasing the block count, block count was hardcoded

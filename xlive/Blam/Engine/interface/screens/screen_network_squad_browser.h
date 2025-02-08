@@ -7,8 +7,9 @@ class c_screen_network_squad_browser : c_screen_with_menu
 	bool m_live_list;
 	char gap_1F04[11];
 
-	void build_players_list_fix(c_player_widget_representation* representations, int32 player_count);
 public:
+	void build_players_list_fix(c_player_widget_representation* representations, int32 player_count);
+
 	static void* load(s_screen_parameters* parameters);
 	static void apply_patches();
 };

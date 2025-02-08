@@ -193,20 +193,28 @@ uint64 c_bitstream::read_long_integer(const char* name, int size_in_bits)
 	return INVOKE_TYPE(0xD1E9A, 0xCE454, read_long_integer_t, this, name, size_in_bits);
 }
 
+CLASS_HOOK_DECLARE_LABEL(c_bitstream__write_unit_vector, c_bitstream::write_unit_vector);
 void c_bitstream::write_unit_vector(const char* name, const real_vector3d* unit_vector)
 {
 	int32 quantized_vector = quantize_unit_vector(unit_vector);
 	write_integer("unit-vector", quantized_vector, 19);
 }
 
+CLASS_HOOK_DECLARE_LABEL(c_bitstream__read_unit_vector, c_bitstream::read_unit_vector);
 void c_bitstream::read_unit_vector(const char* name, real_vector3d* out_unit_vector)
 {
 	int32 quantized_vector = read_integer("unit-vector", 19);
 	dequantize_unit_vector(quantized_vector, out_unit_vector);
 }
 
-__declspec(naked) void jmp_write_unit_vector() { __asm jmp c_bitstream::write_unit_vector }
-__declspec(naked) void jmp_read_unit_vector() { __asm jmp c_bitstream::read_unit_vector }
+__declspec(naked) void jmp_write_unit_vector()
+{
+	CLASS_HOOK_JMP(c_bitstream__write_unit_vector, c_bitstream::write_unit_vector);
+}
+__declspec(naked) void jmp_read_unit_vector()
+{
+	CLASS_HOOK_JMP(c_bitstream__read_unit_vector, c_bitstream::read_unit_vector);
+}
 
 void bitstream_serialization_apply_patches()
 {

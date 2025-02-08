@@ -78,6 +78,7 @@ void c_custom_map_manager::create_custom_map_data_directory()
 	p__create_custom_map_data_directory();
 }
 
+CLASS_HOOK_DECLARE_LABEL(c_custom_map_manager__mark_all_cached_maps_for_deletion, c_custom_map_manager::mark_all_cached_maps_for_deletion);
 void __thiscall c_custom_map_manager::mark_all_cached_maps_for_deletion()
 {
 	EnterCriticalSection(m_lock);
@@ -94,6 +95,7 @@ void __thiscall c_custom_map_manager::mark_all_cached_maps_for_deletion()
 	LeaveCriticalSection(m_lock);
 }
 
+CLASS_HOOK_DECLARE_LABEL(c_custom_map_manager__remove_marked_for_deletion, c_custom_map_manager::remove_marked_for_deletion);
 bool __thiscall c_custom_map_manager::remove_marked_for_deletion()
 {
 	EnterCriticalSection(m_lock);
@@ -283,6 +285,7 @@ bool c_custom_map_manager::write_custom_map_data_cache_to_file(const utf8* path,
 	return success;
 }
 
+CLASS_HOOK_DECLARE_LABEL(c_custom_map_manager__save_custom_map_data, c_custom_map_manager::save_custom_map_data);
 void __thiscall c_custom_map_manager::save_custom_map_data()
 {
 	WCHAR path_wide[MAX_PATH];
@@ -318,6 +321,7 @@ void c_custom_map_manager::load_map_data_cache_from_file_cache(s_custom_map_file
 
 }
 
+CLASS_HOOK_DECLARE_LABEL(c_custom_map_manager__load_custom_map_data_cache, c_custom_map_manager::load_custom_map_data_cache);
 void __thiscall c_custom_map_manager::load_custom_map_data_cache()
 {
 	//typedef void(__thiscall* cache_custom_map_file_image_preview)(c_custom_map_manager* thisx);
@@ -370,6 +374,7 @@ void __thiscall c_custom_map_manager::load_custom_map_data_cache()
 	LeaveCriticalSection(m_lock);
 }
 
+CLASS_HOOK_DECLARE_LABEL(c_custom_map_manager__start_custom_map_sync, c_custom_map_manager::start_custom_map_sync);
 void __thiscall c_custom_map_manager::start_custom_map_sync()
 {
 	// this code doesn't need any modifications, just some functions replaced inside it
@@ -401,6 +406,7 @@ uint32 __thiscall c_custom_map_manager::get_custom_map_list_ids(s_custom_map_id*
 	return map_count;
 }
 
+CLASS_HOOK_DECLARE_LABEL(c_custom_map_manager__get_custom_map_list_ids_by_map_name, c_custom_map_manager::get_custom_map_list_ids_by_map_name);
 uint32 __thiscall c_custom_map_manager::get_custom_map_list_ids_by_map_name(const wchar_t* map_name, s_custom_map_id* out_ids, uint32 out_ids_count)
 {
 	EnterCriticalSection(m_lock);
@@ -435,6 +441,7 @@ uint32 __thiscall c_custom_map_manager::get_custom_map_list_ids_by_map_name(cons
 // TODO de-duplicate custom map entry matching code
 // because just for 1 line of code we re-write same code over and over
 
+CLASS_HOOK_DECLARE_LABEL(c_custom_map_manager__find_matching_entries_by_file_path, c_custom_map_manager::find_matching_entries_by_file_path);
 uint32 __thiscall c_custom_map_manager::find_matching_entries_by_file_path(const wchar_t* file_path, s_custom_map_entry** out_custom_map_entries, uint32 out_custom_map_entries_count)
 {
 	EnterCriticalSection(m_lock);
@@ -499,6 +506,7 @@ uint32 __thiscall c_custom_map_manager::find_matching_entries_by_sha256_hash(con
 	return matching_count_found;
 }
 
+CLASS_HOOK_DECLARE_LABEL(c_custom_map_manager__find_matching_entries_by_map_name_and_hash, c_custom_map_manager::find_matching_entries_by_map_name_and_hash);
 uint32 __thiscall c_custom_map_manager::find_matching_entries_by_map_name_and_hash(const wchar_t* map_name, const BYTE* sha256_hash, s_custom_map_entry** out_custom_map_entries, uint32 out_custom_map_entries_count)
 {
 	EnterCriticalSection(m_lock);
@@ -563,6 +571,7 @@ uint32 __thiscall c_custom_map_manager::find_matching_entries_by_map_name(const 
 	return matching_count_found;
 }
 
+CLASS_HOOK_DECLARE_LABEL(c_custom_map_manager__get_entry_by_id, c_custom_map_manager::get_entry_by_id);
 bool __thiscall c_custom_map_manager::get_entry_by_id(const s_custom_map_id* custom_map_id, s_custom_map_entry** out_entry)
 {
 	// custom_scenario_test_map_name_instead_of_hash
@@ -659,6 +668,7 @@ bool __thiscall c_custom_map_manager::remove_duplicates_by_map_name_and_hash(con
 	return removed;
 }
 
+CLASS_HOOK_DECLARE_LABEL(c_custom_map_manager__delete_single_entry, c_custom_map_manager::delete_single_entry);
 bool __thiscall c_custom_map_manager::delete_single_entry(const s_custom_map_entry* entry)
 {
 	EnterCriticalSection(m_lock);
@@ -679,6 +689,7 @@ bool __thiscall c_custom_map_manager::delete_single_entry(const s_custom_map_ent
 	return removed;
 }
 
+CLASS_HOOK_DECLARE_LABEL(c_custom_map_manager__add_entry, c_custom_map_manager::add_entry);
 bool __thiscall c_custom_map_manager::add_entry(const s_custom_map_entry* entry)
 {
 	EnterCriticalSection(m_lock);
@@ -698,6 +709,7 @@ bool __thiscall c_custom_map_manager::add_entry(const s_custom_map_entry* entry)
 	return success;
 }
 
+CLASS_HOOK_DECLARE_LABEL(c_custom_map_manager__remove_duplicates_and_add_entry, c_custom_map_manager::remove_duplicates_and_add_entry);
 bool __thiscall c_custom_map_manager::remove_duplicates_and_add_entry(const s_custom_map_entry* entry)
 {
 	remove_entries_matching_file_path(entry);
@@ -707,6 +719,7 @@ bool __thiscall c_custom_map_manager::remove_duplicates_and_add_entry(const s_cu
 
 // compared to the other function
 // this reads the file and populates the map entry datas
+CLASS_HOOK_DECLARE_LABEL(c_custom_map_manager__remove_duplicates_write_entry_data_and_add, c_custom_map_manager::remove_duplicates_write_entry_data_and_add);
 bool __thiscall c_custom_map_manager::remove_duplicates_write_entry_data_and_add(s_custom_map_entry* entry)
 {
 	remove_entries_matching_file_path(entry);
@@ -810,6 +823,7 @@ bool __thiscall c_custom_map_manager::add_custom_map_entry_by_map_file_path(cons
 	return map_loaded;
 }
 
+CLASS_HOOK_DECLARE_LABEL(c_custom_map_manager__initialize, c_custom_map_manager::initialize);
 void __thiscall c_custom_map_manager::initialize()
 {
 	m_index_of_last_previewed_bitmap = 0;
@@ -819,6 +833,7 @@ void __thiscall c_custom_map_manager::initialize()
 }
 
 // atexit
+CLASS_HOOK_DECLARE_LABEL(c_custom_map_manager__cleanup, c_custom_map_manager::cleanup);
 void __thiscall c_custom_map_manager::cleanup()
 {
 	m_new_custom_map_entry_list_buffer = nullptr;
@@ -831,21 +846,66 @@ void __thiscall c_custom_map_manager::cleanup()
 	delete m_lock;
 }
 
-static __declspec(naked) void jmp_get_entry_by_id() { __asm jmp c_custom_map_manager::get_entry_by_id }
-static __declspec(naked) void jmp_load_custom_map_data_cache() { __asm jmp c_custom_map_manager::load_custom_map_data_cache }
-static __declspec(naked) void jmp_start_custom_map_sync() { __asm jmp c_custom_map_manager::start_custom_map_sync }
-static __declspec(naked) void jmp_mark_all_cached_maps_for_deletion() { __asm jmp c_custom_map_manager::mark_all_cached_maps_for_deletion }
-static __declspec(naked) void jmp_find_matching_entries_by_file_path() { __asm jmp c_custom_map_manager::find_matching_entries_by_file_path }
-static __declspec(naked) void jmp_find_matching_entries_by_map_name_and_hash() { __asm jmp c_custom_map_manager::find_matching_entries_by_map_name_and_hash }
-static __declspec(naked) void jmp_delete_single_entry() { __asm jmp c_custom_map_manager::delete_single_entry }
-static __declspec(naked) void jmp_remove_duplicates_and_add_entry() { __asm jmp c_custom_map_manager::remove_duplicates_and_add_entry }
-static __declspec(naked) void jmp_save_custom_map_data() { __asm jmp c_custom_map_manager::save_custom_map_data }
-static __declspec(naked) void jmp_remove_marked_for_deletion() { __asm jmp c_custom_map_manager::remove_marked_for_deletion }
-static __declspec(naked) void jmp_add_entry() { __asm jmp c_custom_map_manager::add_entry }
-static __declspec(naked) void jmp_remove_duplicates_write_entry_data_and_add() { __asm jmp c_custom_map_manager::remove_duplicates_write_entry_data_and_add }
-static __declspec(naked) void jmp_cleanup() { __asm jmp c_custom_map_manager::cleanup }
-static __declspec(naked) void jmp_initialize() { __asm jmp c_custom_map_manager::initialize }
-static __declspec(naked) void jmp_get_custom_map_list_ids_by_map_name() { __asm jmp c_custom_map_manager::get_custom_map_list_ids_by_map_name }
+static __declspec(naked) void jmp_get_entry_by_id() 
+{ 
+	CLASS_HOOK_JMP(c_custom_map_manager__get_entry_by_id, c_custom_map_manager::get_entry_by_id);
+}
+static __declspec(naked) void jmp_load_custom_map_data_cache()
+{
+	CLASS_HOOK_JMP(c_custom_map_manager__load_custom_map_data_cache, c_custom_map_manager::load_custom_map_data_cache);
+}
+static __declspec(naked) void jmp_start_custom_map_sync()
+{
+	CLASS_HOOK_JMP(c_custom_map_manager__start_custom_map_sync, c_custom_map_manager::start_custom_map_sync);
+}
+static __declspec(naked) void jmp_mark_all_cached_maps_for_deletion()
+{
+	CLASS_HOOK_JMP(c_custom_map_manager__mark_all_cached_maps_for_deletion, c_custom_map_manager::mark_all_cached_maps_for_deletion);
+}
+static __declspec(naked) void jmp_find_matching_entries_by_file_path()
+{
+	CLASS_HOOK_JMP(c_custom_map_manager__find_matching_entries_by_file_path, c_custom_map_manager::find_matching_entries_by_file_path);
+}
+static __declspec(naked) void jmp_find_matching_entries_by_map_name_and_hash()
+{
+	CLASS_HOOK_JMP(c_custom_map_manager__find_matching_entries_by_map_name_and_hash, c_custom_map_manager::find_matching_entries_by_map_name_and_hash);
+}
+static __declspec(naked) void jmp_delete_single_entry()
+{
+	CLASS_HOOK_JMP(c_custom_map_manager__delete_single_entry, c_custom_map_manager::delete_single_entry);
+}
+static __declspec(naked) void jmp_remove_duplicates_and_add_entry()
+{
+	CLASS_HOOK_JMP(c_custom_map_manager__remove_duplicates_and_add_entry, c_custom_map_manager::remove_duplicates_and_add_entry);
+}
+static __declspec(naked) void jmp_save_custom_map_data()
+{
+	CLASS_HOOK_JMP(c_custom_map_manager__save_custom_map_data, c_custom_map_manager::save_custom_map_data);
+}
+static __declspec(naked) void jmp_remove_marked_for_deletion()
+{
+	CLASS_HOOK_JMP(c_custom_map_manager__remove_marked_for_deletion, c_custom_map_manager::remove_marked_for_deletion);
+}
+static __declspec(naked) void jmp_add_entry()
+{
+	CLASS_HOOK_JMP(c_custom_map_manager__add_entry, c_custom_map_manager::add_entry);
+}
+static __declspec(naked) void jmp_remove_duplicates_write_entry_data_and_add()
+{
+	CLASS_HOOK_JMP(c_custom_map_manager__remove_duplicates_write_entry_data_and_add, c_custom_map_manager::remove_duplicates_write_entry_data_and_add);
+}
+static __declspec(naked) void jmp_cleanup()
+{
+	CLASS_HOOK_JMP(c_custom_map_manager__cleanup, c_custom_map_manager::cleanup);
+}
+static __declspec(naked) void jmp_initialize()
+{
+	CLASS_HOOK_JMP(c_custom_map_manager__initialize, c_custom_map_manager::initialize);
+}
+static __declspec(naked) void jmp_get_custom_map_list_ids_by_map_name()
+{
+	CLASS_HOOK_JMP(c_custom_map_manager__get_custom_map_list_ids_by_map_name, c_custom_map_manager::get_custom_map_list_ids_by_map_name);
+}
 
 // custom map selection list code
 class c_custom_game_custom_map_list // : public c_list_widget
@@ -853,17 +913,19 @@ class c_custom_game_custom_map_list // : public c_list_widget
 public:
 	//c_list_item_widget item_widget[14];
 
-	c_custom_game_custom_map_list* __thiscall constructor_hook(int a2)
+	static void constructor_hook(c_custom_game_custom_map_list* _this, int a2)
 	{
+		//CLASS_HOOK_DECLARE_LABEL("c_custom_game_custom_map_list__constructor_hook");
+
 		typedef c_custom_game_custom_map_list*(__thiscall* original_constructor_t)(c_custom_game_custom_map_list*, int);
 		auto p_original_constructor = Memory::GetAddress<original_constructor_t>(0x25AE3B);
 
 		// execute first part of the function
-		p_original_constructor(this, a2);
+		p_original_constructor(_this, a2);
 		// then load the map list
 
 		// here we replace the custom map list allocator
-		DWORD thisptr = (DWORD)this;
+		DWORD thisptr = (DWORD)_this;
 
 		s_data_array** custom_map_menu_list = (s_data_array**)(thisptr + 112);
 
@@ -894,13 +956,15 @@ public:
 		_slot_linker* linker = (_slot_linker*)(thisptr + 172);
 		_slot* slot = (_slot*)(thisptr + 2032);
 		linker->link(slot);
-
-		return this;
+		return;
 	}
 };
 //ASSERT_STRUCT_SIZE(c_custom_game_custom_map_list, 3292);
 
-static __declspec(naked) void jmp_c_custom_game_custom_map_list_constructor_hook() { __asm jmp c_custom_game_custom_map_list::constructor_hook }
+static __declspec(naked) void jmp_c_custom_game_custom_map_list_constructor_hook()
+{
+	//CLASS_HOOK_JMP(c_custom_game_custom_map_list__constructor_hook, c_custom_game_custom_map_list::constructor_hook);
+}
 
 void c_custom_map_manager::ApplyCustomMapExtensionLimitPatches()
 {
@@ -921,7 +985,7 @@ void c_custom_map_manager::ApplyCustomMapExtensionLimitPatches()
 	// custom map data menu list hook/patches
 	if (!Memory::IsDedicatedServer())
 	{
-		PatchCall(Memory::GetAddressRelative(0x64F708), jmp_c_custom_game_custom_map_list_constructor_hook);
+		PatchCall(Memory::GetAddressRelative(0x64F708), c_custom_game_custom_map_list::constructor_hook);
 
 		// jump to function end just before updating custom map list
 		// jmp near 0xB7

@@ -507,6 +507,7 @@ void c_screen_multiplayer_pregame_lobby::initialize_long_text_chat()
 
 }
 
+CLASS_HOOK_DECLARE_LABEL(c_screen_multiplayer_pregame_lobby__update_protocol, c_screen_multiplayer_pregame_lobby::update_protocol);
 void c_screen_multiplayer_pregame_lobby::update_protocol()
 {
 	//INVOKE_TYPE(0x24300D, 0x0, void(__thiscall*)(c_screen_multiplayer_pregame_lobby*), this);
@@ -543,8 +544,11 @@ void c_screen_multiplayer_pregame_lobby::update_protocol()
 	update_favourites_icons();
 
 }
-__declspec(naked) void jmp_update_protocol() { __asm { jmp c_screen_multiplayer_pregame_lobby::update_protocol } }
 
+__declspec(naked) void jmp_update_protocol()
+{
+	CLASS_HOOK_JMP(c_screen_multiplayer_pregame_lobby__update_protocol, c_screen_multiplayer_pregame_lobby::update_protocol);
+}
 
 void c_screen_multiplayer_pregame_lobby::update_chat_icons()
 {
