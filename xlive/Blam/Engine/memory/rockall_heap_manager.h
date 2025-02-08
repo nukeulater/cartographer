@@ -2,7 +2,7 @@
 
 struct c_fixed_memory_rockall_frontend_vtbl
 {
-    bool(__thiscall* Deletet)(int a1, int a2, int a3);
+    bool(__thiscall* Delete)(int a1, int a2, int a3);
     bool(__thiscall* Details)(int a1, uint8* block, int32* out_size);
     bool(__thiscall* KnownArea)(int a1, int a2);
     bool(__thiscall* MultipleDelete)(int a1, int a2, int a3, int a4);
@@ -23,6 +23,6 @@ struct c_fixed_memory_rockall_frontend_vtbl
 class c_fixed_memory_rockall_frontend
 {
 public:
-    virtual bool Deletet(int a2, int a3) = 0;
+    virtual bool Delete(int a2, int a3) = 0;
     virtual bool Details(const uint8* memory_block, int32* out_size) = 0;
 };

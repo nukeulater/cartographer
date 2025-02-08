@@ -138,10 +138,10 @@ bool __cdecl rasterizer_dx9_weather_plate_build_vertex_buffer(
 	switch (output_type)
 	{
 	case _rasterizer_dx9_weather_plate_output_type_position:
-		rasterizer_dx9_fullscreen_calculate_position(location, 0.f, (real_vector4d*)output);
+		rasterizer_dx9_viewport_calculate_position(location, 0.f, (real_vector4d*)output);
 		break;
 	case _rasterizer_dx9_weather_plate_output_type_screen_texcoord:
-		rasterizer_dx9_fullscreen_calculate_texcoords(bounds, (real_point2d*)location, (real_point2d*)output);
+		rasterizer_dx9_fullscreen_texture_window_calculate_texcoords(bounds, (real_point2d*)location, (real_point2d*)output);
 		break;
 	case _rasterizer_dx9_weather_plate_output_type_plane_position:
 		global_window_parameters = global_window_parameters_get();
