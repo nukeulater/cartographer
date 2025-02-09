@@ -70,12 +70,12 @@ real32 __cdecl main_time_update_hook(bool fixed_time_step, real32 fixed_time_del
 		if (time_globals::available())
 			time_globals::get()->game_ticks_leftover = 0.0f;
 
-		time_now_msec = main_time_globals->last_milliseconds + (long long)(fixed_time_delta * 1000.);
+		time_now_msec = main_time_globals->last_milliseconds + (uint64)(fixed_time_delta * 1000.f);
 	}
 	else
 	{
 		time_now_msec = main_time_get_absolute_milliseconds();
-		dt_sec = (real32)((real64)(time_now_msec - main_time_globals->last_milliseconds) / 1000.);
+		dt_sec = (real32)((real32)(time_now_msec - main_time_globals->last_milliseconds) / 1000.f);
 
 		// don't run the frame limiter when time step is fixed, because the code doesn't support it
 		// in case of fixed time step, frame limiter should be handled by the other frame limiter
@@ -103,7 +103,7 @@ real32 __cdecl main_time_update_hook(bool fixed_time_step, real32 fixed_time_del
 
 
 					time_now_msec = main_time_get_absolute_milliseconds();
-					dt_sec = (real32)((real64)(time_now_msec - main_time_globals->last_milliseconds) / 1000.);
+					dt_sec = (real32)((real64)(time_now_msec - main_time_globals->last_milliseconds) / 1000.f);
 				}
 			}
 			else
@@ -111,7 +111,7 @@ real32 __cdecl main_time_update_hook(bool fixed_time_step, real32 fixed_time_del
 				Sleep(15u);
 
 				time_now_msec = main_time_get_absolute_milliseconds();
-				dt_sec = (real32)((real64)(time_now_msec - main_time_globals->last_milliseconds) / 1000.);
+				dt_sec = (real32)((real64)(time_now_msec - main_time_globals->last_milliseconds) / 1000.f);
 			}
 		}
 	}
