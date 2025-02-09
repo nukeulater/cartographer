@@ -845,7 +845,7 @@ void sign_in_xbox_task_progress_cb(c_screen_xbox_live_task_progress_dialog* dial
 			{
 				if (g_force_cartographer_update)
 				{
-					//Just in case save the config to prevent a high iq individual from getting themsevles in an update loop.
+					//Just in case save the config to prevent a high iq individual from getting themselves in an update loop.
 					SaveH2Config();
 					g_force_cartographer_update = false;
 					ui_load_cartographer_update_notice_menu();

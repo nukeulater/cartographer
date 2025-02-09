@@ -895,7 +895,7 @@ bool __cdecl rasterizer_dx9_render_scene_end(void)
     return INVOKE(0x262215, 0x0, rasterizer_dx9_render_scene_end);
 }
 
-void __cdecl rasterizer_dx9_clear_render_target(uint32 flags, D3DCOLOR color, real32 z, bool stencil)
+void __cdecl rasterizer_dx9_clear_render_target(uint32 flags, pixel32 color, real32 z, bool stencil)
 {
     INVOKE(0x25FC2A, 0x0, rasterizer_dx9_clear_render_target, flags, color, z, stencil);
     return;
