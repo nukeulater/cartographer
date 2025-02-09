@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "render_cartographer_ingame_ui.h"
 
+#include "main/main_game_time.h"
 #include "cartographer/twizzler/twizzler.h"
 #include "cseries/cseries_strings.h"
 #include "game/game.h"
@@ -48,6 +49,7 @@ static void render_cartographer_git_build_info(void);
 static bool render_cartographer_achievement_message(const char* achivement_message);
 static void render_cartographer_update_message(const char* update_text, int64 update_size_bytes, int64 update_downloaded_bytes);
 static void render_netdebug_text(void);
+static void render_main_game_time_debug(void);
 
 /* globals */
 
@@ -84,6 +86,7 @@ void render_cartographer_ingame_ui(void)
 	}
 	render_cartographer_git_build_info();
 	render_netdebug_text();
+	render_main_game_time_debug();
 	rasterizer_dx9_perf_event_end("render cartographer ingame ui");
 
 	return;
@@ -258,6 +261,35 @@ void render_cartographer_update_message(const char* update_text, int64 update_si
 	}
 
 	return;
+}
+
+void render_main_game_time_debug(void)
+{
+	const s_rasterizer_globals* rasterizer_globals = rasterizer_globals_get();
+	const int16 line_height = get_text_size_from_font_cache(k_netdebug_text_font);
+
+	rectangle2d bounds;
+	wchar_t main_game_tiem_debug_text[512];
+
+	swprintf_s(main_game_tiem_debug_text, ARRAYSIZE(main_game_tiem_debug_text),
+		L"dt default: %.6f dt performance counter: %.6f",
+		g_main_game_time_debug.dt_default,
+		g_main_game_time_debug.dt_performance_counter
+	);
+
+	rasterizer_get_frame_bounds(&bounds);
+	bounds.top = (int16)(256 * rasterizer_globals->ui_scale);
+	bounds.left = (int16)(64 * rasterizer_globals->ui_scale);
+	bounds.bottom = bounds.top + line_height;
+
+	real_argb_color text_color_console = *global_real_argb_white;
+	text_color_console.alpha *= (75.f / 100.f);
+
+	draw_string_reset();
+	draw_string_set_draw_mode(k_netdebug_text_font, 0, 0, 0, &text_color_console, global_real_argb_black, false);
+	draw_string_set_format(0, 0, 0, false);
+
+	rasterizer_draw_unicode_string(&bounds, main_game_tiem_debug_text);
 }
 
 void render_netdebug_text(void)

@@ -20,6 +20,10 @@ uint32 __cdecl system_milliseconds();
 void shell_windows_initialize();
 void shell_windows_apply_patches();
 
+LARGE_INTEGER shell_time_counter_freq();
+LARGE_INTEGER shell_time_counter_now(LARGE_INTEGER* freq);
+LARGE_INTEGER shell_time_counter_diff(LARGE_INTEGER c1, LARGE_INTEGER c2);
+
 unsigned long long shell_time_now_sec();
 unsigned long long shell_time_now_msec();
 unsigned long long shell_time_now(unsigned long long denominator);
