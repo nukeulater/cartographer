@@ -913,7 +913,7 @@ class c_custom_game_custom_map_list // : public c_list_widget
 public:
 	//c_list_item_widget item_widget[14];
 
-	static void constructor_hook(c_custom_game_custom_map_list* _this, int a2)
+	c_custom_game_custom_map_list* constructor_hook(int a2)
 	{
 		//CLASS_HOOK_DECLARE_LABEL("c_custom_game_custom_map_list__constructor_hook");
 
@@ -921,11 +921,11 @@ public:
 		auto p_original_constructor = Memory::GetAddress<original_constructor_t>(0x25AE3B);
 
 		// execute first part of the function
-		p_original_constructor(_this, a2);
+		p_original_constructor(this, a2);
 		// then load the map list
 
 		// here we replace the custom map list allocator
-		DWORD thisptr = (DWORD)_this;
+		DWORD thisptr = (DWORD)this;
 
 		s_data_array** custom_map_menu_list = (s_data_array**)(thisptr + 112);
 
@@ -956,14 +956,14 @@ public:
 		_slot_linker* linker = (_slot_linker*)(thisptr + 172);
 		_slot* slot = (_slot*)(thisptr + 2032);
 		linker->link(slot);
-		return;
+		return this;
 	}
 };
 //ASSERT_STRUCT_SIZE(c_custom_game_custom_map_list, 3292);
 
 static __declspec(naked) void jmp_c_custom_game_custom_map_list_constructor_hook()
 {
-	//CLASS_HOOK_JMP(c_custom_game_custom_map_list__constructor_hook, c_custom_game_custom_map_list::constructor_hook);
+	CLASS_HOOK_JMP(c_custom_game_custom_map_list__constructor_hook, c_custom_game_custom_map_list::constructor_hook);
 }
 
 void c_custom_map_manager::ApplyCustomMapExtensionLimitPatches()
@@ -985,7 +985,7 @@ void c_custom_map_manager::ApplyCustomMapExtensionLimitPatches()
 	// custom map data menu list hook/patches
 	if (!Memory::IsDedicatedServer())
 	{
-		PatchCall(Memory::GetAddressRelative(0x64F708), c_custom_game_custom_map_list::constructor_hook);
+		PatchCall(Memory::GetAddressRelative(0x64F708), jmp_c_custom_game_custom_map_list_constructor_hook);
 
 		// jump to function end just before updating custom map list
 		// jmp near 0xB7
