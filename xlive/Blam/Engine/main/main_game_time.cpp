@@ -95,7 +95,7 @@ real32 __cdecl main_time_update_hook(bool fixed_time_step, real32 fixed_time_del
 	LARGE_INTEGER freq;
 	freq = shell_time_counter_freq();
 
-	uint32 time_now_msec;
+	uint64 time_now_msec;
 
 	s_main_time_globals* main_time_globals = s_main_time_globals::get();
 	game_time = game_in_progress() ? get_game_time_ticks() : 0;
@@ -121,7 +121,7 @@ real32 __cdecl main_time_update_hook(bool fixed_time_step, real32 fixed_time_del
 		else
 		{
 			time_now_msec = main_time_get_absolute_milliseconds();
-			dt_sec = (real32)((real64)(time_now_msec - main_time_globals->last_milliseconds) / 1000.f);
+			dt_sec = (real32)((real32)(time_now_msec - main_time_globals->last_milliseconds) / 1000.f);
 		}
 
 		// don't run the frame limiter when time step is fixed, because the code doesn't support it
@@ -155,7 +155,7 @@ real32 __cdecl main_time_update_hook(bool fixed_time_step, real32 fixed_time_del
 					else
 					{
 						time_now_msec = main_time_get_absolute_milliseconds();
-						dt_sec = (real32)((real64)(time_now_msec - main_time_globals->last_milliseconds) / 1000.f);
+						dt_sec = (real32)((real32)(time_now_msec - main_time_globals->last_milliseconds) / 1000.f);
 					}
 				}
 			}
@@ -170,7 +170,7 @@ real32 __cdecl main_time_update_hook(bool fixed_time_step, real32 fixed_time_del
 				else
 				{
 					time_now_msec = main_time_get_absolute_milliseconds();
-					dt_sec = (real32)((real64)(time_now_msec - main_time_globals->last_milliseconds) / 1000.f);
+					dt_sec = (real32)((real32)(time_now_msec - main_time_globals->last_milliseconds) / 1000.f);
 				}
 			}
 		}
@@ -179,7 +179,7 @@ real32 __cdecl main_time_update_hook(bool fixed_time_step, real32 fixed_time_del
 	if (use_precise_counters)
 	{
 		time_now_msec = main_time_get_absolute_milliseconds();
-		g_main_game_time_debug.dt_default = (real32)((real64)(time_now_msec - main_time_globals->last_milliseconds) / 1000.f);
+		g_main_game_time_debug.dt_default = (real32)((real32)(time_now_msec - main_time_globals->last_milliseconds) / 1000.f);
 		g_main_game_time_debug.dt_performance_counter = dt_sec;
 	}
 	else
