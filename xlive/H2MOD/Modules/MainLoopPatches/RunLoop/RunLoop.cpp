@@ -16,9 +16,7 @@
 #include "XLive/xnet/IpManagement/XnIp.h"
 
 
-// TODO Move most of this logic to Blam/Engine/main/main.cpp
-
-#define TIMER_RESOLUTION_MS 1
+// ### TODO Move most of this logic to Blam/Engine/main/main.cpp
 
 H2Config_Experimental_Rendering_Mode g_experimental_rendering_mode = _rendering_mode_original_game_frame_limit;
 
@@ -75,22 +73,6 @@ void CartographerMainLoop() {
 	*/
 }
 
-void __cdecl main_game_time_initialize_hook()
-{
-	// windows 10 version 2004 and above added behaviour changes to how windows timer resolution works, and we have to explicitly set the time resolution
-	// and since they were added, when playing on a laptop on battery it migth add heavy stuttering when using a frame limiter based on Sleep function (or std::this_thread::sleep_for) implementation
-	// the game sets them already but only during the loading screen period, then it resets to system default when the loading screen ends 
-	// (tho i think in the new implementation is working on a per thread basis now instead of global frequency, since it still works even when the game resets after loading screen ends and loading screen runs in another thread)
-
-	// More code in Tweaks.cpp in InitH2Tweaks
-
-	// More details @ https://randomascii.wordpress.com/2020/10/04/windows-timer-resolution-the-great-rule-change/
-
-	timeBeginPeriod(TIMER_RESOLUTION_MS);
-
-	INVOKE(0x2869F, 0x24841, main_game_time_initialize_hook);
-}
-
 void __cdecl game_modules_dispose_hook() {
 	auto p_game_modules_dispose = Memory::GetAddress<void(__cdecl*)()>(0x48BBF, 0x41E60);
 	p_game_modules_dispose();
@@ -98,7 +80,7 @@ void __cdecl game_modules_dispose_hook() {
 	DeinitH2Startup();
 
 	// reset time resolution to system default on game exit (initialization happens in main_game_time_initialize_hook())
-	timeEndPeriod(TIMER_RESOLUTION_MS);
+	timeEndPeriod(SYSTEM_TIMER_RESOLUTION_MS);
 }
 
 typedef void(_cdecl* main_loop_body_t)();
@@ -124,6 +106,7 @@ void main_loop_apply_patches() {
 	PatchCall(Memory::GetAddress(0x39E64, 0xC684), main_loop_body);
 
 	if (Memory::IsDedicatedServer()) {
+		main_game_time_apply_patches();
 		addDebugText("Hooking loop & shutdown Function");
 	}
 	else {
@@ -147,7 +130,6 @@ void main_loop_apply_patches() {
 		} // switch (g_experimental_rendering_mode)
 	}
 
-	PatchCall(Memory::GetAddress(0x39E3D, 0xBA40), main_game_time_initialize_hook);
 	PatchCall(Memory::GetAddress(0x39E7C, 0xC6F7), game_modules_dispose_hook);
 
 	addDebugText("Post RunLoop Hooking.");

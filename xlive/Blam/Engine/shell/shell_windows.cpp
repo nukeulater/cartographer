@@ -58,23 +58,36 @@ unsigned long long shell_time_from_counter(LARGE_INTEGER counter, LARGE_INTEGER 
 	return _Whole + _Part;
 }
 
+LARGE_INTEGER shell_time_counter_freq()
+{
+	LARGE_INTEGER freq;
+	QueryPerformanceFrequency(&freq);
+	return freq;
+}
+
 LARGE_INTEGER shell_time_counter_now(LARGE_INTEGER* freq)
 {
 	LARGE_INTEGER counter;
 	if (freq) 
 	{
-		QueryPerformanceFrequency(freq);
+		*freq = shell_time_counter_freq();
 	}
 	QueryPerformanceCounter(&counter);
 	counter.QuadPart -= shell_get_startup_counter().QuadPart;
 	return counter;
 }
 
+LARGE_INTEGER shell_time_counter_diff(LARGE_INTEGER c1, LARGE_INTEGER c2)
+{
+	c1.QuadPart -= c2.QuadPart;
+	return c1;
+}
+
 unsigned long long shell_time_diff(LARGE_INTEGER t2, unsigned long long denominator)
 {
 	LARGE_INTEGER counter, freq;
 	counter = shell_time_counter_now(&freq);
-	counter.QuadPart -= t2.QuadPart;
+	counter = shell_time_counter_diff(counter, t2);
 	return shell_time_from_counter(counter, freq, denominator);
 }
 
@@ -118,8 +131,8 @@ uint32 __cdecl system_milliseconds()
 
 DWORD WINAPI timeGetTime_hook()
 {
-	unsigned long long time_now_msec = shell_time_now_msec();
-	return (DWORD)time_now_msec;
+	unsigned long long current_time_msec = shell_time_now_msec();
+	return (DWORD)current_time_msec;
 }
 static_assert(std::is_same_v<decltype(timeGetTime), decltype(timeGetTime_hook)>, "Invalid timeGetTime_hook signature");
 
@@ -135,13 +148,68 @@ static void shell_system_set_timer_resolution_max(bool enable)
 	NtSetTimerResolutionHelper(ulMaximumResolution, enable, &ulCurrentResolution);
 }
 
+void shell_windows_yield_thread(HANDLE frame_limit_timer_handle, LARGE_INTEGER last_time, int framerate)
+{
+	const int threadWaitTimePercentage = 90;
+	const int min_time_to_suspend_exec_usec = 3000;
+
+	unsigned long long min_frametime_usec = (unsigned long long)(1000000.f / (float)framerate);
+	unsigned long long dt_usec = shell_time_diff(last_time, k_shell_time_usec_denominator);
+
+	if (dt_usec < min_frametime_usec)
+	{
+		unsigned long long sleep_time_usec = min_frametime_usec - dt_usec;
+
+		// sleep threadWaitTimePercentage out of the target render time using thread sleep or timer wait
+		long long system_yield_time_usec = (threadWaitTimePercentage * sleep_time_usec) / 100;
+
+		// sleep just the milliseconds part
+		// system_yield_time_usec = system_yield_time_usec - (system_yield_time_usec % 1000);
+
+		// skip CPU yield if time is lower than 3ms
+		// because the system timer isn't precise enough for our needs
+		if (system_yield_time_usec > min_time_to_suspend_exec_usec)
+		{
+			if (NULL != frame_limit_timer_handle)
+			{
+				ULONG ulMinimumResolution, ulMaximumResolution, ulCurrentResolution;
+				NtQueryTimerResolutionHelper(&ulMinimumResolution, &ulMaximumResolution, &ulCurrentResolution);
+
+				shell_system_set_timer_resolution_max(true);
+
+				if (10ll * system_yield_time_usec > ulMaximumResolution)
+				{
+					LARGE_INTEGER liDueTime;
+
+					liDueTime.QuadPart = -10ll * system_yield_time_usec;
+					if (SetWaitableTimer(frame_limit_timer_handle, &liDueTime, 0, NULL, NULL, TRUE))
+					{
+						// Wait for the timer.
+						NtWaitForSingleObjectHelper(frame_limit_timer_handle, FALSE, &liDueTime);
+					}
+				}
+			}
+
+			/*int sleepTimeMs = system_yield_time_usec / 1000ll;
+			if (sleepTimeMs >= 0)
+				Sleep(sleepTimeMs);*/
+		}
+
+		// spin-lock the remaining slice of time
+		while (true)
+		{
+			if (shell_time_diff(last_time, k_shell_time_usec_denominator) >= min_frametime_usec)
+				break;
+		}
+	}
+}
+
 void shell_windows_throttle_framerate(int desired_framerate)
 {
 	static LARGE_INTEGER last_counter;
 	static int last_desired_framerate_setting = -1;
 	static bool frame_limiter_initialized = false;
 
-	const int threadWaitTimePercentage = 90;
 	static HANDLE hFrameLimitTimer = NULL;
 
 	if (desired_framerate <= 0)
@@ -162,6 +230,8 @@ void shell_windows_throttle_framerate(int desired_framerate)
 		last_counter = shell_time_counter_now(NULL);
 		frame_limiter_initialized = true;
 
+		//shell_system_set_timer_resolution_max(true);
+
 		if (NULL == hFrameLimitTimer)
 		{
 			hFrameLimitTimer = CreateWaitableTimer(NULL, FALSE, NULL);
@@ -179,57 +249,7 @@ void shell_windows_throttle_framerate(int desired_framerate)
 		return;
 	}
 
-	unsigned long long min_frametime_usec = (long long)(1000000.0 / (double)desired_framerate);
-	unsigned long long dt_usec = shell_time_diff(last_counter, k_shell_time_usec_denominator);
-
-	const int min_time_to_suspend_exec_usec = 3000;
-
-	if (dt_usec < min_frametime_usec)
-	{
-		unsigned long long sleep_time_usec = min_frametime_usec - dt_usec;
-
-		// sleep threadWaitTimePercentage out of the target render time using thread sleep or timer wait
-		long long system_yield_time_usec = (threadWaitTimePercentage * sleep_time_usec) / 100;
-
-		// sleep just the milliseconds part
-		// system_yield_time_usec = system_yield_time_usec - (system_yield_time_usec % 1000);
-
-		// skip CPU yield if time is lower than 3ms
-		// because the system timer isn't precise enough for our needs
-		if (system_yield_time_usec > min_time_to_suspend_exec_usec)
-		{
-			if (NULL != hFrameLimitTimer)
-			{
-				// Create an unnamed waitable timer.
-				ULONG ulMinimumResolution, ulMaximumResolution, ulCurrentResolution;
-				NtQueryTimerResolutionHelper(&ulMinimumResolution, &ulMaximumResolution, &ulCurrentResolution);
-
-				if (10ll * system_yield_time_usec > ulMaximumResolution)
-				{
-					LARGE_INTEGER liDueTime;
-					NtSetTimerResolutionHelper(ulMaximumResolution, TRUE, &ulCurrentResolution);
-
-					liDueTime.QuadPart = -10ll * system_yield_time_usec;
-					if (SetWaitableTimer(hFrameLimitTimer, &liDueTime, 0, NULL, NULL, TRUE))
-					{
-						// Wait for the timer.
-						NtWaitForSingleObjectHelper(hFrameLimitTimer, FALSE, &liDueTime);
-					}
-				}
-			}
-
-			/*int sleepTimeMs = system_yield_time_usec / 1000ll;
-			if (sleepTimeMs >= 0)
-				Sleep(sleepTimeMs);*/
-		}
-
-		// spin-lock the remaining slice of time
-		while (true)
-		{
-			if (shell_time_diff(last_counter, k_shell_time_usec_denominator) >= min_frametime_usec)
-				break;
-		}
-	}
+	shell_windows_yield_thread(hFrameLimitTimer, last_counter, desired_framerate);
 
 	last_counter = shell_time_counter_now(NULL);
 }

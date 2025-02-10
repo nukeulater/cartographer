@@ -1,8 +1,18 @@
 #pragma once
 
+// #define MAIN_GAME_TIME_DEBUG
+
+#define SYSTEM_TIMER_RESOLUTION_MS 1
+
 extern bool g_main_game_time_frame_limiter_enabled;
 
 void main_game_time_apply_patches();
+
+struct s_main_time_debug
+{
+	real32 dt_default;
+	real32 dt_performance_counter;
+};
 
 #pragma pack(push, 1)
 struct s_main_time_globals
@@ -34,3 +44,5 @@ struct s_main_time_globals
 };
 #pragma pack(pop)
 static_assert(sizeof(s_main_time_globals) == 38);
+
+extern s_main_time_debug g_main_game_time_debug;
