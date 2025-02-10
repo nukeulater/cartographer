@@ -139,7 +139,7 @@ real32 __cdecl main_time_update_hook(bool fixed_time_step, real32 fixed_time_del
 					uint32 yield_time_msec = 0;
 					real32 fMsSleep = (real32)(desired_frame_time - dt_sec) * 1000.f;
 
-					if (fMsSleep >= 1.0f)
+					if (fMsSleep >= 2.0f)
 					{
 						yield_time_msec = (int32)fMsSleep;
 
