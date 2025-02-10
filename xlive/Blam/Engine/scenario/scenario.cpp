@@ -109,7 +109,7 @@ static void __cdecl scenario_tags_postprocess(void)
 		}
 		case _tag_group_vertex_shader:
 		{
-			rasterizer_dx9_vertex_shaders_replace_map_bytecode(i);
+			//rasterizer_dx9_vertex_shaders_replace_map_bytecode(i);
 			break;
 		}
 		default:
