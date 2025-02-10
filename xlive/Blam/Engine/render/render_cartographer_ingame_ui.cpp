@@ -265,13 +265,14 @@ void render_cartographer_update_message(const char* update_text, int64 update_si
 
 void render_main_game_time_debug(void)
 {
+#ifdef MAIN_GAME_TIME_DEBUG
 	const s_rasterizer_globals* rasterizer_globals = rasterizer_globals_get();
 	const int16 line_height = get_text_size_from_font_cache(k_netdebug_text_font);
 
 	rectangle2d bounds;
-	wchar_t main_game_tiem_debug_text[512];
+	wchar_t main_game_time_debug_text[512];
 
-	swprintf_s(main_game_tiem_debug_text, ARRAYSIZE(main_game_tiem_debug_text),
+	swprintf_s(main_game_time_debug_text, ARRAYSIZE(main_game_time_debug_text),
 		L"dt default: %.6f dt performance counter: %.6f",
 		g_main_game_time_debug.dt_default,
 		g_main_game_time_debug.dt_performance_counter
@@ -289,7 +290,8 @@ void render_main_game_time_debug(void)
 	draw_string_set_draw_mode(k_netdebug_text_font, 0, 0, 0, &text_color_console, global_real_argb_black, false);
 	draw_string_set_format(0, 0, 0, false);
 
-	rasterizer_draw_unicode_string(&bounds, main_game_tiem_debug_text);
+	rasterizer_draw_unicode_string(&bounds, main_game_time_debug_text);
+#endif
 }
 
 void render_netdebug_text(void)

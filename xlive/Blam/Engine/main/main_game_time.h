@@ -1,5 +1,7 @@
 #pragma once
 
+// #define MAIN_GAME_TIME_DEBUG
+
 #define SYSTEM_TIMER_RESOLUTION_MS 1
 
 extern bool g_main_game_time_frame_limiter_enabled;

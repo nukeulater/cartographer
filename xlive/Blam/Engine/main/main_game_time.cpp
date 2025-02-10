@@ -10,7 +10,9 @@
 bool g_main_game_time_frame_limiter_enabled = false;
 LARGE_INTEGER g_main_game_time_counter_last_time;
 
+#ifdef MAIN_GAME_TIME_DEBUG
 s_main_time_debug g_main_game_time_debug;
+#endif
 
 real32 main_time_get_max_frame_time()
 {
@@ -176,6 +178,7 @@ real32 __cdecl main_time_update_hook(bool fixed_time_step, real32 fixed_time_del
 		}
 	}
 
+#ifdef MAIN_GAME_TIME_DEBUG
 	if (use_precise_counters)
 	{
 		time_now_msec = main_time_get_absolute_milliseconds();
@@ -187,6 +190,7 @@ real32 __cdecl main_time_update_hook(bool fixed_time_step, real32 fixed_time_del
 		g_main_game_time_debug.dt_default = dt_sec;
 		g_main_game_time_debug.dt_performance_counter = main_time_get_delta_sec_precise(shell_time_counter_now(NULL), freq);
 	}
+#endif
 
 	g_main_game_time_counter_last_time = shell_time_counter_now(NULL);
 
