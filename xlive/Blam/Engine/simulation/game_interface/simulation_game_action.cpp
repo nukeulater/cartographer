@@ -35,7 +35,7 @@ void __cdecl simulation_action_game_engine_player_create(int16 player_index)
 	if (game_is_server() && game_is_distributed())
 	{
 		c_simulation_world* world = simulation_get_world();
-		int32 entity_index = simulation_entity_create(6, NONE);
+		int32 entity_index = simulation_entity_create(_simulation_entity_type_game_engine_player, NONE);
 		if (entity_index != NONE)
 		{
 			game_engine_globals_set_player_entity_index(player_index, entity_index);

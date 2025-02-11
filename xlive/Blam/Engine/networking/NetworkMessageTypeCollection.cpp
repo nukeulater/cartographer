@@ -15,7 +15,7 @@ uint8 g_network_message_type_collection[k_network_message_type_collection_count 
 
 void register_network_message(void* network_message_collection, int32 type, const char* name, int32 a4, int32 size1, int32 size2, void* write_packet_method, void* read_packet_method, void* unk_callback)
 {
-	return INVOKE(0x1E81D6, 0x1CA199, register_network_message, network_message_collection, type, name, a4, size1, size2, write_packet_method, read_packet_method, unk_callback);
+	return INVOKE_TYPE(0x1E81D6, 0x1CA199, void(__thiscall*)(void*, int32, const char*, int32, int32, int32, void*, void*, void*), network_message_collection, type, name, a4, size1, size2, write_packet_method, read_packet_method, unk_callback);
 }
 
 const char* get_network_message_description(int32 type)
