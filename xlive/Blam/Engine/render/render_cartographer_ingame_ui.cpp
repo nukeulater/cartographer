@@ -305,6 +305,12 @@ void render_netdebug_text(void)
 			s_simulation_player_netdebug_data* netdebug_data = &netdebug_data_default;
 			s_observer_channel* observer_channel = NULL;
 			int32 observer_channel_index;
+
+			bool available = session->is_session_class_online()
+				&& session->session_mode() == _network_session_mode_in_game;
+			if (!available)
+				return;
+
 			if (!session->is_host())
 			{
 				s_membership_peer* membership_peer = session->get_peer_membership(session->get_local_peer_index());

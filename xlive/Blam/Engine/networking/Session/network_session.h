@@ -564,6 +564,11 @@ public:
 	// switch multiple players with a single membership update
 	void switch_players_to_teams(datum* player_indexes, int32 player_count, e_game_team* team_indexes);
 
+	bool is_session_class_online() const
+	{
+		return m_session_class == _network_session_class_xbox_live;
+	}
+
 	const char* describe_network_protocol_type() const
 	{
 		static const char* const k_network_protocols_text[] =
