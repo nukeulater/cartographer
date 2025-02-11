@@ -689,8 +689,6 @@ DWORD CServerList::Enumerate(HANDLE hHandle, DWORD cbBuffer, CHAR* pvBuffer, PXO
 	if (serverListQuery == nullptr)
 		return ERROR_INVALID_HANDLE;
 
-	serverListQuery->m_itemQueryMutex.lock();
-
 	switch (serverListQuery->m_operationState)
 	{
 	case OperationPending:
