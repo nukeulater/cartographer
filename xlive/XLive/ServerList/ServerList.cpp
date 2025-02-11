@@ -35,7 +35,7 @@ _HALO2VISTA_TITLE_SERVICE_PROPERTIES h2v_service_properties;
 
 HANDLE g_hXLocatorHandle = INVALID_HANDLE_VALUE;
 
-CServerList* GetServerListQueryByHandle(HANDLE hHandle, bool lock)
+static CServerList* GetServerListQueryByHandle(HANDLE hHandle, bool lock)
 {
 	std::lock_guard lg(serverListRequestMutex);
 	CServerList* result = nullptr;
@@ -59,7 +59,7 @@ CServerList* GetServerListQueryByHandle(HANDLE hHandle, bool lock)
 	return result;
 }
 
-bool RemoveServerListQueryByPtr(CServerList* serverListQuery)
+static bool RemoveServerListQueryByPtr(CServerList* serverListQuery)
 {
 	// remove from the list, to note memory doesn't get released
 	// because async I/O might still be in progress
@@ -527,23 +527,23 @@ void CServerList::EnumerateFromHttp()
 			if (itemsToDownloadQuery[serverQueryIdx].first == nullptr)
 			{
 				itemsToDownloadQuery[serverQueryIdx] = std::make_pair(curl_interface_init_no_verify(), std::string());
+				itemsToDownloadQuery[serverQueryIdx].second.reserve(16384);
 			}
 			else
 			{
 				// remove the handle first, easy handle still valid, to update the easyopts
 				curl_multi_remove_handle(curl_mhandle, itemsToDownloadQuery[serverQueryIdx].first);
 				itemsToDownloadQuery[serverQueryIdx].second.clear();
+				itemsToDownloadQuery[serverQueryIdx].second.reserve(16384);
 			}
 
 			auto& itemQuery = itemsToDownloadQuery[serverQueryIdx++];
 
-			// + 21 since XUID is a 64 bit integer, max characters used to represent it in decimal is 20, +1 for null terminator
-			char server_url[NUMBEROF(k_cartographer_server_url) + 21];
-			strncpy(server_url, k_cartographer_server_url, NUMBEROF(k_cartographer_server_url));
-			strncat(server_url, xuidStrItr->GetString(), 20);	// max characters used to represent uint64 in decimal is 20
+			std::string server_url(k_cartographer_server_url);
+			server_url.append(xuidStrItr->GetString());
 
 			// server_url is copied to another buffer when setting CURLOPT_URL
-			curl_easy_setopt(itemQuery.first, CURLOPT_URL, server_url);
+			curl_easy_setopt(itemQuery.first, CURLOPT_URL, server_url.c_str());
 			curl_easy_setopt(itemQuery.first, CURLOPT_WRITEFUNCTION, BasicStrDownloadCb);
 			curl_easy_setopt(itemQuery.first, CURLOPT_WRITEDATA, &itemQuery.second);
 			curl_easy_setopt(itemQuery.first, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_2_0);
@@ -653,6 +653,7 @@ void CServerList::GetServerCounts(PXOVERLAPPED pOverlapped)
 	CURL* curl;
 	CURLcode res;
 	std::string readBuffer;
+	readBuffer.reserve(4096);
 
 	curl = curl_interface_init_no_verify();
 	if (curl) {
@@ -682,11 +683,13 @@ void CServerList::GetServerCounts(PXOVERLAPPED pOverlapped)
 
 DWORD CServerList::Enumerate(HANDLE hHandle, DWORD cbBuffer, CHAR* pvBuffer, PXOVERLAPPED pOverlapped)
 {
-	bool lock_resource = true;
+	bool lockQuery = true;
 
-	CServerList* serverListQuery = GetServerListQueryByHandle(hHandle, lock_resource);
+	CServerList* serverListQuery = GetServerListQueryByHandle(hHandle, lockQuery);
 	if (serverListQuery == nullptr)
 		return ERROR_INVALID_HANDLE;
+
+	serverListQuery->m_itemQueryMutex.lock();
 
 	switch (serverListQuery->m_operationState)
 	{
@@ -740,7 +743,7 @@ DWORD CServerList::Enumerate(HANDLE hHandle, DWORD cbBuffer, CHAR* pvBuffer, PXO
 		assert(0);
 	}
 
-	if (lock_resource)
+	if (lockQuery)
 		serverListQuery->m_itemQueryMutex.unlock();
 
 	return ERROR_IO_PENDING;
@@ -753,6 +756,7 @@ void CServerList::RemoveServer(PXOVERLAPPED pOverlapped)
 	CURL* curl;
 	CURLcode res;
 	std::string readBuffer;
+	readBuffer.reserve(4096);
 
 	pOverlapped->InternalLow = ERROR_IO_INCOMPLETE;
 	pOverlapped->InternalHigh = 0;
@@ -793,6 +797,7 @@ void CServerList::AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, 
 	CURL* curl;
 	CURLcode res;
 	std::string readBuffer;
+	readBuffer.reserve(4096);
 
 	XnIp* localUser = gXnIpMgr.GetLocalUserXn();
 
