@@ -231,7 +231,6 @@ public:
 	void send_message(int32 session_index, int32 observer_index, bool send_out_of_band, int32 type, int32 size, void* data);
 
 private:
-	static void force_constant_network_rate();
 };
 ASSERT_STRUCT_SIZE(c_network_observer, 0x75C8);
 

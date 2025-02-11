@@ -83,12 +83,6 @@ bool NetworkSession::LocalPeerIsEstablished()
 	return GetActiveNetworkSession()->established();
 }
 
-// returns NONE (-1) if fails
-int32 NetworkSession::GetPeerIndexFromNetworkAddress(const network_address* address)
-{
-	return GetActiveNetworkSession()->get_peer_index_from_address(address);
-}
-
 bool NetworkSession::GetMapFileLocation(wchar_t* buffer, size_t size)
 {
 	// host-only

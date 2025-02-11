@@ -78,7 +78,6 @@ struct s_session_peer;
 // USE/IMPLEMENT THE HELPER FUNCTIONS IN THE c_network_session CLASS !!!!!!
 namespace NetworkSession
 {
-	int32 GetPeerIndexFromNetworkAddress(const network_address* address);
 	bool GetMapFileLocation(wchar_t* buffer, size_t size);
 
 	bool LocalPeerIsSessionHost();
