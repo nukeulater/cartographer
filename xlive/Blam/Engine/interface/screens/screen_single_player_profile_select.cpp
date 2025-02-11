@@ -5,6 +5,15 @@
 #include "saved_games/saved_game_files.h"
 #include "interface/user_interface_globals.h"
 
+/* constants */
+
+enum
+{
+	k_player_profile_list_display_count = 16
+};
+
+/* public code */
+
 int32 c_player_profile_list::setup_children()
 {
 	return INVOKE_TYPE(0x237583, 0x0, int32(__thiscall*)(c_player_profile_list*), this);
@@ -33,6 +42,8 @@ void c_player_profile_list::unknown_function_2(int32 a1)
 CLASS_HOOK_DECLARE_LABEL(c_player_profile_list__update_displayed_profiles, c_player_profile_list::update_displayed_profiles);
 void c_player_profile_list::update_displayed_profiles(void)
 {
+	//INVOKE_TYPE(0x2372D6, 0x0, void(__thiscall*)(c_player_profile_list*), this);
+
 	uint32 profile_storage_size;
 	s_user_interface_player_profile_storage* profile_storage = this->get_displayed_player_profile_storage(&profile_storage_size);
 
@@ -43,7 +54,7 @@ void c_player_profile_list::update_displayed_profiles(void)
 	c_list_item_widget* current_child = (c_list_item_widget*)this->m_child_widget;
 
 	csmemset(profile_indices, NONE, sizeof(profile_indices));
-	for (int32 current_child_widget_index = 0; current_child_widget_index < 16; ++current_child_widget_index)
+	for (int32 current_child_widget_index = 0; current_child_widget_index < k_player_profile_list_display_count; ++current_child_widget_index)
 	{
 		if (current_child->get_last_data_index() != NONE)
 		{
@@ -64,7 +75,7 @@ void c_player_profile_list::update_displayed_profiles(void)
 			enumerated_file_index = profile_storage[current_profile_storage_index].enumerated_file_index;
 
 			int32 current_player_profile_indices_index = 0;
-			for (; current_player_profile_indices_index < 16; ++current_player_profile_indices_index)
+			for (; current_player_profile_indices_index < k_player_profile_list_display_count; ++current_player_profile_indices_index)
 			{
 				if (enumerated_file_index == profile_indices[current_player_profile_indices_index])
 				{
@@ -76,15 +87,15 @@ void c_player_profile_list::update_displayed_profiles(void)
 				}
 			}
 
-			if (current_player_profile_indices_index != 16)
+			if (current_player_profile_indices_index != k_player_profile_list_display_count)
 				profile_indices[current_player_profile_indices_index] = NONE;
 
-			if (current_player_profile_indices_index == 16 && enumerated_file_index != NONE)
+			if (current_player_profile_indices_index == k_player_profile_list_display_count && enumerated_file_index != NONE)
 				profile_storage[current_profile_storage_index].enumerated_file_index = NONE;
 		}
 	}
 
-	for(int32 index = 0; index < 16; ++index)
+	for(int32 index = 0; index < k_player_profile_list_display_count; ++index)
 	{
 		const uint32 current_profile_index = profile_indices[index];
 		if(current_profile_index != NONE)
@@ -107,21 +118,16 @@ void c_player_profile_list::update_displayed_profiles(void)
 					{
 						csmemcpy(&stored_profile->profile, user_interface_globals_get_edit_player_profile(), sizeof(s_saved_game_player_profile));
 					}
-					else
+					else if (!saved_game_player_profile_load(current_profile_index, &stored_profile->profile))
 					{
-						bool result = saved_game_player_profile_load(current_profile_index, &stored_profile->profile);
-						if (!result)
-						{
-							csmemset(&stored_profile->profile, 0, sizeof(s_saved_game_player_profile));
-							saved_games_get_display_name(enumerated_file_index, stored_profile->profile.name);
-						}
+						csmemset(&stored_profile->profile, 0, sizeof(s_saved_game_player_profile));
+						saved_games_get_display_name(enumerated_file_index, stored_profile->profile.name);
 					}
 				}
 			}
 		}
 	}
-
-	//INVOKE_TYPE(0x2372D6, 0x0, void(__thiscall*)(c_player_profile_list*), this);
+	return;
 }
 
 __declspec(naked) void jmp_c_player_profile_list__update_displayed_profiles()

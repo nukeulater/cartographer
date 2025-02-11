@@ -895,7 +895,7 @@ bool __cdecl rasterizer_dx9_render_scene_end(void)
     return INVOKE(0x262215, 0x0, rasterizer_dx9_render_scene_end);
 }
 
-void __cdecl rasterizer_dx9_clear_render_target(uint32 flags, D3DCOLOR color, real32 z, bool stencil)
+void __cdecl rasterizer_dx9_clear_render_target(uint32 flags, pixel32 color, real32 z, bool stencil)
 {
     INVOKE(0x25FC2A, 0x0, rasterizer_dx9_clear_render_target, flags, color, z, stencil);
     return;
@@ -1062,7 +1062,12 @@ static bool rasterizer_dx9_should_use_d3d9ex(void)
     // Possibly because it was changed as a part of the H2TOOLSET macro when PI studios was upgrading the Halo 2 Editing Kit
     OSVERSIONINFOW version_information;
     version_information.dwOSVersionInfoSize = sizeof(version_information);
+
+#pragma warning( push )
+#pragma warning( disable : 4996)
     if (GetVersionEx(&version_information))
+#pragma warning( pop ) 
+
     {
         if (version_information.dwMajorVersion < 6)
         {

@@ -2,19 +2,16 @@
 #include "ServerList.h"
 
 #include "XLive/Cryptography/Rc4.h"
+#include "XLive/xnet/IpManagement/XnIp.h"
 
-#include "cseries/cseries_strings.h"
 
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/Accounts/Accounts.h"
-
-#include "rapidjson/document.h"
-#include "rapidjson/prettywriter.h"
-
-#include "../xnet/IpManagement/XnIp.h"
-
 #include "H2MOD/Utils/Utils.h"
+
+#include <rapidjson/document.h>
+#include <rapidjson/writer.h>
 
 const char k_cartographer_add_server_url[] = k_cartographer_url_https"/live/add_server.php";
 const char k_cartographer_del_server_url[] = k_cartographer_url_https"/live/del_server.php";
@@ -41,6 +38,7 @@ HANDLE g_hXLocatorHandle = INVALID_HANDLE_VALUE;
 CServerList* GetServerListQueryByHandle(HANDLE hHandle, bool lock)
 {
 	std::lock_guard lg(serverListRequestMutex);
+	CServerList* result = nullptr;
 
 	for (auto& request : serverListRequests)
 	{
@@ -53,11 +51,12 @@ CServerList* GetServerListQueryByHandle(HANDLE hHandle, bool lock)
 			if (lock)
 				request.second->m_itemQueryMutex.lock();
 
-			return request.second;
+			result = request.second;
+			break;
 		}
 	}
 
-	return nullptr;
+	return result;
 }
 
 bool RemoveServerListQueryByPtr(CServerList* serverListQuery)
@@ -538,11 +537,13 @@ void CServerList::EnumerateFromHttp()
 
 			auto& itemQuery = itemsToDownloadQuery[serverQueryIdx++];
 
-			c_static_string<512> server_url(k_cartographer_server_url);
-			server_url.append(xuidStrItr->GetString());
+			// + 21 since XUID is a 64 bit integer, max characters used to represent it in decimal is 20, +1 for null terminator
+			char server_url[NUMBEROF(k_cartographer_server_url) + 21];
+			strncpy(server_url, k_cartographer_server_url, NUMBEROF(k_cartographer_server_url));
+			strncat(server_url, xuidStrItr->GetString(), 20);	// max characters used to represent uint64 in decimal is 20
 
 			// server_url is copied to another buffer when setting CURLOPT_URL
-			curl_easy_setopt(itemQuery.first, CURLOPT_URL, server_url.get_string());
+			curl_easy_setopt(itemQuery.first, CURLOPT_URL, server_url);
 			curl_easy_setopt(itemQuery.first, CURLOPT_WRITEFUNCTION, BasicStrDownloadCb);
 			curl_easy_setopt(itemQuery.first, CURLOPT_WRITEDATA, &itemQuery.second);
 			curl_easy_setopt(itemQuery.first, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_2_0);
