@@ -13,6 +13,8 @@ static void rasterizer_dx9_shaders_replace_classification_bytecode(const s_verte
 
 void rasterizer_dx9_vertex_shaders_replace_map_bytecode(datum vertex_shader_tag_index)
 {
+	/* DISABLED FOR NOW
+	* 
 	const bool sm3_supported = rasterizer_globals_get()->d3d9_sm3_supported;
 
 	for (size_t i = 0; i < NUMBEROF(k_vertex_shader_replacement_information); ++i)
@@ -27,6 +29,7 @@ void rasterizer_dx9_vertex_shaders_replace_map_bytecode(datum vertex_shader_tag_
 			break;
 		}
 	}
+	*/
 	return;
 }
 
