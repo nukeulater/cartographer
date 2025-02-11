@@ -563,6 +563,42 @@ public:
 	// switch multiple players with a single membership update
 	void switch_players_to_teams(datum* player_indexes, int32 player_count, e_game_team* team_indexes);
 
+	int32 get_peer_index_by_observer_index(int32 observer_index) const
+	{
+		int32 peer_index = NONE;
+
+		for (int32 i = 0; i < k_network_maximum_machines_per_session; i++)
+		{
+			const s_session_peer* peer = &m_session_peers[i];
+			if (peer->peer_valid && peer->observer_channel_index == observer_index)
+			{
+				peer_index = i;
+				break;
+			}
+		}
+
+		return peer_index;
+	}
+
+	bool is_network_channel_session_host(int32 network_channel_index) const
+	{
+		bool result = false;
+
+		if ((established() || local_state_joining_session()) && !is_host())
+		{
+			int32 observer_index = m_network_observer->get_observer_index_by_channel_index(m_session_index, network_channel_index);
+			int32 peer_index = get_peer_index_by_observer_index(observer_index);
+
+			if (peer_index != NONE
+				&& is_peer_session_host(peer_index))
+			{
+				result = true;
+			}
+		}
+
+		return result;
+	}
+
 	bool is_session_class_online() const
 	{
 		return m_session_class == _network_session_class_xbox_live;

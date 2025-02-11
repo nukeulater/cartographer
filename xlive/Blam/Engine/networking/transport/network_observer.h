@@ -230,6 +230,27 @@ public:
 	int32 get_observer_channel_state(int32 observer_index) { return m_observer_channels[observer_index].state; };
 	void send_message(int32 session_index, int32 observer_index, bool send_out_of_band, int32 type, int32 size, void* data);
 
+	int32 get_observer_index_by_channel_index(
+		int32 session_index,
+		int32 network_channel_index)
+	{
+		int32 observer_index = NONE;
+
+		for (int32 i = 0; i < k_network_channel_count; i++)
+		{
+			s_observer_channel* observer_channel = &m_observer_channels[i];
+			if (observer_channel->state != _observer_channel_state_none
+				&& observer_channel->channel_index == network_channel_index
+				&& TEST_BIT(observer_channel->owner_flags, session_index) != 0)
+			{
+				observer_index = i;
+				break;
+			}
+		}
+
+		return observer_index;
+	}
+
 private:
 };
 ASSERT_STRUCT_SIZE(c_network_observer, 0x75C8);

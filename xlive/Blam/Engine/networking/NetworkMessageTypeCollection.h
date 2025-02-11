@@ -1,9 +1,7 @@
 #pragma once
 #include "game/game_allegiance.h"
 
-#define player_identifier_size_bits (sizeof(unsigned long long) * CHAR_BIT)
-
-enum e_network_message_type_collection : unsigned int
+enum e_network_message_type_collection : int32
 {
 	_ping,
 	_pong,
@@ -65,7 +63,7 @@ enum e_network_message_type_collection : unsigned int
 	k_network_message_type_collection_count
 };
 
-static const char* network_message_type_collection_name[] = {
+static const char* k_network_message_type_collection_description[] = {
 	"ping",
 	"pong",
 	"broadcast_search",
@@ -170,13 +168,13 @@ struct s_text_chat
 #pragma pack(pop)
 ASSERT_STRUCT_SIZE(s_text_chat, 404);
 
-const char* GetNetworkMessageName(int enumVal);
-void register_network_message(void *, int, const char*, int, int, int, void*, void*, void*);
+const char* get_network_message_description(int32 type);
+void register_network_message(void* network_message_collection, int32 type, const char* name, int32 a4, int32 size1, int32 size2, void* write_packet_method, void* read_packet_method, void* unk_callback);
 
 namespace NetworkMessage
 {
 	void ApplyGamePatches();
 	void SendRequestMapFilename(int mapDownloadId);
-	void SendRankChange(int peer_index, BYTE rank);
-	void SendAntiCheat(int peer_index);
+	void SendRankChange(int32 peer_index, int8 rank);
+	void SendAntiCheat(int32 peer_index);
 }

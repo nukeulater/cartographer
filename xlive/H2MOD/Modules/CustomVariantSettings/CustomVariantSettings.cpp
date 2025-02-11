@@ -71,7 +71,7 @@ namespace CustomVariantSettings
 								peer->observer_channel_index, 
 								false, 
 								_custom_variant_settings, 
-								CustomVariantSettingsPacketSize, 
+								k_custom_variant_settings_packet_size, 
 								&currentVariantSettings);
 					}
 				}

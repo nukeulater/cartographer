@@ -11,18 +11,16 @@
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 #include "H2MOD/Modules/MapManager/MapManager.h"
 
-uint8 g_network_message_type_collection[e_network_message_type_collection::k_network_message_type_collection_count * 32];
+uint8 g_network_message_type_collection[k_network_message_type_collection_count * 32];
 
-void register_network_message(void* network_message_collection, int type, const char* name, int a4, int size1, int size2, void* write_packet_method, void* read_packet_method, void* unk_callback)
+void register_network_message(void* network_message_collection, int32 type, const char* name, int32 a4, int32 size1, int32 size2, void* write_packet_method, void* read_packet_method, void* unk_callback)
 {
-	typedef void(__thiscall* register_packet_t)(void*, int, const char*, int, int, int, void*, void*, void*);
-	auto register_packet = Memory::GetAddress<register_packet_t>(0x1E81D6, 0x1CA199);
-	return register_packet(network_message_collection, type, name, a4, size1, size2, write_packet_method, read_packet_method, unk_callback);
+	return INVOKE(0x1E81D6, 0x1CA199, register_network_message, network_message_collection, type, name, a4, size1, size2, write_packet_method, read_packet_method, unk_callback);
 }
 
-const char* GetNetworkMessageName(int type)
+const char* get_network_message_description(int32 type)
 {
-	return network_message_type_collection_name[type];
+	return k_network_message_type_collection_description[type];
 }
 
 bool MessageIsCustom(e_network_message_type_collection type)
@@ -33,24 +31,24 @@ bool MessageIsCustom(e_network_message_type_collection type)
 void __cdecl encode_map_file_name_message(c_bitstream* stream, int a2, const s_custom_map_filename* data)
 {
 	stream->write_string_wchar("map-file-name", &data->file_name, ARRAYSIZE(data->file_name));
-	stream->write_integer("map-download-id", data->map_download_id, CHAR_BIT * sizeof(data->map_download_id));
+	stream->write_integer("map-download-id", data->map_download_id, SIZEOF_BITS(data->map_download_id));
 }
 bool __cdecl decode_map_file_name_message(c_bitstream* stream, int a2, s_custom_map_filename* data)
 {
 	stream->read_string_wchar("map-file-name", &data->file_name, ARRAYSIZE(data->file_name));
-	data->map_download_id = stream->read_integer("map-download-id", CHAR_BIT * sizeof(data->map_download_id));
+	data->map_download_id = stream->read_integer("map-download-id", SIZEOF_BITS(data->map_download_id));
 	return stream->error_occured() == false;
 }
 
 void __cdecl encode_request_map_filename_message(c_bitstream* stream, int a2, s_request_map_filename* data)
 {
-	stream->write_raw_data("user-identifier", &data->player_id, player_identifier_size_bits);
-	stream->write_integer("map-download-id", data->map_download_id, CHAR_BIT * sizeof(data->map_download_id));
+	stream->write_raw_data("user-identifier", &data->player_id, SIZEOF_BITS(data->player_id));
+	stream->write_integer("map-download-id", data->map_download_id, SIZEOF_BITS(data->map_download_id));
 }
 bool __cdecl decode_request_map_filename_message(c_bitstream* stream, int a2, s_request_map_filename* data)
 {
-	stream->read_raw_data("user-identifier", &data->player_id, player_identifier_size_bits);
-	data->map_download_id = stream->read_integer("map-download-id", CHAR_BIT * sizeof(data->map_download_id));
+	stream->read_raw_data("user-identifier", &data->player_id, SIZEOF_BITS(data->player_id));
+	data->map_download_id = stream->read_integer("map-download-id", SIZEOF_BITS(data->map_download_id));
 	return stream->error_occured() == false;
 }
 
@@ -66,11 +64,11 @@ bool __cdecl decode_team_change_message(c_bitstream* stream, int a2, s_team_chan
 
 void __cdecl encode_rank_change_message(c_bitstream* stream, int a2, const s_rank_change* data)
 {
-	stream->write_integer("rank", data->rank, CHAR_BITS);
+	stream->write_integer("rank", data->rank, SIZEOF_BITS(data->rank));
 }
 bool __cdecl decode_rank_change_message(c_bitstream* stream, int a2, s_rank_change* data)
 {
-	data->rank = (int8)stream->read_integer("rank", CHAR_BITS);
+	data->rank = (int8)stream->read_integer("rank", SIZEOF_BITS(data->rank));
 	return stream->error_occured() == false;
 }
 
@@ -86,7 +84,7 @@ bool __cdecl decode_anti_cheat_message(c_bitstream* stream, int a2, s_anti_cheat
 
 void register_custom_network_message(void* network_messages)
 {
-	typedef void(__cdecl* register_test_packet_t)(void* network_messages);
+	typedef void(__cdecl* register_test_packet_t)(void*);
 	auto p_register_test_message = Memory::GetAddress<register_test_packet_t>(0x1ECE05, 0x1CD7BE);
 
 	p_register_test_message(network_messages);
@@ -100,24 +98,24 @@ void register_custom_network_message(void* network_messages)
 	register_network_message(network_messages, _rank_change, "rank-change", 0, sizeof(s_rank_change), sizeof(s_rank_change),
 		(void*)encode_rank_change_message, (void*)decode_rank_change_message, NULL);
 
-	register_network_message(network_messages, _anti_cheat, "anti-cheat", 0, sizeof(s_anti_cheat), sizeof(s_anti_cheat),
+	register_network_message(network_messages, _anti_cheat, "", 0, sizeof(s_anti_cheat), sizeof(s_anti_cheat),
 		(void*)encode_anti_cheat_message, (void*)decode_anti_cheat_message, NULL);
 
-	register_network_message(network_messages, _custom_variant_settings, "variant-settings", 0, CustomVariantSettingsPacketSize, CustomVariantSettingsPacketSize,
+	register_network_message(network_messages, _custom_variant_settings, "variant-settings", 0, k_custom_variant_settings_packet_size, k_custom_variant_settings_packet_size,
 		(void*)CustomVariantSettings::EncodeVariantSettings, (void*)CustomVariantSettings::DecodeVariantSettings, NULL);
 }
 
-typedef void(__stdcall* handle_out_of_band_message_t)(void* thisx, network_address* address, e_network_message_type_collection message_type, int a4, void* packet);
+typedef void(__stdcall* handle_out_of_band_message_t)(void* thisx, network_address* address, e_network_message_type_collection message_type, int32 a4, uint8* packet);
 handle_out_of_band_message_t p_handle_out_of_band_message;
 
-void __stdcall handle_out_of_band_message_hook(void* thisx, network_address* address, e_network_message_type_collection message_type, int a4, void* packet)
+void __stdcall handle_out_of_band_message_hook(void* thisx, network_address* address, e_network_message_type_collection message_type, int32 a4, uint8* packet)
 {
 	c_network_session* session;
 	if (network_life_cycle_in_squad_session(&session))
 	{
 		/* surprisingly the game doesn't use this too much, pretty much for request-join and time-sync packets */
 		LOG_TRACE_NETWORK("{} - Received message: {} from peer index: {}",
-			__FUNCTION__, GetNetworkMessageName(message_type), session->get_peer_index_from_address(address));
+			__FUNCTION__, get_network_message_description(message_type), session->get_peer_index_from_address(address));
 	}
 
 	if (!MessageIsCustom(message_type))
@@ -257,14 +255,17 @@ void __stdcall read_channel_message_hook(void* thisx, int32 network_channel_inde
 		if (peer_network_channel->is_channel_state_5()
 			&& peer_network_channel->get_network_address(&addr))
 		{
-			int32 sender_peer_index = session->get_peer_index_from_address(&addr);
-
-			if (sender_peer_index != NONE
-				&& !session->is_peer_local(sender_peer_index)
-				&& session->is_peer_session_host(sender_peer_index))
+			if (in_session)
 			{
-				s_anti_cheat* recieved_data = (s_anti_cheat*)packet;
-				twizzler_set_status(recieved_data->enabled);
+				int32 sender_peer_index = session->get_peer_index_from_address(&addr);
+
+				if (sender_peer_index != NONE
+					&& !session->is_peer_local(sender_peer_index)
+					&& session->is_peer_session_host(sender_peer_index))
+				{
+					s_anti_cheat* recieved_data = (s_anti_cheat*)packet;
+					twizzler_set_status(recieved_data->enabled);
+				}
 			}
 		}
 		break;
@@ -277,13 +278,17 @@ void __stdcall read_channel_message_hook(void* thisx, int32 network_channel_inde
 		{
 			int32 sender_peer_index = session->get_peer_index_from_address(&addr);
 
-			if (sender_peer_index != NONE
-				&& !session->is_peer_local(sender_peer_index)
-				&& session->is_peer_session_host(sender_peer_index))
+			if (in_session)
 			{
-				auto recieved_data = (CustomVariantSettings::s_variant_settings*)packet;
-				CustomVariantSettings::UpdateCustomVariantSettings(recieved_data);
+				if (sender_peer_index != NONE
+					&& !session->is_peer_local(sender_peer_index)
+					&& session->is_peer_session_host(sender_peer_index))
+				{
+					auto recieved_data = (CustomVariantSettings::s_variant_settings*)packet;
+					CustomVariantSettings::UpdateCustomVariantSettings(recieved_data);
+				}
 			}
+
 		}
 		break;
 	}
@@ -294,12 +299,15 @@ void __stdcall read_channel_message_hook(void* thisx, int32 network_channel_inde
 		if (peer_network_channel->is_channel_state_5()
 			&& peer_network_channel->get_network_address(&addr))
 		{
-			int32 sender_peer_index = session->get_peer_index_from_address(&addr);
-
-			if (sender_peer_index != NONE
-				&& !session->is_peer_local(sender_peer_index))
+			if (in_session)
 			{
-				EventHandler::NetworkPlayerEventExecute(EventExecutionType::execute_before, sender_peer_index, EventHandler::NetworkPlayerEventType::remove);
+				int32 sender_peer_index = session->get_peer_index_from_address(&addr);
+
+				if (sender_peer_index != NONE
+					&& !session->is_peer_local(sender_peer_index))
+				{
+					EventHandler::NetworkPlayerEventExecute(EventExecutionType::execute_before, sender_peer_index, EventHandler::NetworkPlayerEventType::remove);
+				}
 			}
 		}
 		break; // don't return, leave the game to update state
@@ -314,12 +322,12 @@ void __stdcall read_channel_message_hook(void* thisx, int32 network_channel_inde
 		if (peer_network_channel->get_network_address(&addr))
 		{
 			LOG_TRACE_NETWORK("{} - Received message: {} from peer index: {}, address: {:x}",
-				__FUNCTION__, GetNetworkMessageName(message_type), session->get_peer_index_from_address(&addr), ntohl(addr.address.ipv4));
+				__FUNCTION__, get_network_message_description(message_type), session->get_peer_index_from_address(&addr), ntohl(addr.address.ipv4));
 		}
 		else
 		{
 			LOG_ERROR_NETWORK("{} - Received message: {} from network channel: {} possibly invalid payload or type",
-				__FUNCTION__, GetNetworkMessageName(message_type), network_channel_index);
+				__FUNCTION__, get_network_message_description(message_type), network_channel_index);
 		}
 	}
 
@@ -348,13 +356,16 @@ void __stdcall read_channel_message_hook(void* thisx, int32 network_channel_inde
 		if (peer_network_channel->is_channel_state_5()
 			&& peer_network_channel->get_network_address(&addr))
 		{
-			int32 sender_peer_index = session->get_peer_index_from_address(&addr);
-
-			if (sender_peer_index != NONE
-				&& !session->is_peer_local(sender_peer_index))
+			if (in_session)
 			{
-				EventHandler::NetworkPlayerEventExecute(EventExecutionType::execute_after, sender_peer_index, EventHandler::NetworkPlayerEventType::add);
-				NetworkMessage::SendAntiCheat(sender_peer_index);
+				int32 sender_peer_index = session->get_peer_index_from_address(&addr);
+
+				if (sender_peer_index != NONE
+					&& !session->is_peer_local(sender_peer_index))
+				{
+					EventHandler::NetworkPlayerEventExecute(EventExecutionType::execute_after, sender_peer_index, EventHandler::NetworkPlayerEventType::add);
+					NetworkMessage::SendAntiCheat(sender_peer_index);
+				}
 			}
 		}
 		break;
@@ -391,7 +402,7 @@ void NetworkMessage::SendRequestMapFilename(int mapDownloadId)
 	}
 }
 
-void NetworkMessage::SendRankChange(int peer_index, BYTE rank)
+void NetworkMessage::SendRankChange(int32 peer_index, int8 rank)
 {
 	c_network_session* session = NULL;
 	if (network_life_cycle_in_squad_session(&session) 
@@ -411,7 +422,7 @@ void NetworkMessage::SendRankChange(int peer_index, BYTE rank)
 		}
 	}
 }
-void NetworkMessage::SendAntiCheat(int peer_index)
+void NetworkMessage::SendAntiCheat(int32 peer_index)
 {
 	c_network_session* session = NULL;
 	if (network_life_cycle_in_squad_session(&session) 
