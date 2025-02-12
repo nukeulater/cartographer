@@ -25,6 +25,8 @@
 #include "tag_files/tag_loader/tag_injection.h"
 #include "XLive/xnet/IpManagement/XnIp.h"
 
+#include <fstream>
+
 std::mutex commandInsertMtx;
 
 bool readObjectIds = true;

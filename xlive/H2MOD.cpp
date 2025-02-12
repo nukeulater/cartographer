@@ -319,7 +319,11 @@ bool __cdecl OnMapLoad(s_game_options* options)
 
 	TagFixes::OnMapLoad();
 
-	game_globals_apply_tag_patches(options);
+	if (options->game_mode == _game_mode_multiplayer)
+	{
+		game_globals_apply_tag_patches();
+	}
+
 	ImGuiHandler::WeaponOffsets::MapLoad();
 
 	// when the game is minimized, the game might skip loading the main menu

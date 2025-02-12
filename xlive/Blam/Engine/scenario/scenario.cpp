@@ -18,7 +18,7 @@ static void __cdecl scenario_apply_level_patches(void);
 
 /* public code */
 
-scenario* get_global_scenario(void) 
+scenario* global_scenario_get(void) 
 {
 	return *Memory::GetAddress<scenario**>(0x479E74, 0x4A6430);
 }
@@ -42,7 +42,7 @@ void scenario_apply_patches(void)
 
 uint32 scenario_netgame_equipment_size(void)
 {
-	return get_global_scenario()->netgame_equipment.count;
+	return global_scenario_get()->netgame_equipment.count;
 }
 
 void location_invalidate(s_location* object_location)

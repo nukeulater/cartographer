@@ -545,7 +545,7 @@ static void user_interface_controller_removed_handler(void)
 			user_interface_controller_verify_reconnection,
 			user_interface_controller_verify_reconnection_failed);
 
-		const scenario* scnr = get_global_scenario();
+		const scenario* scnr = global_scenario_get();
 
 		if (scnr && scnr->type == scenario_type_singleplayer && !game_time_get_paused())
 		{

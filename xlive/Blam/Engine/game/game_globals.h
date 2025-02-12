@@ -1,6 +1,5 @@
 #pragma once
 #include "game_engine.h"
-#include "game_options.h"
 #include "materials.h"
 
 #include "bitmaps/bitmap_group.h"
@@ -580,7 +579,7 @@ ASSERT_STRUCT_SIZE(s_game_globals, 644);
 
 /* public code */
 
-void game_globals_apply_tag_patches(s_game_options* options);
+void game_globals_apply_tag_patches(void);
 
 s_game_globals* scenario_get_game_globals(void);
 

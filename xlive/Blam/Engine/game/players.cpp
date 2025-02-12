@@ -264,7 +264,7 @@ void __cdecl player_configuration_validate_character_type(s_player_properties* c
     // Campaign verification
     if (game_is_campaign())
     {
-        scenario* scnr = get_global_scenario();
+        scenario* scnr = global_scenario_get();
         uint32 block_size = scnr->player_starting_locations.count;
         if (block_size > 0)
         {

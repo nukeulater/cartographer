@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "TagFixes.h"
 
+#include "cache/cache_files.h"
 #include "shaders/shader_definitions.h"
 #include "units/biped_definitions.h"
 

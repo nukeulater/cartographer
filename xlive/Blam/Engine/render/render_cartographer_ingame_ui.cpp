@@ -1,16 +1,20 @@
 #include "stdafx.h"
 #include "render_cartographer_ingame_ui.h"
 
-#include "main/main_game_time.h"
 #include "cartographer/twizzler/twizzler.h"
 #include "cseries/cseries_strings.h"
 #include "game/game.h"
 #include "game/game_engine.h"
+#ifdef MAIN_GAME_TIME_DEBUG
+#include "main/main_time.h"
+#endif
 #include "rasterizer/rasterizer_globals.h"
 #include "rasterizer/rasterizer_text.h"
 #include "rasterizer/dx9/rasterizer_dx9.h"
 #include "shell/shell_windows.h"
+#include "networking/logic/life_cycle_manager.h"
 #include "networking/network_statistics.h"
+#include "networking/Session/network_session.h"
 #include "text/draw_string.h"
 #include "text/font_cache.h"
 #include "text/unicode.h"

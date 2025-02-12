@@ -60,8 +60,6 @@ static_assert(EXECUTABLE_TYPE <= 7 && EXECUTABLE_TYPE >= 0, "EXECUTABLE_TYPE VAL
 #include <xinput.h>
 #include <dinput.h>
 
-// TODO: include this only if trac
-#include <fstream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <float.h>

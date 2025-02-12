@@ -1,5 +1,4 @@
 #pragma once
-#include "math/matrix_math.h"
 #include "objects/objects.h"
 #include "tag_files/string_id.h"
 

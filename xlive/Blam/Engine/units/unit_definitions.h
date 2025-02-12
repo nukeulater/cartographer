@@ -1,7 +1,6 @@
 #pragma once
 #include "dialogue_definitions.h"
 #include "unit_action_system.h"
-#include "units.h"
 
 #include "ai/ai.h"
 
@@ -248,7 +247,7 @@ struct _unit_definition
     tag_block<dialogue_variant_definition> dialogue_variants;
 
     real32 grenade_velocity;    // World Units Per Second
-    e_unit_grenade_type grenade_type;
+    int16 grenade_type;         // e_unit_grenade_type
     int16 grenade_count;
     tag_block<powered_seat_definition> powered_seats;
     tag_block<unit_initial_weapon> weapons;

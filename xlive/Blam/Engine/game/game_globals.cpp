@@ -51,13 +51,10 @@ void (*k_game_globals_custom_representation_function_table[k_cartographer_custom
 
 /* public code */
 
-void game_globals_apply_tag_patches(s_game_options* options)
+void game_globals_apply_tag_patches(void)
 {
-	if (options->game_mode == _game_mode_multiplayer)
-	{
-		game_globals_add_new_player_representations();
-		game_globals_remove_singleplayer_representation();
-	}
+	game_globals_add_new_player_representations();
+	game_globals_remove_singleplayer_representation();
 	return;
 }
 
@@ -111,7 +108,7 @@ static void game_globals_add_new_player_representations(void)
 {
 	if (!Memory::IsDedicatedServer())
 	{
-		scenario* scenario_definition = get_global_scenario();
+		scenario* scenario_definition = global_scenario_get();
 
 		s_game_globals_custom_representation_result representations[k_cartographer_custom_representation_count]{};
 		for (uint32 i = 0; i < k_cartographer_custom_representation_count; ++i)
@@ -277,7 +274,7 @@ static void add_new_representations(s_game_globals_custom_representation_result*
 
 static void add_simulation_table_entries(s_game_globals_custom_representation_result* representations)
 {
-	scenario* scenario = get_global_scenario();
+	scenario* scenario = global_scenario_get();
 
 	// do an initial loop through the representation results to determine which ones need new blocks added
 	uint32 new_entry_count = 0;
