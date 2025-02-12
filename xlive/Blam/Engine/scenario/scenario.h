@@ -1,10 +1,9 @@
 #pragma once
 #include "scenario_definitions.h"
-#include "objects/object_placement.h"
 
 /* public code */
 
-scenario* get_global_scenario(void);
+scenario* global_scenario_get(void);
 
 void set_global_scenario(scenario* _scenario);
 

@@ -3,8 +3,9 @@
 
 #include "../SpecialEventHelpers.h"
 
-#include "items/weapon_definitions.h"
+#include "cache/cache_files.h"
 #include "game/game_globals.h"
+#include "items/weapon_definitions.h"
 #include "models/models.h"
 #include "scenario/scenario.h"
 #include "structures/structure_bsp_definitions.h"
@@ -81,7 +82,7 @@ void christmas_event_map_load(void)
 
 		// Change/Add weather system to bsp
 
-		structure_bsp* bsp_definition = (structure_bsp*)tag_get_fast(get_global_scenario()->structure_bsps[0]->structure_bsp.index);
+		structure_bsp* bsp_definition = (structure_bsp*)tag_get_fast(global_scenario_get()->structure_bsps[0]->structure_bsp.index);
 
 		structure_weather_palette_entry* weat_block = (structure_weather_palette_entry*)tag_injection_extend_block(&bsp_definition->weather_palette, bsp_definition->weather_palette.type_size(), 1);
 

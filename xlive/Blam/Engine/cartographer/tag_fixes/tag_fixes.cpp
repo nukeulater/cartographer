@@ -182,7 +182,7 @@ static void tag_fixes_misty_rain(void)
 				tag_injection_inject();
 
 				// Set the field in the scenario
-				scenario* scenario_definition = get_global_scenario();
+				scenario* scenario_definition = global_scenario_get();
 				structure_weather_palette_entry* palette = scenario_definition->weather_palette[0];
 				const char name[] = "misty_cs";
 				csstrnzcpy(palette->name, name, NUMBEROF(name));
@@ -192,7 +192,7 @@ static void tag_fixes_misty_rain(void)
 				// Set the field in every single bsp in the scenario
 				for(int32 i = 0; i < scenario_definition->structure_bsps.count; ++i)
 				{
-					structure_bsp* bsp_definition = (structure_bsp*)tag_get_fast(get_global_scenario()->structure_bsps[i]->structure_bsp.index);
+					structure_bsp* bsp_definition = (structure_bsp*)tag_get_fast(global_scenario_get()->structure_bsps[i]->structure_bsp.index);
 					structure_weather_palette_entry* bsp_palette = bsp_definition->weather_palette[0];
 					csstrnzcpy(bsp_palette->name, name, NUMBEROF(name));
 					bsp_palette->weather_system.group.group = _tag_group_weather_system;

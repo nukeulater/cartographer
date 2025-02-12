@@ -122,7 +122,7 @@ void rasterizer_dx9_postprocess_scene(int32 render_layer_debug_view, bool lens_f
 	// and is used for post-processing (e.g. brightness, bloom, sun etc.)
 	// which is later copied in the backbuffer to be displayed on the screen
 	e_rasterizer_target target = _rasterizer_target_resolved;
-	scenario* global_scenario = get_global_scenario();
+	scenario* global_scenario = global_scenario_get();
 	if (global_scenario)
 	{
 		if (!frame_parameters_type_is_above_or_equal_to_7()
