@@ -8,7 +8,7 @@
 #include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
 #include "main/interpolator.h"
 #include "saved_games/cartographer_player_profile.h"
-#include "units/unit_definitions.h"
+#include "units/units.h"
 
 real32 g_player_control_dt = 0.0f;
 
