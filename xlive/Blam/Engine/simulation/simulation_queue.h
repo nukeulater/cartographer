@@ -205,7 +205,7 @@ public:
 		return m_stats.valid;
 	}
 
-	void allocate(int32 data_size, s_simulation_queue_element** out_allocated_elem);
+	void allocate(int32 size, s_simulation_queue_element** out_allocated_elem);
 	void transfer_elements(c_simulation_queue* source_queue);
 	void deallocate(s_simulation_queue_element* element);
 	void enqueue(s_simulation_queue_element* element);

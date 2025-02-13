@@ -106,7 +106,16 @@ bool game_is_predicted(void)
 
 bool game_in_progress(void)
 {
-	return get_main_game_globals() && get_main_game_globals()->game_in_progress;
+    bool result = false;
+    if (get_main_game_globals() != NULL && get_main_game_globals()->game_in_progress)
+    {
+        ASSERT(!get_main_game_globals()->initializing);
+        ASSERT(get_main_game_globals()->map_active);
+
+        result = true;
+    }
+
+    return result;
 }
 
 bool game_is_active(void)
