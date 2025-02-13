@@ -241,7 +241,7 @@ public:
 			s_observer_channel* observer_channel = &m_observer_channels[i];
 			if (observer_channel->state != _observer_channel_state_none
 				&& observer_channel->channel_index == network_channel_index
-				&& TEST_BIT(observer_channel->owner_flags, session_index) != 0)
+				&& TEST_BIT(observer_channel->owner_flags, session_index))
 			{
 				observer_index = i;
 				break;

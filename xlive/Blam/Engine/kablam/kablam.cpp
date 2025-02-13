@@ -1,12 +1,12 @@
 #include "stdafx.h"
 
-#include "ServerConsole.h"
+#include "kablam.h"
 
 #include "cseries/cseries_strings.h"
+#include "shell/shell_windows.h"
+
 #include "H2MOD/GUI/ImGui_Integration/Console/CommandHandler.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
-#include "H2MOD/Utils/Utils.h"
-
 
 typedef void* (__cdecl* dedi_command_t)(wchar_t** a1, int a2, char a3);
 dedi_command_t p_dedi_command;
@@ -17,9 +17,9 @@ kablam_vip_add_t p_kablam_vip_add;
 typedef signed int(__cdecl* kablam_vip_clear_t)();
 kablam_vip_clear_t p_kablam_vip_clear;
 
-static std::map<const wchar_t*, ServerConsole::e_server_console_commands> commands_map;
+static std::map<const wchar_t*, e_server_console_commands> commands_map;
 
-void* __cdecl DediCommandHook(wchar_t** command_line_split_wide, int split_count, char a3) {
+void* __cdecl kablam_command_handler_hook(wchar_t** command_line_split_wide, int split_count, char a3) {
 
 	wchar_t* command = command_line_split_wide[0];
 	if (command[0] == L'$') {
@@ -88,7 +88,7 @@ void* __cdecl DediCommandHook(wchar_t** command_line_split_wide, int split_count
 	bool playCommand = false;
 	auto playCommandFind = commands_map.find(lower_command.get_string());
 	if (playCommandFind != commands_map.end()
-		&& playCommandFind->second == ServerConsole::play)
+		&& playCommandFind->second == _kablam_command_play)
 		playCommand = true;
 
 	if (!playCommand)
@@ -111,9 +111,9 @@ kablam_command_play_t* p_kablam_command_play;
 bool __cdecl kablam_command_play(wchar_t* playlist_file_path, int a2)
 {
 	LOG_INFO_GAME("[{}]: {}", __FUNCTION__, "");
-	EventHandler::ServerCommandEventExecute(EventExecutionType::execute_before, ServerConsole::play);
+	EventHandler::ServerCommandEventExecute(EventExecutionType::execute_before, _kablam_command_play);
 	auto res = p_kablam_command_play(playlist_file_path, a2);
-	EventHandler::ServerCommandEventExecute(EventExecutionType::execute_after, ServerConsole::play);
+	EventHandler::ServerCommandEventExecute(EventExecutionType::execute_after, _kablam_command_play);
 	return res;
 }
 
@@ -121,24 +121,25 @@ void ServerConsole::ApplyHooks()
 {
 	if (!Memory::IsDedicatedServer())
 		return;
-	commands_map[L"ban"] = e_server_console_commands::ban;
-	commands_map[L"description"] = e_server_console_commands::description;
-	commands_map[L"exit"] = e_server_console_commands::exit;
-	commands_map[L"kick"] = e_server_console_commands::kick;
-	commands_map[L"live"] = e_server_console_commands::live;
-	commands_map[L"name"] = e_server_console_commands::name;
-	commands_map[L"play"] = e_server_console_commands::play;
-	commands_map[L"players"] = e_server_console_commands::players;
-	commands_map[L"playing"] = e_server_console_commands::playing;
-	commands_map[L"privacy"] = e_server_console_commands::privacy;
-	commands_map[L"sendmsg"] = e_server_console_commands::sendmsg;
-	commands_map[L"skip"] = e_server_console_commands::skip;
-	commands_map[L"statsfolder"] = e_server_console_commands::statsfolder;
-	commands_map[L"status"] = e_server_console_commands::status;
-	commands_map[L"unban"] = e_server_console_commands::unban;
-	commands_map[L"vip"] = e_server_console_commands::vip;
-	commands_map[L"any"] = e_server_console_commands::any;
-	p_dedi_command = (dedi_command_t)DetourFunc(Memory::GetAddress<BYTE*>(0, 0x1CCFC), (BYTE*)DediCommandHook, 7);
+	commands_map[L"ban"] = _kablam_command_ban;
+	commands_map[L"description"] = _kablam_command_description;
+	commands_map[L"exit"] = _kablam_command_exit;
+	commands_map[L"kick"] = _kablam_command_kick;
+	commands_map[L"live"] = _kablam_command_live;
+	commands_map[L"name"] = _kablam_command_name;
+	commands_map[L"play"] = _kablam_command_play;
+	commands_map[L"players"] = _kablam_command_players;
+	commands_map[L"playing"] = _kablam_command_playing;
+	commands_map[L"privacy"] = _kablam_command_privacy;
+	commands_map[L"sendmsg"] = _kablam_command_sendmsg;
+	commands_map[L"skip"] = _kablam_command_skip;
+	commands_map[L"statsfolder"] = _kablam_command_statsfolder;
+	commands_map[L"status"] = _kablam_command_status;
+	commands_map[L"unban"] = _kablam_command_unban;
+	commands_map[L"vip"] = _kablam_command_vip;
+	commands_map[L"any"] = _kablam_command_any;
+
+	p_dedi_command = (dedi_command_t)DetourFunc(Memory::GetAddress<BYTE*>(0, 0x1CCFC), (BYTE*)kablam_command_handler_hook, 7);
 	p_kablam_vip_add = Memory::GetAddress<kablam_vip_add_t>(0, 0x1D932);
 	p_kablam_vip_clear = Memory::GetAddress<kablam_vip_clear_t>(0, 0x1DB16);
 
@@ -207,24 +208,23 @@ void ServerConsole::ClearVip()
 	p_kablam_vip_clear();
 }
 
-int messageTimeout = 0;
-
+static int32 message_timeout = 0;
 void ServerConsole::SendMsg(const wchar_t* message, bool timeout)
 {
 	bool execute = !timeout;
-	if (TimeElapsedMS(messageTimeout) > 10000)
+	if (system_milliseconds() - message_timeout > 10 * 1000)
 	{
-		messageTimeout = GetCurrentTimeMS();
+		message_timeout = system_milliseconds();
 		execute = true;
 	}
 
 	if (execute) {
 
 		// first we construct kablam_command_send_msg, by manually passing the vtable pointer, and the message to be copied
-		kablam_command_send_msg sendMsgCommand(Memory::GetAddress(0, 0x352DFC), message);
+		c_kablam_command_send_msg sendMsgCommand(Memory::GetAddress<void*>(0, 0x352DFC), message);
 
 		// send the message
-		sendMsgCommand.sendGameMessage();
+		sendMsgCommand.send_message();
 	}
 }
 

@@ -252,8 +252,8 @@ namespace playlist_loader
 	//	}
 	//}
 
-	typedef void(__stdcall* h_playlist_processs_setting)(playlist_entry* playlist_entry);
-	h_playlist_processs_setting p_playlist_process_setting;
+	typedef void(__stdcall* t_playlist_processs_setting)(playlist_entry* playlist_entry);
+	t_playlist_processs_setting p_playlist_process_setting;
 	void __stdcall process_setting(playlist_entry* playlist_entry)
 	{
 		if (!process_custom_setting_eval(playlist_entry))
@@ -261,15 +261,15 @@ namespace playlist_loader
 			p_playlist_process_setting(playlist_entry);
 		}
 	}
-	void reset_custom_settings(ServerConsole::e_server_console_commands command)
+	void reset_custom_settings(e_server_console_commands command)
 	{
-		if (command == ServerConsole::play)
+		if (command == _kablam_command_play)
 			customVariantSettingsMap.clear();
 	}
 
 	void apply_hooks()
 	{
-		p_playlist_process_setting = (h_playlist_processs_setting)DetourClassFunc(Memory::GetAddress<BYTE*>(0, 0x10FBE), (BYTE*)process_setting, 13);
+		p_playlist_process_setting = (t_playlist_processs_setting)DetourClassFunc(Memory::GetAddress<BYTE*>(0, 0x10FBE), (BYTE*)process_setting, 13);
 	}
 
 	void initialize()
