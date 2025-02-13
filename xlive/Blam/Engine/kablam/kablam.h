@@ -71,8 +71,9 @@ namespace ServerConsole
 	static int __cdecl OutputCb(StringHeaderFlags flags, const char* fmt, ...);
 
 	void ApplyHooks();
-	void LogToDedicatedServerConsole(const wchar_t* fmt, ...);
-	void SendCommand(wchar_t** command, int split_commands_size, char unk);
+	int LogToDedicatedServerConsoleWide(const wchar_t* fmt, ...);
+	int LogToDedicatedServerConsole(const char* fmt, ...);
+	void SendCommand(wchar_t** command, int32 split_commands_size, bool a3);
 	void AddVip(std::wstring gamerTag);
 	void ClearVip();
 	void SendMsg(const wchar_t* message, bool timeout = false);
