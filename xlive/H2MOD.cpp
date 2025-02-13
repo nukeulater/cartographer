@@ -83,6 +83,7 @@
 #include "H2MOD/GUI/ImGui_Integration/Console/CommandCollection.h"
 #include "H2MOD/GUI/ImGui_Integration/ImGui_Handler.h"
 #include "H2MOD/Modules/Accounts/AccountLogin.h"
+#include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
 #include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
 #include "H2MOD/Modules/DirectorHooks/DirectorHooks.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
@@ -1084,6 +1085,9 @@ void H2MOD::Initialize()
 
 	if (!Memory::IsDedicatedServer())
 	{
+		// TODO: remove this garbage
+		custom_language_initialize();
+
 		// Apply patches for the hud that need to be applied before WinMain is called
 		hud_apply_pre_winmain_patches();
 

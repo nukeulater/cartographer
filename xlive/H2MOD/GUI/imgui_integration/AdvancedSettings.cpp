@@ -18,6 +18,7 @@
 #include "saved_games/cartographer_player_profile.h"
 
 #include "H2MOD.h"
+#include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
 
@@ -902,7 +903,7 @@ namespace ImGuiHandler {
 					if (ImGui::Combo("##Language_Selection", (int*)&g_language, lang_items, k_language_count))
 					{
 						H2Config_language.code_main = (g_language == 8 ? -1 : g_language);
-						//setCustomLanguage(H2Config_language.code_main, H2Config_language.code_variant);
+						setCustomLanguage(H2Config_language.code_main, H2Config_language.code_variant);
 					}
 					ImGui::PopItemWidth();
 

@@ -57,7 +57,7 @@ const wchar_t* k_online_button_text[k_language_count] =
 	L"ONLINE",
 	L"オンライン",
 	L"ONLINE",
-	L"EN LÍNEA"
+	L"EN LÍNEA",
 	L"EN LIGNE",
 	L"IN LINEA",
 	L"온라인",
