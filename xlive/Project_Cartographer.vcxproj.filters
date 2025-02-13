@@ -10,7 +10,7 @@
     <ClCompile Include="Blam\Engine\networking\transport\network_channel.cpp" />
     <ClCompile Include="Blam\Engine\networking\transport\network_observer.cpp" />
     <ClCompile Include="Blam\Engine\networking\session\network_session.cpp" />
-    <ClCompile Include="H2MOD\Modules\Shell\ServerConsole.cpp" />
+    <ClCompile Include="Blam\Engine\kablam\kablam.cpp" />
     <ClCompile Include="Util\log.cpp" />
     <ClCompile Include="XLive\Cryptography\Rc4.cpp" />
     <ClCompile Include="Blam\Engine\tag_files\files_windows.cpp" />
@@ -54,7 +54,6 @@
     <ClCompile Include="XLive\XUser\XUserContext.cpp" />
     <ClCompile Include="XLive\XUser\XUserProperty.cpp" />
     <ClCompile Include="XLive\XStorage\XStorage.cpp" />
-    <ClCompile Include="H2MOD\Modules\Input\PlayerControl.cpp" />
     <ClCompile Include="H2MOD\Modules\Input\KeyboardInput.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\ImGui_Handler.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\AdvancedSettings.cpp" />
@@ -544,7 +543,7 @@
     <ClInclude Include="Blam\Engine\networking\transport\network_channel.h" />
     <ClInclude Include="Blam\Engine\networking\transport\network_observer.h" />
     <ClInclude Include="Blam\Engine\networking\session\network_session.h" />
-    <ClInclude Include="H2MOD\Modules\Shell\ServerConsole.h" />
+    <ClInclude Include="Blam\Engine\kablam\kablam.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Util\SimpleIni.h" />
     <ClInclude Include="XLive\Cryptography\Rc4.h" />
@@ -596,7 +595,6 @@
     <ClInclude Include="XLive\XUser\XUserContext.h" />
     <ClInclude Include="XLive\XUser\XUserProperty.h" />
     <ClInclude Include="XLive\XStorage\XStorage.h" />
-    <ClInclude Include="H2MOD\Modules\Input\PlayerControl.h" />
     <ClInclude Include="H2MOD\Modules\Input\KeyboardInput.h" />
     <ClInclude Include="Blam\Engine\game\game_options.h" />
     <ClInclude Include="H2MOD\Modules\Input\ControllerInput.h" />

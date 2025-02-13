@@ -178,13 +178,6 @@ std::string GetVKeyCodeString(int vkey) {
 	return strStream.str();
 }
 
-void PadCStringWithChar(char* strToPad, size_t toFullLength, char c) {
-	for (size_t i = strlen(strToPad); i < toFullLength - 1; i++) {
-		strToPad[i] = c;
-	}
-	strToPad[toFullLength - 1] = '\0';
-}
-
 int GetWidePathFromFullWideFilename(const wchar_t* filepath, wchar_t* rtnpath) {
 	const wchar_t* backslash_offset = wcsrchr(filepath, L'\\');
 	const wchar_t* forward_slash_offset = wcsrchr(filepath, L'/');
@@ -213,36 +206,6 @@ LONG GetDWORDRegKey(HKEY hKey, const wchar_t* strValueName, DWORD* nValue) {
 		*nValue = nResult;
 	}
 	return nError;
-}
-
-char* custom_label_literal(char* label_escaped) {
-	int label_escaped_length = strlen(label_escaped);
-	int length_shift = 0;
-	char* label_literal = (char*)malloc(label_escaped_length + 1);
-
-	for (int i = 0; i < label_escaped_length; i++) {
-		if (label_escaped[i] == '\\' && label_escaped[i + 1] == '\\') {
-			label_literal[i + length_shift] = '\\';
-			length_shift--;
-			i++;
-		}
-		else if (label_escaped[i] == '\\' && label_escaped[i + 1] == 'n') {
-			label_literal[i + length_shift] = '\n';
-			length_shift--;
-			i++;
-		}
-		else if (label_escaped[i] == '\\' && label_escaped[i + 1] == 'r') {
-			label_literal[i + length_shift] = '\r';
-			length_shift--;
-			i++;
-		}
-		else {
-			label_literal[i + length_shift] = label_escaped[i];
-		}
-	}
-
-	label_literal[label_escaped_length + length_shift] = 0;
-	return label_literal;
 }
 
 char* custom_label_escape(char* label_literal) {
@@ -312,27 +275,6 @@ bool isInteger(std::string myString)
 bool isInteger(std::wstring myString)
 {
 	return myString.find_first_not_of(L"0123456789") == std::wstring::npos;
-}
-
-int HostnameToIp(char* hostname, char* ip) {
-	struct hostent *he;
-	struct in_addr **addr_list;
-	WSADATA wsaData;
-	WSAStartup(MAKEWORD(2, 2), &wsaData);
-	if ((he = gethostbyname(hostname)) == NULL) {
-		return WSAGetLastError();
-	}
-
-	addr_list = (struct in_addr **) he->h_addr_list;
-
-	for (int i = 0; addr_list[i] != NULL; i++)
-	{
-		//Return the first one;
-		strncpy(ip, inet_ntoa(*addr_list[i]), 100);
-		return 0;
-	}
-
-	return 1;
 }
 
 DWORD crc32buf(const char* buf, size_t len)
@@ -428,20 +370,6 @@ char* encode_rfc3986(const char* label_literal, size_t label_literal_length) {
 	return label_escaped;
 }
 
-void wcstombs2(wchar_t* source, char* out_buffer, size_t buf_len) {
-	size_t loop_len = wcslen(source);
-	if (loop_len >= buf_len)
-		loop_len = buf_len - 1; // - 1 for null
-
-	size_t out_buffer_idx = 0;
-	for (size_t i = 0; i < loop_len; i++) {
-		if (source[i] >= 0 && source[i] <= 0xFF) {
-			out_buffer[out_buffer_idx++] = (char)source[i];
-		}
-	}
-	out_buffer[out_buffer_idx] = 0;
-}
-
 std::string ToNarrow(const wchar_t *s, char dfault,	const std::locale& loc)
 {
 	std::ostringstream stm;
@@ -450,14 +378,6 @@ std::string ToNarrow(const wchar_t *s, char dfault,	const std::locale& loc)
 		stm << std::use_facet< std::ctype<wchar_t> >(loc).narrow(*s++, dfault);
 	}
 	return stm.str();
-}
-
-char* wcstombs2r(wchar_t* text)
-{
-	size_t output_size = (wcslen(text) + 1) * sizeof(char);
-	char* output = (char*)malloc(output_size);
-	wcstombs2(text, output, output_size);
-	return output;
 }
 
 struct stringMe {
@@ -577,61 +497,6 @@ int TrimRemoveConsecutiveSpaces(char* text) {
 	if (text[text_pos - 1] == ' ')
 		text[--text_pos] = 0;
 	return text_pos;//new length
-}
-
-int stripWhitespace(wchar_t *inputStr) {
-	wchar_t *start;
-	start = inputStr;
-	while (*start && *start == ' ') start++;
-	printf("It is %p and %p\n", inputStr, start);
-	printf("Strlen + 1 is: %i\n", wcslen(start) + 1);
-	memmove(inputStr, start, wcslen(start) + 1);
-	return 0;
-}
-
-void pushHostLobby() {
-	typedef bool(__cdecl* should_send_broadcast_reply_t)(void* session);
-	auto p_should_send_broadcast_reply = Memory::GetAddress<should_send_broadcast_reply_t>(0x1ADA7B, 0x1A69DB);
-
-	if (p_should_send_broadcast_reply(NULL))
-	{
-		char msg[100] = { 0x00, 0x43, 0x05 };
-		sprintf(&msg[3], "push clientlobby %d", H2Config_base_port + 1);
-
-		addDebugText("Pushing open lobby.");
-
-		SOCKET socketDescriptor;
-		struct sockaddr_in serverAddress;
-		if ((socketDescriptor = socket(AF_INET, SOCK_DGRAM, 0)) == INVALID_SOCKET) {
-			addDebugText("ERROR: Could not create socket.");
-		}
-		serverAddress.sin_family = AF_INET;
-		serverAddress.sin_addr.s_addr = H2Config_master_ip;
-		serverAddress.sin_port = htons(H2Config_master_port_relay);
-
-		if (sendto(socketDescriptor, msg, strlen(&msg[3]) + 3, 0, (struct sockaddr*)&serverAddress, sizeof(serverAddress)) <= 0) {
-			//returns -1 if it wasn't successful. Note that it doesn't return -1 if the connection couldn't be established (UDP)
-			addDebugText("ERROR: Failed to push open lobby.");
-		}
-
-		closesocket(socketDescriptor);
-	}
-}
-
-int GetCurrentTimeMS()
-{
-	timeb tb;
-	ftime(&tb);
-	int nCount = tb.millitm + (tb.time & 0xfffff) * 1000;
-	return nCount;
-}
-
-int TimeElapsedMS(int startms)
-{
-	int nSpan = GetCurrentTimeMS() - startms;
-	if (nSpan < 0)
-		nSpan += 0x100000 * 1000;
-	return nSpan;
 }
 
 bool FileTypeCheck(const std::string& file_path, const std::string& file_type)

@@ -6,12 +6,8 @@ bool GetFileLine(FILE* fp, char** fileLine);
 char CmpVersions(const char* version_base, const char* version_alt);
 void ReadIniFile(void* fileConfig, bool configIsFILE, const char* header, const char* headerVersion, int(interpretSettingFunc)(char* fileLine, char* version, int lineNumber));
 std::string GetVKeyCodeString(int vkey);
-void PadCStringWithChar(char* strToPad, size_t toFullLength, char c);
 int GetWidePathFromFullWideFilename(const wchar_t* filepath, wchar_t* rtnpath);
 LONG GetDWORDRegKey(HKEY hKey, const wchar_t* strValueName, DWORD* nValue);
-void pushHostLobby();
-///FREE MEMOERY in returned char*
-char* custom_label_literal(char* label_escaped);
 ///FREE MEMOERY in returned char*
 char* custom_label_escape(char* label_literal);
 bool FloatIsNaN(float vagueFloat);
@@ -19,15 +15,11 @@ bool isFloat(std::string myString);
 bool isFloat(std::wstring myString);
 bool isInteger(std::string myString);
 bool isInteger(std::wstring myString);
-///IP is char array size 100
-int HostnameToIp(char* hostname, char* ip);
 
 bool HexStrToBytes(const std::string& hexStr, uint8_t* byteBuf, size_t bufLen);
 std::string ByteToHexStr(const uint8_t* buffer, size_t size);
 
 char* encode_rfc3986(const char* label_literal, size_t label_literal_length = 0u);
-void wcstombs2(wchar_t* source, char* out_buffer, size_t buf_len);
-char* wcstombs2r(wchar_t* text);
 std::string ToNarrow(const wchar_t *s, char dfault = '?', const std::locale& loc = std::locale());
 
 ///FREE MEMOERY in rtn_response if returned 0 (success).
@@ -52,9 +44,6 @@ std::wstring IntToWString(T t, std::ios_base & (*f)(std::ios_base&))
 	return std::wstring(out.begin(), out.end());
 }
 
-int stripWhitespace(wchar_t *inputStr);
-int GetCurrentTimeMS();
-int TimeElapsedMS(int startms);
 bool FileTypeCheck(const std::string& file_path, const std::string& file_type);
 
 class FrequencyLimiter

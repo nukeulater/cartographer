@@ -1,7 +1,8 @@
 #pragma once
+
+#include "kablam/kablam.h"
 #include "game/game_options.h"
 #include "networking/logic/life_cycle_manager.h"
-#include "H2MOD/Modules/Shell/ServerConsole.h"
 
 /*
  * To Setup a new Event you need to add an enum to EventType above the none enum
@@ -80,7 +81,7 @@ namespace EventHandler
 	using GameLifeCycleEventCallback = void(*)(e_game_life_cycle state);
 	using NetworkPlayerEventCallback = void(*)(int peerIndex, NetworkPlayerEventType type);
 	using GameLoopEventCallback = void(*)();
-	using ServerCommandEventCallback = void(*)(ServerConsole::e_server_console_commands command);
+	using ServerCommandEventCallback = void(*)(e_server_console_commands command);
 	using PlayerControlEventCallback = void(*)(float* yaw, float* pitch);
 	using MapLoadEventCallback = void(*)(e_game_mode type);
 	using BlueScreenEventCallback = void(*)();
