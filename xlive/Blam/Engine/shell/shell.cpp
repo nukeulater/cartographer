@@ -173,9 +173,15 @@ bool shell_initialize(void)
 	return result;
 }
 
-void shell_dispose(void)
+void __cdecl shell_dispose(void)
 {
 	INVOKE(0x48A9, 0x4CFE, shell_dispose);
+	return;
+}
+
+void __cdecl shell_update(void)
+{
+	INVOKE(0x7902, 0xBA18, shell_update);
 	return;
 }
 

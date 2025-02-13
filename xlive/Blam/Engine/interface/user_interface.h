@@ -366,6 +366,8 @@ ASSERT_STRUCT_SIZE(s_screen_parameters, 0x20);
 
 /* prototypes */
 
+void user_interface_apply_patches(void);
+
 bool __cdecl user_interface_automation_is_active(void);
 uint32 __cdecl user_interface_milliseconds(void);
 bool __cdecl user_interface_error_display_allowed(void);
@@ -385,5 +387,7 @@ void __cdecl user_interface_enter_game_shell(int32 context);
 void __cdecl render_menu_user_interface(int32 controller_index, e_user_interface_render_window render_window, rectangle2d* out_rect2d);
 
 void __cdecl user_interface_return_to_mainmenu(bool a1);
+
+void __cdecl user_interface_update(real32 dt);
 
 uint32 user_interface_set_context_presence(e_context_presence game_mode);

@@ -37,5 +37,7 @@ void game_time_set_paused(bool pause);
 
 void game_time_discard(int32 desired_ticks, int32 actual_ticks, real32* elapsed_game_dt);
 
+void __cdecl game_time_update(real32 dt, real32* out_time_delta, int32* out_target_tick_count);
+
 void game_time_apply_patches();
 

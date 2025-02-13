@@ -8,6 +8,11 @@
 
 /* public code */
 
+void user_interface_apply_patches(void)
+{
+	return;
+}
+
 bool __cdecl user_interface_automation_is_active(void)
 {
 	return false;
@@ -90,6 +95,12 @@ void __cdecl render_menu_user_interface(int32 controller_index, e_user_interface
 void __cdecl user_interface_return_to_mainmenu(bool a1)
 {
 	INVOKE(0x20A87E, 0x0, user_interface_return_to_mainmenu, a1);
+	return;
+}
+
+void __cdecl user_interface_update(real32 dt)
+{
+	INVOKE(0x20CA7D, 0x0, user_interface_update, dt);
 	return;
 }
 

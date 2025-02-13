@@ -32,6 +32,7 @@
 #include "interface/first_person_weapons.h"
 #include "interface/new_hud.h"
 #include "interface/new_hud_draw.h"
+#include "interface/user_interface.h"
 #include "interface/user_interface_controller.h"
 #include "interface/user_interface_text.h"
 #include "interface/user_interface_utilities.h"
@@ -1000,6 +1001,7 @@ void H2MOD::ApplyHooks() {
 		bipeds_apply_patches();
 		unit_apply_patches();
 
+		user_interface_apply_patches();
 		user_interface_text_apply_hooks();
 		user_interface_controller_apply_patches();
 		hud_messaging_apply_hooks();
