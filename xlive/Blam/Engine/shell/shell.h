@@ -1,5 +1,7 @@
 #pragma once
 
+/* enums */
+
 enum e_shell_tool_type
 {
 	_shell_tool_type_editing_tools = 0,
@@ -41,6 +43,7 @@ enum e_shell_command_line_flags : int32
 	k_number_of_shell_command_line_flags
 };
 
+/* prototypes */
 
 void shell_apply_patches(void);
 
@@ -54,6 +57,8 @@ const char* shell_get_version(void);
 
 bool shell_initialize(void);
 
-void shell_dispose(void);
+void __cdecl shell_dispose(void);
+
+void __cdecl shell_update(void);
 
 void __cdecl timing_initialize(int32 a1);

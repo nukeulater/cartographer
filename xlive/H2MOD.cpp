@@ -32,6 +32,7 @@
 #include "interface/first_person_weapons.h"
 #include "interface/new_hud.h"
 #include "interface/new_hud_draw.h"
+#include "interface/user_interface.h"
 #include "interface/user_interface_controller.h"
 #include "interface/user_interface_text.h"
 #include "interface/user_interface_utilities.h"
@@ -83,6 +84,7 @@
 #include "H2MOD/GUI/ImGui_Integration/Console/CommandCollection.h"
 #include "H2MOD/GUI/ImGui_Integration/ImGui_Handler.h"
 #include "H2MOD/Modules/Accounts/AccountLogin.h"
+#include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
 #include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
 #include "H2MOD/Modules/DirectorHooks/DirectorHooks.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
@@ -999,6 +1001,7 @@ void H2MOD::ApplyHooks() {
 		bipeds_apply_patches();
 		unit_apply_patches();
 
+		user_interface_apply_patches();
 		user_interface_text_apply_hooks();
 		user_interface_controller_apply_patches();
 		hud_messaging_apply_hooks();
@@ -1084,6 +1087,9 @@ void H2MOD::Initialize()
 
 	if (!Memory::IsDedicatedServer())
 	{
+		// TODO: remove this garbage
+		custom_language_initialize();
+
 		// Apply patches for the hud that need to be applied before WinMain is called
 		hud_apply_pre_winmain_patches();
 

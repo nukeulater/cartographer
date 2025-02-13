@@ -141,6 +141,12 @@ void game_time_discard(int32 desired_ticks, int32 actual_ticks, real32* elapsed_
 	return;
 }
 
+void __cdecl game_time_update(real32 dt, real32* out_time_delta, int32* out_target_tick_count)
+{
+	INVOKE(0x7C1BF, 0x0, game_time_update, dt, out_time_delta, out_target_tick_count);
+	return;
+}
+
 void game_time_apply_patches()
 {
 	// apply framerate throttle patches for when the game is minimized

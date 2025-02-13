@@ -518,8 +518,11 @@ void setCustomLanguage(int main, int variant) {
 
 	custom_language* old_language = current_language;
 	int language_id = *(int*)((char*)Memory::GetAddress() + 0x412818);
-	if ((current_language = get_custom_language(language_id, variant)) == 0)
+	current_language = get_custom_language(language_id, variant);
+	if (current_language == NULL)
+	{
 		current_language = get_custom_language(language_id, 0);
+	}
 	current_language_sub = current_language->lang_variant;
 
 	addDebugText("language_code = %dx%d", current_language_main, current_language_sub);

@@ -3,110 +3,82 @@
 
 #include "game/game.h"
 #include "game/game_time.h"
-#include "math/math.h"
-#include "shell/shell_windows.h"
 #include "game/player_control.h"
+#include "math/math.h"
+#include "shell/shell.h"
+#include "shell/shell_windows.h"
+
+/* constants */
+
+enum
+{
+	k_use_precise_counters = true,
+};
+
+/* typedefs */
+
+typedef void(__cdecl* t_main_time_reset)();
+
+/* globals */
+
+t_main_time_reset p_main_time_reset;
 
 bool g_main_game_time_frame_limiter_enabled = false;
 LARGE_INTEGER g_main_game_time_counter_last_time;
 
 #ifdef MAIN_GAME_TIME_DEBUG
+real32 g_imprecise_dt = 0.f;
 s_main_time_debug g_main_game_time_debug;
 #endif
 
-real32 main_time_get_max_frame_time()
+/* prototypes */
+
+static real32 main_time_get_max_frame_time(void);
+
+static real32 main_time_get_delta_sec_precise(LARGE_INTEGER counter_now, LARGE_INTEGER freq);
+
+static real32 main_time_delta_calculate(LARGE_INTEGER counter_now, LARGE_INTEGER freq);
+
+static uint64 __cdecl main_time_get_absolute_milliseconds(void);
+
+static void __cdecl main_game_time_initialize_hook(void);
+
+/* public code */
+
+void main_game_time_apply_patches(void)
 {
-	time_globals* time_globals = time_globals::get();
-	real32 result = time_globals->tick_length - (real32)(time_globals->game_ticks_leftover / (real32)time_globals->ticks_per_second);
-	return MAX(result, 0.0f);
-}
+	PatchCall(Memory::GetAddress(0x39BE3, 0xC03E), main_time_update);
+	PatchCall(Memory::GetAddress(0x39E3D, 0xBA40), main_game_time_initialize_hook);
 
-void __cdecl compute_target_tick_count(float dt, float* out_time_delta, int* out_target_tick_count)
-{
-	typedef void(__cdecl* compute_target_tick_count_t)(float, float*, int*);
-	auto p_compute_target_tick_count = Memory::GetAddress<compute_target_tick_count_t>(0x7C1BF);
+	DETOUR_ATTACH(p_main_time_reset, Memory::GetAddress<t_main_time_reset>(0x286C5, 0x24867), main_time_reset);
 
-	typedef bool(__cdecl* game_is_not_paused_t)();
-	auto p_game_is_not_paused = Memory::GetAddress<game_is_not_paused_t>(0x497EA);
-
-	p_compute_target_tick_count(dt, out_time_delta, out_target_tick_count);
-}
-
-void __cdecl main_game_time_initialize_hook()
-{
-	// windows 10 version 2004 and above added behaviour changes to how windows timer resolution works, and we have to explicitly set the time resolution
-	// and since they were added, when playing on a laptop on battery it migth add heavy stuttering when using a frame limiter based on Sleep function (or std::this_thread::sleep_for) implementation
-	// the game sets them already but only during the loading screen period, then it resets to system default when the loading screen ends 
-	// (tho i think in the new implementation is working on a per thread basis now instead of global frequency, since it still works even when the game resets after loading screen ends and loading screen runs in another thread)
-
-	// More code in Tweaks.cpp in InitH2Tweaks
-
-	// More details @ https://randomascii.wordpress.com/2020/10/04/windows-timer-resolution-the-great-rule-change/
-
-	timeBeginPeriod(SYSTEM_TIMER_RESOLUTION_MS);
-	g_main_game_time_counter_last_time = shell_time_counter_now(NULL);
-	INVOKE(0x2869F, 0x24841, main_game_time_initialize_hook);
-}
-
-uint64 __cdecl main_time_get_absolute_milliseconds()
-{
-	uint64 milliseconds = system_milliseconds();
-	s_main_time_globals* main_time_globals = s_main_time_globals::get();
-
-	// copy the high part
-	milliseconds |= (uint64)(main_time_globals->last_milliseconds >> 32) << 32;
-
-	if (milliseconds < main_time_globals->last_milliseconds)
+	if (!Memory::IsDedicatedServer())
 	{
-		// adjust the time, a complete cycle of system_milliseconds has passed
-		milliseconds += UINT_MAX + 1ULL;
+		PatchCall(Memory::GetAddress(0x39C0D), main_time_update);
 	}
-
-	ASSERT(milliseconds >= main_time_globals->last_milliseconds);
-	return milliseconds;
+	return;
 }
 
-typedef void(__cdecl* t_main_time_reset)();
-t_main_time_reset p_main_time_reset;
-
-void __cdecl main_time_reset_hook()
+void __cdecl main_time_reset(void)
 {
 	s_main_time_globals* main_time_globals = s_main_time_globals::get();
 	main_time_globals->last_milliseconds = system_milliseconds();
 	g_main_game_time_counter_last_time = shell_time_counter_now(NULL);
 	// main_time_globals->should_reset = true;
+	return;
 }
 
-static real32 main_time_get_delta_sec_precise(LARGE_INTEGER counter_now, LARGE_INTEGER freq)
+real32 __cdecl main_time_update(bool fixed_time_step, real32 fixed_time_delta)
 {
-	real32 result = ((real32)shell_time_counter_diff(counter_now, g_main_game_time_counter_last_time).QuadPart) / (real32)freq.QuadPart;
-	return result;
-}
-
-real32 __cdecl main_time_update_hook(bool fixed_time_step, real32 fixed_time_delta)
-{
-	/*typedef real32(__cdecl* main_time_update_t)(bool, real32);
-	auto p_main_time_update = Memory::GetAddress<main_time_update_t>(0x28814);*/
-
-	typedef void(__cdecl* t_shell_update)();
-	auto p_shell_update = Memory::GetAddress<t_shell_update>(0x7902, 0xBA18);
-
-	int game_time;
+	//return INVOKE(0x28814, 0x0, fixed_time_step, fixed_time_delta);
+	
 	real32 dt_sec = 0.0f;
+	LARGE_INTEGER freq = shell_time_counter_freq();
+	int32 game_time = game_in_progress() ? get_game_time_ticks() : 0;
 
-	LARGE_INTEGER freq;
-	freq = shell_time_counter_freq();
-
-	uint64 time_now_msec;
-
-	s_main_time_globals* main_time_globals = s_main_time_globals::get();
-	game_time = game_in_progress() ? get_game_time_ticks() : 0;
-
-	bool use_precise_counters = true;
 
 	// TranslateMessage()
-	// TODO move to function and cleanup
-	p_shell_update();
+	shell_update();
 
 	if (fixed_time_step)
 	{
@@ -116,15 +88,7 @@ real32 __cdecl main_time_update_hook(bool fixed_time_step, real32 fixed_time_del
 	}
 	else
 	{
-		if (use_precise_counters)
-		{
-			dt_sec = main_time_get_delta_sec_precise(shell_time_counter_now(NULL), freq);
-		}
-		else
-		{
-			time_now_msec = main_time_get_absolute_milliseconds();
-			dt_sec = (real32)((real32)(time_now_msec - main_time_globals->last_milliseconds) / 1000.f);
-		}
+		dt_sec = main_time_delta_calculate(shell_time_counter_now(NULL), freq);
 
 		// don't run the frame limiter when time step is fixed, because the code doesn't support it
 		// in case of fixed time step, frame limiter should be handled by the other frame limiter
@@ -150,38 +114,23 @@ real32 __cdecl main_time_update_hook(bool fixed_time_step, real32 fixed_time_del
 						Sleep(yield_time_msec);
 					}
 
-					if (use_precise_counters)
-					{
-						dt_sec = main_time_get_delta_sec_precise(shell_time_counter_now(NULL), freq);
-					}
-					else
-					{
-						time_now_msec = main_time_get_absolute_milliseconds();
-						dt_sec = (real32)((real32)(time_now_msec - main_time_globals->last_milliseconds) / 1000.f);
-					}
+					dt_sec = main_time_delta_calculate(shell_time_counter_now(NULL), freq);
 				}
 			}
 			else
 			{
 				Sleep(15u);
-
-				if (use_precise_counters)
-				{
-					dt_sec = main_time_get_delta_sec_precise(shell_time_counter_now(NULL), freq);
-				}
-				else
-				{
-					time_now_msec = main_time_get_absolute_milliseconds();
-					dt_sec = (real32)((real32)(time_now_msec - main_time_globals->last_milliseconds) / 1000.f);
-				}
+				dt_sec = main_time_delta_calculate(shell_time_counter_now(NULL), freq);
 			}
 		}
 	}
 
+	s_main_time_globals* main_time_globals = s_main_time_globals::get();
+
 #ifdef MAIN_GAME_TIME_DEBUG
-	if (use_precise_counters)
+	if (k_use_precise_counters)
 	{
-		time_now_msec = main_time_get_absolute_milliseconds();
+		const uint64 time_now_msec = main_time_get_absolute_milliseconds();
 		g_main_game_time_debug.dt_default = (real32)((real32)(time_now_msec - main_time_globals->last_milliseconds) / 1000.f);
 		g_main_game_time_debug.dt_performance_counter = dt_sec;
 	}
@@ -206,24 +155,73 @@ real32 __cdecl main_time_update_hook(bool fixed_time_step, real32 fixed_time_del
 	return dt_sec;
 }
 
-void main_game_time_apply_patches()
+/* private code */
+
+static real32 main_time_get_max_frame_time(void)
 {
-	PatchCall(Memory::GetAddress(0x39BE3, 0xC03E), main_time_update_hook);
-	PatchCall(Memory::GetAddress(0x39E3D, 0xBA40), main_game_time_initialize_hook);
-
-	DETOUR_ATTACH(p_main_time_reset, Memory::GetAddress<t_main_time_reset>(0x286C5, 0x24867), main_time_reset_hook);
-
-	if (!Memory::IsDedicatedServer())
-	{
-		PatchCall(Memory::GetAddress(0x39C0D), main_time_update_hook);
-		//NopFill(Memory::GetAddress(0x2728E7), 5);
-
-		//PatchCall(Memory::GetAddress(0x39D04), compute_target_tick_count);
-
-		//NopFill(Memory::GetAddress(0x39BDA), 2);
-		//NopFill(Memory::GetAddress(0x39DF0), 8);
-
-		//NopFill(Memory::GetAddress(0x39DE1), 5);
-	}
+	time_globals* time_globals = time_globals::get();
+	real32 result = time_globals->tick_length - (real32)(time_globals->game_ticks_leftover / (real32)time_globals->ticks_per_second);
+	return MAX(result, 0.0f);
 }
 
+static real32 main_time_get_delta_sec_precise(LARGE_INTEGER counter_now, LARGE_INTEGER freq)
+{
+	real32 result = (real32)(((real64)shell_time_counter_diff(counter_now, g_main_game_time_counter_last_time).QuadPart) / (real64)freq.QuadPart);
+	return result;
+}
+
+static real32 main_time_delta_calculate(LARGE_INTEGER counter_now, LARGE_INTEGER freq)
+{
+	const s_main_time_globals* main_time_globals = s_main_time_globals::get();
+
+	real32 dt;
+	// We want the return value to be configurable
+	if (k_use_precise_counters)
+	{
+		// Precise dt
+		dt = main_time_get_delta_sec_precise(shell_time_counter_now(NULL), freq);;
+	}
+	else
+	{
+		// Imprecise dt (original logic)
+		uint64 time_now_msec = main_time_get_absolute_milliseconds();
+		dt = (real32)((real32)(time_now_msec - main_time_globals->last_milliseconds) / 1000.f);
+	}
+	
+	return dt;
+}
+
+static uint64 __cdecl main_time_get_absolute_milliseconds(void)
+{
+	uint64 milliseconds = system_milliseconds();
+	s_main_time_globals* main_time_globals = s_main_time_globals::get();
+
+	// copy the high part
+	milliseconds |= (uint64)(main_time_globals->last_milliseconds >> 32) << 32;
+
+	if (milliseconds < main_time_globals->last_milliseconds)
+	{
+		// adjust the time, a complete cycle of system_milliseconds has passed
+		milliseconds += UINT_MAX + 1ULL;
+	}
+
+	ASSERT(milliseconds >= main_time_globals->last_milliseconds);
+	return milliseconds;
+}
+
+static void __cdecl main_game_time_initialize_hook(void)
+{
+	// windows 10 version 2004 and above added behaviour changes to how windows timer resolution works, and we have to explicitly set the time resolution
+	// and since they were added, when playing on a laptop on battery it migth add heavy stuttering when using a frame limiter based on Sleep function (or std::this_thread::sleep_for) implementation
+	// the game sets them already but only during the loading screen period, then it resets to system default when the loading screen ends 
+	// (tho i think in the new implementation is working on a per thread basis now instead of global frequency, since it still works even when the game resets after loading screen ends and loading screen runs in another thread)
+
+	// More code in Tweaks.cpp in InitH2Tweaks
+
+	// More details @ https://randomascii.wordpress.com/2020/10/04/windows-timer-resolution-the-great-rule-change/
+
+	timeBeginPeriod(SYSTEM_TIMER_RESOLUTION_MS);
+	g_main_game_time_counter_last_time = shell_time_counter_now(NULL);
+	INVOKE(0x2869F, 0x24841, main_game_time_initialize_hook);
+	return;
+}

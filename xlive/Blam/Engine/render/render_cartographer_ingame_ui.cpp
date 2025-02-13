@@ -5,9 +5,7 @@
 #include "cseries/cseries_strings.h"
 #include "game/game.h"
 #include "game/game_engine.h"
-#ifdef MAIN_GAME_TIME_DEBUG
-#include "main/main_time.h"
-#endif
+#include "main/main_game_time.h"
 #include "rasterizer/rasterizer_globals.h"
 #include "rasterizer/rasterizer_text.h"
 #include "rasterizer/dx9/rasterizer_dx9.h"
