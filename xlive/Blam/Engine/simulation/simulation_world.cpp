@@ -30,14 +30,17 @@ c_simulation_queue* c_simulation_world::queue_get(e_simulation_queue_type type) 
 	return &g_simulation_queues[type];
 }
 
-void c_simulation_world::simulation_queue_allocate(e_event_queue_type type, int32 size, s_simulation_queue_element** out_allocated_elem)
+void c_simulation_world::simulation_queue_allocate(e_event_queue_type type, int32 data_size, s_simulation_queue_element** out_allocated_elem)
 {
-	*out_allocated_elem = NULL;
+	ASSERT(type != _simulation_queue_element_type_none);
+	ASSERT(data_size > 0);
+	ASSERT(out_allocated_elem != NULL);
 
+	*out_allocated_elem = NULL;
 	if (TEST_FLAG(FLAG(type), _simulation_queue_element_type_bookkeeping))
 	{
 		// player event, player update, gamestate clear
-		queue_get(_simulation_queue_bookkeeping)->allocate(size, out_allocated_elem);
+		queue_get(_simulation_queue_bookkeeping)->allocate(data_size, out_allocated_elem);
 	}
 	else
 	{
@@ -64,7 +67,7 @@ void c_simulation_world::simulation_queue_allocate(e_event_queue_type type, int3
 
 		// event, creation, update, entity_deletion, entity_promotion, game_global_event
 		if (!sim_queue_restrict_allocations)
-			simulation_queue->allocate(size, out_allocated_elem);
+			simulation_queue->allocate(data_size, out_allocated_elem);
 	}
 
 	if (*out_allocated_elem)
@@ -121,11 +124,13 @@ void c_simulation_world::simulation_queue_enqueue(s_simulation_queue_element* el
 	}
 }
 
-void c_simulation_world::apply_simulation_queue(const c_simulation_queue* queue, simulation_update* update)
+void c_simulation_world::apply_simulation_queue(const c_simulation_queue* simulation_queue, simulation_update* update)
 {
-	if (queue->queued_count() > 0)
+	ASSERT(simulation_queue != NULL);
+
+	if (simulation_queue->queued_count() > 0)
 	{
-		const s_simulation_queue_element* element = queue->get_first_element();
+		const s_simulation_queue_element* element = simulation_queue->get_first_element();
 
 		while (element != NULL)
 		{
@@ -162,14 +167,15 @@ void c_simulation_world::apply_simulation_queue(const c_simulation_queue* queue,
 				break;
 			case _simulation_queue_element_type_gamestates_clear:
 				break;
-			//case _simulation_queue_element_type_sandbox_event:
-				//break;
+			case _simulation_queue_element_type_sandbox_event:
+				ASSERT(false);
+				break;
 			default:
-				// DEBUG unk event type
+				ASSERT(false);
 				break;
 			}
 
-			element = queue->get_next_element(element);
+			element = simulation_queue->get_next_element(element);
 		}
 	}
 }

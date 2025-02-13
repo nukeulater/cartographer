@@ -5,21 +5,23 @@
 
 #include "networking/memory/networking_memory.h"
 
-void c_simulation_queue::allocate(int32 data_size, s_simulation_queue_element** out_allocated_elem)
+void c_simulation_queue::allocate(int32 size, s_simulation_queue_element** out_allocated_elem)
 {
-	*out_allocated_elem = NULL;
+	ASSERT(size > 0);
+	ASSERT(out_allocated_elem != NULL);
 
+	*out_allocated_elem = NULL;
 	if (initialized())
 	{
-		uint32 required_data_size = sizeof(s_simulation_queue_element) + data_size;
+		uint32 required_data_size = sizeof(s_simulation_queue_element) + size;
 
 		if (allocated_count() + 1 < k_simulation_queue_count_max)
 		{
 			if (allocated_size_in_bytes() + required_data_size < k_simulation_queue_size_max)
 			{
-				if (data_size < k_simulation_queue_element_data_size_max)
+				if (size < k_simulation_queue_element_data_size_max)
 				{
-					if (allocated_new_encoded_size_bytes(data_size) < k_simulation_queue_max_encoded_size)
+					if (allocated_new_encoded_size_bytes(size) < k_simulation_queue_max_encoded_size)
 					{
 						uint8* net_heap_block = network_heap_allocate_block(required_data_size);
 						if (net_heap_block)
@@ -28,7 +30,7 @@ void c_simulation_queue::allocate(int32 data_size, s_simulation_queue_element** 
 							s_simulation_queue_element* allocated_elem = (s_simulation_queue_element*)net_heap_block;
 							allocated_elem->type = _simulation_queue_element_type_none;
 							allocated_elem->data = net_heap_block + sizeof(s_simulation_queue_element);
-							allocated_elem->data_size = data_size;
+							allocated_elem->data_size = size;
 							allocated_elem->next = NULL;
 
 							m_allocated_count++;

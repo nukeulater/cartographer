@@ -63,10 +63,14 @@ void simulation_notify_reset_complete()
 
 void simulation_reset_immediate()
 {
-    s_simulation_globals* sim_globals = simulation_get_globals();
+    s_simulation_globals* simulation_globals = simulation_get_globals();
 
-    sim_globals->simulation_reset_in_progress = true;
-    sim_globals->world->reset_world();
+    ASSERT(simulation_globals->world);
+    ASSERT(simulation_globals->world->exists());
+    ASSERT(!simulation_globals->world->is_authority());
+
+    simulation_globals->simulation_reset_in_progress = true;
+    simulation_globals->world->reset_world();
     simulation_queue_game_global_event_insert(_simulation_queue_game_global_event_main_reset_map);
     // ### TODO figure out these
     // simulation_gamestate_entities_build_clear_flags();
@@ -99,10 +103,13 @@ bool simulation_in_progress()
     if (simulation_engine_initialized()
         && game_in_progress()
         && game_get_active_structure_bsp_index() != NONE
-        && !simulation_is_paused()
-        && simulation_get_world()->is_active())
+        && !simulation_is_paused())
     {
-        result = true;
+        ASSERT(simulation_get_globals()->world);
+        if (simulation_get_world()->is_active())
+        {
+            result = true;
+        }
     }
 
     return result;
@@ -126,6 +133,11 @@ c_simulation_type_collection* simulation_get_type_collection()
 
 void __cdecl simulation_apply_before_game(simulation_update* update)
 {
+    ASSERT(update != NULL);
+    ASSERT(simulation_get_globals()->engine_initialized);
+    ASSERT(simulation_get_globals()->world);
+    ASSERT(game_in_progress());
+
     c_simulation_queue simulation_bookkeeping_queue, game_simulation_queue;
     c_simulation_world* sim_world = simulation_get_world();
 
@@ -185,8 +197,14 @@ void __cdecl simulation_apply_before_game(simulation_update* update)
     // ### FIXME 
     // IMPLEMENT simulation_get_world()->queue_get(_simulation_queue_basic)->requires_application();
 
-	if (game_simulation_queue.queued_count() > 0)
+    if (game_simulation_queue.queued_count() <= 0)
+    {
+        ASSERT(game_simulation_queue.allocated_size_in_bytes() == 0);
+    }
+    else
 	{
+        ASSERT(game_simulation_queue.allocated_size_in_bytes() > 0);
+
 		sim_world->apply_simulation_queue(&game_simulation_queue, update);
 
 		// purge any deletion pending object during this update
