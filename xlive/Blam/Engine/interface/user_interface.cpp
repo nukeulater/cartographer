@@ -10,6 +10,7 @@
 
 void user_interface_apply_patches(void)
 {
+	PatchCall(Memory::GetAddress(0x39C7A), user_interface_update);
 	return;
 }
 
@@ -100,6 +101,14 @@ void __cdecl user_interface_return_to_mainmenu(bool a1)
 
 void __cdecl user_interface_update(real32 dt)
 {
+	static real32 user_interface_precise_accumulator_msec = 0.f;
+	user_interface_precise_accumulator_msec += (dt * 1000.f) - floor(dt * 1000.f);
+	if (user_interface_precise_accumulator_msec >= 1.f)
+	{
+		*Memory::GetAddress<int32*>(0x971900, 0x0) += (int32)user_interface_precise_accumulator_msec;
+		user_interface_precise_accumulator_msec -= (int32)user_interface_precise_accumulator_msec;
+	}
+
 	INVOKE(0x20CA7D, 0x0, user_interface_update, dt);
 	return;
 }

@@ -27,7 +27,6 @@ bool g_main_game_time_frame_limiter_enabled = false;
 LARGE_INTEGER g_main_game_time_counter_last_time;
 
 #ifdef MAIN_GAME_TIME_DEBUG
-real32 g_imprecise_dt = 0.f;
 s_main_time_debug g_main_game_time_debug;
 #endif
 
@@ -75,7 +74,6 @@ real32 __cdecl main_time_update(bool fixed_time_step, real32 fixed_time_delta)
 	real32 dt_sec = 0.0f;
 	LARGE_INTEGER freq = shell_time_counter_freq();
 	int32 game_time = game_in_progress() ? get_game_time_ticks() : 0;
-
 
 	// TranslateMessage()
 	shell_update();
@@ -179,7 +177,7 @@ static real32 main_time_delta_calculate(LARGE_INTEGER counter_now, LARGE_INTEGER
 	if (k_use_precise_counters)
 	{
 		// Precise dt
-		dt = main_time_get_delta_sec_precise(shell_time_counter_now(NULL), freq);;
+		dt = main_time_get_delta_sec_precise(shell_time_counter_now(NULL), freq);
 	}
 	else
 	{
