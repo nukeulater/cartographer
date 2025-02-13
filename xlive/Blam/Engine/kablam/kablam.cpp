@@ -211,20 +211,20 @@ void ServerConsole::ClearVip()
 static int32 message_timeout = 0;
 void ServerConsole::SendMsg(const wchar_t* message, bool timeout)
 {
-	bool execute = !timeout;
+	bool should_execute = !timeout;
 	if (system_milliseconds() - message_timeout > 10 * 1000)
 	{
 		message_timeout = system_milliseconds();
-		execute = true;
+		should_execute = true;
 	}
 
-	if (execute) {
+	if (should_execute) {
 
 		// first we construct kablam_command_send_msg, by manually passing the vtable pointer, and the message to be copied
-		c_kablam_command_send_msg sendMsgCommand(Memory::GetAddress<void*>(0, 0x352DFC), message);
+		c_kablam_command_send_msg sendMsgCommand(message);
 
 		// send the message
-		sendMsgCommand.send_message();
+		sendMsgCommand.execute();
 	}
 }
 

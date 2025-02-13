@@ -24,29 +24,44 @@ enum e_server_console_commands {
 	k_kablam_command_count
 };
 
-// TODO: implement this properly
 class c_kablam_interface
 {
-	virtual void execute() = 0;
-};
+	int32 field_4;
+	bool field_8;
 
-struct c_kablam_command_send_msg // : c_kablam_interface
-{
-	void* vtbl; // we set the vtable manually for now
-	DWORD field_4;
-	DWORD field_8;
-	wchar_t message[121];
-	int32 unk_3;
+public:
+	virtual bool execute() = 0;
+	virtual bool function_1() = 0;
 
-	c_kablam_command_send_msg(void* _vtbl, const wchar_t* _message) : vtbl(_vtbl)
+	c_kablam_interface(int32 a1, bool a2)
 	{
-		csmemset((void*)&field_4, 0, sizeof(c_kablam_command_send_msg) - sizeof(vtbl));
+		field_4 = a1;
+		field_8 = a2;
+	}
+};
+ASSERT_STRUCT_SIZE(c_kablam_interface, 12);
+
+class c_kablam_command_send_msg : protected c_kablam_interface
+{
+	wchar_t message[121];
+	int32 field_100;
+
+public:
+	c_kablam_command_send_msg(const wchar_t* _message) 
+		: c_kablam_interface(8, true)
+	{
 		wcscpy_s(message, ARRAYSIZE(message), _message);
+		field_100 = 0;
 	}
 
-	void send_message()
+	virtual bool execute() override
 	{
-		INVOKE_TYPE(0x0, 0x7175, void(__thiscall*)(c_kablam_command_send_msg*), this);
+		return INVOKE_TYPE(0x0, 0x7175, bool(__thiscall*)(c_kablam_command_send_msg*), this);
+	}
+
+	virtual bool function_1() override
+	{
+		return false;
 	}
 };
 ASSERT_STRUCT_SIZE(c_kablam_command_send_msg, 260);
