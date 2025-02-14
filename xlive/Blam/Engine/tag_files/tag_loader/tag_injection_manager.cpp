@@ -293,7 +293,7 @@ void c_tag_injecting_manager::apply_definition_fixup(e_tag_group group, datum in
 	{
 		case _tag_group_biped:
 			{
-				biped_definitions_fixup(injected_index);;
+				biped_definitions_fixup(injected_index);
 				break;
 			}
 		case _tag_group_creature:

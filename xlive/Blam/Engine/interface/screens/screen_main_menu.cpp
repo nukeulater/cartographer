@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "screen_main_menu.h"
 
 #include "screen_4way_signin.h"
@@ -57,8 +57,8 @@ const wchar_t* k_online_button_text[k_language_count] =
 	L"ONLINE",
 	L"オンライン",
 	L"ONLINE",
-	L"EN LÍNEA",
 	L"EN LIGNE",
+	L"EN LÍNEA",
 	L"IN LINEA",
 	L"온라인",
 	L"在线的",

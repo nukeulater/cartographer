@@ -155,7 +155,7 @@ void matrix4x3_inverse(const real_matrix4x3* input, real_matrix4x3* output)
 		output->vectors.forward.j = input->vectors.left.i;
 		
 		output->vectors.up.i = input->vectors.forward.k;
-		output->vectors.forward.k = input->vectors.up.i;;
+		output->vectors.forward.k = input->vectors.up.i;
 
 		output->vectors.up.j = input->vectors.left.k;
 		output->vectors.left.k = input->vectors.up.j;

@@ -100,7 +100,7 @@ struct s_lens_flare_definition
 {
 	// Explaination("LENS FLARE", "")
 
-    real_angle falloff_angle;;
+    real_angle falloff_angle;
     real_angle cutoff_angle;
     real32 cos_falloff_angle;
     real32 cos_cutoff_angle;
