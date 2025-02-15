@@ -1058,21 +1058,18 @@ int CommandCollection::SetPortNumber(const std::vector<std::string>& tokens, Con
 		return -1;
 	}
 
+	const unsigned short port_min = 2000;
+	const unsigned short port_max = 65534 - 34;
+
 	unsigned short port;
-	if (ComVar(&port).SetFromStr(tokens[1]))
+	if (ComVar(&port).SetFromStr(tokens[1])
+		&& (port >= port_min && port <= port_max))
 	{
-		if (port > 1000 && port < 65534)
-		{
-			H2Config_base_port = port;
-		}
-		else
-		{
-			outputCb(StringFlag_None, "# invalid port number, a number between 1000 and 65534 is expected");
-		}
+		H2Config_base_port = port;
 	}
 	else
 	{
-		outputCb(StringFlag_None, "# invalid port number, a number between 1000 and 65534 is expected");
+		outputCb(StringFlag_None, "# invalid port number, a number between %u and %u is expected", port_min, port_max);
 	}
 
 	return 0;
