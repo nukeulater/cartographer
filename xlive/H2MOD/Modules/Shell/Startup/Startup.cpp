@@ -11,7 +11,6 @@
 #include "tool/tool_patches_initialize.h"
 
 #include "H2MOD.h"
-#include "H2MOD/Modules/Accounts/AccountLogin.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Utils/Utils.h"
 
@@ -32,18 +31,8 @@ static void startup_init_h2_game(void);
 
 static void startup_init_h2_tools(e_h2_type type);
 
-void PostH2Config() {
-
-	wchar_t mutexName2[256];
-	swprintf(mutexName2, ARRAYSIZE(mutexName2), L"Halo2BasePort#%d", H2Config_base_port);
-	/*HANDLE mutex2 =*/ CreateMutex(0, TRUE, mutexName2);
-	DWORD lastErr2 = GetLastError();
-	if (lastErr2 == ERROR_ALREADY_EXISTS)
-	{
-		addDebugText("Base port %d is already bound to!\nExpect MP to not work!", H2Config_base_port);
-		_Shell::OpenMessageBox(NULL, MB_ICONWARNING, "BASE PORT BIND WARNING!", "Base port %d is already bound to!\nExpect MP to not work!", H2Config_base_port);
-	}
-	addDebugText("Base port: %d.", H2Config_base_port);
+void PostH2Config() 
+{
 }
 
 void InitLocalAppData()
@@ -109,10 +98,6 @@ void H2DedicatedServerStartup() {
 	// if the server runs in LIVE mode, check XLiveSignIn/XLiveSignOut in AccountLogin.cpp
 	if (shell_is_dedicated_server())
 	{
-		addDebugText("Signing in dedicated server locally.");
-
-		AccountEdit_remember = false;
-		ConfigureLocalUserDetails();
 	}
 }
 

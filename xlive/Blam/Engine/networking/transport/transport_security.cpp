@@ -6,8 +6,6 @@
 #include "game/players.h"
 #include "shell/shell_windows.h"
 
-#include <Xlive/xnet/Sockets/XSocket.h>
-
 /* globals */
 
 static char g_transport_security_identifier_string[32];
@@ -99,9 +97,9 @@ char* transport_secure_address_to_string(
 	{
 		s_transport_secure_address secure_address = *in_secure_address;
 
-		const u_short port = XSocketHTONS(secure_address.addr.wPortOnline);
+		const u_short port = htons(secure_address.addr.wPortOnline);
 		transport_address address;
-		address.address.raw_ipv4 = XSocketNTOHL(secure_address.addr.ina.S_un.S_addr);
+		address.address.raw_ipv4 = ntohl(secure_address.addr.ina.S_un.S_addr);
 
 		csprintf(
 			string,
@@ -129,7 +127,7 @@ char* transport_secure_address_to_string(
 		if (include_online_address)
 		{
 			transport_address online_address;
-			online_address.address.raw_ipv4 = XSocketNTOHL(secure_address.addr.inaOnline.S_un.S_addr);
+			online_address.address.raw_ipv4 = ntohl(secure_address.addr.inaOnline.S_un.S_addr);
 			csnappendf(
 				string,
 				size,

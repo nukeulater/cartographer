@@ -1,15 +1,12 @@
 #include "stdafx.h"
 #include "screen_cartographer_errors.h"
 
-#include "screen_cartographer_account_manager.h"
-
 #include "input/input_windows.h"
 #include "interface/user_interface.h"
 #include "interface/user_interface_controller.h"
 #include "interface/user_interface_memory.h"
 #include "interface/user_interface_utilities.h"
 #include "main/game_preferences.h"
-#include "H2MOD/Modules/Accounts/Accounts.h"
 
 /* structures */
 
@@ -33,88 +30,12 @@ static const s_cartographer_error_globals k_cartographer_error_globals[k_languag
 			L"You are using an outdated version of Project Cartographer! Please install the latest version.",
 		},
 		{
-			L"Invalid Login Token!",
-			L"Login Again."
-		},
-		{
-			L"Invalid Account ID!",
-			L"The Username or Email Address you entered is not one of an existing account. Please check your spelling or create a new account if you don't have one already."
-		},
-		{
-			L"Incorrect Password!",
-			L"The password you entered is incorrect!"
-		},
-		{
-			L"BANNED!",
-			L"The computer you are currently using is banned! If you think this is a mistake, post on the online forum pleading your innocence; if you have any you cheater!"
-		},
-		{
-			L"BANNED!",
-			L"Your account is banned! If you think this is a mistake, post on the online forum pleading your innocence; if you have any you cheater!",
-		},
-		{
-			L"Account Disabled!",
-			L"Your account is currently disabled, closed or deleted! Please contact an administrator if this was a mistake."
-		},
-		{
 			L"Unknown Error!?",
 			L"The error that has occured has not been handled. Please contact an admin including any log files you have and what you did."
 		},
 		{
 			L"Something's Broken!",
 			L"An internal error has occured. We've probably noticed this already but contact an admin if this persists."
-		},
-		{
-			L"Accounts in Use",
-			L"Another instance of Halo 2 / H2Server is currently signing in, please try again after it finishes."
-		},
-		{
-			L"Insufficient PC Identification!",
-			L"Your PC does not have sufficient unique identifiers available. Please contact an admin about linking this PC with another that you own that does have sufficient info. This is to ensure fair online play."
-		},
-		{
-			L"Invalid Email!",
-			L"The Email address you have entered is invalid! Please double check your spelling."
-		},
-		{
-			L"Invalid Username!",
-			L"The Username you have entered is invalid! Please ensure you have formed it correctly using only allowed symbols!"
-		},
-		{
-			L"Invalid Password!",
-			L"The Password you have entered is invalid! Please ensure you have formed it correctly using only allowed symbols!"
-		},
-		{
-			L"Email Already in Use!",
-			L"The Email Address you have entered is already in use! You cannot use an email for multiple accounts. Please use a different email, sign in to that account or reset its password if you have forgotton it."
-		},
-		{
-			L"Username Taken!",
-			L"The Username you have entered is already in use!"
-		},
-		{
-			L"Password mismatch!",
-			L"Password confirmation does not match the actual password!"
-		},
-		{
-			L"BANNED Email Provider!",
-			L"The Email Address you have entered is using a domain name that has been banned! We do not allow disposable email addresses! If this is a mistake please contact an admin."
-		},
-		{
-			L"Verification Email Sent!",
-			L"An email has been sent to the email address submitted. Please follow the instuctions in the email to activate your account."
-		},
-		{
-			L"Creating Account...",
-			L"Processing your new account...\r\nPlease wait."
-		},
-		{
-			L"Logging in...",
-			L"Please wait while you are being logged in."
-		},
-		{
-			L"Connection Failed!",
-			L"Please visit:\r\nhttps://halo2pc.com/connection\r\nfor help with troubleshooting potential issues."
 		},
 		{
 			L"Restart Required",
@@ -173,23 +94,6 @@ c_cartographer_error_menu::c_cartographer_error_menu(e_user_interface_channel_ty
 
 void c_cartographer_error_menu::pre_destroy()
 {
-	switch (m_error_id)
-	{
-	case _cartographer_error_id_invalid_login_token:
-		if (c_cartographer_account_manager_menu::g_accounting_go_back_to_list && c_cartographer_account_manager_menu::is_accounting_active_handle()) 
-		{
-			c_cartographer_account_manager_menu::load_for_account_add_context();
-			c_cartographer_account_manager_menu::g_accounting_go_back_to_list = true;
-		}
-
-		// Make sure we read the accounts file again so we can modify it later on
-		ReadH2Accounts();
-		c_cartographer_account_manager_menu::update_accounting_active_handle(false);
-		break;
-	case _cartpgrapher_error_id_none:
-	default:
-		break;
-	}
 }
 
 bool c_cartographer_error_menu::handle_event(s_event_record* event)

@@ -33,10 +33,6 @@ enum e_display_split_type : uint32;
 extern bool g_force_cartographer_update;
 extern bool g_h2_portable;
 
-extern unsigned short H2Config_base_port;
-extern unsigned long H2Config_ip_lan;
-extern unsigned long H2Config_ip_broadcast_override;
-
 extern _H2Config_language H2Config_language;
 extern bool H2Config_custom_labels_capture_missing;
 extern bool H2Config_skip_intro;
@@ -56,8 +52,6 @@ extern int H2Config_additional_pcr_time;
 extern bool H2Config_debug_log;
 extern int H2Config_debug_log_level;
 extern bool H2Config_debug_log_console;
-extern char H2Config_login_identifier[255];
-extern char H2Config_login_password[255];
 extern short H2Config_team_bit_flags;
 extern bool H2Config_team_flag_array[8];
 extern char H2Config_stats_authkey[32 + 1];

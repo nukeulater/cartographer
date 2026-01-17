@@ -6,8 +6,6 @@
 #include "networking/logic/network_logic.h"
 #include "networking/transport/transport_security.h"
 
-#include <XLive/ServerList/ServerList.h>
-
 /* constants */
 
 enum
@@ -110,7 +108,6 @@ void* __cdecl c_screen_network_squad_browser::load(s_screen_parameters* paramete
 {
 	return INVOKE(0x21A238, 0x0, c_screen_network_squad_browser::load, parameters);
 }
-
 
 /* private code */
 

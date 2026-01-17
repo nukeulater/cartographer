@@ -97,7 +97,6 @@
 #ifdef TERMINAL_ENABLED
 #include "H2MOD/GUI/ImGui_Integration/Console/CommandCollection.h"
 #endif
-#include "H2MOD/Modules/Accounts/AccountLogin.h"
 #include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
 #include "H2MOD/Modules/DirectorHooks/DirectorHooks.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"

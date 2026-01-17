@@ -17,10 +17,8 @@
 
 #include "imgui_ProdigyCleanTTF.h"
 
-
 const char* k_advanced_settings_window_name = "advanced_settings";
 const char* k_weapon_offsets_window_name = "Weapon Offsets";
-const char* k_motd_window_name = "motd";
 const char* k_debug_overlay_window_name = "debug_overlay";
 const char* k_message_box_window_name = "messagebox";
 
@@ -45,7 +43,6 @@ namespace ImGuiHandler
 	const s_imgui_window imgui_windows[k_imgui_window_type_count] =
 	{
 		{ k_weapon_offsets_window_name, WeaponOffsets::Render, WeaponOffsets::Open, WeaponOffsets::Close, (e_im_window_handler_flags)0},
-		{ k_motd_window_name, ImMOTD::Render, ImMOTD::Open, ImMOTD::Close, (e_im_window_handler_flags)0},
 		{ k_message_box_window_name, ImMessageBox::Render, ImMessageBox::Open, ImMessageBox::Close, (e_im_window_handler_flags)0},
 		{ k_advanced_settings_window_name, ImAdvancedSettings::Render, ImAdvancedSettings::Open, ImAdvancedSettings::Close, (e_im_window_handler_flags)0},
 #ifdef TERMINAL_ENABLED

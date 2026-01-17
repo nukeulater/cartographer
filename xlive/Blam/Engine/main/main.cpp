@@ -47,7 +47,6 @@
 
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 #include "H2MOD/Modules/MapManager/MapManager.h"
-#include "XLive/xnet/IpManagement/XnIp.h"
 
 /* structures */
 
@@ -225,7 +224,6 @@ void main_loop_body(void)
 	if (!shell_is_dedicated_server())
 	{
 		mapManager->MapDownloadUpdateTick();
-		gXnIpMgr.GetLocalUserXn()->m_pckStats.PckDataSampleUpdate();	// update local user network stats
 	}
 	
 	//INVOKE(0x399CC, 0xBFDE, main_loop_body);

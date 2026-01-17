@@ -31,9 +31,6 @@ static const wchar_t* k_h2config_filenames[] = { L"halo2config", L"h2serverconfi
 #define k_h2config_version_section "H2ConfigurationVersion:" k_h2config_version_number
 #define k_h2config_version_debug_section "Debug:" k_h2config_version_number
 
-static const uint16 k_default_base_port = 2000;
-static const char* k_default_base_port_string = "2000";
-
 /* globals */
 
 bool g_force_cartographer_update = false;
@@ -42,9 +39,6 @@ bool g_h2config_initialized = false;
 
 // config variables
 
-uint16 H2Config_base_port = k_default_base_port;
-unsigned long H2Config_ip_lan = htonl(INADDR_NONE);
-unsigned long H2Config_ip_broadcast_override = htonl(INADDR_BROADCAST);
 _H2Config_language H2Config_language = { -1, 0 };
 bool H2Config_custom_labels_capture_missing = false;
 bool H2Config_skip_intro = false;
@@ -64,8 +58,6 @@ int H2Config_additional_pcr_time = 25;
 bool H2Config_debug_log = false;
 int H2Config_debug_log_level = 2;
 bool H2Config_debug_log_console = false;
-char H2Config_login_identifier[255] = { "" };
-char H2Config_login_password[255] = { "" };
 int H2Config_minimum_player_start = 0;
 char H2Config_team_bit_flags_str[] = "1-1-1-1-1-1-1-1";
 bool H2Config_team_flag_array[8];
@@ -384,15 +376,6 @@ void SaveH2Config()
 				"\n# Leave blank/empty for no effect."
 				"\n\n"
 
-				"# login_identifier Options (Server):"
-				"\n# The email or username used to login to an account."
-				"\n# Note: Server accounts *should not* be signed into multiple times concurrently *unless* it is all on the same computer (i.e. only exempt when running multiple server instances)."
-				"\n\n"
-
-				"# login_password Options (Server):"
-				"\n# The password used to login to the defined account."
-				"\n\n"
-
 				"# additional_pcr_time Options (Server):"
 				"\n# By default, 25 seconds are added to post game carnage time from the playlist setting."
 				"\n# Now you have the possibility to change it to your preference."
@@ -444,17 +427,6 @@ void SaveH2Config()
 		}
 
 		CONFIG_SET(&ini, "h2portable", &g_h2_portable);
-		CONFIG_SET(&ini, "base_port", &H2Config_base_port);
-
-		ComVarAddrIpv4 address_lan(&H2Config_ip_lan);
-		bool lanaddr_override_valid = H2Config_ip_lan != htonl(INADDR_NONE) && H2Config_ip_lan != htonl(INADDR_ANY);
-		CONFIG_SET(&ini, "lan_ip", lanaddr_override_valid ? address_lan.AsString().c_str() : "");
-
-		ComVarAddrIpv4 address_broadcast(&H2Config_ip_broadcast_override);
-		bool broadcast_override_valid = H2Config_ip_broadcast_override != htonl(INADDR_ANY);
-		CONFIG_SET(&ini, "broadcast_ip", broadcast_override_valid ? address_broadcast.AsString().c_str() : "255.255.255.255");
-
-		CONFIG_SET(&ini, "upnp", &H2Config_upnp_enable);
 
 		if (!is_dedicated_server)
 		{
@@ -513,9 +485,6 @@ void SaveH2Config()
 			CONFIG_SET(&ini, "shuffle_even_teams", &H2Config_even_shuffle_teams);
 			CONFIG_SET(&ini, "koth_random", &H2Config_koth_random);
 			CONFIG_SET(&ini, "enable_anti_cheat", &g_twizzler_status);
-
-			CONFIG_SET(&ini, "login_identifier", H2Config_login_identifier);
-			CONFIG_SET(&ini, "login_password", H2Config_login_password);
 
 			CONFIG_SET_C(&ini, "teams_enabled_bit_flags", H2Config_team_bit_flags_str,
 				"# teams_enabled_bit_flags (Server)"
@@ -604,43 +573,12 @@ void ReadH2Config()
 		else
 		{
 			CONFIG_GET(&ini, "h2portable", "false", &g_h2_portable);
-			CONFIG_GET(&ini, "base_port", k_default_base_port_string, &H2Config_base_port);
 			CONFIG_GET(&ini, "upnp", "true", &H2Config_upnp_enable);
 			CONFIG_GET(&ini, "enable_xdelay", "true", &H2Config_xDelay);
 
 			CONFIG_GET_DEBUG_KEY(&ini, "debug_log", "false", &H2Config_debug_log);
 			CONFIG_GET_DEBUG_KEY(&ini, "debug_log_level", "2", &H2Config_debug_log_level);
 			CONFIG_GET_DEBUG_KEY(&ini, "debug_log_console", "false", &H2Config_debug_log_console);
-
-			const char* ip_lan = nullptr;
-			CONFIG_GET(&ini, "lan_ip", "", &ip_lan);
-			H2Config_ip_lan = htonl(INADDR_NONE);
-			if (ip_lan)
-			{
-				bool lan_addr_override_valid = 
-					strnlen_s(ip_lan, 15) >= 7 
-					&& (inet_addr(ip_lan) != htonl(INADDR_NONE) || inet_addr(ip_lan) != htonl(INADDR_ANY));
-
-				if (lan_addr_override_valid)
-				{
-					H2Config_ip_lan = inet_addr(ip_lan);
-				}
-			}
-
-			const char* ip_broadcast = nullptr;
-			CONFIG_GET(&ini, "broadcast_ip", "255.255.255.255", &ip_broadcast);
-			H2Config_ip_broadcast_override = htonl(INADDR_BROADCAST);
-			if (ip_broadcast)
-			{
-				bool broadcast_addr_override_valid =
-					strnlen_s(ip_broadcast, 15) >= 7
-					&& inet_addr(ip_broadcast) != htonl(INADDR_ANY);
-
-				if (broadcast_addr_override_valid)
-				{
-					H2Config_ip_broadcast_override = inet_addr(ip_broadcast);
-				}
-			}
 
 			// client only
 			if (!is_dedicated_server)
@@ -765,18 +703,6 @@ void ReadH2Config()
 				CONFIG_GET(&ini, "enable_anti_cheat", "true", &g_twizzler_status);
 				twizzler_set_status(g_twizzler_status);
 
-				const char* login_identifier = NULL;
-				CONFIG_GET(&ini, "login_identifier", "", &login_identifier);
-				if (login_identifier) {
-					strncpy_s(H2Config_login_identifier, login_identifier, sizeof(H2Config_login_identifier));
-				}
-
-				const char* login_password = NULL;
-				CONFIG_GET(&ini, "login_password", "", &login_password);
-				if (login_password) {
-					strncpy_s(H2Config_login_password, login_password, sizeof(H2Config_login_password));
-				}
-
 				std::string team_bit_mask(ini.GetValue(k_h2config_version_section, "teams_enabled_bit_flags", H2Config_team_bit_flags_str));
 				if (!team_bit_mask.empty())
 				{
@@ -811,19 +737,6 @@ void ReadH2Config()
 						}
 					}
 				}
-			}
-		}
-
-		// Increment base port for multiple instances so we don't interfere with each other
-		if (shell_get_instance_num() > 1 && H2Config_base_port == k_default_base_port)
-		{
-			if (H2Config_base_port < 64000 + 1)
-			{
-				H2Config_base_port += 1000 * (uint16)shell_get_instance_num();
-			}
-			else if (H2Config_base_port < 65535 - 10 + 1)
-			{
-				H2Config_base_port += 10 * (uint16)shell_get_instance_num();
 			}
 		}
 

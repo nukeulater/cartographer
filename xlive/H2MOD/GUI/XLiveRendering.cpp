@@ -9,11 +9,6 @@
 
 extern void initialize_instance();
 
-#ifndef IMGUI_DISABLE
-extern LRESULT IMGUI_IMPL_API ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-#endif
-
-static HWND H2hWnd;
 static D3DPRESENT_PARAMETERS g_d3dPresentParameters;
 static IDirect3DDevice9Ex* g_xlive_d3d_device;
 static CRITICAL_SECTION g_render_section;
@@ -38,117 +33,78 @@ void XLiveRendering::D3D9ReleaseResources()
 }
 
 // #5297: XLiveInitializeEx
-int WINAPI XLiveInitializeEx(XLIVE_INITIALIZE_INFO* pXii, DWORD dwVersion)
-{
-	LOG_TRACE_XLIVE("XLiveInitializeEx()");
+// ### GFWL - FIXME
+//int WINAPI XLiveInitializeEx(XLIVE_INITIALIZE_INFO* pXii, DWORD dwVersion)
+//{
+//	LOG_TRACE_XLIVE("XLiveInitializeEx()");
+//
+//	initialize_instance();
+//
+//	g_xlive_d3d_device = pXii->pD3D;
+//	if (g_xlive_d3d_device)
+//	{
+//		XLiveRendering::InitializeD3D9((D3DPRESENT_PARAMETERS*)pXii->pD3DPP);
+//	}
+//
+//	LOG_TRACE_XLIVE("XLiveInitializeEx() - dwVersion = {0:x}", dwVersion);
+//	return 0;
+//}
 
-	initialize_instance();
 
-	g_xlive_d3d_device = pXii->pD3D;
-	if (g_xlive_d3d_device)
-	{
-		XLiveRendering::InitializeD3D9((D3DPRESENT_PARAMETERS*)pXii->pD3DPP);
-	}
-
-	LOG_TRACE_XLIVE("XLiveInitializeEx() - dwVersion = {0:x}", dwVersion);
-	return 0;
-}
-
-// #5000: XLiveInitialize
-HRESULT WINAPI XLiveInitialize(XLIVE_INITIALIZE_INFO* pXii)
-{
-	return XLiveInitializeEx(pXii, 0);
-}
+// ### GFWL - FIXME
 
 // #5003: XLiveUninitialize
-int WINAPI XLiveUninitialize()
-{
-	LOG_TRACE_XLIVE("XLiveUninitialize");
-	
-	XLiveRendering::D3D9ReleaseResources();
-	
-	DeleteCriticalSection(&g_render_section);
-	return 0;
-}
+//int WINAPI XLiveUninitialize()
+//{
+//	LOG_TRACE_XLIVE("XLiveUninitialize");
+//	
+//	XLiveRendering::D3D9ReleaseResources();
+//	
+//	DeleteCriticalSection(&g_render_section);
+//	return 0;
+//}
 
-// #5005: XLiveOnCreateDevice
-int WINAPI XLiveOnCreateDevice(IUnknown* pD3D, VOID* vD3DPP)
-{	
-	//LOG_TRACE_XLIVE("XLiveOnCreateDevice  (pD3D = %X, pD3DPP = %X)", pD3D, vD3DPP);
-	return 0;
-}
+// ### GFWL - FIXME
 
-// #5007: XLiveOnResetDevice
-int WINAPI XLiveOnResetDevice(D3DPRESENT_PARAMETERS* pD3DPP)
-{
-	g_d3dPresentParameters = *pD3DPP;
-
-	//Have to invalidate ImGUI on device reset, otherwise it hangs the device in a reset loop.
-	//https://github.com/ocornut/imgui/issues/1464#issuecomment-347469716
-
-	XLiveRendering::D3D9ReleaseResources();
-
-	//LOG_TRACE_XLIVE("XLiveOnResetDevice");
-	return 0;
-}
-
-// #5006 XLiveOnDestroyDevice
-HRESULT WINAPI XLiveOnDestroyDevice()
-{
-	XLiveRendering::D3D9ReleaseResources();
-	
-	//LOG_TRACE_XLIVE("XLiveOnDestroyDevice");
-	return S_OK;
-}
-
-// #5001
-int WINAPI XLiveInput(XLIVE_INPUT_INFO* pPii)
-{
-	static bool has_initialised_input = false;
-	if (!has_initialised_input)
-	{
-		H2hWnd = pPii->hWnd;
-		has_initialised_input = true;
-	}
-
-	if ((pPii->uMSG == WM_KEYDOWN || pPii->uMSG == WM_SYSKEYDOWN)
-		&& (GetKeyState(pPii->wParam) & 0x8000))
-	{
-		// hotkeys
-		KeyboardInput::ExecuteHotkey(pPii->wParam);
-	}
-	
-	return S_OK;
-}
-
-// #5030: XLivePreTranslateMessage
-BOOL WINAPI XLivePreTranslateMessage(const LPMSG lpMsg)
-{
-	return false;
-}
+//// #5007: XLiveOnResetDevice
+//int WINAPI XLiveOnResetDevice(D3DPRESENT_PARAMETERS* pD3DPP)
+//{
+//	g_d3dPresentParameters = *pD3DPP;
+//
+//	//Have to invalidate ImGUI on device reset, otherwise it hangs the device in a reset loop.
+//	//https://github.com/ocornut/imgui/issues/1464#issuecomment-347469716
+//
+//	XLiveRendering::D3D9ReleaseResources();
+//
+//	//LOG_TRACE_XLIVE("XLiveOnResetDevice");
+//	return 0;
+//}
 
 // #5002: XLiveRender
-HRESULT WINAPI XLiveRender()
-{
-	EnterCriticalSection(&g_render_section);
 
-	if (!g_xlive_d3d_device)
-	{
-		LeaveCriticalSection(&g_render_section);
-		return E_UNEXPECTED;
-	}
+// ### GFWL - FIXME
 
-	if (FAILED(g_xlive_d3d_device->TestCooperativeLevel())) 
-	{
-		LeaveCriticalSection(&g_render_section);
-		return E_UNEXPECTED;
-	}
-
-#ifndef IMGUI_DISABLE
-	ImGuiHandler::DrawImgui();
-#endif
-
-	LeaveCriticalSection(&g_render_section);
-	return S_OK;
-}
+//HRESULT WINAPI XLiveRender()
+//{
+//	EnterCriticalSection(&g_render_section);
+//
+//	if (!g_xlive_d3d_device)
+//	{
+//		LeaveCriticalSection(&g_render_section);
+//		return E_UNEXPECTED;
+//	}
+//
+//	if (FAILED(g_xlive_d3d_device->TestCooperativeLevel())) 
+//	{
+//		LeaveCriticalSection(&g_render_section);
+//		return E_UNEXPECTED;
+//	}
+//
+//#ifndef IMGUI_DISABLE
+//	
+//#endif
+//
+//	LeaveCriticalSection(&g_render_section);
+//	return S_OK;
+// }
 

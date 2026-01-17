@@ -11,6 +11,7 @@
 #include "rasterizer/dx9/rasterizer_dx9_main.h"
 #include "interface/user_interface_networking.h"
 
+#include "H2MOD/Modules/Input/KeyboardInput.h"
 #include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Modules/Shell/Config.h"
@@ -431,10 +432,10 @@ static LRESULT WINAPI H2WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 	const WNDPROC g_WndProc = Memory::GetAddress<WNDPROC>(0x790E);
 
 #ifndef IMGUI_DISABLE
-	if (ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
+	/*if (ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
 	{
 		return 1;
-	}
+	}*/
 #endif
 
 	LRESULT result = 1;
@@ -480,6 +481,13 @@ static LRESULT WINAPI H2WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 		}
 
 		break;
+	}
+
+	if ((uMsg == WM_KEYDOWN || uMsg == WM_SYSKEYDOWN)
+		&& (GetKeyState(wParam) & 0x8000))
+	{
+		// hotkeys
+		KeyboardInput::ExecuteHotkey(wParam);
 	}
 
 	if (exec_base_wndproc)

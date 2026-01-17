@@ -656,6 +656,9 @@ bool __cdecl rasterizer_dx9_device_initialize(s_rasterizer_parameters* parameter
 				hr,
 				XLiveInitialize(&xlive_init_info)
 			);
+
+			assert(SUCCEEDED(hr));
+
 			succeeded &= SUCCEEDED(hr);
 			if (succeeded)
 			{

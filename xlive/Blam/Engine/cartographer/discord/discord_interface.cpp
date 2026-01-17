@@ -532,11 +532,14 @@ static void discord_rich_presence_update(
 		session.hostAddress = 
 			(session_host ? network_session->m_session_virtual_couch.xsession_info.hostAddress : network_session->m_network_observer->m_observer_channels[observer_index].xnaddr);
 
+		
+		XUID host;
 
-		s_transport_secure_identifier session_id;
-		network_session->get_transport_session_id(&session_id);
+		host = 0;
+		// ### GFLW - FIXME
+		/* XUserGetXUID(0, &host);*/
 
-		csprintf(g_discord_globals.activity.party.id, sizeof(g_discord_globals.activity.party.id), "%016llx", session_id.id.ab);
+		csprintf(g_discord_globals.activity.party.id, sizeof(g_discord_globals.activity.party.id), "%016llx", host);
 		g_discord_globals.activity.party.privacy = DiscordActivityPartyPrivacy_Public;
 		discord_interface_encode_xsession_info(&session);
 	}

@@ -14,8 +14,6 @@
 #include "saved_games/game_state.h"
 #include "saved_games/game_variant.h"
 
-#include <XLive/XAM/xam.h>
-
 /* constants */
 
 enum e_game_loaded_status
@@ -310,6 +308,7 @@ void main_menu_launch_force(void)
 {
 	if (g_main_menu_launch_delay_xlive_ui)
 	{
+		// ### GFWL - FIXME
 		XNotifyDelayUI(120000);
 		main_menu_launch(9);
 		g_main_menu_launch_delay_xlive_ui = false;

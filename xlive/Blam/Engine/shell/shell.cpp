@@ -181,7 +181,11 @@ bool shell_initialize(void)
 				SYSTEM_DEBUG_MEMORY(rasterizer_initialize());
 				sub_285FD();
 
-				FakePBuffer** var_c00479e78 = Memory::GetAddress<FakePBuffer**>(0x479E78);
+				void** var_c00479e78 = Memory::GetAddress<void**>(0x479E78);
+
+				(void)var_c00479e78;
+				
+				// GFWL - FIXME
 				XLivePBufferAllocate(2, var_c00479e78);
 
 				for (DWORD i = 0; i < 2; ++i)

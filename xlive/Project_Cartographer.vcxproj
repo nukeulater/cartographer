@@ -28,7 +28,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{DC9655D6-D9C0-4837-8A63-B0693EEED4E8}</ProjectGuid>
-    <ProjectName>xlive</ProjectName>
+    <ProjectName>cartographer</ProjectName>
     <WindowsTargetPlatformVersion>10.0.26100.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -211,7 +211,8 @@
       <AdditionalDependencies>imguilib$(Platform)$(Configuration).lib;tinyxmllib$(Platform)$(Configuration).lib;zlib$(Platform)$(Configuration).lib;iphlpapi.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;ws2_32.lib;odbc32.lib;odbccp32.lib;Winmm.lib;d3d9.lib;d3dx9.lib;psapi.lib;detours.lib;libminiupnpc.lib;wolfssl.lib;nghttp2.lib;libcurl.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <SuppressStartupBanner>false</SuppressStartupBanner>
-      <ModuleDefinitionFile>.\xlive_exports.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>
+      </ModuleDefinitionFile>
       <ProgramDatabaseFile>$(IntDir)xlive.pdb</ProgramDatabaseFile>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention />
@@ -286,7 +287,8 @@
       <AdditionalDependencies>tinyxmllib$(Platform)$(Configuration).lib;zlib$(Platform)$(Configuration).lib;iphlpapi.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;ws2_32.lib;odbc32.lib;odbccp32.lib;Winmm.lib;d3d9.lib;d3dx9.lib;psapi.lib;detours.lib;libminiupnpc.lib;wolfssl.lib;nghttp2.lib;libcurl.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <SuppressStartupBanner>false</SuppressStartupBanner>
-      <ModuleDefinitionFile>.\xlive_exports.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>
+      </ModuleDefinitionFile>
       <ProgramDatabaseFile>$(IntDir)xlive.pdb</ProgramDatabaseFile>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>
@@ -360,7 +362,8 @@
       <AdditionalDependencies>imguilib$(Platform)$(Configuration).lib;tinyxmllib$(Platform)$(Configuration).lib;zlib$(Platform)$(Configuration).lib;iphlpapi.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;ws2_32.lib;odbc32.lib;odbccp32.lib;Winmm.lib;d3d9.lib;d3dx9.lib;psapi.lib;detours.lib;libminiupnpc.lib;wolfssl.lib;nghttp2.lib;libcurl.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <SuppressStartupBanner>false</SuppressStartupBanner>
-      <ModuleDefinitionFile>.\xlive_exports.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>
+      </ModuleDefinitionFile>
       <ProgramDatabaseFile>$(IntDir)xlive.pdb</ProgramDatabaseFile>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>
@@ -434,7 +437,8 @@
       <AdditionalDependencies>tinyxmllib$(Platform)$(Configuration).lib;zlib$(Platform)$(Configuration).lib;iphlpapi.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;ws2_32.lib;odbc32.lib;odbccp32.lib;Winmm.lib;d3d9.lib;d3dx9.lib;psapi.lib;detours.lib;libminiupnpc.lib;wolfssl.lib;nghttp2.lib;libcurl.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <SuppressStartupBanner>false</SuppressStartupBanner>
-      <ModuleDefinitionFile>.\xlive_exports.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>
+      </ModuleDefinitionFile>
       <ProgramDatabaseFile>$(IntDir)xlive.pdb</ProgramDatabaseFile>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>
@@ -505,7 +509,8 @@
     <Link>
       <AdditionalDependencies>imguilib$(Platform)$(Configuration).lib;tinyxmllib$(Platform)$(Configuration).lib;zlib$(Platform)$(Configuration).lib;iphlpapi.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;ws2_32.lib;odbc32.lib;odbccp32.lib;Winmm.lib;d3d9.lib;d3dx9.lib;dxguid.lib;psapi.lib;detours.lib;libminiupnpc.lib;wolfssl.lib;nghttp2.lib;libcurl-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <ModuleDefinitionFile>.\xlive_exports_debug.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>
+      </ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(IntDir)xlive.pdb</ProgramDatabaseFile>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
@@ -565,7 +570,8 @@
     <Link>
       <AdditionalDependencies>imguilib$(Platform)$(Configuration).lib;tinyxmllib$(Platform)$(Configuration).lib;zlib$(Platform)$(Configuration).lib;iphlpapi.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;ws2_32.lib;odbc32.lib;odbccp32.lib;Winmm.lib;d3d9.lib;d3dx9.lib;dxguid.lib;psapi.lib;detours.lib;libminiupnpc.lib;wolfssl.lib;nghttp2.lib;libcurl-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <ModuleDefinitionFile>.\xlive_exports_debug.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>
+      </ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(IntDir)xlive.pdb</ProgramDatabaseFile>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
@@ -888,6 +894,7 @@
     <ClCompile Include="Blam\Engine\physics\havok.cpp" />
     <ClCompile Include="Blam\Engine\physics\impacts.cpp" />
     <ClCompile Include="Blam\Engine\physics\physics_constants.cpp" />
+    <ClCompile Include="xlive.cpp" />
     <ClInclude Include="3rdparty\discord\include\discord_game_sdk.h" />
     <ClInclude Include="3rdparty\havok\common\base\container\array\hkArray.h" />
     <ClInclude Include="3rdparty\havok\common\base\math\matrix\hkMatrix3.h" />
@@ -1141,7 +1148,6 @@
     <ClInclude Include="Blam\Engine\interface\screens\screen_squad_settings.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_variant_game_engine_type.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_video_settings.h" />
-    <ClInclude Include="Blam\Engine\interface\screens\screen_cartographer_account_manager_strings.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_vsync_setting.h" />
     <ClInclude Include="Blam\Engine\interface\signal_slot.h" />
     <ClInclude Include="Blam\Engine\interface\terminal.h" />
@@ -1404,8 +1410,6 @@
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\ImGui_Handler.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\ImGui_NetworkStatsOverlay.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\MessageBox.cpp" />
-    <ClCompile Include="H2MOD\GUI\ImGui_Integration\MOTD.cpp" />
-    <ClCompile Include="Blam\Engine\interface\screens\screen_cartographer_account_manager.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_cartographer_menus.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_brightness_menu.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_cartographer_errors.cpp" />
@@ -1452,14 +1456,9 @@
     </ClCompile>
     <ClCompile Include="Util\curl-interface.cpp" />
     <ClCompile Include="Util\Memory.cpp" />
-    <ClCompile Include="XLive\Cryptography\Rc4.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="H2MOD.cpp" />
     <ClCompile Include="H2MOD\GUI\XLiveRendering.cpp" />
-    <ClCompile Include="H2MOD\Modules\Accounts\AccountCreate.cpp" />
-    <ClCompile Include="H2MOD\Modules\Accounts\AccountLogin.cpp" />
-    <ClCompile Include="H2MOD\Modules\Accounts\Accounts.cpp" />
-    <ClCompile Include="H2MOD\Modules\Achievements\Achievements.cpp" />
     <ClCompile Include="H2MOD\Modules\Shell\Config.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\CustomLanguage.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\CustomMenuGlobals.cpp" />
@@ -1473,25 +1472,6 @@
     <ClCompile Include="H2MOD\Variants\Infection\Infection.cpp" />
     <ClCompile Include="H2MOD\Variants\VariantSystem.cpp" />
     <ClCompile Include="Util\Hooks\Hook.cpp" />
-    <ClCompile Include="xliveless.cpp" />
-    <ClCompile Include="XLive\achievements\XAchievements.cpp" />
-    <ClCompile Include="XLive\ServerList\ServerList.cpp" />
-    <ClCompile Include="XLive\xnet\net_utils.cpp" />
-    <ClCompile Include="XLive\xnet\NIC.cpp" />
-    <ClCompile Include="XLive\XNet\upnp.cpp" />
-    <ClCompile Include="XLive\XNet\XNetQoS.cpp" />
-    <ClCompile Include="XLive\XNet\xnet.cpp" />
-    <ClCompile Include="XLive\XNet\Sockets\XSocket.cpp" />
-    <ClCompile Include="XLive\XNet\IpManagement\XnIp.cpp" />
-    <ClCompile Include="XLive\Voice\XHVEngine.cpp" />
-    <ClCompile Include="XLive\XAM\xam.cpp" />
-    <ClCompile Include="XLive\xbox\xbox.cpp" />
-    <ClCompile Include="XLive\XSession\XSession.cpp" />
-    <ClCompile Include="XLive\XUser\XCustomAction.cpp" />
-    <ClCompile Include="XLive\XUser\XUser.cpp" />
-    <ClCompile Include="XLive\XUser\XUserContext.cpp" />
-    <ClCompile Include="XLive\XUser\XUserProperty.cpp" />
-    <ClCompile Include="XLive\XStorage\XStorage.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\detours\include\detours.h" />
@@ -2532,7 +2512,6 @@
     <ClInclude Include="H2MOD\GUI\imgui_integration\WeaponOffsetsStringTable.h" />
     <ClInclude Include="H2MOD\Modules\Config\WeaponOffsetConfig\WeaponOffsetConfig.h" />
     <ClInclude Include="H2MOD\GUI\ImGui_Integration\ImGui_NetworkStatsOverlay.h" />
-    <ClInclude Include="Blam\Engine\interface\screens\screen_cartographer_account_manager.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_cartographer_menus.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_brightness_menu.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_cartographer_errors.h" />
@@ -2575,7 +2554,6 @@
     <ClInclude Include="Util\Memory.h" />
     <ClInclude Include="3rdparty\SimpleIni\SimpleIni.h" />
     <ClInclude Include="version.h" />
-    <ClInclude Include="XLive\Cryptography\Rc4.h" />
     <ClInclude Include="Blam\Engine\tag_files\files_windows.h" />
     <ClInclude Include="Blam\Engine\game\game_time.h" />
     <ClInclude Include="Blam\Engine\hs\hs.h" />
@@ -2586,10 +2564,6 @@
     <ClInclude Include="Blam\Engine\game\game_options.h" />
     <ClInclude Include="H2MOD.h" />
     <ClInclude Include="H2MOD\GUI\XLiveRendering.h" />
-    <ClInclude Include="H2MOD\Modules\Accounts\AccountCreate.h" />
-    <ClInclude Include="H2MOD\Modules\Accounts\AccountLogin.h" />
-    <ClInclude Include="H2MOD\Modules\Accounts\Accounts.h" />
-    <ClInclude Include="H2MOD\Modules\Achievements\Achievements.h" />
     <ClInclude Include="H2MOD\Modules\Shell\Config.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\CustomLanguage.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\CustomMenuGlobals.h" />
@@ -2604,26 +2578,9 @@
     <ClInclude Include="H2MOD\Variants\VariantSystem.h" />
     <ClInclude Include="resources\resource.h" />
     <ClInclude Include="Util\Hooks\Hook.h" />
+    <ClInclude Include="xlive.h" />
     <ClInclude Include="xlivedefs.h" />
     <ClInclude Include="xliveless.h" />
-    <ClInclude Include="XLive\achievements\XAchievements.h" />
-    <ClInclude Include="XLive\ServerList\ServerList.h" />
-    <ClInclude Include="XLive\xnet\NIC.h" />
-    <ClInclude Include="XLive\xnet\net_utils.h" />
-    <ClInclude Include="XLive\XNet\upnp.h" />
-    <ClInclude Include="XLive\XNet\XNetQoS.h" />
-    <ClInclude Include="XLive\XNet\xnet.h" />
-    <ClInclude Include="XLive\XNet\Sockets\XSocket.h" />
-    <ClInclude Include="XLive\XNet\IpManagement\XnIp.h" />
-    <ClInclude Include="XLive\Voice\XHVEngine.h" />
-    <ClInclude Include="XLive\XAM\xam.h" />
-    <ClInclude Include="XLive\xbox\xbox.h" />
-    <ClInclude Include="XLive\XSession\XSession.h" />
-    <ClInclude Include="XLive\XUser\XCustomAction.h" />
-    <ClInclude Include="XLive\XUser\XUser.h" />
-    <ClInclude Include="XLive\XUser\XUserContext.h" />
-    <ClInclude Include="XLive\XUser\XUserProperty.h" />
-    <ClInclude Include="XLive\XStorage\XStorage.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />
@@ -2631,10 +2588,6 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\bitmaps\crash_window_header.bmp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="xlive_exports.def" />
-    <None Include="xlive_exports_debug.def" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

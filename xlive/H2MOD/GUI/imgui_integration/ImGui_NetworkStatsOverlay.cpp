@@ -10,7 +10,6 @@
 #include "networking/session/network_session.h"
 #include "simulation/simulation.h"
 
-#include "XLive/xnet/IpManagement/XnIp.h"
 
 // converts the ammount of bytes to the appropriate measurement unit and gets the units description string
 net_bandwidth_display_data get_net_bandwidth_display_data(unsigned int bytes_count)
@@ -92,7 +91,8 @@ void ShowNetworkStatsOverlay(bool* p_open)
 
 		ImGui::Text("Network time: %llu msec", network_time);
 
-		XnIp* localIp = gXnIpMgr.GetLocalUserXn();
+		// ### GFWL - FIXME
+		/*XnIp* localIp = gXnIpMgr.GetLocalUserXn();
 
 		if (localIp->m_valid)
 		{
@@ -124,7 +124,7 @@ void ShowNetworkStatsOverlay(bool* p_open)
 						bandwidth_usage.unit_str);
 				}
 			}
-		}
+		}*/
 
 		// ImGui::Text("Object count: %d", object_get_count());
 		// ImGui::Text("Object count from iter: %d", object_count_from_iter());

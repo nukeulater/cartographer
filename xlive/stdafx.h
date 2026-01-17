@@ -75,6 +75,8 @@
 #include "xliveless.h"
 #include "xlivedefs.h"
 
+#include "xlive.h"
+
 // cartographer includes
 
 #include "version.h"

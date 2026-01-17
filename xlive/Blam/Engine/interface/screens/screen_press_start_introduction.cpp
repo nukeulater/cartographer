@@ -3,7 +3,6 @@
 
 #include "interface/user_interface.h"
 #include "interface/user_interface_memory.h"
-#include "H2MOD/Modules/Accounts/AccountLogin.h"
 
 // typedef
 
@@ -30,12 +29,7 @@ bool c_screen_press_start_introduction::handle_event(s_event_record* event)
 
 CLASS_HOOK_DECLARE_LABEL(c_screen_press_start_introduction__initialize, c_screen_press_start_introduction::initialize);
 void c_screen_press_start_introduction::initialize(s_screen_parameters* parameters)
-{
-	if (XUserSignedIn(0)) {
-		XUserSignOut(0);
-		UpdateMasterLoginStatus();
-	}
-	
+{	
 	//orignal c_screen_press_start_introduction::initialize
 	INVOKE_TYPE(0x23F180, 0x0, void(__thiscall*)(c_screen_press_start_introduction*, s_screen_parameters*), this, parameters);
 }

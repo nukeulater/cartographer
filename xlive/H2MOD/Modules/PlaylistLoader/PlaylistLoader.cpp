@@ -254,19 +254,6 @@ namespace playlist_loader
 		return false;
 	}
 
-	//Kept in case we want to create new headers in the future.
-	//void process_playlist_header_hook(DWORD* playlist_entry, int a2)
-	//{
-	//	__asm
-	//	{
-	//		mov ecx, playlist_entry
-	//		mov ebx, a2
-	//		mov eax, [0x12D14]
-	//		add eax, [Memory::baseAddress]
-	//		call eax
-	//	}
-	//}
-
 	typedef void(__stdcall* t_playlist_processs_setting)(playlist_entry* playlist_entry);
 	t_playlist_processs_setting p_playlist_process_setting;
 	void __stdcall process_setting(playlist_entry* playlist_entry)

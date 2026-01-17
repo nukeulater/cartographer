@@ -1,5 +1,0 @@
-#pragma once
-
-/* constants */
-
-#define XONLINE_E_SESSION_REGISTER_KEY_FAILED 0x8015520D

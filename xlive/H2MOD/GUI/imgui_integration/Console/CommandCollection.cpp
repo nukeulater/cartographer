@@ -27,7 +27,6 @@
 // for XNet connection logging
 #include "interface/user_interface_networking.h"
 #include "tag_files/tag_loader/tag_injection.h"
-#include "XLive/xnet/IpManagement/XnIp.h"
 
 static const char command_error_bad_arg[] = "# exception catch (bad arg): ";
 
@@ -48,7 +47,6 @@ namespace CommandCollection
 	static int LeaveNetworkSessionCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
 	static int IsSessionHostCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
 	static int DownloadMapCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
-	static int LogXNetConnectionsCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
 	static int LogSelectedMapFilenameCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
 	static int RequestFileNameCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
 	static int ReloadMapsCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
@@ -61,9 +59,7 @@ namespace CommandCollection
 	static int connect(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
 	static int change_player_team(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx);
 	static int quit(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
-	static int SetAddressLANIpv4(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx);
 	static int SetAddressBroadcastIpv4(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx);
-	static int SetPortNumber(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx);
 
 	TEST_N_DEF(CC5);
 }
@@ -77,15 +73,6 @@ ComVarFromPtr(og_frame_limiter_var_cmd, bool, &g_main_game_time_frame_limiter_en
 extern real32 g_rumble_factor;
 ComVarFromPtr(rumble_var_cmd, real32, &g_rumble_factor,
 	"var_rumble_scale", "change controller vibration strength (0.0 to 1.0), 1 parameter(s): <float>", 1, 1, CommandCollection::RumbleScaleCmd);
-
-ComVarFromPtr(h2config_set_base_port, unsigned short, &H2Config_base_port,
-	"var_network_port", "change the network port used to connect over the network", 1, 1, CommandCollection::SetPortNumber);
-
-ComVarFromPtrIpv4(h2config_set_lan_ipv4_address, &H2Config_ip_lan,
-	"var_lan_ip_address_override", "sets the LAN override address of the local machine", 1, 1, CommandCollection::SetAddressLANIpv4);
-
-ComVarFromPtrIpv4(h2config_set_broadcast_ipv4_address, &H2Config_ip_broadcast_override,
-	"var_broadcast_ip_address_override", "sets the broadcast override address", 1, 1, CommandCollection::SetAddressBroadcastIpv4);
 
 // don't forget to add '_cmd' after the name, 
 // if you add a variable command created using `DECL_ComVarCommandPtr` macro
@@ -105,9 +92,6 @@ void CommandCollection::InitializeCommands()
 	InsertCommand(new ConsoleCommand(network_stats_overlay_var_cmd));
 	InsertCommand(new ConsoleCommand(og_frame_limiter_var_cmd));
 	InsertCommand(new ConsoleCommand(rumble_var_cmd));
-	InsertCommand(new ConsoleCommand(h2config_set_lan_ipv4_address));
-	InsertCommand(new ConsoleCommand(h2config_set_broadcast_ipv4_address));
-	InsertCommand(new ConsoleCommand(h2config_set_base_port));
 	InsertCommand(new ConsoleCommand("help", "outputs all commands, 0 - 1 parameter(s): <string>(optional): command name", 0, 1, CommandCollection::HelpCmd));
 	InsertCommand(new ConsoleCommand("log_peers", "logs all peers to console, 0 parameter(s)", 0, 0, CommandCollection::LogPeersCmd));
 	InsertCommand(new ConsoleCommand("log_players", "logs all players to console, 0 parameter(s)", 0, 0, CommandCollection::LogPlayersCmd));
@@ -120,7 +104,6 @@ void CommandCollection::InitializeCommands()
 	InsertCommand(new ConsoleCommand("request_map_file", "requests map file name from host, 0 parameter(s)", 0, 0, CommandCollection::RequestFileNameCmd));
 	InsertCommand(new ConsoleCommand("max_players", "set maximum players that can join, 1 parameter(s): <int>", 1, 1, CommandCollection::SetMaxPlayersCmd));
 	InsertCommand(new ConsoleCommand("warp_fix", "(EXPERIMENTAL) increases client position update control threshold", 1, 1, CommandCollection::WarpFixCmd, CommandFlags_::CommandFlag_Hidden));
-	InsertCommand(new ConsoleCommand("log_xnet_connections", "logs the xnet connections for debugging purposes, 0 parameter(s)", 0, 0, CommandCollection::LogXNetConnectionsCmd, CommandFlags_::CommandFlag_Hidden));
 	InsertCommand(new ConsoleCommand("tag_inject", "injects tag into memory, 3 parameter(s): <string>: tag_name, tag_type, map_name", 3, 3, CommandCollection::InjectTagCmd, CommandFlags_::CommandFlag_Hidden));
 	InsertCommand(new ConsoleCommand("invite", "creates a invite code that you can send to people for direct connecting", 0, 0, CommandCollection::invite));
 	InsertCommand(new ConsoleCommand("connect", "lets you directly connect to a session with an invite code", 1, 1, CommandCollection::connect));
@@ -296,13 +279,6 @@ static int CommandCollection::NetworkMetricsCmd(const std::vector<std::string>& 
 		}
 	}
 
-	return 0;
-}
-
-static int CommandCollection::LogXNetConnectionsCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
-{
-	TextOutputCb* outputCb = ctx.outputCb;
-	gXnIpMgr.LogConnectionsToConsole(outputCb);
 	return 0;
 }
 
@@ -790,25 +766,6 @@ static int CommandCollection::quit(const std::vector<std::string>& tokens, Conso
 	return 0;
 }
 
-static int CommandCollection::SetAddressLANIpv4(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
-{
-	TextOutputCb* outputCb = ctx.outputCb;
-
-	if (gXnIpMgr.GetLocalUserXn()->m_valid)
-	{
-		outputCb(StringFlag_None, "# set the LAN address override before LOGIN, during the \"PRESS ANY KEY\" dialog, when signed-out!");
-		return -1;
-	}
-
-	if (network_life_cycle_in_squad_session(NULL))
-	{
-		outputCb(StringFlag_None, "# LAN address override cannot be updated during a game session!");
-		return -1;
-	}
-
-	return SetAddressIpv4HandlerCmd(tokens, ctx);
-}
-
 static int CommandCollection::SetAddressBroadcastIpv4(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
 	TextOutputCb* outputCb = ctx.outputCb;
@@ -820,39 +777,6 @@ static int CommandCollection::SetAddressBroadcastIpv4(const std::vector<std::str
 	}
 
 	return SetAddressIpv4HandlerCmd(tokens, ctx);
-}
-
-static int CommandCollection::SetPortNumber(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
-{
-	TextOutputCb* outputCb = ctx.outputCb;
-
-	if (gXnIpMgr.GetLocalUserXn()->m_valid)
-	{
-		outputCb(StringFlag_None, "# set the port number before LOGIN, during the \"PRESS ANY KEY\" dialog, when signed-out!");
-		return -1;
-	}
-
-	if (network_life_cycle_in_squad_session(NULL))
-	{
-		outputCb(StringFlag_None, "# port number configuration cannot be updated during a game session!");
-		return -1;
-	}
-
-	const unsigned short port_min = 2000;
-	const unsigned short port_max = 65534 - 34;
-
-	unsigned short port;
-	if (ComVar(&port).SetFromStr(tokens[1])
-		&& (port >= port_min && port <= port_max))
-	{
-		H2Config_base_port = port;
-	}
-	else
-	{
-		outputCb(StringFlag_None, "# invalid port number, a number between %u and %u is expected", port_min, port_max);
-	}
-
-	return 0;
 }
 
 TEST_N_DEF(CC4);

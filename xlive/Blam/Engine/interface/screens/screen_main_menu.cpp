@@ -306,7 +306,8 @@ void c_main_menu_list::handle_item_xbox_live(s_event_record* const& event)
 	{
 		if (transport_available())
 		{
-			user_interface_guide_state_manager_get()->add_user_signin_task(true, screen_show_screen_4way_signin_xbox_live_callback);
+			// ### GFWL - FIXME
+			// user_interface_guide_state_manager_get()->add_user_signin_task(true, screen_show_screen_4way_signin_xbox_live_callback);
 		}
 		else
 		{
@@ -498,8 +499,9 @@ static bool __cdecl screen_show_screen_4way_signin_system_link_offline(e_control
 
 static bool __cdecl screen_show_screen_4way_signin_xbox_live_callback(void)
 {
-	if (!XUserSignedOnline(_controller0))
-		return true;
+	// ### GFWL - HOOK
+	/*if (!XUserSignedOnline(_controller_index_0))
+		return true;*/
 
 	if (!user_interface_controller_is_player_profile_valid(_controller0))
 	{

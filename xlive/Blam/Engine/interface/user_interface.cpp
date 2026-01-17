@@ -21,8 +21,6 @@
 #include "saved_games/player_profile.h"
 #include "scenario/scenario_definitions.h"
 
-#include <XLive/xbox/xbox.h>
-
 #include "user_interface_networking.h"
 
 /* macros */
@@ -522,7 +520,12 @@ void __cdecl user_interface_update(real32 dt)
 
 uint32 user_interface_set_context_presence(uint32 game_mode)
 {
+	return 0;
+
+	// GFWL - FIXME
+	/* 
 	return XUserSetContext(0, X_CONTEXT_PRESENCE, game_mode);
+	*/
 }
 
 #ifdef UI_DEBUG

@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "online_account_xbox.h"
 #include "interface/user_interface_guide.h"
-#include "H2MOD/Modules/Accounts/AccountLogin.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Utils/Utils.h"
 
@@ -34,6 +33,4 @@ bool __cdecl online_connected_to_xbox_live()
 
 void online_account_transition_to_offline()
 {
-	ConfigureLocalUserDetails();
-	XUserSignInSetStatusChanged(0);
 }

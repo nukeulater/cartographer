@@ -18,8 +18,6 @@
 #include "text/unicode.h"
 
 #include "H2MOD/GUI/imgui_integration/imgui_handler.h"
-#include "H2MOD/Modules/Accounts/AccountLogin.h"
-#include "H2MOD/Modules/Achievements/Achievements.h"
 #include "H2MOD/Modules/Updater/Updater.h"
 #include "version_git.h"
 
@@ -77,15 +75,6 @@ void render_cartographer_ingame_ui(void)
 	rasterizer_dx9_perf_event_begin("render cartographer ingame ui", NULL);
 	render_cartographer_status_bar(k_cartographer_build_text);
 	render_cartographer_update_message(g_auto_update_text, sizeOfDownload, sizeOfDownloaded);
-	if (!AchievementMap.empty())
-	{
-		auto it = AchievementMap.begin();
-		it->second = true;
-		if (!render_cartographer_achievement_message(it->first.c_str()))
-		{
-			AchievementMap.erase(it);
-		}
-	}
 	render_cartographer_git_build_info();
 	render_netdebug_text();
 	render_main_game_time_debug();
@@ -95,6 +84,11 @@ void render_cartographer_ingame_ui(void)
 }
 
 /* private code */
+
+static const char* GetMasterStateStr()
+{
+	return "<stubbed for now>";
+}
 
 void render_cartographer_status_bar(const char *build_text)
 {

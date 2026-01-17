@@ -529,15 +529,6 @@ void GSDownloadInstall()
 }
 
 void GSDownloadCancel() {
-	//DWORD result = WaitForSingleObject(hThreadDownloader, 0);
-	//if (result == WAIT_OBJECT_0) {
-		// the thread handle is signaled - the thread has terminated
-	//}
-	//else {
-		// the thread handle is not signaled - the thread is still alive
-	//}
-
-
 	if (hThreadDownloader) {
 		TerminateThread(hThreadDownloader, 1);
 		hThreadDownloader = 0;

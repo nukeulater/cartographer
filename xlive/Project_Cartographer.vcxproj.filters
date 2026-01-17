@@ -10,15 +10,10 @@
     <ClCompile Include="Blam\Engine\networking\session\network_observer.cpp" />
     <ClCompile Include="Blam\Engine\networking\session\network_session.cpp" />
     <ClCompile Include="Blam\Engine\kablam\kablam.cpp" />
-    <ClCompile Include="XLive\Cryptography\Rc4.cpp" />
     <ClCompile Include="Blam\Engine\tag_files\files_windows.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="H2MOD.cpp" />
     <ClCompile Include="H2MOD\GUI\XLiveRendering.cpp" />
-    <ClCompile Include="H2MOD\Modules\Accounts\AccountCreate.cpp" />
-    <ClCompile Include="H2MOD\Modules\Accounts\AccountLogin.cpp" />
-    <ClCompile Include="H2MOD\Modules\Accounts\Accounts.cpp" />
-    <ClCompile Include="H2MOD\Modules\Achievements\Achievements.cpp" />
     <ClCompile Include="H2MOD\Modules\Shell\Config.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\CustomLanguage.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\CustomMenuGlobals.cpp" />
@@ -32,27 +27,9 @@
     <ClCompile Include="H2MOD\Variants\Infection\Infection.cpp" />
     <ClCompile Include="H2MOD\Variants\VariantSystem.cpp" />
     <ClCompile Include="Util\Hooks\Hook.cpp" />
-    <ClCompile Include="xliveless.cpp" />
-    <ClCompile Include="XLive\achievements\XAchievements.cpp" />
-    <ClCompile Include="XLive\ServerList\ServerList.cpp" />
-    <ClCompile Include="XLive\XNet\upnp.cpp" />
-    <ClCompile Include="XLive\XNet\XNetQoS.cpp" />
-    <ClCompile Include="XLive\XNet\xnet.cpp" />
-    <ClCompile Include="XLive\XNet\Sockets\XSocket.cpp" />
-    <ClCompile Include="XLive\XNet\IpManagement\XnIp.cpp" />
-    <ClCompile Include="XLive\Voice\XHVEngine.cpp" />
-    <ClCompile Include="XLive\XAM\xam.cpp" />
-    <ClCompile Include="XLive\xbox\xbox.cpp" />
-    <ClCompile Include="XLive\XSession\XSession.cpp" />
-    <ClCompile Include="XLive\XUser\XCustomAction.cpp" />
-    <ClCompile Include="XLive\XUser\XUser.cpp" />
-    <ClCompile Include="XLive\XUser\XUserContext.cpp" />
-    <ClCompile Include="XLive\XUser\XUserProperty.cpp" />
-    <ClCompile Include="XLive\XStorage\XStorage.cpp" />
     <ClCompile Include="H2MOD\Modules\Input\KeyboardInput.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\ImGui_Handler.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\AdvancedSettings.cpp" />
-    <ClCompile Include="H2MOD\GUI\ImGui_Integration\MOTD.cpp" />
     <ClCompile Include="H2MOD\Modules\TagFixes\TagFixes.cpp" />
     <ClCompile Include="H2MOD\Modules\RenderHooks\RenderHooks.cpp" />
     <ClCompile Include="Util\Memory.cpp" />
@@ -61,8 +38,6 @@
     <ClCompile Include="H2MOD\Modules\MainMenu\MapSlots.cpp" />
     <ClCompile Include="H2MOD\Modules\SpecialEvents\SpecialEvents.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\MessageBox.cpp" />
-    <ClCompile Include="XLive\xnet\NIC.cpp" />
-    <ClCompile Include="XLive\xnet\net_utils.cpp" />
     <ClCompile Include="Util\curl-interface.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomVariantSettings\CustomVariantSettings.cpp" />
     <ClCompile Include="H2MOD\Modules\PlaylistLoader\PlaylistLoader.cpp" />
@@ -327,7 +302,6 @@
     <ClCompile Include="Blam\Engine\networking\panorama\panorama_achievements.cpp" />
     <ClCompile Include="Blam\Engine\networking\panorama\panorama_presence.cpp" />
     <ClCompile Include="Blam\Engine\game\game_results.cpp" />
-    <ClCompile Include="Blam\Engine\interface\screens\screen_cartographer_account_manager.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_cartographer_menus.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_brightness_menu.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_settings.cpp" />
@@ -560,6 +534,7 @@
     <ClCompile Include="Blam\Engine\networking\logic\life_cycle\life_cycle_handler_joining.cpp" />
     <ClCompile Include="Blam\Engine\math\crypto_windows.cpp" />
     <ClCompile Include="Blam\Engine\cartographer\build_version\cartographer_build_version.cpp" />
+    <ClCompile Include="xlive.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
@@ -588,7 +563,6 @@
     <ClInclude Include="Blam\Engine\networking\session\network_session.h" />
     <ClInclude Include="Blam\Engine\kablam\kablam.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="XLive\Cryptography\Rc4.h" />
     <ClInclude Include="Blam\Engine\tag_files\files_windows.h" />
     <ClInclude Include="Blam\Engine\game\game_time.h" />
     <ClInclude Include="Blam\Engine\hs\hs.h" />
@@ -597,10 +571,6 @@
     <ClInclude Include="Blam\Engine\game\players.h" />
     <ClInclude Include="H2MOD.h" />
     <ClInclude Include="H2MOD\GUI\XLiveRendering.h" />
-    <ClInclude Include="H2MOD\Modules\Accounts\AccountCreate.h" />
-    <ClInclude Include="H2MOD\Modules\Accounts\AccountLogin.h" />
-    <ClInclude Include="H2MOD\Modules\Accounts\Accounts.h" />
-    <ClInclude Include="H2MOD\Modules\Achievements\Achievements.h" />
     <ClInclude Include="H2MOD\Modules\Shell\Config.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\CustomLanguage.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\CustomMenuGlobals.h" />
@@ -617,22 +587,6 @@
     <ClInclude Include="Util\Hooks\Hook.h" />
     <ClInclude Include="xlivedefs.h" />
     <ClInclude Include="xliveless.h" />
-    <ClInclude Include="XLive\achievements\XAchievements.h" />
-    <ClInclude Include="XLive\ServerList\ServerList.h" />
-    <ClInclude Include="XLive\XNet\upnp.h" />
-    <ClInclude Include="XLive\XNet\XNetQoS.h" />
-    <ClInclude Include="XLive\XNet\xnet.h" />
-    <ClInclude Include="XLive\XNet\Sockets\XSocket.h" />
-    <ClInclude Include="XLive\XNet\IpManagement\XnIp.h" />
-    <ClInclude Include="XLive\Voice\XHVEngine.h" />
-    <ClInclude Include="XLive\XAM\xam.h" />
-    <ClInclude Include="XLive\xbox\xbox.h" />
-    <ClInclude Include="XLive\XSession\XSession.h" />
-    <ClInclude Include="XLive\XUser\XCustomAction.h" />
-    <ClInclude Include="XLive\XUser\XUser.h" />
-    <ClInclude Include="XLive\XUser\XUserContext.h" />
-    <ClInclude Include="XLive\XUser\XUserProperty.h" />
-    <ClInclude Include="XLive\XStorage\XStorage.h" />
     <ClInclude Include="H2MOD\Modules\Input\KeyboardInput.h" />
     <ClInclude Include="Blam\Engine\game\game_options.h" />
     <ClInclude Include="H2MOD\Modules\Input\ControllerInput.h" />
@@ -644,8 +598,6 @@
     <ClInclude Include="Blam\Engine\objects\damage.h" />
     <ClInclude Include="H2MOD\Modules\MainMenu\MapSlots.h" />
     <ClInclude Include="H2MOD\Modules\SpecialEvents\SpecialEvents.h" />
-    <ClInclude Include="XLive\xnet\NIC.h" />
-    <ClInclude Include="XLive\xnet\net_utils.h" />
     <ClInclude Include="Util\curl-interface.h" />
     <ClInclude Include="H2MOD\Modules\CustomVariantSettings\CustomVariantSettings.h" />
     <ClInclude Include="H2MOD\Modules\PlaylistLoader\PlaylistLoader.h" />
@@ -1063,7 +1015,6 @@
     <ClInclude Include="Blam\Engine\networking\panorama\panorama_user_history.h" />
     <ClInclude Include="Blam\Engine\networking\panorama\panorama_presence.h" />
     <ClInclude Include="Blam\Engine\game\game_results.h" />
-    <ClInclude Include="Blam\Engine\interface\screens\screen_cartographer_account_manager.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_cartographer_menus.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_brightness_menu.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_settings.h" />
@@ -1160,7 +1111,6 @@
     <ClInclude Include="Blam\Engine\objects\crates.h" />
     <ClInclude Include="Blam\Engine\sound\sound_classes.h" />
     <ClInclude Include="Blam\Engine\devices\device_controls.h" />
-    <ClInclude Include="Blam\Engine\interface\screens\screen_cartographer_account_manager_strings.h" />
     <ClInclude Include="Blam\Engine\networking\network_statistics.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\vertex_shaders_dx9\preprocessed_hlsl_from_tool\compiled\convolution_world.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\vertex_shaders_dx9\preprocessed_hlsl_from_tool\compiled\debug_tangentspace_rigid.h" />
@@ -2099,6 +2049,7 @@
     <ClInclude Include="Blam\Engine\networking\logic\life_cycle\life_cycle_handler_joining.h" />
     <ClInclude Include="Blam\Engine\cartographer\build_version\cartographer_build_version.h" />
     <ClInclude Include="Blam\Engine\networking\messages\network_messages.h" />
+    <ClInclude Include="xlive.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />
@@ -2106,9 +2057,5 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\bitmaps\crash_window_header.bmp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="xlive_exports.def" />
-    <None Include="xlive_exports_debug.def" />
   </ItemGroup>
 </Project>

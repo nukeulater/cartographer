@@ -9,7 +9,6 @@
 
 extern const char* k_advanced_settings_window_name;
 extern const char* k_weapon_offsets_window_name;
-extern const char* k_motd_window_name;
 extern const char* k_debug_overlay_window_name;
 extern const char* k_message_box_window_name;
 
@@ -24,10 +23,9 @@ enum e_network_stats_display_type : int32
 
 enum e_imgui_window_type
 {
-	_imgui_window_weapon_offsets = 0,
-	_imgui_window_motd = 1,
-	_imgui_window_message_box = 2,
-	_imgui_window_advanced_settings = 3,
+	_imgui_window_weapon_offsets,
+	_imgui_window_message_box,
+	_imgui_window_advanced_settings,
 #ifdef TERMINAL_ENABLED
 	_imgui_window_console,
 #endif
