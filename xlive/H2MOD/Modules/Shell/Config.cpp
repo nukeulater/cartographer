@@ -51,7 +51,6 @@ bool H2Config_hide_ingame_chat = false;
 bool H2Config_xDelay = true;
 bool H2Config_shader_lod_max = false;
 bool H2Config_light_suppressor = false;
-bool H2Config_voice_chat = false;
 char H2Config_dedi_server_name[XUSER_NAME_SIZE] = { "" };
 char H2Config_dedi_server_playlist[MAX_PATH] = { "" };
 int H2Config_additional_pcr_time = 25;

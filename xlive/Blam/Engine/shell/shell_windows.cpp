@@ -155,7 +155,7 @@ bool shell_platform_initialize(void)
 	{
 		shell_command_line_flag_set(_shell_command_line_flag_nointro, H2Config_skip_intro);
 	}
-	shell_command_line_flag_set(_shell_command_line_flag_disable_voice_chat, true);			// ### TODO FIXME: voice-chat is disabled for now
+	// shell_command_line_flag_set(_shell_command_line_flag_disable_voice_chat, true);
 
 	if (!is_dedi)
 	{

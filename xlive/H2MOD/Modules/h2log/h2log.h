@@ -183,7 +183,6 @@ extern h2log* g_h2mod_log;
 extern h2log* g_network_log;
 extern h2log* g_console_log;
 extern h2log* g_onscreendebug_log;
-extern h2log* voice_log;
 
 #define CHECK_PTR(check, expression) \
 do \
