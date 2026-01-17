@@ -174,7 +174,6 @@ bool shell_initialize(void)
 			network_configuration_initialize();
 			SYSTEM_DEBUG_MEMORY(network_configuration_initialize());
 
-
 			result = rasterizer_initialize();
 			if (result)
 			{
@@ -182,11 +181,11 @@ bool shell_initialize(void)
 				sub_285FD();
 
 				void** var_c00479e78 = Memory::GetAddress<void**>(0x479E78);
-
-				(void)var_c00479e78;
 				
 				// GFWL - FIXME
 				XLivePBufferAllocate(2, var_c00479e78);
+
+				assert(*var_c00479e78 != NULL);
 
 				for (DWORD i = 0; i < 2; ++i)
 				{

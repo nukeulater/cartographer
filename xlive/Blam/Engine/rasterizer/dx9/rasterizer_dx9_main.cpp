@@ -731,11 +731,7 @@ bool __cdecl rasterizer_initialize(void)
 	{
 		rasterizer_globals->use_d3d9_ex = rasterizer_dx9_should_use_d3d9ex();
 		
-		if (result)
-		{
-			result = rasterizer_dx9_get_create_ex_proc();
-		}
-
+		result = rasterizer_dx9_get_create_ex_proc();
 		if (result)
 		{
 			result = rasterizer_dx9_create_device_interface();

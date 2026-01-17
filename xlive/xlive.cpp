@@ -67,6 +67,9 @@ do { \
 	RESOLVE_FUNC_ORD(hModuleXLive, XLiveOnDestroyDevice, (const char*)5006);
 	RESOLVE_FUNC_ORD(hModuleXLive, XNotifyDelayUI, (const char*)653);
 
+	RESOLVE_FUNC_ORD(hModuleXLive, XLivePBufferAllocate, (const char*)5016);
+	RESOLVE_FUNC_ORD(hModuleXLive, XLivePBufferSetByte, (const char*)5019);
+
 #undef RESOLVE_FUNC
 	return true;
 }
