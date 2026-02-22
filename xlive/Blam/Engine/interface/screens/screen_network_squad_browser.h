@@ -5,6 +5,8 @@
 
 /* enums */
 
+#define LIVE_SQUAD_LIST_MAX_ITEMS 2000
+
 enum e_screen_network_squad_browser_columns : uint32
 {
 	_screen_network_squad_browser_column_favorite,

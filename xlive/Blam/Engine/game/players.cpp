@@ -257,22 +257,6 @@ void player_configuration_validate_character_type(
 		{
 			configuration_data->appearance.player_character_type = _character_type_elite;
 		}
-
-		// Force skeletons in mp during the halloween event
-		// Carto addition
-		if (e_character_type character = configuration_data->appearance.player_character_type;
-			character != _character_type_flood && H2Config_spooky_boy && get_current_special_event() == _special_event_halloween)
-		{
-			configuration_data->appearance.player_character_type = _character_type_skeleton;
-			if (!shell_is_dedicated_server())
-			{
-				for (uint32 i = 0; i < k_number_of_users; i++)
-				{
-					network_session_interface_set_local_user_character_type(i, _character_type_skeleton);
-					//user_interface_controller_update_network_properties((e_controller_index)i);
-				}
-			}
-		}
 	}
 }
 

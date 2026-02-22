@@ -29,14 +29,6 @@ void kablam_config_apply_patches(void)
 void __cdecl kablam_config_initialize(HKEY key, LPCWSTR subkey)
 {
 	INVOKE(0x0, 0x8EFA, kablam_config_initialize, key, subkey);
-
-	c_kablam_config_live* live_config = kablam_config_live_get();
-
-	if (live_config)
-	{
-		wcsncpy_s(live_config->m_live_id, L"live bypass", NUMBEROF(live_config->m_live_id));
-	}
-
 	kablam_config_cartographer_initialize();
 	return;
 }

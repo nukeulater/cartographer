@@ -61,8 +61,6 @@ const wchar_t *const infectionSoundTable[k_language_count][e_infection_sounds::_
 
 /* prototypes */
 
-static e_character_type infection_human_get_player_type(void);
-
 static e_character_type infection_zombie_get_character_type(void);
 
 static void reset_zombie_player_status(void);
@@ -250,7 +248,7 @@ void Infection::preSpawnServerSetup() {
 		}
 		else 
 		{
-			player->configuration.appearance.player_character_type = infection_human_get_player_type();
+			player->configuration.profile_traits.profile.player_character_type = _character_type_spartan;
 		}
 	}
 }
@@ -258,8 +256,7 @@ void Infection::preSpawnServerSetup() {
 void Infection::setPlayerAsHuman(int32 player_index)
 {
 	player_datum* player = player_get(player_index);
-
-	player->configuration.appearance.player_character_type = infection_human_get_player_type();
+	player->configuration.profile_traits.profile.player_character_type = _character_type_spartan;
 	player->unit_speed = k_human_unit_speed;
 }
 
@@ -586,15 +583,9 @@ void Infection::OnPlayerSpawn(ExecTime execTime, datum player_index)
 
 /* private code */
 
-static e_character_type infection_human_get_player_type(void)
-{
-	const bool human_should_be_skeleton = get_current_special_event() == _special_event_halloween && H2Config_spooky_boy;
-	return human_should_be_skeleton ? _character_type_skeleton : _character_type_spartan;
-}
-
 static e_character_type infection_zombie_get_character_type(void)
 {
-	return k_use_flood_zombies ? _character_type_flood : _character_type_elite;
+	return rand() % 2 ? _character_type_flood : _character_type_elite;
 }
 
 static void reset_zombie_player_status(void)

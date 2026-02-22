@@ -2,9 +2,6 @@
 
 #include "xlivedefs.h"
 
-#define _WIN32_LEAN_AND_MEAN
-#include <windows.h>
-
 HRESULT WINAPI XLiveInitialize_hook(XLIVE_INITIALIZE_INFO* pii);
 HRESULT WINAPI XLiveOnResetDevice_hook(VOID* pD3DPP);
 DWORD WINAPI XNotifyDelayUI_hook(ULONG ulMilliSeconds);
@@ -20,6 +17,11 @@ HRESULT WINAPI XLivePBufferSetByte_hook(
     UCHAR ucValue
 );
 
+DWORD WINAPI XUserGetXUID_hook(
+    DWORD dwUserIndex,
+    XUID* pxuid
+);
+
 bool GetXLiveModuleTable();
 
 #define XLiveInitialize(pPii) XLiveInitialize_hook(pPii)
@@ -28,4 +30,6 @@ bool GetXLiveModuleTable();
 #define XNotifyDelayUI(ulMilliseconds) XNotifyDelayUI_hook(ulMilliseconds)
 
 #define XLivePBufferSetByte(xebBuffer, ulOffset, ucValue) XLivePBufferSetByte_hook(xebBuffer, ulOffset, ucValue)
+
+#define XUserGetXUID(dwUserIndex, pxuid) XUserGetXUID_hook(dwUserIndex, pxuid)
 

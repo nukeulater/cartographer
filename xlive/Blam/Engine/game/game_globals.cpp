@@ -33,7 +33,6 @@ static void game_globals_remove_singleplayer_representation(void);
 // Adds new representations to the globals tag
 static void game_globals_add_new_player_representations(void);
 
-static void game_globals_prepare_skeleton_representation(s_game_globals_custom_representation_result* result);
 static void game_globals_prepare_flood_representation(s_game_globals_custom_representation_result* result);
 static void game_globals_prepare_lmao_representation(s_game_globals_custom_representation_result* result);
 
@@ -44,7 +43,6 @@ static void add_simulation_table_entries(s_game_globals_custom_representation_re
 
 static void (*const k_game_globals_custom_representation_function_table[k_cartographer_custom_representation_count])(s_game_globals_custom_representation_result*)
 {
-	game_globals_prepare_skeleton_representation,
 	game_globals_prepare_flood_representation,
 	game_globals_prepare_lmao_representation
 };
@@ -116,29 +114,6 @@ static void game_globals_add_new_player_representations(void)
 
 	add_new_representations(representations);
 	add_simulation_table_entries(representations);
-	return;
-}
-
-static void game_globals_prepare_skeleton_representation(s_game_globals_custom_representation_result* result)
-{
-	result->success = false;
-	result->fallback_character_type = _character_type_spartan;
-
-	tag_injection_set_active_map(k_carto_shared_map);
-	datum skele_datum = tag_injection_load(_tag_group_biped, "objects\\characters\\masterchief_skeleton\\masterchief_skeleton", true);
-	datum skele_fp_datum = tag_injection_load(_tag_group_render_model, "objects\\characters\\masterchief_skeleton\\fp\\fp", true);
-	datum skele_body_datum = tag_injection_load(_tag_group_render_model, "objects\\characters\\masterchief_skeleton\\fp_body\\fp_body", true);
-
-	if (skele_datum != NONE && skele_fp_datum != NONE && skele_body_datum != NONE && get_current_special_event() == _special_event_halloween && !H2Config_no_events)
-	{
-		tag_injection_inject();
-
-		result->success = true;
-		result->third_person_unit = skele_datum;
-		result->first_person_hands = skele_fp_datum;
-		result->first_person_body = skele_body_datum;
-		result->variant = _string_id_invalid;
-	}
 	return;
 }
 

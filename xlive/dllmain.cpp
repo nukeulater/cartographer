@@ -20,7 +20,6 @@
 /* globals */
 
 HMODULE hThis = NULL;
-HMODULE hModuleXLive = NULL;
 
 /* externs */
 
@@ -40,11 +39,6 @@ BOOL APIENTRY DllMain( HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpRese
 	{
 	case DLL_PROCESS_ATTACH:
 		hThis = hModule;
-		hModuleXLive = LoadLibrary(L"xlive.dll");
-		if (hModuleXLive == NULL)
-		{
-			assert(false);
-		}
 		assert(GetXLiveModuleTable());
 		InitH2Startup();
 		break;

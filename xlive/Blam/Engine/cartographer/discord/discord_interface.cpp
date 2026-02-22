@@ -534,10 +534,7 @@ static void discord_rich_presence_update(
 
 		
 		XUID host;
-
-		host = 0;
-		// ### GFLW - FIXME
-		/* XUserGetXUID(0, &host);*/
+		XUserGetXUID(0, &host);
 
 		csprintf(g_discord_globals.activity.party.id, sizeof(g_discord_globals.activity.party.id), "%016llx", host);
 		g_discord_globals.activity.party.privacy = DiscordActivityPartyPrivacy_Public;

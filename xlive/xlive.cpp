@@ -5,7 +5,7 @@
 #include "H2MOD/GUI/XLiveRendering.h"
 #include "H2MOD/GUI/imgui_integration/imgui_handler.h"
 
-extern HMODULE hModuleXLive;
+HMODULE hModuleXLive = NULL;
 
 #define XLIVE_FUNC_DEFINE(def, func, args) \
 	static def (WINAPI *func##Orig) args; \
@@ -40,21 +40,34 @@ XLIVE_FUNC_DEFINE(DWORD, XNotifyDelayUI, (ULONG ulMilliSeconds))
 	return XNotifyDelayUIOrig(ulMilliSeconds);
 }
 
-XLIVE_FUNC_DEFINE(HRESULT, XLivePBufferAllocate, (ULONG ulSize,
+XLIVE_FUNC_DEFINE(HRESULT, XLivePBufferAllocate, (
+	ULONG ulSize,
 	VOID** pxebBuffer))
 {
 	return XLivePBufferAllocateOrig(ulSize, pxebBuffer);
 }
 
-XLIVE_FUNC_DEFINE(HRESULT, XLivePBufferSetByte, (VOID* xebBuffer,
+XLIVE_FUNC_DEFINE(HRESULT, XLivePBufferSetByte, (
+	VOID* xebBuffer,
 	ULONG ulOffset,
 	UCHAR ucValue))
 {
 	return XLivePBufferSetByteOrig(xebBuffer, ulOffset, ucValue);
 }
 
+XLIVE_FUNC_DEFINE(DWORD, XUserGetXUID, (
+	DWORD dwUserIndex,
+	XUID* pxuid
+	))
+{
+	return XUserGetXUIDOrig(dwUserIndex, pxuid);
+}
+
 bool GetXLiveModuleTable()
 {
+	hModuleXLive = LoadLibrary(L"xlive.dll");
+	assert(hModuleXLive != NULL);
+
 #define RESOLVE_FUNC_ORD(module, fn, ordinal) \
 do { \
 	fn##Orig = (decltype(fn##_hook)*)GetProcAddress(module, ordinal); \
@@ -69,6 +82,8 @@ do { \
 
 	RESOLVE_FUNC_ORD(hModuleXLive, XLivePBufferAllocate, (const char*)5016);
 	RESOLVE_FUNC_ORD(hModuleXLive, XLivePBufferSetByte, (const char*)5019);
+
+	RESOLVE_FUNC_ORD(hModuleXLive, XUserGetXUID, (const char*)5261);
 
 #undef RESOLVE_FUNC
 	return true;

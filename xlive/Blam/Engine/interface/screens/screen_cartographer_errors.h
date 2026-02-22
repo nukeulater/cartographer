@@ -10,6 +10,7 @@ enum e_cartographer_error_id
 	_cartographer_error_id_unknown_unhandled_error,
 	_cartographer_error_id_internal_error,
 	_cartographer_error_id_setting_requiring_game_restart,
+	_cartographer_error_id_missing_resources,
 
 	k_cartographer_error_id_count,
 	_cartpgrapher_error_id_none = NONE,

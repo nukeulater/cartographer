@@ -98,8 +98,7 @@ void network_message_cartographer_send_request_map_filename(int32 map_download_i
 		&& !session->is_host()
 		&& session->get_transport_session_id(&data.session_data.identifier))
 	{
-		// ### FIXME - GFWL
-		// XUserGetXUID(0, &data.player_id);
+		XUserGetXUID(0, (XUID*)&data.player_id);
 		data.map_download_id = map_download_id;
 
 		c_network_observer* observer = session->m_network_observer;

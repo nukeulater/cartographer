@@ -41,6 +41,12 @@ static const s_cartographer_error_globals k_cartographer_error_globals[k_languag
 			L"Restart Required",
 			L"The setting you have just changed requires that you restart your game for it to take effect."
 		},
+		{
+			L"Cartographer tag resources",
+			L"Error: Cartographer Shared map content is missing. Try updating your game from the mainmenu.\r\n\r\n"
+			L"By going to Cartographer > Update.\r\n\r\n"
+			L"If that doesn't work reach out to us in #help on discord."
+		}
 	},
 };
 

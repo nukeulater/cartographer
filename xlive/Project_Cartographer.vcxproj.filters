@@ -57,12 +57,7 @@
     <ClCompile Include="H2MOD\GUI\imgui_integration\WeaponOffsets.cpp" />
     <ClCompile Include="Blam\Engine\render\render_cameras.cpp" />
     <ClCompile Include="H2MOD\Variants\GraveRobber\GraveRobber.cpp" />
-    <ClCompile Include="H2MOD\Modules\SpecialEvents\Events\Birthday.cpp" />
     <ClCompile Include="H2MOD\Modules\SpecialEvents\SpecialEventHelpers.cpp" />
-    <ClCompile Include="H2MOD\Modules\SpecialEvents\Events\Halloween.cpp" />
-    <ClCompile Include="H2MOD\Modules\SpecialEvents\Events\Mook.cpp" />
-    <ClCompile Include="H2MOD\Modules\SpecialEvents\Events\Paddy.cpp" />
-    <ClCompile Include="H2MOD\Modules\SpecialEvents\Events\Christmas.cpp" />
     <ClCompile Include="Blam\Engine\animations\animation_channel.cpp" />
     <ClCompile Include="Blam\Engine\animations\animation_manager.cpp" />
     <ClCompile Include="Blam\Engine\animations\animation_interpolation.cpp" />
@@ -456,8 +451,6 @@
     <ClCompile Include="Blam\Engine\interface\terminal.cpp" />
     <ClCompile Include="Blam\Engine\networking\transport\transport_address.cpp" />
     <ClCompile Include="Blam\Engine\networking\transport\transport_security.cpp" />
-    <ClCompile Include="H2MOD\Modules\SpecialEvents\Events\MapObjectPlacements\Halloween\Coagulation.cpp" />
-    <ClCompile Include="H2MOD\Modules\SpecialEvents\Events\MapObjectPlacements\Halloween\Lockout.cpp" />
     <ClCompile Include="Blam\Engine\cache\cache_files_windows.cpp" />
     <ClCompile Include="Blam\Engine\achievements\achievement_live_interface.cpp" />
     <ClCompile Include="Blam\Engine\cseries\cseries_windows_debug.cpp" />
@@ -628,8 +621,6 @@
     <ClInclude Include="H2MOD\GUI\ImGui_Integration\Console\ImGui_ConsoleImpl.h" />
     <ClInclude Include="H2MOD\GUI\ImGui_Integration\Console\CommandCollection.h" />
     <ClInclude Include="H2MOD\Modules\Config\WeaponOffsetConfig\WeaponOffsetConfig.h" />
-    <ClInclude Include="H2MOD\Modules\SpecialEvents\Events\MapObjectPlacements\Halloween\Lockout.h" />
-    <ClInclude Include="H2MOD\Modules\SpecialEvents\Events\MapObjectPlacements\Halloween\Coagulation.h" />
     <ClInclude Include="Blam\Engine\camera\camera.h" />
     <ClInclude Include="Blam\Engine\render\render_cameras.h" />
     <ClInclude Include="H2MOD\Variants\GraveRobber\GraveRobber.h" />
@@ -640,12 +631,7 @@
     <ClInclude Include="3rdparty\imgui\imgui_internal.h" />
     <ClInclude Include="3rdparty\imgui\imstb_textedit.h" />
     <ClInclude Include="3rdparty\imgui\imstb_truetype.h" />
-    <ClInclude Include="H2MOD\Modules\SpecialEvents\Events\Birthday.h" />
     <ClInclude Include="H2MOD\Modules\SpecialEvents\SpecialEventHelpers.h" />
-    <ClInclude Include="H2MOD\Modules\SpecialEvents\Events\Christmas.h" />
-    <ClInclude Include="H2MOD\Modules\SpecialEvents\Events\Halloween.h" />
-    <ClInclude Include="H2MOD\Modules\SpecialEvents\Events\Mook.h" />
-    <ClInclude Include="H2MOD\Modules\SpecialEvents\Events\Paddy.h" />
     <ClInclude Include="Blam\Engine\animations\animation_channel.h" />
     <ClInclude Include="Blam\Engine\animations\animation_manager.h" />
     <ClInclude Include="Blam\Engine\animations\animation_interpolation.h" />

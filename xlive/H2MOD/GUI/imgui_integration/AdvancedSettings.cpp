@@ -848,14 +848,6 @@ namespace ImGuiHandler {
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(advanced_settings_get_string(_advanced_string_no_events_tooltip));
 
-					if (get_current_special_event() == _special_event_halloween) {
-						TextVerticalPad(advanced_settings_get_string(_advanced_string_skeleton_biped));
-						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##spooky_scary", &H2Config_spooky_boy);
-						if (ImGui::IsItemHovered())
-							ImGui::SetTooltip(advanced_settings_get_string(_advanced_string_skeleton_biped_tooltip));
-					}
-
 					// next column elements now
 					//Skip Intro
 					ImGui::NextColumn();
@@ -981,35 +973,6 @@ namespace ImGuiHandler {
 							{
 								H2Config_forced_event = _special_event_none;
 							} ImGui::SameLine();
-							if (ImGui::RadioButton("Christmas", &event_type, _special_event_christmas))
-							{
-								H2Config_forced_event = _special_event_christmas;
-							} ImGui::SameLine();
-							if (ImGui::RadioButton("St Paddys", &event_type, _special_event_st_paddys))
-							{
-								H2Config_forced_event = _special_event_st_paddys;
-							} ImGui::SameLine();
-							if (ImGui::RadioButton("Mook Madness", &event_type, _special_event_mook_maddness))
-							{
-								H2Config_forced_event = _special_event_mook_maddness;
-							}
-
-							if (ImGui::RadioButton("Halloween", &event_type, _special_event_halloween))
-							{
-								H2Config_forced_event = _special_event_halloween;
-							}ImGui::SameLine();
-							if (ImGui::RadioButton("Birthday", &event_type, _special_event_birthday))
-							{
-								H2Config_forced_event = _special_event_birthday;
-							}
-
-						}
-						if (ImGui::CollapsingHeader("WGIT Testing"))
-						{
-							if (ImGui::Button("Custom Languages"))
-							{
-								//GSCustomMenuCall_Language();
-							}
 						}
 					}
 				}
