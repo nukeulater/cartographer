@@ -39,6 +39,8 @@ public:
 
 	bool signed_in_to_live() const;
 
+	XUSER_SIGNIN_STATE get_signin_state() const;
+
 	void add_user_signin_task(bool sign_to_live, void* signin_callback);
 };
 #pragma pack(pop)

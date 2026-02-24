@@ -13,6 +13,11 @@ bool c_user_interface_guide_state_manager::signed_in_to_live() const
 	return m_sign_in_state == eXUserSigninState_SignedInToLive;
 }
 
+XUSER_SIGNIN_STATE c_user_interface_guide_state_manager::get_signin_state() const
+{
+	return m_sign_in_state;
+}
+
 void c_user_interface_guide_state_manager::add_user_signin_task(bool sign_to_live, void* signin_callback)
 {
 	//INVOKE_TYPE(0xDD7550, 0x0, int(__thiscall*)(c_user_interface_guide_state_manager*, bool, void*), this, sign_to_live, signin_callback);

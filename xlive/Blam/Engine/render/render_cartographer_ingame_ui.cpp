@@ -16,6 +16,7 @@
 #include "text/draw_string.h"
 #include "text/font_cache.h"
 #include "text/unicode.h"
+#include "interface/user_interface_guide.h"
 
 #include "H2MOD/GUI/imgui_integration/imgui_handler.h"
 #include "H2MOD/Modules/Updater/Updater.h"
@@ -87,7 +88,7 @@ void render_cartographer_ingame_ui(void)
 
 static const char* GetMasterStateStr()
 {
-	switch (XUserGetSigninState(0))
+	switch (user_interface_guide_state_manager_get()->get_signin_state())
 	{
 	case eXUserSigninState_NotSignedIn:
 		return "Offline";
