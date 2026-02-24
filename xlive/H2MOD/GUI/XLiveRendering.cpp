@@ -7,13 +7,11 @@
 #include "H2MOD/GUI/ImGui_Integration/ImGui_Handler.h"
 #include "H2MOD/Modules/Input/KeyboardInput.h"
 
-extern void initialize_instance();
-
 static D3DPRESENT_PARAMETERS g_d3dPresentParameters;
 static IDirect3DDevice9Ex* g_xlive_d3d_device;
 static CRITICAL_SECTION g_render_section;
 
-void XLiveRendering::InitializeD3D9(D3DPRESENT_PARAMETERS* presentParameters)
+void XLiveRendering::InitializeD3D9(IDirect3DDevice9Ex* pD3DD, D3DPRESENT_PARAMETERS* presentParameters)
 {
 	InitializeCriticalSection(&g_render_section);
 
@@ -27,29 +25,9 @@ void XLiveRendering::InitializeD3D9(D3DPRESENT_PARAMETERS* presentParameters)
 void XLiveRendering::D3D9ReleaseResources()
 {
 #ifndef IMGUI_DISABLE
-	ImGuiHandler::release_motd_texture();
 	ImGui_ImplDX9_InvalidateDeviceObjects();
 #endif
 }
-
-// #5297: XLiveInitializeEx
-// ### GFWL - FIXME
-//int WINAPI XLiveInitializeEx(XLIVE_INITIALIZE_INFO* pXii, DWORD dwVersion)
-//{
-//	LOG_TRACE_XLIVE("XLiveInitializeEx()");
-//
-//	initialize_instance();
-//
-//	g_xlive_d3d_device = pXii->pD3D;
-//	if (g_xlive_d3d_device)
-//	{
-//		XLiveRendering::InitializeD3D9((D3DPRESENT_PARAMETERS*)pXii->pD3DPP);
-//	}
-//
-//	LOG_TRACE_XLIVE("XLiveInitializeEx() - dwVersion = {0:x}", dwVersion);
-//	return 0;
-//}
-
 
 // ### GFWL - FIXME
 
@@ -79,32 +57,4 @@ void XLiveRendering::D3D9ReleaseResources()
 //	//LOG_TRACE_XLIVE("XLiveOnResetDevice");
 //	return 0;
 //}
-
-// #5002: XLiveRender
-
-// ### GFWL - FIXME
-
-//HRESULT WINAPI XLiveRender()
-//{
-//	EnterCriticalSection(&g_render_section);
-//
-//	if (!g_xlive_d3d_device)
-//	{
-//		LeaveCriticalSection(&g_render_section);
-//		return E_UNEXPECTED;
-//	}
-//
-//	if (FAILED(g_xlive_d3d_device->TestCooperativeLevel())) 
-//	{
-//		LeaveCriticalSection(&g_render_section);
-//		return E_UNEXPECTED;
-//	}
-//
-//#ifndef IMGUI_DISABLE
-//	
-//#endif
-//
-//	LeaveCriticalSection(&g_render_section);
-//	return S_OK;
-// }
 

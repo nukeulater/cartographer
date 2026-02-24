@@ -61,7 +61,7 @@ extern bool H2Config_koth_random;
 
 extern WPARAM H2Config_hotkeyIdHelp;
 extern WPARAM H2Config_hotkeyIdToggleHideIngameChat;
-extern WPARAM H2Config_hotkeyIdGuide;
+extern WPARAM H2Config_hotkeyIdImGuide;
 extern WPARAM H2Config_hotkeyIdConsole;
 extern int H2Config_minimum_player_start;
 

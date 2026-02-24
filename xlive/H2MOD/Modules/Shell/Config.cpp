@@ -203,9 +203,9 @@ bool H2Config_force_off_d3d9ex = false;
 bool H2Config_force_off_sm3 = false;
 bool H2Config_use_vsync = false;
 
-WPARAM H2Config_hotkeyIdHelp = VK_F2;
-WPARAM H2Config_hotkeyIdToggleHideIngameChat = VK_F9;
-WPARAM H2Config_hotkeyIdGuide = VK_HOME;
+WPARAM H2Config_hotkeyIdToggleHideIngameChat = VK_F2;
+WPARAM H2Config_hotkeyIdHelp = VK_F3;
+WPARAM H2Config_hotkeyIdImGuide = VK_F4;
 WPARAM H2Config_hotkeyIdConsole = VK_F10;
 
 void SaveH2Config()
@@ -456,7 +456,6 @@ void SaveH2Config()
 
 			CONFIG_SET(&ini, "no_events", &H2Config_no_events);
 
-			CONFIG_SET(&ini, "skeleton_biped", &H2Config_spooky_boy);
 #ifndef NDEBUG
 			CONFIG_SET(&ini, "forced_event", &H2Config_forced_event);
 #endif
@@ -509,8 +508,8 @@ void SaveH2Config()
 			CONFIG_SET_C(&ini, "hotkey_hide_ingame_chat", H2Config_hotkeyIdToggleHideIngameChat, vkstring.get_string());
 
 			vkstring.set("#");
-			GetVKeyCodeString(H2Config_hotkeyIdGuide, &vkstring);
-			CONFIG_SET_C(&ini, "hotkey_guide", H2Config_hotkeyIdGuide, vkstring.get_string());
+			GetVKeyCodeString(H2Config_hotkeyIdImGuide, &vkstring);
+			CONFIG_SET_C(&ini, "hotkey_guide", H2Config_hotkeyIdImGuide, vkstring.get_string());
 			vkstring.clear();
 
 			vkstring.set("#");
@@ -611,9 +610,9 @@ void ReadH2Config()
 				CONFIG_GET(&ini, "disable_ingame_keyboard", "false", &H2Config_disable_ingame_keyboard);
 				CONFIG_GET(&ini, "hide_ingame_chat", "false", &H2Config_hide_ingame_chat);
 
-				CONFIG_GET(&ini, "hotkey_help", "0x72", &H2Config_hotkeyIdHelp); // VK_F2
-				CONFIG_GET(&ini, "hotkey_hide_ingame_chat", "0x78", &H2Config_hotkeyIdToggleHideIngameChat); // VK_F9
-				CONFIG_GET(&ini, "hotkey_guide", "0x24", &H2Config_hotkeyIdGuide); // VK_HOME
+				CONFIG_GET(&ini, "hotkey_hide_ingame_chat", "0x71", &H2Config_hotkeyIdToggleHideIngameChat); // VK_F2
+				CONFIG_GET(&ini, "hotkey_help", "0x72", &H2Config_hotkeyIdHelp); // VK_F3
+				CONFIG_GET(&ini, "hotkey_guide", "0x73", &H2Config_hotkeyIdImGuide); // VK_
 				CONFIG_GET(&ini, "hotkey_console", "0x79", &H2Config_hotkeyIdConsole); // VK_F10
 
 				int shadows_override;
@@ -656,7 +655,6 @@ void ReadH2Config()
 						break;
 				}
 				CONFIG_GET(&ini, "no_events", "false", &H2Config_no_events);
-				CONFIG_GET(&ini, "skeleton_biped", "true", &H2Config_spooky_boy);
 
 #ifndef NDEBUG
 				H2Config_forced_event = ini.GetLongValue(k_h2config_version_section, "forced_event", H2Config_forced_event);

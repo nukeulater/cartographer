@@ -87,7 +87,6 @@ namespace ImGuiHandler
 			io.ClearInputKeys();
 			io.ClearInputMouse();
 			io.ClearInputCharacters();
-			release_motd_texture();
 			last_frame_update = false;
 		}
 
@@ -206,61 +205,6 @@ namespace ImGuiHandler
 	{
 		ImGui::AlignTextToFramePadding();
 		ImGui::Text(label);
-	}
-
-	bool LoadTextureFromFile(const wchar_t* filename, s_imgui_images image, int* out_width, int* out_height)
-	{
-		// Load texture from disk
-		D3DXIMAGE_INFO imgInfo;
-		PDIRECT3DTEXTURE9 texture = nullptr;
-		//HRESULT hr = D3DXCreateTextureFromFileA(g_pDevice, filename, &texture);
-		const HRESULT hr = D3DXCreateTextureFromFileEx(rasterizer_dx9_device_get_interface(), filename, D3DX_DEFAULT_NONPOW2, D3DX_DEFAULT_NONPOW2, D3DX_FROM_FILE, 0,
-			D3DFMT_FROM_FILE, D3DPOOL_DEFAULT, D3DX_FILTER_NONE, D3DX_FILTER_NONE, 0, &imgInfo, NULL, &texture);
-
-		if (hr != S_OK)
-			return false;
-
-		// Retrieve description of the texture surface so we can access its size
-		switch (image)
-		{
-		case patch_notes:
-			if (g_patch_notes_texture)
-				g_patch_notes_texture->Release(); // release the texture if we already have one
-
-			g_patch_notes_texture = texture;
-			break;
-		default:
-			return false;
-		}
-
-		//texture->GetLevelDesc(0, &my_image_desc);
-		//*out_width = my_image_desc.Width;
-		//*out_height = my_image_desc.Height;
-		
-		*out_width = imgInfo.Width;
-		*out_height = imgInfo.Height;
-		return true;
-	}
-
-
-	PDIRECT3DTEXTURE9 GetTexture(s_imgui_images image)
-	{
-		switch (image) {
-		case patch_notes:
-			return g_patch_notes_texture;
-		default: 
-			return NULL;
-		}
-	}
-
-	void release_motd_texture(void)
-	{
-		if (g_patch_notes_texture)
-		{
-			g_patch_notes_texture->Release();
-			g_patch_notes_texture = NULL;
-		}
-		return;
 	}
 
 	e_imgui_aspect_ratio GetAspectRatio(const real_point2d* display_size)

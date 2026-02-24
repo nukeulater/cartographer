@@ -8,6 +8,8 @@
 #include "Util/Memory.h"
 #include "Util/Hooks/Hook.h"
 
+extern void initialize_instance();
+
 HMODULE hModuleXLive = NULL;
 
 #define XLIVE_DEFINE_FUNC(type, ret, name, args) \
@@ -19,6 +21,12 @@ XLIVE_DEFINE_FUNC(XLiveInitialize_t,
 	HRESULT, XLiveInitialize, (XLIVE_INITIALIZE_INFO* pXii)
 )
 {
+	initialize_instance();
+	if (pXii->pD3D != NULL)
+	{
+		XLiveRendering::InitializeD3D9(pXii->pD3D, (D3DPRESENT_PARAMETERS*)pXii->pD3DPP);
+	}
+
 	return XLiveInitializeHook(pXii);
 }
 
@@ -26,13 +34,14 @@ XLIVE_DEFINE_FUNC(XLiveRender_t,
 	HRESULT, XLiveRender, ()
 )
 {
-	return XLiveRenderOrig();
+	ImGuiHandler::DrawImgui();
+	return XLiveRenderHook();
 }
 
 XLIVE_DEFINE_FUNC(XLiveOnResetDevice_t, HRESULT, XLiveOnResetDevice, (VOID* pD3DPP))
 {
-	//XLiveRendering::D3D9ReleaseResources();
-	return XLiveOnResetDeviceOrig(pD3DPP);
+	XLiveRendering::D3D9ReleaseResources();
+	return XLiveOnResetDeviceHook(pD3DPP);
 }
 
 XLIVE_DEFINE_FUNC(XNotifyDelayUI_t, DWORD, XNotifyDelayUI, (ULONG ulMilliSeconds))
@@ -64,6 +73,8 @@ bool DetourXLive()
 {
 	DETOUR_BEGIN();
 	DETOUR_ATTACH(XLiveInitializeHook, XLiveInitializeOrig, XLiveInitialize);
+	DETOUR_ATTACH(XLiveOnResetDeviceHook, XLiveOnResetDeviceOrig, XLiveOnResetDevice);
+	DETOUR_ATTACH(XLiveRenderHook, XLiveRenderOrig, XLiveRender);
 	DETOUR_COMMIT();
 
 	return true;
@@ -77,6 +88,7 @@ bool InitializeXLiveModuleTable()
 #define RESOLVE_FUNC_ORD(module, fn, ordinal)				\
 {															\
 	fn##Orig = (fn##_t*)GetProcAddress(module, ordinal);	\
+	fn##Hook = fn##Orig;									\
 	assert(fn##Orig != NULL);								\
 }
 

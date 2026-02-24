@@ -110,8 +110,6 @@ enum e_advanced_string
 	_advanced_string_upnp_tooltip,
 	_advanced_string_no_events_title,
 	_advanced_string_no_events_tooltip,
-	_advanced_string_skeleton_biped,
-	_advanced_string_skeleton_biped_tooltip,
 	k_advanced_string_count
 };
 
@@ -224,8 +222,6 @@ const char *const k_advanced_settings_string_table_english[k_advanced_string_cou
 	"Enabled UPNP Port forwarding for the project.",
 	"No Events",
 	"Opt out of event cosmetics restart required to take effect",
-	"Play as Spooky boy",
-	"Changes your biped to be a Spooky Scary Skeleton for the Halloween event"
 };
 
 // Make sure that the spanish strings include u8 at the front of them or else they wont display properly
@@ -337,8 +333,6 @@ const char *const k_advanced_settings_string_table_spanish[k_advanced_string_cou
 	u8"Habilita el reenvío de puertos UPNP para el proyecto.",
 	u8"No hay eventos",
 	u8"Se requiere el reinicio de los cosméticos del evento para que surta efecto",
-	u8"Juega como Spooky boy",
-	u8"Cambia a tu bípedo para que sea un esqueleto espeluznante y aterrador para el evento de Halloween."
 };
 
 // TODO: finish localization

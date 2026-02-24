@@ -432,10 +432,10 @@ static LRESULT WINAPI H2WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 	const WNDPROC g_WndProc = Memory::GetAddress<WNDPROC>(0x790E);
 
 #ifndef IMGUI_DISABLE
-	/*if (ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
+	if (ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
 	{
 		return 1;
-	}*/
+	}
 #endif
 
 	LRESULT result = 1;
