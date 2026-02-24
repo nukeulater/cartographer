@@ -87,7 +87,17 @@ void render_cartographer_ingame_ui(void)
 
 static const char* GetMasterStateStr()
 {
-	return "<stubbed for now>";
+	switch (XUserGetSigninState(0))
+	{
+	case eXUserSigninState_NotSignedIn:
+		return "Offline";
+	case eXUserSigninState_SignedInLocally:
+		return "Connected - Local";
+	case eXUserSigninState_SignedInToLive:
+		return "Connected";
+	default:
+		return "<unkonwn>";
+	}
 }
 
 void render_cartographer_status_bar(const char *build_text)

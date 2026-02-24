@@ -308,7 +308,6 @@ void main_menu_launch_force(void)
 {
 	if (g_main_menu_launch_delay_xlive_ui)
 	{
-		// ### GFWL - FIXME
 		XNotifyDelayUI(120000);
 		main_menu_launch(9);
 		g_main_menu_launch_delay_xlive_ui = false;
