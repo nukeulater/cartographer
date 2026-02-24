@@ -360,7 +360,6 @@ uint32 __cdecl user_interface_controller_get_guest_controllers_count_for_master(
 		if (controller_idx == master_controller_index)
 			continue;
 
-
 		if (user_interface_controller_has_xbox_live(controller_idx))
 		{
 			s_player_identifier player_id = g_user_interface_controller_globals->controllers[controller_idx].controller_user_identifier;
@@ -371,7 +370,6 @@ uint32 __cdecl user_interface_controller_get_guest_controllers_count_for_master(
 			if (online_xuid_same_account(compare_id, master_identifier))
 				count++;
 		}
-
 	}
 
 	return count;

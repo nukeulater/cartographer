@@ -13,7 +13,7 @@ constexpr bool ONLINE_USER_VALID(XUID account)
 
 bool online_xuid_is_guest_account(XUID xuid);
 
-bool online_xuid_same_account(XUID xuid1, XUID xuid2);
+bool online_xuid_same_account(XUID a1, XUID a2);
 
 uint8 online_xuid_get_guest_account_number(XUID xuid);
 

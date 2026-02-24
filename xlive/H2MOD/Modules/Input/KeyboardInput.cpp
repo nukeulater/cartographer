@@ -61,12 +61,18 @@ void KeyboardInput::ToggleKeyboardInput()
 	}
 }
 
-void KeyboardInput::ExecuteHotkey(WPARAM message)
+void KeyboardInput::ExecuteHotkey(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	for(auto &hk : g_keyboard_hotkey_data)
 	{
-		if (*hk.message == message)
+		if (*hk.message == wParam)
 		{
+			if (wParam == VK_F4
+				&& (GetAsyncKeyState(VK_MENU) & 0x8000) != 0)
+			{
+				continue;
+			}
+
 			hk.callback();
 		}
 	}

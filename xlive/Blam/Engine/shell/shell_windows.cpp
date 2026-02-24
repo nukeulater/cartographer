@@ -487,7 +487,7 @@ static LRESULT WINAPI H2WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 		&& (GetKeyState(wParam) & 0x8000))
 	{
 		// hotkeys
-		KeyboardInput::ExecuteHotkey(wParam);
+		KeyboardInput::ExecuteHotkey(hWnd, uMsg, wParam, lParam);
 	}
 
 	if (exec_base_wndproc)

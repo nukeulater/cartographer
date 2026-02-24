@@ -20,9 +20,9 @@ uint8 online_xuid_get_guest_account_number(XUID xuid)
 	return uint8(xuid >> 62);
 }
 
-bool online_xuid_same_account(XUID xuid1, XUID xuid2)
+bool online_xuid_same_account(XUID a1, XUID a2)
 {
-	return (xuid1 & XUSER_XUID_SAME_MASK) == (xuid2 & XUSER_XUID_SAME_MASK);
+	return (a1 & XUSER_XUID_SAME_MASK) == (a2 & XUSER_XUID_SAME_MASK);
 }
 
 bool __cdecl online_connected_to_xbox_live()
