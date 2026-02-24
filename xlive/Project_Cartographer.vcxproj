@@ -120,6 +120,7 @@
     <IncludePath>$(IncludePath)</IncludePath>
     <LibraryPath>$(WindowsSDK_LibraryPath_x86);$(DXSDK_DIR)Lib\x86;3rdparty/discord/lib;3rdparty/imgui/lib;3rdparty/spdlog/lib;3rdparty/tinyxml/lib;3rdparty/zlib/lib;3rdparty/libcurl/lib/nghttp2/;3rdparty/libcurl/lib/wolfssl/;3rdparty/libcurl/lib/curl/release;3rdparty/miniupnpc/lib/release;3rdparty/detours/lib.X86;$(LibraryPath)</LibraryPath>
     <ExternalIncludePath>$(ExternalIncludePath);$(DXSDK_DIR)Include</ExternalIncludePath>
+    <TargetExt>.asi</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_min_msvc|Win32'">
     <OutDir>$(SolutionDir)Halo2\</OutDir>
@@ -128,6 +129,7 @@
     <IncludePath>$(IncludePath)</IncludePath>
     <LibraryPath>$(WindowsSDK_LibraryPath_x86);$(DXSDK_DIR)Lib\x86;3rdparty/discord/lib;3rdparty/imgui/lib;3rdparty/spdlog/lib;3rdparty/tinyxml/lib;3rdparty/zlib/lib;3rdparty/libcurl/lib/nghttp2/;3rdparty/libcurl/lib/wolfssl/;3rdparty/libcurl/lib/curl/release;3rdparty/miniupnpc/lib/release;3rdparty/detours/lib.X86;$(LibraryPath)</LibraryPath>
     <ExternalIncludePath>$(ExternalIncludePath);$(DXSDK_DIR)Include</ExternalIncludePath>
+    <TargetExt>.asi</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_llvm|Win32'">
     <OutDir>$(SolutionDir)Halo2\</OutDir>
@@ -136,6 +138,7 @@
     <IncludePath>$(IncludePath)</IncludePath>
     <LibraryPath>$(WindowsSDK_LibraryPath_x86);$(DXSDK_DIR)Lib\x86;3rdparty/discord/lib;3rdparty/imgui/lib;3rdparty/spdlog/lib;3rdparty/tinyxml/lib;3rdparty/zlib/lib;3rdparty/libcurl/lib/nghttp2/;3rdparty/libcurl/lib/wolfssl/;3rdparty/libcurl/lib/curl/release;3rdparty/miniupnpc/lib/release;3rdparty/detours/lib.X86;$(LibraryPath)</LibraryPath>
     <ExternalIncludePath>$(ExternalIncludePath);$(DXSDK_DIR)Include</ExternalIncludePath>
+    <TargetExt>.asi</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_min_llvm|Win32'">
     <OutDir>$(SolutionDir)Halo2\</OutDir>
@@ -144,6 +147,7 @@
     <IncludePath>$(IncludePath)</IncludePath>
     <LibraryPath>$(WindowsSDK_LibraryPath_x86);$(DXSDK_DIR)Lib\x86;3rdparty/discord/lib;3rdparty/imgui/lib;3rdparty/spdlog/lib;3rdparty/tinyxml/lib;3rdparty/zlib/lib;3rdparty/libcurl/lib/nghttp2/;3rdparty/libcurl/lib/wolfssl/;3rdparty/libcurl/lib/curl/release;3rdparty/miniupnpc/lib/release;3rdparty/detours/lib.X86;$(LibraryPath)</LibraryPath>
     <ExternalIncludePath>$(ExternalIncludePath);$(DXSDK_DIR)Include</ExternalIncludePath>
+    <TargetExt>.asi</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_msvc|Win32'">
     <OutDir>$(SolutionDir)Halo2\</OutDir>
@@ -160,6 +164,7 @@
     <LibraryPath>$(WindowsSDK_LibraryPath_x86);$(DXSDK_DIR)Lib\x86;3rdparty/discord/lib;3rdparty/imgui/lib;3rdparty/spdlog/lib;3rdparty/tinyxml/lib;3rdparty/zlib/lib;3rdparty/libcurl/lib/nghttp2/;3rdparty/libcurl/lib/wolfssl/;3rdparty/libcurl/lib/curl/debug/;3rdparty/miniupnpc/lib/debug;3rdparty/detours/lib.X86;$(LibraryPath)</LibraryPath>
     <IncludePath>$(IncludePath)</IncludePath>
     <ExternalIncludePath>$(ExternalIncludePath);$(DXSDK_DIR)Include</ExternalIncludePath>
+    <TargetExt>.asi</TargetExt>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_msvc|Win32'">
     <Midl>
