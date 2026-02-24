@@ -37,6 +37,8 @@ public:
 	bool m_field_609;
 	char gap_609[6];
 
+	bool signed_in_to_live() const;
+
 	void add_user_signin_task(bool sign_to_live, void* signin_callback);
 };
 #pragma pack(pop)

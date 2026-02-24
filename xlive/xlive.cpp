@@ -69,6 +69,11 @@ XLIVE_DEFINE_FUNC(XUserGetSigninState_t, XUSER_SIGNIN_STATE, XUserGetSigninState
 	return XUserGetSigninStateOrig(dwUserIndex);
 }
 
+XLIVE_DEFINE_FUNC(XShowSigninUI_t, DWORD, XShowSigninUI, (DWORD cPanes, DWORD dwFlags))
+{
+	return XShowSigninUIOrig(cPanes, dwFlags);
+}
+
 bool DetourXLive()
 {
 	DETOUR_BEGIN();
@@ -102,6 +107,8 @@ bool InitializeXLiveModuleTable()
 
 	RESOLVE_FUNC_ORD(hModuleXLive, XUserGetXUID, (const char*)5261);
 	RESOLVE_FUNC_ORD(hModuleXLive, XUserGetSigninState, (const char*)5262);
+
+	RESOLVE_FUNC_ORD(hModuleXLive, XShowSigninUI, (const char*)5260)
 
 	DetourXLive();
 

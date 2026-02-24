@@ -13,4 +13,6 @@ HRESULT XLivePBufferAllocate(ULONG ulSize, VOID** pxebBuffer);
 HRESULT XLivePBufferSetByte(VOID* xebBuffer, ULONG ulOffset, UCHAR ucValue);
 DWORD XUserGetXUID(DWORD dwUserIndex, XUID* pxuid);
 
+DWORD XShowSigninUI(DWORD cPanes, DWORD dwFlags);
+
 XUSER_SIGNIN_STATE XUserGetSigninState(DWORD dwUserIndex);
