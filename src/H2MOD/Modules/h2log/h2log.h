@@ -114,22 +114,6 @@ do \
 	} \
 } while(0)
 
-#define LIMITED_LOGW(log_limit, logger, ...) \
-do \
-{ \
-	static unsigned int _logged_times_count; \
-	if (_logged_times_count < log_limit) { \
-		logger(__VA_ARGS__); \
-		_logged_times_count++; \
-	} \
-	else if (_logged_times_count == log_limit) \
-	{ \
-		logger(L"	reached max log count of {} for: ", log_limit); \
-		logger(__VA_ARGS__); \
-		_logged_times_count++; \
-	} \
-} while(0)
-
 // Generic logging
 // For the most unimportant stuff
 #define LOG_TRACE(logger, msg, ...)      h2log_print(logger, log_level::_trace, msg, __VA_ARGS__)
@@ -236,6 +220,40 @@ do \
 
 // "Wait, that's illegal" except it is definitely not a joke related to xLiveLess
 #define LOG_CRITICAL_XLIVE(msg, ...)     LOG_CRITICAL  (g_xlive_log, msg, __VA_ARGS__)
+
+// to note this is not thread safe
+// you might see the max log count reached message more than once in a row
+#define LIMITED_LOG(log_limit, logger, msg, ...) \
+do \
+{ \
+	static unsigned int _logged_times_count; \
+	if (_logged_times_count < log_limit) { \
+		logger(msg, __VA_ARGS__); \
+		_logged_times_count++; \
+	} \
+	else if (_logged_times_count == log_limit) \
+	{ \
+		logger("	reached max log count of {} for: ", log_limit); \
+		logger(msg, __VA_ARGS__); \
+		_logged_times_count++; \
+	} \
+} while(0)
+
+#define LIMITED_LOGW(log_limit, logger, msg, ...) \
+do \
+{ \
+	static unsigned int _logged_times_count; \
+	if (_logged_times_count < log_limit) { \
+		logger(msg, __VA_ARGS__); \
+		_logged_times_count++; \
+	} \
+	else if (_logged_times_count == log_limit) \
+	{ \
+		logger(L"	reached max log count of {} for: ", log_limit); \
+		logger(__VA_ARGS__); \
+		_logged_times_count++; \
+	} \
+} while(0)
 
 #else
 
