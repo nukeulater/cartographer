@@ -115,7 +115,6 @@ static e_h2_type detect_process_type(void)
 					result = _h2_type_ek_guerilla;
 				}
 
-
 				// Check version
 				if (
 					ustrnicmp(original_product_version, k_supported_h2_game_version, product_version_len) &&

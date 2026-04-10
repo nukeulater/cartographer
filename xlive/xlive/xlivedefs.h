@@ -1,5 +1,20 @@
 #pragma once
 
+#define XLIVE_GET_VERSION_FROM_FILE(dwFileVersionMS, dwFileVersionLS) \
+	LOWORD(dwFileVersionLS) | ((HIWORD(dwFileVersionLS) | (((16 * HIWORD(dwFileVersionMS)) | dwFileVersionMS & 0xF) << 16)) << 8)
+
+#define XLIVE_BUILD_VERSION(major, minor, build, revision) \
+    (DWORD)((((((major) << 4) | (minor) & 0xF) << 16) | ((build) & 0xFF)) << 8) | (revision & 0xFF)
+
+#define __XLIVE_VERSION_NUMBER_TO_STRING(x) #x
+#define _XLIVE_VERSION_NUMBER_TO_STRING(x) __XLIVE_VERSION_NUMBER_TO_STRING(x)
+
+#define XLIVE_VERSION_TO_STRING(major, minor, build, revision) \
+    _XLIVE_VERSION_NUMBER_TO_STRING(major) "."                          \
+    _XLIVE_VERSION_NUMBER_TO_STRING(minor) "."                          \
+    _XLIVE_VERSION_NUMBER_TO_STRING(build) "."                          \
+    _XLIVE_VERSION_NUMBER_TO_STRING(revision)
+
 typedef struct _XUSER_DATA
 {
     BYTE                                type;

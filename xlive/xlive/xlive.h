@@ -4,7 +4,22 @@
 
 #include "xlive_fn_defs.h"
 
-bool InitializeXLiveModuleTable();
+bool XLiveModInitialize();
+
+#define XLIVE_BUILD_MODULE_VERSION(major, minor, build, revision) \
+    { XLIVE_BUILD_VERSION(major, minor, build, revision), XLIVE_VERSION_TO_STRING(major, minor, build, revision) }
+
+struct XLIVE_MODULE_VERSION
+{
+	DWORD dwVersion;
+	const char* pszVersion;
+};
+
+
+enum eXLiveSupported
+{
+
+};
 
 HRESULT XLiveInitialize(XLIVE_INITIALIZE_INFO* pXii);
 HRESULT XLiveOnResetDevice(VOID* pD3DPP);

@@ -20,24 +20,26 @@ void addDebugTextInternal(char* text) {
 	ASSERT(initialisedDebugText == true && "addDebugText() called before initialize");
 	if (!initialisedDebugText) return;
 
-	int lenInput = strlen(text);
+	int textLen = strlen(text);
 
 	char* endChar = strchr(text, '\n');
 	if (endChar) {
-		lenInput = endChar - text;
+		textLen = endChar - text;
 	}
 
-	std::lock_guard lg(addTextMutex);
+	{
+		std::lock_guard lg(addTextMutex);
 
 #ifdef TERMINAL_ENABLED
-	CircularStringBuffer* output = GetMainConsoleInstance()->GetTabOutput(_console_tab_logs);
-	output->AddString(StringFlag_None, text, lenInput);
+		CircularStringBuffer* output = GetMainConsoleInstance()->GetTabOutput(_console_tab_logs);
+		output->AddString(StringFlag_None, text, textLen);
 #endif
 #ifndef SPDLOG_DISABLED
-	g_onscreendebug_log->debug(text);
+		g_onscreendebug_log->debug(text);
 #endif
-	if (endChar) {
-		return addDebugTextInternal(endChar + 1);
+		if (endChar) {
+			return addDebugTextInternal(endChar + 1);
+		}
 	}
 }
 

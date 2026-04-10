@@ -8,9 +8,23 @@
 #include "Util/Memory.h"
 #include "Util/Hooks/Hook.h"
 
+#include "H2MOD/Utils/Utils.h"
+
+#include "H2MOD/GUI/imgui_integration/Console/ImGui_ConsoleImpl.h"
+
 extern void initialize_instance();
 
-HMODULE hModuleXLive = NULL;
+HMODULE g_hModuleXLive = NULL;
+
+DWORD g_XLiveVersion;
+char g_XliveVersionStr[128];
+
+XLIVE_MODULE_VERSION g_XLiveSupportedList[] =
+{
+	XLIVE_BUILD_MODULE_VERSION(1, 2, 241, 0),
+	XLIVE_BUILD_MODULE_VERSION(2, 0, 672, 0),
+	XLIVE_BUILD_MODULE_VERSION(3, 5, 88, 0),
+};
 
 #define XLIVE_DEFINE_FUNC(type, ret, name, args) \
 	static type* name##Orig; \
@@ -74,7 +88,7 @@ XLIVE_DEFINE_FUNC(XShowSigninUI_t, DWORD, XShowSigninUI, (DWORD cPanes, DWORD dw
 	return XShowSigninUIOrig(cPanes, dwFlags);
 }
 
-bool DetourXLive()
+bool XLiveDetoursInitialize()
 {
 	DETOUR_BEGIN();
 	DETOUR_ATTACH(XLiveInitializeHook, XLiveInitializeOrig, XLiveInitialize);
@@ -85,10 +99,44 @@ bool DetourXLive()
 	return true;
 }
 
-bool InitializeXLiveModuleTable()
+bool XLiveSupportedVersion(DWORD dwVersion, DWORD* dwOutSupportedVerIndex)
 {
-	hModuleXLive = LoadLibrary(L"xlive.dll");
-	assert(hModuleXLive != NULL);
+	for (int i = 0; i < ARRAYSIZE(g_XLiveSupportedList); i++)
+	{
+		const XLIVE_MODULE_VERSION* pVersion = &g_XLiveSupportedList[i];
+
+		if (dwVersion == pVersion->dwVersion)
+		{
+			*dwOutSupportedVerIndex = (DWORD)i;
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool XLiveModInitialize()
+{
+	g_hModuleXLive = LoadLibrary(L"xlive.dll");
+	assert(g_hModuleXLive != NULL);
+
+	DWORD versionIndex;
+
+	if (!GetModuleFileVersion(g_hModuleXLive, &g_XLiveVersion))
+	{
+		assert(false);
+		return false;
+	}
+
+	if (XLiveSupportedVersion(g_XLiveVersion, &versionIndex))
+	{
+		IMCONSOLE_LOG("XLIVE version loaded: %X - %s", g_XLiveSupportedList[versionIndex].dwVersion, g_XLiveSupportedList[versionIndex].pszVersion);
+	}
+	else
+	{
+		IMCONSOLE_LOG("XLIVE version loaded: ( --- unknown version, possible issues --- )");
+	}
+
 
 #define RESOLVE_FUNC_ORD(module, fn, ordinal)				\
 {															\
@@ -97,20 +145,20 @@ bool InitializeXLiveModuleTable()
 	assert(fn##Orig != NULL);								\
 }
 
-	RESOLVE_FUNC_ORD(hModuleXLive, XLiveInitialize, (const char*)5000);
-	RESOLVE_FUNC_ORD(hModuleXLive, XLiveOnResetDevice, (const char*)5007);
-	RESOLVE_FUNC_ORD(hModuleXLive, XLiveRender, (const char*)5002);
-	RESOLVE_FUNC_ORD(hModuleXLive, XNotifyDelayUI, (const char*)653);
+	RESOLVE_FUNC_ORD(g_hModuleXLive, XLiveInitialize, (const char*)5000);
+	RESOLVE_FUNC_ORD(g_hModuleXLive, XLiveOnResetDevice, (const char*)5007);
+	RESOLVE_FUNC_ORD(g_hModuleXLive, XLiveRender, (const char*)5002);
+	RESOLVE_FUNC_ORD(g_hModuleXLive, XNotifyDelayUI, (const char*)653);
 
-	RESOLVE_FUNC_ORD(hModuleXLive, XLivePBufferAllocate, (const char*)5016);
-	RESOLVE_FUNC_ORD(hModuleXLive, XLivePBufferSetByte, (const char*)5019);
+	RESOLVE_FUNC_ORD(g_hModuleXLive, XLivePBufferAllocate, (const char*)5016);
+	RESOLVE_FUNC_ORD(g_hModuleXLive, XLivePBufferSetByte, (const char*)5019);
 
-	RESOLVE_FUNC_ORD(hModuleXLive, XUserGetXUID, (const char*)5261);
-	RESOLVE_FUNC_ORD(hModuleXLive, XUserGetSigninState, (const char*)5262);
+	RESOLVE_FUNC_ORD(g_hModuleXLive, XUserGetXUID, (const char*)5261);
+	RESOLVE_FUNC_ORD(g_hModuleXLive, XUserGetSigninState, (const char*)5262);
 
-	RESOLVE_FUNC_ORD(hModuleXLive, XShowSigninUI, (const char*)5260)
+	RESOLVE_FUNC_ORD(g_hModuleXLive, XShowSigninUI, (const char*)5260)
 
-	DetourXLive();
+	XLiveDetoursInitialize();
 
 #undef RESOLVE_FUNC
 	return true;

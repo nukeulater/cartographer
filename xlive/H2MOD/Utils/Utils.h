@@ -23,3 +23,6 @@ int MasterHttpResponse(const char* url, const char* http_request, char** rtn_res
 void CreateDirTree(const wchar_t* path);
 DWORD crc32buf(const char* buf, size_t len);
 bool ComputeFileCrc32Hash(wchar_t* filepath, DWORD& rtncrc32);
+
+BOOL GetModuleFileVersion(HMODULE hModule, DWORD* pdwVersion);
+

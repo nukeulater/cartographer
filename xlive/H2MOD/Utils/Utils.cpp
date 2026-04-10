@@ -560,3 +560,72 @@ std::string ByteToHexStr(const uint8_t* buffer, size_t size) {
 	}
 	return str.str();
 }
+
+// Function to get file version information from a module
+BOOL GetModuleFileVersion(HMODULE hModule, DWORD* pdwVersion)
+{
+	BOOL bResult = FALSE;
+	char szModulePath[MAX_PATH];
+	DWORD dwHandle = 0, dwVersionInfoSize = 0;
+	LPBYTE lpVersionInfo = NULL;
+	VS_FIXEDFILEINFO* pFileInfo = NULL;
+	UINT uInfoSize = 0;
+
+	do
+	{
+		// Get the full path of the module
+		if (GetModuleFileNameA(hModule, szModulePath, MAX_PATH) == 0)
+		{
+			/*printf("Failed to get module file name. Error: %d\n", GetLastError());*/
+			return FALSE;
+		}
+
+		// Get the version information size
+		dwVersionInfoSize = GetFileVersionInfoSizeA(szModulePath, &dwHandle);
+		if (dwVersionInfoSize == 0)
+		{
+			/*printf("No version information found for: %s\n", szModulePath);*/
+			return FALSE;
+		}
+
+		// Allocate buffer for version information
+		lpVersionInfo = (LPBYTE)malloc(dwVersionInfoSize);
+		if (lpVersionInfo == NULL)
+		{
+			/*printf("Memory allocation failed\n");*/
+			return FALSE;
+		}
+
+		// Get the version information
+		if (!GetFileVersionInfoA(szModulePath, dwHandle, dwVersionInfoSize, lpVersionInfo))
+		{
+			/*printf("Failed to get file version info. Error: %d\n", GetLastError());*/
+			break;
+		}
+
+		// Query the fixed file information
+		if (!VerQueryValueA(lpVersionInfo, "\\", (LPVOID*)&pFileInfo, &uInfoSize))
+		{
+			/*printf("Failed to query version value\n");*/
+			break;
+		}
+
+		if (uInfoSize < sizeof(VS_FIXEDFILEINFO))
+		{
+			/*printf("Version info size mismatch\n");*/
+			break;
+		}
+
+		// Format the version string
+		if (pFileInfo)
+		{
+			*pdwVersion = XLIVE_GET_VERSION_FROM_FILE(pFileInfo->dwFileVersionMS, pFileInfo->dwFileVersionLS);
+			bResult = TRUE;
+		}
+	} while (0);
+
+	if (lpVersionInfo)
+		free(lpVersionInfo);
+
+	return bResult;
+}

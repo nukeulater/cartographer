@@ -116,6 +116,9 @@ public:
 	static int set_opacity_cb(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
 };
 
+#define IMCONSOLE_LOG(fmt, ...) \
+CartographerConsole::LogToTab(_console_tab_logs, \
+	fmt, __VA_ARGS__)
 
 #define QUICK_DBG(header, fmt, ...) \
 do { \

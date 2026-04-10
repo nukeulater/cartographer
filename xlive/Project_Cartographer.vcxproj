@@ -1470,6 +1470,7 @@
     <ClCompile Include="H2MOD\Variants\Infection\Infection.cpp" />
     <ClCompile Include="H2MOD\Variants\VariantSystem.cpp" />
     <ClCompile Include="Util\Hooks\Hook.cpp" />
+    <ClInclude Include="xlive\openlive.h" />
     <ClInclude Include="xlive\xlive_fn_defs.h" />
   </ItemGroup>
   <ItemGroup>

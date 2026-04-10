@@ -50,18 +50,17 @@ void InitLocalAppData()
 		CreateDirectoryW(appdata_path, NULL);
 	}
 	
-	// Run folder checks if we're using dev preview paths 
-	if (USE_DEV_PREVIEW_CONFIG_FILE_PATHS)
+	// Run folder checks if we're using dev preview paths
+#if USE_DEV_PREVIEW_CONFIG_FILE_PATHS
+	ustrncat(appdata_path, k_appdata_dev_preview_path, NUMBEROF(appdata_path));
+
+	// Make sure dev preview folder exists and create if not
+	const errno_t dev_path_error = _waccess_s(appdata_path, 6);
+	if (dev_path_error != ERROR_SUCCESS)
 	{
-		ustrncat(appdata_path, k_appdata_dev_preview_path, NUMBEROF(appdata_path));
-		
-		// Make sure dev preview folder exists and create if not
-		const errno_t dev_path_error = _waccess_s(appdata_path, 6);
-		if (dev_path_error != ERROR_SUCCESS)
-		{
-			CreateDirectoryW(appdata_path, NULL);
-		}
+		CreateDirectoryW(appdata_path, NULL);
 	}
+#endif
 
 	ustrncpy(g_h2_appdata_local_path, appdata_path, MAX_PATH);
 	return;
@@ -70,11 +69,7 @@ void InitLocalAppData()
 ///Before the game window appears
 void InitH2Startup()
 {
-	DETOUR_BEGIN();
-	cseries_windows_debug_initialize();
-	
 	const e_h2_type type = Memory::Initialize();
-
 	if (type == _h2_type_game ||
 		type == _h2_type_server)
 	{
@@ -85,6 +80,8 @@ void InitH2Startup()
 		type == _h2_type_ek_tool ||
 		type == _h2_type_ek_guerilla)
 	{
+		DETOUR_BEGIN();
+		cseries_windows_debug_initialize();
 		DETOUR_COMMIT();
 		startup_init_h2_tools(type);
 	}
@@ -165,6 +162,9 @@ static void startup_force_working_directory_to_process_directory(void)
 
 static void startup_init_h2_game(void)
 {
+	DETOUR_BEGIN();
+	cseries_windows_debug_initialize();
+
 	shell_windows_initialize();
 	shell_apply_patches();
 	shell_windows_apply_patches();
