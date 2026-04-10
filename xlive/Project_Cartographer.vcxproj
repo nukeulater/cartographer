@@ -190,7 +190,7 @@
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <WarningLevel>Level4</WarningLevel>
       <SuppressStartupBanner>false</SuppressStartupBanner>
-      <AdditionalIncludeDirectories>.\;.\3rdparty\;.\3rdparty\detours\include;.\3rdparty\discord\include;.\3rdparty\imgui\imgui;.\3rdparty\libcurl;.\3rdparty\miniupnpc\include;.\3rdparty\spdlog\include;.\3rdparty\tinyxml;.\3rdparty\zlib\src;.\Blam\Engine</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;.\3rdparty\;.\3rdparty\detours\include;.\3rdparty\discord\include;.\3rdparty\imgui\imgui;.\3rdparty\libcurl;.\3rdparty\miniupnpc\include;.\3rdparty\spdlog\include;.\3rdparty\tinyxml;.\3rdparty\zlib\src;.\Blam</AdditionalIncludeDirectories>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <ControlFlowGuard>false</ControlFlowGuard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -266,7 +266,7 @@
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <WarningLevel>Level4</WarningLevel>
       <SuppressStartupBanner>false</SuppressStartupBanner>
-      <AdditionalIncludeDirectories>.\;.\3rdparty\;.\3rdparty\detours\include;.\3rdparty\discord\include;.\3rdparty\imgui\imgui;.\3rdparty\libcurl;.\3rdparty\miniupnpc\include;.\3rdparty\spdlog\include;.\3rdparty\tinyxml;.\3rdparty\zlib\src;.\Blam\Engine</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;.\3rdparty\;.\3rdparty\detours\include;.\3rdparty\discord\include;.\3rdparty\imgui\imgui;.\3rdparty\libcurl;.\3rdparty\miniupnpc\include;.\3rdparty\spdlog\include;.\3rdparty\tinyxml;.\3rdparty\zlib\src;.\Blam</AdditionalIncludeDirectories>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <ControlFlowGuard>false</ControlFlowGuard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -343,7 +343,7 @@
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <WarningLevel>Level4</WarningLevel>
       <SuppressStartupBanner>false</SuppressStartupBanner>
-      <AdditionalIncludeDirectories>.\;.\3rdparty\;.\3rdparty\detours\include;.\3rdparty\discord\include;.\3rdparty\imgui\imgui;.\3rdparty\libcurl;.\3rdparty\miniupnpc\include;.\3rdparty\spdlog\include;.\3rdparty\tinyxml;.\3rdparty\zlib\src;.\Blam\Engine</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;.\3rdparty\;.\3rdparty\detours\include;.\3rdparty\discord\include;.\3rdparty\imgui\imgui;.\3rdparty\libcurl;.\3rdparty\miniupnpc\include;.\3rdparty\spdlog\include;.\3rdparty\tinyxml;.\3rdparty\zlib\src;.\Blam</AdditionalIncludeDirectories>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <ControlFlowGuard>false</ControlFlowGuard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -418,7 +418,7 @@
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <WarningLevel>Level4</WarningLevel>
       <SuppressStartupBanner>false</SuppressStartupBanner>
-      <AdditionalIncludeDirectories>.\;.\3rdparty\;.\3rdparty\detours\include;.\3rdparty\discord\include;.\3rdparty\imgui\imgui;.\3rdparty\libcurl;.\3rdparty\miniupnpc\include;.\3rdparty\spdlog\include;.\3rdparty\tinyxml;.\3rdparty\zlib\src;.\Blam\Engine</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;.\3rdparty\;.\3rdparty\detours\include;.\3rdparty\discord\include;.\3rdparty\imgui\imgui;.\3rdparty\libcurl;.\3rdparty\miniupnpc\include;.\3rdparty\spdlog\include;.\3rdparty\tinyxml;.\3rdparty\zlib\src;.\Blam</AdditionalIncludeDirectories>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <ControlFlowGuard>false</ControlFlowGuard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -489,7 +489,7 @@
       <WarningLevel>Level4</WarningLevel>
       <SuppressStartupBanner>false</SuppressStartupBanner>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
-      <AdditionalIncludeDirectories>.\;.\3rdparty\;.\3rdparty\detours\include;.\3rdparty\discord\include;.\3rdparty\imgui\imgui;.\3rdparty\libcurl;.\3rdparty\miniupnpc\include;.\3rdparty\spdlog\include;.\3rdparty\tinyxml;.\3rdparty\zlib\src;.\Blam\Engine</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;.\3rdparty\;.\3rdparty\detours\include;.\3rdparty\discord\include;.\3rdparty\imgui\imgui;.\3rdparty\libcurl;.\3rdparty\miniupnpc\include;.\3rdparty\spdlog\include;.\3rdparty\tinyxml;.\3rdparty\zlib\src;.\Blam</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <WholeProgramOptimization>false</WholeProgramOptimization>
@@ -552,7 +552,7 @@
       <WarningLevel>Level4</WarningLevel>
       <SuppressStartupBanner>false</SuppressStartupBanner>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
-      <AdditionalIncludeDirectories>.\;.\3rdparty\;.\3rdparty\detours\include;.\3rdparty\discord\include;.\3rdparty\imgui\imgui;.\3rdparty\libcurl;.\3rdparty\miniupnpc\include;.\3rdparty\spdlog\include;.\3rdparty\tinyxml;.\3rdparty\zlib\src;.\Blam\Engine</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;.\3rdparty\;.\3rdparty\detours\include;.\3rdparty\discord\include;.\3rdparty\imgui\imgui;.\3rdparty\libcurl;.\3rdparty\miniupnpc\include;.\3rdparty\spdlog\include;.\3rdparty\tinyxml;.\3rdparty\zlib\src;.\Blam</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <WholeProgramOptimization>false</WholeProgramOptimization>
@@ -1415,24 +1415,24 @@
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\ImGui_Handler.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\ImGui_NetworkStatsOverlay.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\MessageBox.cpp" />
-    <ClCompile Include="Blam\Engine\interface\screens\screen_cartographer_menus.cpp" />
-    <ClCompile Include="Blam\Engine\interface\screens\screen_brightness_menu.cpp" />
-    <ClCompile Include="Blam\Engine\interface\screens\screen_cartographer_errors.cpp" />
-    <ClCompile Include="Blam\Engine\interface\screens\screen_virtual_keyboard.cpp" />
+    <ClCompile Include="Blam\interface\screens\screen_cartographer_menus.cpp" />
+    <ClCompile Include="Blam\interface\screens\screen_brightness_menu.cpp" />
+    <ClCompile Include="Blam\interface\screens\screen_cartographer_errors.cpp" />
+    <ClCompile Include="Blam\interface\screens\screen_virtual_keyboard.cpp" />
     <ClCompile Include="H2MOD\Modules\GamePhysics\Patches\ProjectileFix.cpp" />
-    <ClCompile Include="Blam\Engine\main\map_repository.cpp" />
+    <ClCompile Include="Blam\main\map_repository.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomVariantSettings\CustomVariantSettings.cpp" />
     <ClCompile Include="H2MOD\Modules\DirectorHooks\DirectorHooks.cpp" />
     <ClCompile Include="H2MOD\Modules\EventHandler\EventHandler.cpp" />
-    <ClCompile Include="Blam\Engine\physics\character_physics_mode_melee.cpp" />
+    <ClCompile Include="Blam\physics\character_physics_mode_melee.cpp" />
     <ClCompile Include="H2MOD\Modules\Input\KeyboardInput.cpp" />
     <ClCompile Include="H2MOD\Modules\MainMenu\MapSlots.cpp" />
     <ClCompile Include="H2MOD\Modules\MapManager\MapManager.cpp" />
-    <ClCompile Include="Blam\Engine\networking\messages\network_message_type_collection.cpp" />
-    <ClCompile Include="Blam\Engine\memory\bitstream.cpp" />
-    <ClCompile Include="Blam\Engine\networking\delivery\network_channel.cpp" />
-    <ClCompile Include="Blam\Engine\networking\session\network_observer.cpp" />
-    <ClCompile Include="Blam\Engine\networking\session\network_session.cpp" />
+    <ClCompile Include="Blam\networking\messages\network_message_type_collection.cpp" />
+    <ClCompile Include="Blam\memory\bitstream.cpp" />
+    <ClCompile Include="Blam\networking\delivery\network_channel.cpp" />
+    <ClCompile Include="Blam\networking\Session\network_observer.cpp" />
+    <ClCompile Include="Blam\networking\Session\network_session.cpp" />
     <ClCompile Include="H2MOD\Modules\PlaylistLoader\PlaylistLoader.cpp" />
     <ClCompile Include="H2MOD\Modules\RenderHooks\RenderHooks.cpp" />
     <ClCompile Include="H2MOD\Modules\Shell\H2MODShell.cpp" />
@@ -1440,9 +1440,9 @@
     <ClCompile Include="H2MOD\Modules\SpecialEvents\SpecialEventHelpers.cpp" />
     <ClCompile Include="H2MOD\Modules\SpecialEvents\SpecialEvents.cpp" />
     <ClCompile Include="H2MOD\Modules\TagFixes\TagFixes.cpp" />
-    <ClCompile Include="Blam\Engine\interface\screens\screen_xbox_live_task_progress_dialog.cpp" />
+    <ClCompile Include="Blam\interface\screens\screen_xbox_live_task_progress_dialog.cpp" />
     <ClCompile Include="H2MOD\GUI\imgui_integration\WeaponOffsets.cpp" />
-    <ClCompile Include="Blam\Engine\kablam\kablam.cpp" />
+    <ClCompile Include="Blam\kablam\kablam.cpp" />
     <ClCompile Include="H2MOD\Variants\GraveRobber\GraveRobber.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug_msvc|Win32'">Create</PrecompiledHeader>
@@ -1470,7 +1470,7 @@
     <ClCompile Include="H2MOD\Variants\Infection\Infection.cpp" />
     <ClCompile Include="H2MOD\Variants\VariantSystem.cpp" />
     <ClCompile Include="Util\Hooks\Hook.cpp" />
-    <ClInclude Include="xlive_fn_defs.h" />
+    <ClInclude Include="xlive\xlive_fn_defs.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\detours\include\detours.h" />
@@ -1492,7 +1492,7 @@
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\upnperrors.h" />
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\upnpreplyparse.h" />
     <ClInclude Include="3rdparty\spdlog\include\spdlog\fmt\bundled\posix.h" />
-    <ClInclude Include="Blam\Engine\interface\hud_definitions.h" />
+    <ClInclude Include="Blam\interface\hud_definitions.h" />
     <ClInclude Include="Blam\Cache\TagGroups\shader_pass_definition.hpp" />
     <ClInclude Include="Blam\Engine\cache\cache_files.h" />
     <ClInclude Include="Blam\Engine\networking\messages\network_messages_text_chat.h" />
@@ -2511,34 +2511,34 @@
     <ClInclude Include="H2MOD\GUI\imgui_integration\WeaponOffsetsStringTable.h" />
     <ClInclude Include="H2MOD\Modules\Config\WeaponOffsetConfig\WeaponOffsetConfig.h" />
     <ClInclude Include="H2MOD\GUI\ImGui_Integration\ImGui_NetworkStatsOverlay.h" />
-    <ClInclude Include="Blam\Engine\interface\screens\screen_cartographer_menus.h" />
-    <ClInclude Include="Blam\Engine\interface\screens\screen_brightness_menu.h" />
-    <ClInclude Include="Blam\Engine\interface\screens\screen_cartographer_errors.h" />
-    <ClInclude Include="Blam\Engine\interface\screens\screen_virtual_keyboard.h" />
+    <ClInclude Include="Blam\interface\screens\screen_cartographer_menus.h" />
+    <ClInclude Include="Blam\interface\screens\screen_brightness_menu.h" />
+    <ClInclude Include="Blam\interface\screens\screen_cartographer_errors.h" />
+    <ClInclude Include="Blam\interface\screens\screen_virtual_keyboard.h" />
     <ClInclude Include="H2MOD\Modules\GamePhysics\Patches\ProjectileFix.h" />
-    <ClInclude Include="Blam\Engine\main\map_repository.h" />
+    <ClInclude Include="Blam\main\map_repository.h" />
     <ClInclude Include="H2MOD\Modules\CustomVariantSettings\CustomVariantSettings.h" />
     <ClInclude Include="H2MOD\Modules\DirectorHooks\DirectorHooks.h" />
     <ClInclude Include="H2MOD\Modules\EventHandler\EventHandler.hpp" />
-    <ClInclude Include="Blam\Engine\physics\character_physics_mode_melee.h" />
+    <ClInclude Include="Blam\physics\character_physics_mode_melee.h" />
     <ClInclude Include="H2MOD\Modules\Input\ControllerInput.h" />
     <ClInclude Include="H2MOD\Modules\Input\KeyboardInput.h" />
     <ClInclude Include="H2MOD\Modules\MainMenu\MapSlots.h" />
     <ClInclude Include="H2MOD\Modules\MapManager\MapManager.h" />
-    <ClInclude Include="Blam\Engine\networking\messages\network_message_type_collection.h" />
-    <ClInclude Include="Blam\Engine\memory\bitstream.h" />
-    <ClInclude Include="Blam\Engine\networking\delivery\network_channel.h" />
-    <ClInclude Include="Blam\Engine\networking\session\network_observer.h" />
-    <ClInclude Include="Blam\Engine\networking\session\network_session.h" />
+    <ClInclude Include="Blam\networking\messages\network_message_type_collection.h" />
+    <ClInclude Include="Blam\memory\bitstream.h" />
+    <ClInclude Include="Blam\networking\delivery\network_channel.h" />
+    <ClInclude Include="Blam\networking\Session\network_observer.h" />
+    <ClInclude Include="Blam\networking\Session\network_session.h" />
     <ClInclude Include="H2MOD\Modules\PlaylistLoader\PlaylistLoader.h" />
     <ClInclude Include="H2MOD\Modules\RenderHooks\RenderHooks.h" />
-    <ClInclude Include="Blam\Engine\kablam\kablam.h" />
+    <ClInclude Include="Blam\kablam\kablam.h" />
     <ClInclude Include="H2MOD\Modules\Shell\H2MODShell.h" />
     <ClInclude Include="H2MOD\Modules\h2log\h2log.h" />
     <ClInclude Include="H2MOD\Modules\SpecialEvents\SpecialEventHelpers.h" />
     <ClInclude Include="H2MOD\Modules\SpecialEvents\SpecialEvents.h" />
     <ClInclude Include="H2MOD\Modules\TagFixes\TagFixes.h" />
-    <ClInclude Include="Blam\Engine\interface\screens\screen_xbox_live_task_progress_dialog.h" />
+    <ClInclude Include="Blam\interface\screens\screen_xbox_live_task_progress_dialog.h" />
     <ClInclude Include="H2MOD\Variants\GraveRobber\GraveRobber.h" />
     <ClInclude Include="resources\version_resource.h" />
     <ClInclude Include="stdafx.h" />
@@ -2546,14 +2546,14 @@
     <ClInclude Include="Util\Memory.h" />
     <ClInclude Include="3rdparty\SimpleIni\SimpleIni.h" />
     <ClInclude Include="version.h" />
-    <ClInclude Include="Blam\Engine\tag_files\files_windows.h" />
-    <ClInclude Include="Blam\Engine\game\game_time.h" />
-    <ClInclude Include="Blam\Engine\hs\hs.h" />
-    <ClInclude Include="Blam\Engine\objects\object_placement.h" />
-    <ClInclude Include="Blam\Engine\objects\objects.h" />
-    <ClInclude Include="Blam\Engine\game\player_control.h" />
-    <ClInclude Include="Blam\Engine\game\players.h" />
-    <ClInclude Include="Blam\Engine\game\game_options.h" />
+    <ClInclude Include="Blam\tag_files\files_windows.h" />
+    <ClInclude Include="Blam\game\game_time.h" />
+    <ClInclude Include="Blam\hs\hs.h" />
+    <ClInclude Include="Blam\objects\object_placement.h" />
+    <ClInclude Include="Blam\objects\objects.h" />
+    <ClInclude Include="Blam\game\player_control.h" />
+    <ClInclude Include="Blam\game\players.h" />
+    <ClInclude Include="Blam\game\game_options.h" />
     <ClInclude Include="H2MOD.h" />
     <ClInclude Include="H2MOD\GUI\XLiveRendering.h" />
     <ClInclude Include="H2MOD\Modules\Shell\Config.h" />
@@ -2570,9 +2570,8 @@
     <ClInclude Include="H2MOD\Variants\VariantSystem.h" />
     <ClInclude Include="resources\resource.h" />
     <ClInclude Include="Util\Hooks\Hook.h" />
-    <ClInclude Include="xlive.h" />
-    <ClInclude Include="xlivedefs.h" />
-    <ClInclude Include="xliveless.h" />
+    <ClInclude Include="xlive\xlive.h" />
+    <ClInclude Include="xlive\xlivedefs.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

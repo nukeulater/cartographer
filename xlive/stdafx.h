@@ -72,10 +72,9 @@
 
 #include <dxgi1_4.h>
 
-#include "xliveless.h"
-#include "xlivedefs.h"
+#include "xlive/xlivedefs.h"
 
-#include "xlive.h"
+#include "xlive/xlive.h"
 
 // cartographer includes
 
@@ -121,3 +120,5 @@ extern std::random_device rd;
 	namespace _time_name = std::chrono; \
 	using _clock_name = std::chrono::steady_clock; \
 	using namespace std::chrono_literals;
+
+#define STRINGIFY(x) #x
