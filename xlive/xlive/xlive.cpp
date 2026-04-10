@@ -27,8 +27,7 @@ XLIVE_MODULE_VERSION g_XLiveSupportedList[] =
 };
 
 #define XLIVE_DEFINE_FUNC(type, ret, name, args) \
-	static type* name##Orig; \
-	static type* name##Hook; \
+	static type* p##name; \
 	ret name args
 
 XLIVE_DEFINE_FUNC(XLiveInitialize_t,
@@ -41,7 +40,7 @@ XLIVE_DEFINE_FUNC(XLiveInitialize_t,
 		XLiveRendering::InitializeD3D9(pXii->pD3D, (D3DPRESENT_PARAMETERS*)pXii->pD3DPP);
 	}
 
-	return XLiveInitializeHook(pXii);
+	return pXLiveInitialize(pXii);
 }
 
 XLIVE_DEFINE_FUNC(XLiveRender_t,
@@ -49,51 +48,51 @@ XLIVE_DEFINE_FUNC(XLiveRender_t,
 )
 {
 	ImGuiHandler::DrawImgui();
-	return XLiveRenderHook();
+	return pXLiveRender();
 }
 
 XLIVE_DEFINE_FUNC(XLiveOnResetDevice_t, HRESULT, XLiveOnResetDevice, (VOID* pD3DPP))
 {
 	XLiveRendering::D3D9ReleaseResources();
-	return XLiveOnResetDeviceHook(pD3DPP);
+	return pXLiveOnResetDevice(pD3DPP);
 }
 
 XLIVE_DEFINE_FUNC(XNotifyDelayUI_t, DWORD, XNotifyDelayUI, (ULONG ulMilliSeconds))
 {
-	return XNotifyDelayUIOrig(ulMilliSeconds);
+	return pXNotifyDelayUI(ulMilliSeconds);
 }
 
 XLIVE_DEFINE_FUNC(XLivePBufferAllocate_t, HRESULT, XLivePBufferAllocate, (ULONG ulSize, VOID** pxebBuffer))
 {
-	return XLivePBufferAllocateOrig(ulSize, pxebBuffer);
+	return pXLivePBufferAllocate(ulSize, pxebBuffer);
 }
 
 XLIVE_DEFINE_FUNC(XLivePBufferSetByte_t, HRESULT, XLivePBufferSetByte, (VOID* xebBuffer, ULONG ulOffset, UCHAR ucValue))
 {
-	return XLivePBufferSetByteOrig(xebBuffer, ulOffset, ucValue);
+	return pXLivePBufferSetByte(xebBuffer, ulOffset, ucValue);
 }
 
 XLIVE_DEFINE_FUNC(XUserGetXUID_t, DWORD, XUserGetXUID, (DWORD dwUserIndex, XUID* pxuid))
 {
-	return XUserGetXUIDOrig(dwUserIndex, pxuid);
+	return pXUserGetXUID(dwUserIndex, pxuid);
 }
 
 XLIVE_DEFINE_FUNC(XUserGetSigninState_t, XUSER_SIGNIN_STATE, XUserGetSigninState, (DWORD dwUserIndex))
 {
-	return XUserGetSigninStateOrig(dwUserIndex);
+	return pXUserGetSigninState(dwUserIndex);
 }
 
 XLIVE_DEFINE_FUNC(XShowSigninUI_t, DWORD, XShowSigninUI, (DWORD cPanes, DWORD dwFlags))
 {
-	return XShowSigninUIOrig(cPanes, dwFlags);
+	return pXShowSigninUI(cPanes, dwFlags);
 }
 
 bool XLiveDetoursInitialize()
 {
 	DETOUR_BEGIN();
-	DETOUR_ATTACH(XLiveInitializeHook, XLiveInitializeOrig, XLiveInitialize);
-	DETOUR_ATTACH(XLiveOnResetDeviceHook, XLiveOnResetDeviceOrig, XLiveOnResetDevice);
-	DETOUR_ATTACH(XLiveRenderHook, XLiveRenderOrig, XLiveRender);
+	DETOUR_ATTACH(pXLiveInitialize, pXLiveInitialize, XLiveInitialize);
+	DETOUR_ATTACH(pXLiveOnResetDevice, pXLiveOnResetDevice, XLiveOnResetDevice);
+	DETOUR_ATTACH(pXLiveRender, pXLiveRender, XLiveRender);
 	DETOUR_COMMIT();
 
 	return true;
@@ -140,8 +139,7 @@ bool XLiveModInitialize()
 
 #define RESOLVE_FUNC_ORD(module, fn, ordinal)				\
 {															\
-	fn##Orig = (fn##_t*)GetProcAddress(module, ordinal);	\
-	fn##Hook = fn##Orig;									\
+	p##fn = (fn##_t*)GetProcAddress(module, ordinal);		\
 	assert(fn##Orig != NULL);								\
 }
 
