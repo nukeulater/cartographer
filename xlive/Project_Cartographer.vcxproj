@@ -1471,6 +1471,7 @@
     <ClCompile Include="H2MOD\Variants\VariantSystem.cpp" />
     <ClCompile Include="Util\Hooks\Hook.cpp" />
     <ClInclude Include="xlive\xlive_fn_defs.h" />
+    <ClInclude Include="xlive\xlive_ords.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\detours\include\detours.h" />

@@ -2036,7 +2036,7 @@
     <ClInclude Include="Blam\Engine\networking\messages\network_messages.h" />
     <ClInclude Include="xlive.h" />
     <ClInclude Include="xlive_fn_defs.h" />
-    <ClInclude Include="xlive\openlive.h" />
+    <ClInclude Include="xlive\xlive_ords.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

@@ -19,7 +19,7 @@
 
 /* globals */
 
-HMODULE hThis = NULL;
+HMODULE g_hThis = NULL;
 
 /* externs */
 
@@ -38,7 +38,7 @@ BOOL APIENTRY DllMain( HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpRese
 	switch (ul_reason_for_call)
 	{
 	case DLL_PROCESS_ATTACH:
-		hThis = hModule;
+		g_hThis = hModule;
 		XLiveModInitialize();
 		InitH2Startup();
 		break;
