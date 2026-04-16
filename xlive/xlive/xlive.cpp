@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
 #include "xlive.h"
+#include "xlivedefs_ordinals.h"
 
 #include "H2MOD/GUI/XLiveRendering.h"
 #include "H2MOD/GUI/imgui_integration/imgui_handler.h"
@@ -153,22 +154,21 @@ bool XLiveModInitialize()
 	}
 
 	DETOUR_BEGIN();
+	{
+		XLIVE_RESOLVE_FUNCTION(g_hModuleXLive, XLiveInitialize,			XLIVE_ORDINAL_XLIVEINITIALIZE, true);
+		XLIVE_RESOLVE_FUNCTION(g_hModuleXLive, XLiveRender,				XLIVE_ORDINAL_XLIVERENDER, true);
+		XLIVE_RESOLVE_FUNCTION(g_hModuleXLive, XLiveOnResetDevice,		XLIVE_ORDINAL_XLIVEONRESETDEVICE, true);
+		XLIVE_RESOLVE_FUNCTION(g_hModuleXLive, XNotifyDelayUI,			XLIVE_ORDINAL_XNOTIFYDELAYUI, false);
 
-	XLIVE_RESOLVE_FUNCTION(g_hModuleXLive, XLiveInitialize, 5000, true);
-	XLIVE_RESOLVE_FUNCTION(g_hModuleXLive, XLiveRender, 5002, true);
-	XLIVE_RESOLVE_FUNCTION(g_hModuleXLive, XLiveOnResetDevice, 5007, true);
-	XLIVE_RESOLVE_FUNCTION(g_hModuleXLive, XNotifyDelayUI, 653, false);
+		XLIVE_RESOLVE_FUNCTION(g_hModuleXLive, XLivePBufferAllocate,	XLIVE_ORDINAL_XLIVEPBUFFERALLOCATE, false);
+		XLIVE_RESOLVE_FUNCTION(g_hModuleXLive, XLivePBufferSetByte,		XLIVE_ORDINAL_XLIVEPBUFFERSETBYTE, false);
 
-	XLIVE_RESOLVE_FUNCTION(g_hModuleXLive, XLivePBufferAllocate, 5016, false);
-	XLIVE_RESOLVE_FUNCTION(g_hModuleXLive, XLivePBufferSetByte, 5019, false);
+		XLIVE_RESOLVE_FUNCTION(g_hModuleXLive, XUserGetXUID,			XLIVE_ORDINAL_XUSERGETXUID, false);
+		XLIVE_RESOLVE_FUNCTION(g_hModuleXLive, XUserGetSigninState,		XLIVE_ORDINAL_XUSERGETSIGNINSTATE, false);
 
-	XLIVE_RESOLVE_FUNCTION(g_hModuleXLive, XUserGetXUID, 5261, false);
-	XLIVE_RESOLVE_FUNCTION(g_hModuleXLive, XUserGetSigninState, 5262, false);
-
-	XLIVE_RESOLVE_FUNCTION(g_hModuleXLive, XShowSigninUI, 5260, false);
-
+		XLIVE_RESOLVE_FUNCTION(g_hModuleXLive, XShowSigninUI,			XLIVE_ORDINAL_XSHOWSIGNINUI, false);
+	}
 	DETOUR_COMMIT();
 
-#undef RESOLVE_FUNC
 	return true;
 }

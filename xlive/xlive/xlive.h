@@ -1,8 +1,7 @@
 #pragma once
 
 #include "xlivedefs.h"
-
-#include "xlive_fn_defs.h"
+#include "xlivedefs_functions.h"
 
 bool XLiveModInitialize();
 

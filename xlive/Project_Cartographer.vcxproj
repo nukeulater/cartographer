@@ -1470,8 +1470,8 @@
     <ClCompile Include="H2MOD\Variants\Infection\Infection.cpp" />
     <ClCompile Include="H2MOD\Variants\VariantSystem.cpp" />
     <ClCompile Include="Util\Hooks\Hook.cpp" />
-    <ClInclude Include="xlive\xlive_fn_defs.h" />
-    <ClInclude Include="xlive\xlive_ords.h" />
+    <ClInclude Include="xlive\xlivedefs_functions.h" />
+    <ClInclude Include="xlive\xlivedefs_ordinals.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\detours\include\detours.h" />

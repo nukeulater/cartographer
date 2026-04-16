@@ -2035,8 +2035,8 @@
     <ClInclude Include="Blam\Engine\cartographer\build_version\cartographer_build_version.h" />
     <ClInclude Include="Blam\Engine\networking\messages\network_messages.h" />
     <ClInclude Include="xlive.h" />
-    <ClInclude Include="xlive_fn_defs.h" />
-    <ClInclude Include="xlive\xlive_ords.h" />
+    <ClInclude Include="xlive\xlivedefs_functions.h" />
+    <ClInclude Include="xlive\xlivedefs_ordinals.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />
