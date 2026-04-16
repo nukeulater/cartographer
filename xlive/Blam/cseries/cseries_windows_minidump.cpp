@@ -114,7 +114,7 @@ static bool should_include_module_code_seg(const wchar_t* path)
 {
 	bool result = false;
 
-	if (wcsstr(path, L"xlive.dll"))
+	if (wcsstr(path, L"cartographer.asi"))
 	{
 		result = true;
 	}

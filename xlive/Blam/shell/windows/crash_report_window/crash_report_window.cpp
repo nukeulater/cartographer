@@ -321,7 +321,7 @@ static void crash_window_wm_create(HWND hwnd)
 	crash_report_window_create_widgets(hwnd, k_crash_window_width, k_crash_window_height);
 
 	// Load bitmap from windows resource
-	g_crash_hbitmap = LoadBitmapW(GetModuleHandleW(L"xlive.dll"), MAKEINTRESOURCEW(IDB_CRASH_WINDOW_HEADER_BITMAP));
+	g_crash_hbitmap = LoadBitmapW(GetModuleHandleW(L"cartographer.asi"), MAKEINTRESOURCEW(IDB_CRASH_WINDOW_HEADER_BITMAP));
 
 	if (g_crash_hbitmap == NULL)
 	{

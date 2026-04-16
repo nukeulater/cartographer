@@ -247,17 +247,6 @@ void SaveH2Config()
 			"\n# 0 - Config files are read from executable's launch directory then AppDataLocal if missing. Will write to AppDataLocal if not read from the execution directory."
 			"\n# 1 - All config files are read and written to the executable's launch directory (however will still scan and read from AppDataLocal if missing)."
 			"\n\n"
-			"# base_port Options:"
-			"\n# <1 - 65526> - The port the game binds to including any of the nine (9) afterward: UDP and/or TCP (Upper limit: 65535 - 9 = 65526)."
-			"\n\n"
-
-			"# wan_ip Options:"
-			"\n# lan_ip Options:"
-			"\n# This option is used for when you cannot join games hosted on the same local network due to NAT issues."
-			"\n# Configuring these settings for an internal network address avoids the requirement for that host user to port forward."
-			"\n# <IPv4> - External IP Address of the local / internal network user you are trying to connect to. If blank, the External IP returned from the Master Login is used."
-			"\n# <IPv4> - Internal IP Address of the local / internal network user you are trying to connect to."
-			"\n\n"
 		);
 
 		// Client - only instructions
