@@ -47,6 +47,7 @@
 #include <TlHelp32.h>
 #include <iphlpapi.h>
 #include <errno.h>
+#include <assert.h>
 
 // initialize GUIDs locally
 #include <initguid.h>

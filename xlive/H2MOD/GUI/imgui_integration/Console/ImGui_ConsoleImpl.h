@@ -126,10 +126,21 @@ CartographerConsole::LogToTab(_console_tab_logs, \
 	header ": " "   %s() -> " fmt, __FUNCTION__, __VA_ARGS__); \
 } while (0)
 
-#endif
-
-#define SIM_EVENT_QUEUE_DBG(fmt, ...)
+#define SIM_EVENT_QUEUE_DBG(fmt, ...) (void)0
 //#define SIM_EVENT_QUEUE_DBG(fmt, ...) QUICK_DBG("sim-event-queue", fmt, __VA_ARGS__)
 
-#define SIM_ENT_QUEUE_DBG(fmt, ...)
+#define SIM_ENT_QUEUE_DBG(fmt, ...) (void)0
 //#define SIM_ENT_QUEUE_DBG(fmt, ...) QUICK_DBG("sim-ent-queue", fmt, __VA_ARGS__)
+
+#else
+
+#define QUICK_DBG(header, fmt, ...) (void)0
+#define IMCONSOLE_LOG(fmt, ...) (void)0
+
+#define SIM_EVENT_QUEUE_DBG(fmt, ...) (void)0
+#define SIM_ENT_QUEUE_DBG(fmt, ...) (void)0
+
+#endif
+
+
+

@@ -15,12 +15,6 @@ struct XLIVE_MODULE_VERSION
 	const char* pszVersion;
 };
 
-
-enum eXLiveSupported
-{
-
-};
-
 HRESULT XLiveInitialize(XLIVE_INITIALIZE_INFO* pXii);
 HRESULT XLiveOnResetDevice(VOID* pD3DPP);
 DWORD XNotifyDelayUI(ULONG ulMilliSeconds);

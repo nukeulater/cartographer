@@ -47,7 +47,9 @@ XLIVE_DEFINE_FUNC(XLiveRender_t,
 	HRESULT, XLiveRender, ()
 )
 {
+#ifndef IMGUI_DISABLE
 	ImGuiHandler::DrawImgui();
+#endif
 	return pXLiveRender();
 }
 
@@ -129,18 +131,17 @@ bool XLiveModInitialize()
 
 	if (XLiveSupportedVersion(g_XLiveVersion, &versionIndex))
 	{
-		IMCONSOLE_LOG("XLIVE version loaded: %X - %s", g_XLiveSupportedList[versionIndex].dwVersion, g_XLiveSupportedList[versionIndex].pszVersion);
+		IMCONSOLE_LOG("XLIVE version loaded: %s - %X", g_XLiveSupportedList[versionIndex].pszVersion, g_XLiveSupportedList[versionIndex].dwVersion);
 	}
 	else
 	{
-		IMCONSOLE_LOG("XLIVE version loaded: ( --- unknown version, possible issues --- )");
+		IMCONSOLE_LOG("XLIVE version loaded: ( --- unknown version: %X, possible issues --- )", g_XLiveVersion);
 	}
-
 
 #define RESOLVE_FUNC_ORD(module, fn, ordinal)				\
 {															\
 	p##fn = (fn##_t*)GetProcAddress(module, ordinal);		\
-	assert(fn##Orig != NULL);								\
+	assert(p##fn != NULL);								\
 }
 
 	RESOLVE_FUNC_ORD(g_hModuleXLive, XLiveInitialize, (const char*)5000);
