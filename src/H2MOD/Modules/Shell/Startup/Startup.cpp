@@ -31,7 +31,7 @@ static void startup_init_h2_game(void);
 
 static void startup_init_h2_tools(e_h2_type type);
 
-void PostH2Config() 
+void CartographerPostConfig() 
 {
 }
 

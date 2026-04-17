@@ -1,10 +1,10 @@
 #pragma once
 
 
-void InitH2Config();
-void DeinitH2Config();
-void SaveH2Config();
-void ReadH2Config();
+void CartographerInitializeConfiguration();
+void CartographerDeinitializeConfiguration();
+void CartographerSaveConfiguration();
+void CartographerReadConfiguration();
 bool config_use_instance_name(const wchar_t** instance_name);
 
 #ifndef _CARTOGRAPHER_DLL_CONF

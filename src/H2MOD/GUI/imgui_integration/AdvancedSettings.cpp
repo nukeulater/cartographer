@@ -1029,7 +1029,7 @@ namespace ImGuiHandler {
 				cartographer_player_profile_save(g_advanced_settings_current_controller_index);
 
 				if(g_advanced_settings_current_controller_index == _controller0)
-					SaveH2Config();
+					CartographerSaveConfiguration();
 			}
 		}
 	}

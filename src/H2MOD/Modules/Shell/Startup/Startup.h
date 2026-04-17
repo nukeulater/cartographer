@@ -1,7 +1,7 @@
 #pragma once
 
 
-void PostH2Config();
+void CartographerPostConfig();
 void InitH2Startup();
 void H2DedicatedServerStartup();
 

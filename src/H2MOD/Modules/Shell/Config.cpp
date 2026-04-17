@@ -208,9 +208,9 @@ WPARAM H2Config_hotkeyIdHelp = VK_F3;
 WPARAM H2Config_hotkeyIdImGuide = VK_F4;
 WPARAM H2Config_hotkeyIdConsole = VK_F10;
 
-void SaveH2Config()
+void CartographerSaveConfiguration()
 {
-	addDebugText("Saving H2Configuration File...");
+	addDebugText("Saving Cartographer configuration file");
 
 	const bool is_dedicated_server = shell_is_dedicated_server();
 
@@ -421,7 +421,6 @@ void SaveH2Config()
 			std::string lang_str(std::to_string(H2Config_language.code_main) + "x" + std::to_string(H2Config_language.code_variant));
 			CONFIG_SET(&ini, "language_code", lang_str.c_str());
 
-
 			CONFIG_SET(&ini, "language_label_capture", &H2Config_custom_labels_capture_missing);
 
 			CONFIG_SET(&ini, "skip_intro", &H2Config_skip_intro);
@@ -521,7 +520,7 @@ void SaveH2Config()
 }
 
 
-void ReadH2Config()
+void CartographerReadConfiguration()
 {
 	addDebugText("Reading H2Configuration file...");
 
@@ -536,7 +535,7 @@ void ReadH2Config()
 	const errno_t err = _wfopen_s(&file_config, config_file_path, L"rb");
 	if (err)
 	{
-		addDebugText("ERROR: No H2Configuration files could be found!");
+		addDebugText("ERROR: No Cartographer configuration files could be found!");
 		//g_force_cartographer_update = true;
 	}
 	else
@@ -550,10 +549,10 @@ void ReadH2Config()
 		}
 
 		CSimpleIniA ini;
+		SI_Error rc;
 		ini.SetUnicode();
 
-		SI_Error rc = ini.LoadFile(file_config);
-		if (rc < 0)
+		if ((rc = ini.LoadFile(file_config)), rc < 0)
 		{
 			addDebugText("ini.LoadFile() failed with error: %d while trying to read configuration file!", (int)rc);
 		}
@@ -729,27 +728,26 @@ void ReadH2Config()
 		fclose(file_config);
 	}
 
-	addDebugText("End reading H2Configuration file.");
+	addDebugText("End reading Cartographer configuration file.");
 }
 #pragma endregion
 
-#pragma region Config Init/Deinit
-void InitH2Config()
+void CartographerInitializeConfiguration()
 {
 	H2Config_disable_ingame_keyboard = shell_get_instance_num() > 1 ? true : false;
-	ReadH2Config();
+	CartographerReadConfiguration();
 	g_h2config_initialized = true;
+	CartographerPostConfig();
 }
-void DeinitH2Config()
+void CartographerDeinitializeConfiguration()
 {
 	// Only save the config at deinitialization if we've initialized the config
 	if (g_h2config_initialized)
 	{
-		SaveH2Config();
+		CartographerSaveConfiguration();
 	}
 	return;
 }
-#pragma endregion
 
 bool config_use_instance_name(const wchar_t** instance_name)
 {
@@ -784,7 +782,6 @@ static void config_get_formatted_path(wchar_t* config_file_path, const wchar_t* 
 	{
 		usnprintf(config_file_path, count, L"%ws%ws%ws.ini", main_path, k_h2config_filenames[is_dedicated_server], instance_name);
 	}
-	// Use instance number by default
 	else
 	{
 		usnprintf(config_file_path, count, L"%ws%ws%d.ini", main_path, k_h2config_filenames[is_dedicated_server], shell_get_instance_num());

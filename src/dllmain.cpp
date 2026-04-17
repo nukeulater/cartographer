@@ -121,7 +121,7 @@ void exit_instance(void)
 
 	extern void DeinitCustomLanguage();
 	DeinitCustomLanguage();
-	DeinitH2Config();
+	CartographerDeinitializeConfiguration();
 
 	h2log_dispose();
 

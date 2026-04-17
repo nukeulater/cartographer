@@ -19,7 +19,7 @@ HMODULE g_hModuleXLive = NULL;
 DWORD g_XLiveVersion;
 char g_XliveVersionStr[128];
 
-XLIVE_MODULE_VERSION g_XLiveSupportedList[] =
+const XLIVE_MODULE_VERSION g_XLiveSupportedList[] =
 {
 	XLIVE_BUILD_MODULE_VERSION(1, 2, 241, 0),
 	XLIVE_BUILD_MODULE_VERSION(2, 0, 672, 0),

@@ -138,14 +138,12 @@ bool shell_platform_initialize(void)
 	}
 
 	shell_windows_initialize_arguments();
-
 	shell_windows_throttle_framerate_initialize();
 
 	// TODO: initialize the ini config in the same place between client and dedi 
 	if (!is_dedi)
 	{
-		InitH2Config();
-		PostH2Config();
+		CartographerInitializeConfiguration();
 	}
 
 	h2log_initialize();

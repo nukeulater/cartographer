@@ -43,9 +43,8 @@ c_kablam_config_live* kablam_config_live_get()
 static void kablam_config_cartographer_initialize(void)
 {
 	// TODO: initialize the ini config in the same place between client and dedi 
-	InitH2Config();
-	PostH2Config();
-
+	CartographerInitializeConfiguration();
+	
 	// Overwrite the playlist config entry from the registry key with the one in h2config if the entry is defined
 	// TODO: figure out a better option for handling this other than just duplicating the entry in the registry
 	if (csstrnlen(H2Config_dedi_server_playlist, NUMBEROF(H2Config_dedi_server_playlist)) > 0)
