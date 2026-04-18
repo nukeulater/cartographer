@@ -197,7 +197,7 @@ do																								\
 {																								\
 	if (!(STATEMENT))																			\
 	{																							\
-		DISPLAY_ASSERT(csprintf(g_temporary, NUMBEROF(g_temporary), (FORMAT), __VA_ARGS__));	\
+		DISPLAY_ASSERT(cssnprintf(g_temporary, NUMBEROF(g_temporary), (FORMAT), __VA_ARGS__));	\
 	}																							\
 }																								\
 while(0)
@@ -243,22 +243,19 @@ int32 csstrnicmp(const char* s1, const char* s2, size_t size);
 
 int32 csstricmp(const char* s1, const char* s2);
 
-int32 vsprintf(char* buffer, size_t size, const char* format, char* ap);
+int32 csvsnprintf(char* buffer, size_t size, const char* format, va_list ap);
 
 /* 
 * NOTES:
 * size_t max_count was added in vista to this function call
 */
-int32 vsnprintf(char* buffer, size_t size, size_t max_count, const char* format, char* ap);
-
-
-const char* csprintf(char* buffer, size_t size, const char* format, ...);
+int32 vsnprintf(char* buffer, size_t size, size_t max_count, const char* format, va_list ap);
 
 /*
 * NOTES:
 * size_t max_count was added in vista to this function call
 */
-const char* csnprintf(char* buffer, size_t size, size_t max_count, const char* format, ...);
+const char* cssnprintf(char* buffer, size_t size, const char* format, ...);
 
 
 size_t csstrnlen(const char* s, size_t size);

@@ -508,7 +508,7 @@ const char* c_static_string<T>::print(const char* format, ...)
 	va_list args;
 	va_start(args, format);
 	ASSERT(format);
-	vsnprintf(m_string, T, format, args);
+	csvsnprintf(m_string, T, format, args);
 
 	va_end(args);
 	return m_string;
@@ -525,7 +525,7 @@ const char* c_static_string<T>::append_print(const char* format, ...)
 	ASSERT(format);
 	ASSERT(current_length >= 0 && current_length < NUMBEROF(m_string));
 
-	vsprintf(&m_string[current_length], T - current_length, format, args);
+	csvsnprintf(&m_string[current_length], T - current_length, format, args);
 	va_end(args);
 	return m_string;
 }

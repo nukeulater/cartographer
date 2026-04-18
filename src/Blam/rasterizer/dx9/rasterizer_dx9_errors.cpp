@@ -12,7 +12,7 @@ void rasterizer_dx9_errors(HRESULT hr, const char* format, ...)
 	const char* hr_string = "<unknown error>";
 	char error_string[1024] = {};
 	char buffer[1024] = {};
-	vsprintf(error_string, NUMBEROF(error_string), format, va);
+	csvsnprintf(error_string, NUMBEROF(error_string), format, va);
 	switch (hr)
 	{
 	case D3DERR_UNSUPPORTEDCOLOROPERATION:

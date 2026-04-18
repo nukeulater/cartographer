@@ -519,10 +519,10 @@ bool hs_compile_and_evaluate(const char* expression, bool interactive)
 			csstrncpy(source_data, string, NUMBEROF(source_data));
 			break;
 		case 1:
-			csprintf(source_data, NUMBEROF(source_data), "(%s)", string);
+			cssnprintf(source_data, NUMBEROF(source_data), "(%s)", string);
 			break;
 		case 2:
-			csprintf(source_data, NUMBEROF(source_data), "(set %s)", string);
+			cssnprintf(source_data, NUMBEROF(source_data), "(set %s)", string);
 			break;
 		default:
 			halt();
@@ -1178,7 +1178,7 @@ static void hs_enumerate_hud_messages(void)
 static void hs_get_function_parameters_string(int16 function_index, char* buffer, int32 buffer_size)
 {
 	const hs_function_definition* function = hs_function_get(function_index);
-	csprintf(buffer, buffer_size, "(%s", function->name);
+	cssnprintf(buffer, buffer_size, "(%s", function->name);
 	if (function->parameters)
 	{
 		csnappendf(buffer, buffer_size, " %s", function->parameters);

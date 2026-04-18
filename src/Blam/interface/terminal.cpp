@@ -377,7 +377,7 @@ void terminal_printf(const real_argb_color* color, const char* format, ...)
 			output_line->fade_progress = 0.f;
 			output_line->color = color ? *color : default_color;
 			
-			vsprintf(output_line->buffer, ARRAYSIZE(output_line->buffer), format, args);
+			csvsnprintf(output_line->buffer, ARRAYSIZE(output_line->buffer), format, args);
 			output_line->tabstop = strstr(output_line->buffer, "|t") != NULL;
 
 			if (terminal_globals.console_output)

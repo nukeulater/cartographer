@@ -45,7 +45,7 @@ void system_get_date_and_time(char* string, int16 size, bool exclude_millisecond
 	
 	if (exclude_milliseconds)
 	{
-		csprintf(
+		cssnprintf(
 			string,
 			size,
 			"%02d%02d%02d_%02d%02d%02d",
@@ -58,7 +58,7 @@ void system_get_date_and_time(char* string, int16 size, bool exclude_millisecond
 	}
 	else
 	{
-		csprintf(
+		cssnprintf(
 			string,
 			size,
 			"%02d.%02d.%02d %02d:%02d:%02d.%03d",
@@ -76,7 +76,7 @@ void system_get_date_and_time(char* string, int16 size, bool exclude_millisecond
 void handle_fatal_error(int32 code, const char* error)
 {
 	char string[512];
-	csprintf(
+	cssnprintf(
 		string,
 		NUMBEROF(string),
 		"%s\nWould you like a programmer to debug this?\n(You can also view more extensive error messages in debug.txt)",

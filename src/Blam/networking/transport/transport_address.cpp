@@ -27,7 +27,7 @@ char* transport_address_to_string(const transport_address* address, const s_tran
 	{
 	// IPV4
 	case 4:
-		csprintf(
+		cssnprintf(
 			string,
 			maximum_string_length,
 			"%hd.%hd.%hd.%hd",
@@ -66,7 +66,7 @@ char* transport_address_to_string(const transport_address* address, const s_tran
 		break;
 	// IPV6
 	case 16:
-		csprintf(
+		cssnprintf(
 			string,
 			maximum_string_length,
 			"%04X.%04X.%04X.%04X.%04X.%04X.%04X.%04X",

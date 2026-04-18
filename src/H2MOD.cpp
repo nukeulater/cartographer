@@ -276,20 +276,18 @@ void H2MOD::custom_sound_play(const wchar_t* soundName, int delay)
 		std::thread(playSound).detach();
 }
 
-static const real32 seconds_trigger_hold = 1.0f / 30.0f; // 0.033333333 seconds takes 2 60hz seconds
-
-void H2MOD::player_position_increase_client_position_margin_of_error(bool enable)
+void H2MOD::player_position_increase_client_position_error_threshold(bool enable)
 {
 	if (shell_is_dedicated_server())
 		return;
 
-	const real32 k_default_biped_distance_error_margin = 2.5f;
-	const real32 k_default_vehicle_distance_error_margin = 7.5f;
+	const real32 k_default_biped_distance_threshold = 2.5f;
+	const real32 k_default_vehicle_distance_threshold = 7.5f;
 
-	real32 biped_error_margin = !enable ? k_default_biped_distance_error_margin : 4.0f;
-	real32 vehicle_error_margin = !enable ? k_default_vehicle_distance_error_margin : 10.0f;
-	*Memory::GetAddress<real32*>(0x4F958C) = biped_error_margin;
-	*Memory::GetAddress<real32*>(0x4F9594) = vehicle_error_margin;
+	real32 biped_error_margin = !enable ? k_default_biped_distance_threshold : 4.0f;
+	real32 vehicle_error_margin = !enable ? k_default_vehicle_distance_threshold : 10.0f;
+	WriteValue<real32>(Memory::GetAddress(0x4F958C), biped_error_margin);
+	WriteValue<real32>(Memory::GetAddress(0x4F9594), vehicle_error_margin);
 }
 
 void H2MOD::Initialize()
@@ -550,6 +548,8 @@ static uint16 __cdecl get_enabled_team_flags(c_network_session* session)
 
 __declspec(naked) static void object_function_value_adjust_primary_firing(void)
 {
+	static const real32 seconds_trigger_hold = 1.0f / 30.0f; // one 30hz update takes two 60hz updates
+
 	__asm
 	{
 		// eax holds game_time_get()
@@ -735,7 +735,6 @@ static void h2mod_apply_tweaks(void)
 {
 	if (shell_is_dedicated_server())
 	{
-
 	}
 	else
 	{
@@ -807,3 +806,4 @@ static bool FlashlightIsEngineSPCheck(void)
 {
 	return game_is_campaign();
 }
+

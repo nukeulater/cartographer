@@ -271,7 +271,7 @@ void discord_interface_set_difficulty(
 	
 	// Convert difficulty to string
 	char number_string[2];
-	csprintf(number_string, sizeof(number_string), "%hd", difficulty);
+	cssnprintf(number_string, sizeof(number_string), "%hd", difficulty);
 
 	// Create image name we select for the difficulty
 	c_static_string<16> difficulty_image_name;
@@ -536,7 +536,7 @@ static void discord_rich_presence_update(
 		XUID host;
 		XUserGetXUID(0, &host);
 
-		csprintf(g_discord_globals.activity.party.id, sizeof(g_discord_globals.activity.party.id), "%016llx", host);
+		cssnprintf(g_discord_globals.activity.party.id, sizeof(g_discord_globals.activity.party.id), "%016llx", host);
 		g_discord_globals.activity.party.privacy = DiscordActivityPartyPrivacy_Public;
 		discord_interface_encode_xsession_info(&session);
 	}

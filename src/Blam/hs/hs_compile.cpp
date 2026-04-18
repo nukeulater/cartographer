@@ -446,7 +446,7 @@ bool hs_parse_begin(int16 function_index, int32 expression_index)
 		else
 		{
 			const hs_function_definition* function = hs_function_get(function_index);
-			hs_compile_globals.error_message = csprintf(
+			hs_compile_globals.error_message = cssnprintf(
 				hs_compile_globals.error_buffer,
 				NUMBEROF(hs_compile_globals.error_buffer),
 				"a statement block must contain at least one argument.",
@@ -503,7 +503,7 @@ bool hs_parse_set(int16 function_index, int32 expression_index)
 				variable->type = (e_hs_type)hs_global_get_type(hs_global_index);
 				if (expression->type && !hs_can_cast(variable->type, expression->type))
 				{
-					hs_compile_globals.error_message = csprintf(
+					hs_compile_globals.error_message = cssnprintf(
 						hs_compile_globals.error_buffer,
 						NUMBEROF(hs_compile_globals.error_buffer),
 						"you cannot pass the result of this set (type %s) to a function that expects type %s.",
@@ -666,7 +666,7 @@ bool hs_macro_function_parse(int16 function_index, int32 expression_index)
 		{
 			if (string->type == _hs_type_string_id && TEST_BIT(hs_syntax_get(string_expression_index)->flags, _hs_syntax_node_primitive_bit))
 			{
-				csprintf(
+				cssnprintf(
 					hs_compile_globals.error_buffer,
 					NUMBEROF(hs_compile_globals.error_buffer),
 					"this is not a valid string for '%s'",
@@ -680,7 +680,7 @@ bool hs_macro_function_parse(int16 function_index, int32 expression_index)
 	
 	if (result && (parameter_num != definition->formal_parameter_count || string_expression_index != NONE))
 	{
-		csprintf(
+		cssnprintf(
 			hs_compile_globals.error_buffer,
 			NUMBEROF(hs_compile_globals.error_buffer),
 			"the \"%s\" call requires exactly %d arguments.",
@@ -1141,7 +1141,7 @@ static bool hs_parse_enum(int32 expression_index)
 
 		if (enum_index == enum_definition->count)
 		{
-			csprintf(hs_compile_globals.error_buffer, 0x400u, "%s must be ", hs_type_names[expression->type]);// "unparsed"
+			cssnprintf(hs_compile_globals.error_buffer, 0x400u, "%s must be ", hs_type_names[expression->type]);// "unparsed"
 			int16 i = 0;
 			for (; i < enum_definition->count - 1; ++i)
 			{
@@ -1166,7 +1166,7 @@ static bool hs_parse_enum(int32 expression_index)
 	}
 	else
 	{
-		csprintf(
+		cssnprintf(
 			hs_compile_globals.error_buffer,
 			NUMBEROF(hs_compile_globals.error_buffer),
 			"corrupt enum expression (type %d constant-type %d)",
@@ -1361,7 +1361,7 @@ static bool hs_parse_primitive(int32 expression_index)
 			}
 			else
 			{
-				csprintf(
+				cssnprintf(
 					hs_compile_globals.error_buffer,
 					NUMBEROF(hs_compile_globals.error_buffer),
 					"expressions of type %s are currently unsupported.",
@@ -1396,7 +1396,7 @@ static bool hs_parse_variable(int32 expression_index)
 		const int16 type = hs_global_get_type(expression->short_value);
 		if (expression->type && !hs_can_cast(type, expression->type))
 		{
-			csprintf(
+			cssnprintf(
 				hs_compile_globals.error_buffer,
 				NUMBEROF(hs_compile_globals.error_buffer),
 				"i expected a value of type %s, but the variable %s has type %s",
@@ -1516,7 +1516,7 @@ static bool hs_parse_nonprimitive(int32 expression_index)
 				{
 					if (expression->type && !hs_can_cast(script->return_type, expression->type))
 					{
-						csprintf(
+						cssnprintf(
 							hs_compile_globals.error_buffer,
 							NUMBEROF(hs_compile_globals.error_buffer),
 							"i expected a %s, but this script returns a %s.",
@@ -1546,7 +1546,7 @@ static bool hs_parse_nonprimitive(int32 expression_index)
 				const hs_function_definition* function = hs_function_get(expression->function_index);
 				if (expression->type && !hs_can_cast(function->return_type, expression->type))
 				{
-					csprintf(
+					cssnprintf(
 						hs_compile_globals.error_buffer,
 						NUMBEROF(hs_compile_globals.error_buffer),
 						"i expected a %s, but this function returns a %s.",
@@ -1582,7 +1582,7 @@ static bool hs_parse_nonprimitive(int32 expression_index)
 	else
 	{
 		const char* string = expression->type == _hs_special_form ? "\"script\" or \"global\"" : "a function name";
-		csprintf(hs_compile_globals.error_buffer, NUMBEROF(hs_compile_globals.error_buffer), "i expected %s, but i got an expression.", string);
+		cssnprintf(hs_compile_globals.error_buffer, NUMBEROF(hs_compile_globals.error_buffer), "i expected %s, but i got an expression.", string);
 		hs_compile_globals.error_message = hs_compile_globals.error_buffer;
 		hs_compile_globals.error_offset = stored_expression->source_offset;
 	}
@@ -1804,7 +1804,7 @@ static bool hs_get_parameter_indices(const char* function_name, uint16 count, in
 
 	if (node_num != count || next_node_index != NONE)
 	{
-		hs_compile_globals.error_message = csprintf(
+		hs_compile_globals.error_message = cssnprintf(
 			hs_compile_globals.error_buffer,
 			NUMBEROF(hs_compile_globals.error_buffer),
 			"the %s call requires %d arguments.",
@@ -1853,7 +1853,7 @@ static bool hs_parse_tag_block_element(int32 expression_index, int32 offset, int
 	}
 	else
 	{
-		csprintf(hs_compile_globals.error_buffer, NUMBEROF(hs_compile_globals.error_buffer), "this is not a valid %s name", hs_type_names[expression->type]);
+		cssnprintf(hs_compile_globals.error_buffer, NUMBEROF(hs_compile_globals.error_buffer), "this is not a valid %s name", hs_type_names[expression->type]);
 		hs_compile_globals.error_message = hs_compile_globals.error_buffer;
 		hs_compile_globals.error_offset = expression->source_offset;
 	}
@@ -1896,7 +1896,7 @@ static bool hs_parse_tag_block_element_string_id(int32 expression_index, int32 o
 	}
 	else
 	{
-		csprintf(hs_compile_globals.error_buffer, NUMBEROF(hs_compile_globals.error_buffer), "this is not a valid %s name", hs_type_names[expression->type]);
+		cssnprintf(hs_compile_globals.error_buffer, NUMBEROF(hs_compile_globals.error_buffer), "this is not a valid %s name", hs_type_names[expression->type]);
 		hs_compile_globals.error_message = hs_compile_globals.error_buffer;
 		hs_compile_globals.error_offset = expression->source_offset;
 	}

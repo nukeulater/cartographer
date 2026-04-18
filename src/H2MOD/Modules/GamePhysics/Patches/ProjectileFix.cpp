@@ -5,6 +5,8 @@
 #include "game/game_time.h"
 #include "objects/objects.h"
 
+#include "math/matrix_math.h"
+
 #include "items/projectile_definition.h"
 
 #include "math/matrix_math.h"

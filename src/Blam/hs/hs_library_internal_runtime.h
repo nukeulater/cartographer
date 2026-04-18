@@ -311,7 +311,7 @@ static void hs_inspect_real(int16 type, int32 value, char* buffer, int32 buffer_
 {
 	ASSERT(type == _hs_type_real);
 
-	csprintf(buffer, buffer_size, "%f", *(real32*)&value);
+	cssnprintf(buffer, buffer_size, "%f", *(real32*)&value);
 	return;
 }
 
@@ -319,7 +319,7 @@ static void hs_inspect_short_integer(int16 type, int32 value, char* buffer, int3
 {
 	ASSERT(type == _hs_type_short_integer);
 
-	csprintf(buffer, buffer_size, "%d", (int16)value);
+	cssnprintf(buffer, buffer_size, "%d", (int16)value);
 	return;
 }
 
@@ -327,7 +327,7 @@ static void hs_inspect_long_integer(int16 type, int32 value, char* buffer, int32
 {
 	ASSERT(type == _hs_type_long_integer);
 
-	csprintf(buffer, buffer_size, "%ld", (int32)value);
+	cssnprintf(buffer, buffer_size, "%ld", (int32)value);
 	return;
 }
 

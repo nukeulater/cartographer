@@ -341,7 +341,7 @@ int32 uvfprintf(struct _iobuf* stream, const wchar_t* format, char* ap);
 
 int32 uvprintf(const wchar_t* format, char* ap);
 
-int32 uvsnprintf(wchar_t* string, size_t size, const wchar_t* format, char* ap);
+int32 uvsnprintf(wchar_t* string, size_t size, const wchar_t* format, va_list ap);
 
 struct _iobuf* ufdopen(int32 fd, const wchar_t* path);
 

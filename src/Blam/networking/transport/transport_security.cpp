@@ -33,7 +33,7 @@ void transport_secure_address_extract_identifier(
 char* transport_secure_identifier_get_string(
 	const s_transport_secure_identifier* identifier)
 {
-	csprintf(
+	cssnprintf(
 		g_transport_security_identifier_string,
 		NUMBEROF(g_transport_security_identifier_string),
 		"%02X%02X%02X%02X:%02X%02X%02X%02X",
@@ -55,7 +55,7 @@ const char* managed_session_get_id_string(
 {
     ASSERT(session_id != NULL);
 
-	return csprintf(
+	return cssnprintf(
 		g_transport_security_managed_session_id_string,
 		NUMBEROF(g_transport_security_managed_session_id_string),
         "%02X %02X %02X %02X %02X %02X %02X %02X",
@@ -75,7 +75,7 @@ const char* transport_unique_identifier_get_string(
 {
 	ASSERT(unique_identifier != NULL);
 	
-	return csprintf(
+	return cssnprintf(
 		g_transport_security_unique_identifier_string,
 		NUMBEROF(g_transport_security_unique_identifier_string),
 		"%02X%02X%02X%02X%02X%02X",
@@ -101,7 +101,7 @@ char* transport_secure_address_to_string(
 		transport_address address;
 		address.address.raw_ipv4 = ntohl(secure_address.addr.ina.S_un.S_addr);
 
-		csprintf(
+		cssnprintf(
 			string,
 			size,
 			"%hd.%hd.%hd.%hd", 

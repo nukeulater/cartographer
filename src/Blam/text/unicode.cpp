@@ -293,20 +293,20 @@ int32 usnprintf(wchar_t* string, size_t size, const wchar_t* format, ...)
 	return result;
 }
 
-int32 uvfprintf(_iobuf* stream, const wchar_t* format, char* ap)
+int32 uvfprintf(_iobuf* stream, const wchar_t* format, va_list ap)
 {
 	ASSERT(stream != NULL);
 	ASSERT(format != NULL);
 	return vfwprintf(stream, format, ap);
 }
 
-int32 uvprintf(const wchar_t* format, char* ap)
+int32 uvprintf(const wchar_t* format, va_list ap)
 {
 	ASSERT(format != NULL);
 	return vwprintf(format, ap);
 }
 
-int32 uvsnprintf(wchar_t* string, size_t size, const wchar_t* format, char* ap)
+int32 uvsnprintf(wchar_t* string, size_t size, const wchar_t* format, va_list ap)
 {
 	ASSERT(string && format);
 	ASSERT(size > 0);

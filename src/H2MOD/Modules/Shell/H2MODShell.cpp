@@ -16,7 +16,7 @@ void _Shell::OpenMessageBox(HWND hWnd, UINT uType, const char* caption,  const c
 	}
 
 	char* textBufferA = (char*)malloc(stringLength * sizeof(char));
-	vsprintf(textBufferA, stringLength, format, valist);
+	csvsnprintf(textBufferA, stringLength, format, valist);
 
 	MessageBoxA(hWnd, textBufferA, caption, uType);
 

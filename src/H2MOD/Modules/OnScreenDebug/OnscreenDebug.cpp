@@ -35,7 +35,7 @@ void addDebugTextInternal(char* text) {
 		output->AddString(StringFlag_None, text, textLen);
 #endif
 #ifndef SPDLOG_DISABLED
-		g_onscreendebug_log->debug(text);
+		LOG_DEBUG(g_onscreendebug_log, text);
 #endif
 		if (endChar) {
 			return addDebugTextInternal(endChar + 1);
@@ -57,11 +57,11 @@ void addDebugText(const wchar_t* format, ...)
 		return;
 	}
 
-	wchar_t* textBufferW = (wchar_t*)calloc(stringLength, sizeof(wchar_t));
+	wchar_t* textBufferW = (wchar_t*)malloc(stringLength * sizeof(wchar_t));
 	_vsnwprintf_s(textBufferW, stringLength, _TRUNCATE, format, valist);
 
-	char* textBufferA = (char*)calloc(stringLength, sizeof(char));
-	csprintf(textBufferA, stringLength, "%ls", textBufferW);
+	char* textBufferA = (char*)malloc(stringLength * sizeof(char));
+	cssnprintf(textBufferA, stringLength, "%ls", textBufferW);
 
 	addDebugTextInternal(textBufferA);
 
@@ -84,8 +84,8 @@ void addDebugText(const char* format, ...)
 		return;
 	}
 
-	char* textBufferA = (char*)calloc(stringLength, sizeof(char));
-	vsprintf(textBufferA, stringLength, format, valist);
+	char* textBufferA = (char*)malloc(stringLength * sizeof(char));
+	csvsnprintf(textBufferA, stringLength, format, valist);
 
 	addDebugTextInternal(textBufferA);
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #ifndef SPDLOG_DISABLED
+
 // Disable sign/unsigned comparison mismatch in spdlog
 #pragma warning( push )
 #pragma warning( disable : 4389)
@@ -9,12 +10,12 @@
 #pragma warning( pop )
 
 enum log_level : unsigned int {
-	trace,    //          Tell me *everything*
-	debug,    //          Give me the dirty details
-	info,     // Default. Occasionally helpful information
-	warning,  //          What probably shouldn't be happening
-	_log_level_error,    //          Bad news only, please
-	critical  //          I only want to see death and destruction
+	_trace,    //          Tell me *everything*
+	_debug,    //          Give me the dirty details
+	_info,     // Default. Occasionally helpful information
+	_warning,  //          What probably shouldn't be happening
+	_error,    //          Bad news only, please
+	_critical  //          I only want to see death and destruction
 };
 
 class h2log
@@ -41,130 +42,23 @@ public:
 	/// </summary>
 	static h2log* create_console(const std::string &name, int debugLogLevel);
 
-#define log_a(level) \
-do { \
-	if (m_output != nullptr)													\
-		m_output->level(fmt.data(), args...);									\
-	if (!isConsole && console != nullptr && console->m_output != nullptr)		\
-		console->m_output->level(("[" + m_sname + "] " + fmt).data(), args...);	\
-} while (0)
-
-#define log_b(level) \
-do { \
-	if (m_output != nullptr)														\
-		m_output->level(fmt.data(), args...);										\
-	if (!isConsole && console != nullptr && console->m_output != nullptr)			\
-		console->m_output->level((L"[" + m_wname + L"] " + fmt).data(), args...);	\
-} while (0)
-
-#define log_c(level) \
-do { \
-	if (m_output != nullptr)												\
-		m_output->level(msg.data());										\
-	if (!isConsole && console != nullptr && console->m_output != nullptr)	\
-		console->m_output->level(("[" + m_sname + "] " + msg).data());		\
-} while (0)
-
-#define log_d(level) \
-do { \
-	if (m_output != nullptr)												\
-		m_output->level(msg.data());										\
-	if (!isConsole && console != nullptr && console->m_output != nullptr)	\
-		console->m_output->level((L"[" + m_wname + L"] " + msg).data());	\
-} while (0)
+	// For the most unimportant stuff
+	template<typename... Args>
+	void output(log_level level, const std::string& fmt, const Args &... args) {
+		if (m_output != nullptr)
+			m_output->log((spdlog::level::level_enum)level, fmt.data(), std::forward<const Args&>(args)...);
+		if (!isConsole && console != nullptr && console->m_output != nullptr)
+			console->m_output->log((spdlog::level::level_enum)level, ("[" + m_sname + "] " + fmt).data(), std::forward<const Args&>(args)...);
+	}
 
 	// For the most unimportant stuff
 	template<typename... Args>
-	void trace(const std::string& fmt, const Args &... args) { log_a(trace); }
-
-	// For the most unimportant stuff
-	template<typename... Args>
-	void trace(const std::wstring& fmt, const Args &... args) { log_b(trace); }
-
-	// For the most unimportant stuff
-	void trace(const std::string& msg) { log_c(trace); }
-
-	// For the most unimportant stuff
-	void trace(const std::wstring& msg) { log_d(trace); }
-
-
-	// Somewhat more useful information
-	template<typename... Args>
-	void debug(const std::string& fmt, const Args &... args) { log_a(debug); }
-
-	// Somewhat more useful information
-	template<typename... Args>
-	void debug(const std::wstring& fmt, const Args &... args) { log_b(debug); }
-
-	// Somewhat more useful information
-	void debug(const std::string& msg) { log_c(debug); }
-
-	// Somewhat more useful information
-	void debug(const std::wstring& msg) { log_d(debug); }
-
-
-	// Things that even users may want to see
-	template<typename... Args>
-	void info(const std::string& fmt, const Args &... args) { log_a(info); }
-
-	// Things that even users may want to see
-	template<typename... Args>
-	void info(const std::wstring& fmt, const Args &... args) { log_b(info); }
-
-	// Things that even users may want to see
-	void info(const std::string& msg) { log_c(info); }
-
-	// Things that even users may want to see
-	void info(const std::wstring& msg) { log_d(info); }
-
-
-	// A surprise to be sure, but not a serious one
-	template<typename... Args>
-	void warning(const std::string& fmt, const Args &... args) { log_a(warn); }
-
-	// A surprise to be sure, but not a serious one
-	template<typename... Args>
-	void warning(const std::wstring& fmt, const Args &... args) { log_b(warn); }
-
-	// A surprise to be sure, but not a serious one
-	void warning(const std::string& msg) { log_c(warn); }
-
-	// A surprise to be sure, but not a serious one
-	void warning(const std::wstring& msg) { log_d(warn); }
-
-
-	// Absolutely not good, probably game breaking events
-	template<typename... Args>
-	void error(const std::string& fmt, const Args &... args) { log_a(error); }
-
-	// Absolutely not good, probably game breaking events
-	template<typename... Args>
-	void error(const std::wstring& fmt, const Args &... args) { log_b(error); }
-
-	// Absolutely not good, probably game breaking events
-	void error(const std::string& msg) { log_c(error); }
-
-	// Absolutely not good, probably game breaking events
-	void error(const std::wstring& msg) { log_d(error); }
-
-
-	// "Wait, that's illegal" except it is definitely not a joke
-	template<typename... Args>
-	void critical(const std::string& fmt, const Args &... args) { log_a(critical); }
-
-	// "Wait, that's illegal" except it is definitely not a joke
-	template<typename... Args>
-	void critical(const std::wstring& fmt, const Args &... args) { log_b(critical); }
-
-	// "Wait, that's illegal" except it is definitely not a joke
-	void critical(const std::string& msg) { log_c(critical); }
-
-	// "Wait, that's illegal" except it is definitely not a joke
-	void critical(const std::wstring& msg) { log_d(critical); }
-
-#undef log_a
-#undef log_w
-#undef log_b
+	void output(log_level level, const std::wstring& fmt, const Args &... args) { 
+		if (m_output != nullptr)
+			m_output->log((spdlog::level::level_enum)level, fmt.data(), std::forward<const Args&>(args)...);
+		if (!isConsole && console != nullptr && console->m_output != nullptr)
+			console->m_output->log((spdlog::level::level_enum)level, (L"[" + m_wname + L"] " + fmt).data(), std::forward<const Args&>(args)...);
+	}
 
 public:
 	bool isConsole = false;
@@ -184,12 +78,23 @@ extern h2log* g_network_log;
 extern h2log* g_console_log;
 extern h2log* g_onscreendebug_log;
 
-#define CHECK_PTR(check, expression) \
-do \
-{ \
-	if ((check)) \
-		(expression); \
-} while (0)
+template<typename... Args>
+static inline void h2log_print(h2log* logger, log_level level, const char* msg, const Args &... args)
+{
+	if (logger != NULL)
+	{
+		logger->output(level, msg, std::forward<const Args&>(args)...);
+	}
+}
+
+template<typename... Args>
+static inline void h2log_print(h2log* logger, log_level level, const wchar_t* msg, const Args &... args)
+{
+	if (logger != NULL)
+	{
+		logger->output(level, msg, std::forward<const Args&>(args)...);
+	}
+}
 
 // to note this is not thread safe
 // you might see the max log count reached message more than once in a row
@@ -227,22 +132,22 @@ do \
 
 // Generic logging
 // For the most unimportant stuff
-#define LOG_TRACE(logger, msg, ...)      CHECK_PTR((logger), (logger)->trace    (msg, __VA_ARGS__))
+#define LOG_TRACE(logger, msg, ...)      h2log_print(logger, log_level::_trace, msg, __VA_ARGS__)
 
 // Somewhat more useful information
-#define LOG_DEBUG(logger, msg, ...)      CHECK_PTR((logger), (logger)->debug    (msg, __VA_ARGS__))
+#define LOG_DEBUG(logger, msg, ...)      h2log_print(logger, log_level::_debug, msg, __VA_ARGS__)
 
 // Things that even users may want to see
-#define LOG_INFO(logger, msg, ...)       CHECK_PTR((logger), (logger)->info     (msg, __VA_ARGS__))
+#define LOG_INFO(logger, msg, ...)       h2log_print(logger, log_level::_info, msg, __VA_ARGS__)
 
 // A surprise to be sure, but not a serious one
-#define LOG_WARNING(logger, msg, ...)    CHECK_PTR((logger), (logger)->warning  (msg, __VA_ARGS__))
+#define LOG_WARNING(logger, msg, ...)    h2log_print(logger, log_level::_warning, msg, __VA_ARGS__)
 
 // Absolutely not good, probably game breaking events
-#define LOG_ERROR(logger, msg, ...)      CHECK_PTR((logger), (logger)->error    (msg, __VA_ARGS__))
+#define LOG_ERROR(logger, msg, ...)      h2log_print(logger, log_level::_error,  msg, __VA_ARGS__)
 
 // "Wait, that's illegal" except it is definitely not a joke
-#define LOG_CRITICAL(logger, msg, ...)   CHECK_PTR((logger), (logger)->critical (msg, __VA_ARGS__))
+#define LOG_CRITICAL(logger, msg, ...)   h2log_print(logger, log_level::_critical, msg, __VA_ARGS__)
 
 // Mod-specific logging
 // For the most unimportant stuff related to H2mod specifically

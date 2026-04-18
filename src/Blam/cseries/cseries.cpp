@@ -192,43 +192,20 @@ int32 csstricmp(const char* s1, const char* s2)
 	return ascii_stricmp(s1, s2);
 }
 
-int32 vsprintf(char* buffer, size_t size, const char* format, char* ap)
+int32 csvsnprintf(char* buffer, size_t size, const char* format, va_list ap)
 {
 	ASSERT(buffer);
 	ASSERT(format);
 	ASSERT(size > 0);
-
 	const int32 result = (int32)_vsnprintf_s(buffer, size, _TRUNCATE, format, ap);
 	return result;
 }
 
-int32 vsnprintf(char* buffer, size_t size, size_t max_count, const char* format, char* ap)
-{
-	ASSERT(buffer);
-	ASSERT(format);
-	ASSERT(size > 0);
-
-	const int32 result = (int32)_vsnprintf_s(buffer, size, max_count, format, ap);
-	return result;
-}
-
-
-
-
-const char* csprintf(char* buffer, size_t size, const char* format, ...)
+const char* cssnprintf(char* buffer, size_t size, const char* format, ...)
 {
 	va_list va_args;
 	va_start(va_args, format);
-	(void)vsprintf(buffer, size, format, va_args);
-	va_end(va_args);
-	return buffer;
-}
-
-const char* csnprintf(char* buffer, size_t size, size_t max_count, const char* format, ...)
-{
-	va_list va_args;
-	va_start(va_args, format);
-	(void)vsnprintf(buffer, size, max_count, format, va_args);
+	(void)csvsnprintf(buffer, size, format, va_args);
 	va_end(va_args);
 	return buffer;
 }
@@ -258,7 +235,7 @@ char* csnappendf(char* s, size_t size, const char* format, ...)
 
 	size_t current_length = cstrlen(s);
 	ASSERT(current_length >= 0 && current_length < size);
-	vsprintf(&s[current_length], size - current_length, format, va_args);
+	csvsnprintf(&s[current_length], size - current_length, format, va_args);
 
 	va_end(va_args);
 	return s;

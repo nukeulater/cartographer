@@ -1267,7 +1267,7 @@ void objects_dump_memory(void)
 	const char* tag_name = tag_name_strip_path(tag_path);
 
 	char filepath[256];
-	csprintf(filepath, NUMBEROF(filepath), "%s_object_memory%d.txt", tag_name, g_object_memory_dump_number++);
+	cssnprintf(filepath, NUMBEROF(filepath), "%s_object_memory%d.txt", tag_name, g_object_memory_dump_number++);
 	_iobuf* file;
 	const errno_t error = fopen_s(&file, filepath, "a+b");
 	if (error == 0)

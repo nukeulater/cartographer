@@ -555,7 +555,7 @@ void error_va(
 			if (!dont_print_error)
 			{
 				char string[1032];
-				vsprintf(string, NUMBEROF(string), format, ap);
+				csvsnprintf(string, NUMBEROF(string), format, ap);
 
 				event(_event_message, "error: %s", string);
 

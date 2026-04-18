@@ -297,7 +297,7 @@ void main_time_frame_rate_display(void)
 		const int32 framerate_rounded = real_to_long_round(framerate);
 
 		char string[64];
-		csprintf(string, NUMBEROF(string), "[%.1f] %d", (real32)framerate_rounded, framerate_rounded);
+		cssnprintf(string, NUMBEROF(string), "[%.1f] %d", (real32)framerate_rounded, framerate_rounded);
 		
 		const s_render* render = render_get();
 		const int16 width = rectangle2d_width(&render->camera.window_bounds);
@@ -352,7 +352,7 @@ void main_time_frame_rate_display(void)
 			rect.top -= (20 * height_scale_factor);
 			rect.bottom -= (20 * height_scale_factor);
 			char string[4];
-			csprintf(string, NUMBEROF(string), "%d", g_flip_deltas[delta_index]);
+			cssnprintf(string, NUMBEROF(string), "%d", g_flip_deltas[delta_index]);
 			draw_string_set_format(NONE, 1, 0, false);
 			draw_string_set_font(_font_id_6);
 			const real_argb_color* color = g_flip_deltas[delta_index] < 2 ? global_real_argb_red : global_real_argb_green;

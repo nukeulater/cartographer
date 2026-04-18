@@ -75,7 +75,7 @@ h2log* h2log::create(const std::string &name, const std::wstring &filename, int 
 		failAlerted = true;
 	}
 
-	new_h2log->debug("Initialized");
+	LOG_DEBUG(new_h2log, "Initialized");
 	return new_h2log;
 }
 
@@ -96,7 +96,7 @@ h2log* h2log::create_console(const std::string& name, int debugLogLevel)
 	new_h2log->m_output = console->m_output->clone(name);
 	new_h2log->m_output->set_pattern("%^%H:%M:%S.%e [CONSOLE] [%n] : %v%$");
 
-	new_h2log->debug("Initialized");
+	LOG_DEBUG(new_h2log, "Initialized");
 	return new_h2log;
 }
 

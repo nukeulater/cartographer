@@ -647,7 +647,7 @@ static int CommandCollection::WarpFixCmd(const std::vector<std::string>& tokens,
 		return 0;
 	}
 
-	H2MOD::player_position_increase_client_position_margin_of_error(warpFixVar);
+	H2MOD::player_position_increase_client_position_error_threshold(warpFixVar);
 	return 0;
 }
 
@@ -705,7 +705,7 @@ static int CommandCollection::invite(const std::vector<std::string>& tokens, Con
 		// Encode the data into hex string
 		for (uint32 i = 0; i < sizeof(XSESSION_INFO); i++)
 		{
-			csprintf(&connect_string[2 * i], 3, "%02hhX", session_bytes[i]);
+			cssnprintf(&connect_string[2 * i], 3, "%02hhX", session_bytes[i]);
 		}
 
 		outputCb(StringFlag_None, "Invite code generated:");

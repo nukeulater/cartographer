@@ -220,7 +220,7 @@ void console_printf(const char* format, ...)
 	if (is_main_thread())
 	{
 		char string[MAX_PATH];
-		vsprintf(string, NUMBEROF(string) - 5, format, args);
+		csvsnprintf(string, NUMBEROF(string) - 5, format, args);
 		terminal_printf(NULL, "%s", string);
 
 		if (console_dump_to_file)
@@ -247,7 +247,7 @@ void console_warning(const char* format, ...)
 	if (is_main_thread())
 	{
 		char string[MAX_PATH];
-		vsprintf(string, NUMBEROF(string) - 5, format, args);
+		csvsnprintf(string, NUMBEROF(string) - 5, format, args);
 		terminal_printf(global_real_argb_red, "%s", string);
 
 		if (console_dump_to_file)

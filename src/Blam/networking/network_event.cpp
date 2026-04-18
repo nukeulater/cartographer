@@ -78,7 +78,7 @@ static uint32 network_event_get_flags(e_event_level event_level, datum index);
 
 static void network_event_dump_categories_recursive(datum category_index);
 
-static void network_event_print(const char* format, e_event_level event_level, int32 category, char* ap);
+static void network_event_print(const char* format, e_event_level event_level, int32 category, va_list ap);
 
 static int32 network_event_parse_and_get_category_count(const char* event_name, int32 category_count, int32 string_buffer_size, char (*category_names)[k_event_category_string_length]);
 
@@ -285,7 +285,7 @@ static void network_event_dump_categories_recursive(datum category_index)
 	return;
 }
 
-static void network_event_print(const char* format, e_event_level event_level, int32 category, char* ap)
+static void network_event_print(const char* format, e_event_level event_level, int32 category, va_list ap)
 {
 	const uint32 flags = network_event_get_flags(event_level, category);
 	if (flags)
@@ -294,7 +294,7 @@ static void network_event_print(const char* format, e_event_level event_level, i
 		ASSERT(format);
 
 		char event_text[2048];
-		vsprintf(event_text, NUMBEROF(event_text), format, ap);
+		csvsnprintf(event_text, NUMBEROF(event_text), format, ap);
 		
 		char timestamp[256];
 		char dst[256];
@@ -313,22 +313,22 @@ static void network_event_print(const char* format, e_event_level event_level, i
 				const int32 hour = minutes / 60;
 				const int32 minute = minutes % 60;
 
-				csprintf(timestamp, NUMBEROF(timestamp), "%02d:%02d:%02d.%03d%s", hour, minute, time / 1000 % 60, time % 1000, padding_string);
+				cssnprintf(timestamp, NUMBEROF(timestamp), "%02d:%02d:%02d.%03d%s", hour, minute, time / 1000 % 60, time % 1000, padding_string);
 			}
 			else
 			{
-				csprintf(timestamp, NUMBEROF(timestamp), "            %s", padding_string);
+				cssnprintf(timestamp, NUMBEROF(timestamp), "            %s", padding_string);
 			}
 			csstrncat(dst, timestamp, NUMBEROF(dst));
 		}
 
 		if (game_in_progress())
 		{
-			csprintf(timestamp, NUMBEROF(timestamp), "g%06d f%07d", game_time_get(), global_frame_index_get());
+			cssnprintf(timestamp, NUMBEROF(timestamp), "g%06d f%07d", game_time_get(), global_frame_index_get());
 		}
 		else
 		{
-			csprintf(timestamp, NUMBEROF(timestamp), "        f%07d", global_frame_index_get());
+			cssnprintf(timestamp, NUMBEROF(timestamp), "        f%07d", global_frame_index_get());
 		}
 		csstrncat(dst, timestamp, NUMBEROF(dst));
 
@@ -357,7 +357,7 @@ static void network_event_print(const char* format, e_event_level event_level, i
 		if (TEST_BIT(flags, 3) && !g_network_event_print_critical_errors)
 		{
 			char network_event_error[2048];
-			csprintf(network_event_error, NUMBEROF(network_event_error), "critical network event encountered: %s", event_text);
+			cssnprintf(network_event_error, NUMBEROF(network_event_error), "critical network event encountered: %s", event_text);
 			
 			ASSERT_EXCEPTION(network_event_error, network_globals_get()->halt_on_critical_events);
 		}

@@ -198,7 +198,7 @@ public:
 			if ((size_t)buffer_size_needed < m_line_buf_size)
 			{
 				char* buffer = (char*)_malloca(buffer_size_needed);
-				int copied_characters = vsprintf(buffer, buffer_size_needed, fmt, valist);
+				int copied_characters = csvsnprintf(buffer, buffer_size_needed, fmt, valist);
 				AddString(flags, buffer, copied_characters);
 				_freea(buffer);
 			}
@@ -214,7 +214,7 @@ public:
 			if ((size_t)buffer_size_needed < m_line_buf_size)
 			{
 				char* buffer = (char*)_malloca(buffer_size_needed);
-				int copied_characters = vsprintf(buffer, buffer_size_needed, fmt, valist);
+				int copied_characters = csvsnprintf(buffer, buffer_size_needed, fmt, valist);
 				AddString(flags, buffer, copied_characters);
 				_freea(buffer);
 			}

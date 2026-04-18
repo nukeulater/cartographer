@@ -631,7 +631,7 @@ void render_debug_scripting(void)
 		const int16 tab_stops[2] = {250, 350};
 
 		char string[10240];
-		csprintf(string, NUMBEROF(string), "|n|n|nscript name|tsleep time|tfunction");
+		cssnprintf(string, NUMBEROF(string), "|n|n|nscript name|tsleep time|tfunction");
 
 		const s_hs_runtime_globals* hs_runtime_globals = hs_runtime_globals_get();
 		data_array* hs_thread_data = hs_thread_data_get();
