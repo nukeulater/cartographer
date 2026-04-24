@@ -57,7 +57,6 @@ namespace ImGuiHandler
 
 	namespace 
 	{
-		bool				capturing_input = false;
 		bool				clear_imgui_input_state = true;
 	}
 
@@ -89,7 +88,7 @@ namespace ImGuiHandler
 		});
 	}
 
-	bool TakingInput()
+	bool ShouldCaptureInput()
 	{
 		bool result = false;
 
@@ -104,11 +103,6 @@ namespace ImGuiHandler
 		}
 
 		return result;
-	}
-
-	bool InputIsCaptured()
-	{
-		return capturing_input;
 	}
 
 	void DrawUpdate()
@@ -162,14 +156,19 @@ namespace ImGuiHandler
 		}
 		else
 		{
+			
 			imWindow->pClose();
 		}
 
+		if (!TEST_BIT(imWindow->flags, _im_window_no_input_bit))
+		{
+			user_interface_guide_state_manager_get()->set_input_captured_by_shell(g_imgui_window_should_render.test(window));
+		}
+
 		// check if the window blocks the input of the game
-		bool block_game_input = TakingInput();
-		capturing_input = block_game_input;
+		bool block_game_input = ShouldCaptureInput();
 		clear_imgui_input_state = !block_game_input;
-		user_interface_guide_state_manager_get()->set_input_captured_by_shell(block_game_input);
+		
 	}
 
 	bool WindowIsActive(e_imgui_window window)
