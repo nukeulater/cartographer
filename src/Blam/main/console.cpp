@@ -180,7 +180,7 @@ void console_open(bool open_debug_menu)
 		}
 
 		// Prevent game input when console is opened (added code)
-		user_interface_guide_state_manager_get()->m_block_game_input = true;
+		user_interface_guide_state_manager_get()->set_input_captured_by_shell(true);
 	}
 	return;
 }
@@ -195,7 +195,7 @@ void console_close(void)
 		console_globals.active = false;
 		
 		// Allow game input when closed (added code)
-		user_interface_guide_state_manager_get()->m_block_game_input = false;
+		user_interface_guide_state_manager_get()->set_input_captured_by_shell(false);
 	}
 	else
 	{
@@ -307,8 +307,12 @@ void console_update(real32 dt)
 				edit_text_selection_reset(&console_globals.input_state.edit);
 				break;
 			case _key_up_arrow:
-				console_globals.selected_previous_command_index += 2;
 			case _key_down_arrow:
+				if (key->key_code == _key_up_arrow)
+				{
+					console_globals.selected_previous_command_index += 2;
+				}
+
 				last_command = --console_globals.selected_previous_command_index > 0;
 				console_globals.selected_previous_command_index = last_command ? console_globals.selected_previous_command_index : 0;
 

@@ -33,7 +33,7 @@ namespace ImGuiHandler
 				ImGui::SetCursorPosY(190);
 				if (ImGui::Button("Ok", ImVec2(610, 50)))
 				{
-					ImGuiHandler::ToggleWindow(k_message_box_window_name);
+					ImGuiHandler::WindowToggle(_imgui_window_message_box);
 				}
 			}
 			// Pop style var

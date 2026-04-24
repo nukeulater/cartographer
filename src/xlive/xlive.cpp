@@ -12,6 +12,8 @@
 #include "Util/Memory.h"
 #include "Util/Hooks/Hook.h"
 
+#include "interface/user_interface_guide.h"
+
 extern void initialize_instance();
 
 HMODULE g_hModuleXLive = NULL;
@@ -28,7 +30,7 @@ const XLIVE_MODULE_VERSION g_XLiveSupportedList[] =
 
 #define XLIVE_DEFINE_FUNC(type, ret, name, args) \
 	static type* p##name; \
-	ret name args
+	ret WINAPI name args
 
 #define XLIVE_RESOLVE_FUNCTION(module, fn, ordinal, hook)					\
 do																			\
@@ -60,7 +62,7 @@ XLIVE_DEFINE_FUNC(XLiveRender_t,
 )
 {
 #ifndef IMGUI_DISABLE
-	ImGuiHandler::DrawImgui();
+	ImGuiHandler::DrawUpdate();
 #endif
 	return pXLiveRender();
 }
@@ -115,6 +117,20 @@ XLIVE_DEFINE_FUNC(XShowSigninUI_t,
 	return pXShowSigninUI(cPanes, dwFlags);
 }
 
+XLIVE_DEFINE_FUNC(XNotifyGetNext_t,
+	BOOL, XNotifyGetNext, (HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId, PULONG_PTR pParam)
+)
+{
+	BOOL result = pXNotifyGetNext(hNotification, dwMsgFilter, pdwId, pParam);
+	if (*pdwId == 0x9)
+	{
+		c_user_interface_guide_state_manager* guide_state_manager = user_interface_guide_state_manager_get();
+		guide_state_manager->set_xlive_capturing_input(!!(*(ULONG*)pParam));
+	}
+
+	return result;
+}
+
 bool XLiveGetIsSupportedVersion(DWORD dwVersion, const XLIVE_MODULE_VERSION** dwOutSupportedVerIndex)
 {
 	for (int i = 0; i < ARRAYSIZE(g_XLiveSupportedList); i++)
@@ -167,6 +183,8 @@ bool XLiveModInitialize()
 		XLIVE_RESOLVE_FUNCTION(g_hModuleXLive, XUserGetSigninState,		XLIVE_ORDINAL_XUSERGETSIGNINSTATE, false);
 
 		XLIVE_RESOLVE_FUNCTION(g_hModuleXLive, XShowSigninUI,			XLIVE_ORDINAL_XSHOWSIGNINUI, false);
+
+		XLIVE_RESOLVE_FUNCTION(g_hModuleXLive, XNotifyGetNext,			XLIVE_ORDINAL_XNOTIFYGETNEXT, true);
 	}
 	DETOUR_COMMIT();
 

@@ -488,11 +488,9 @@ void __cdecl input_abstraction_update(void)
 					game_input_state);
 				input_abstraction_apply_raw_mouse_update(k_windows_device_controller_index, game_input_state);
 			}
-
 		}
 		else
 		{
-
 			if (!profile_settings->controller_modern)
 			{
 				input_abstraction_update_throttles_legacy(gamepad_state, &left_stick, &right_stick);
@@ -539,7 +537,7 @@ void __cdecl input_abstraction_update(void)
 				{
 #ifndef IMGUI_DISABLE
 					ImGuiHandler::ImAdvancedSettings::set_controller_index(controller);
-					ImGuiHandler::ToggleWindow(k_advanced_settings_window_name);
+					ImGuiHandler::WindowToggle(_imgui_window_advanced_settings);
 					g_controller_advanced_settings_toggle[controller] = true;
 #endif
 				}
@@ -558,7 +556,14 @@ void __cdecl input_abstraction_update(void)
 	return;
 }
 
-void __cdecl input_abstraction_update_input_state(e_controller_index controller_index, s_gamepad_input_preferences* preference, s_gamepad_input_button_state* gamepad_state, real_euler_angles2d* left_stick_analog, real_euler_angles2d* right_stick_analog, s_game_input_state* input_state)
+void __cdecl input_abstraction_update_input_state(
+	e_controller_index controller_index, 
+	s_gamepad_input_preferences* preference, 
+	s_gamepad_input_button_state* gamepad_state, 
+	real_euler_angles2d* left_stick_analog, 
+	real_euler_angles2d* right_stick_analog, 
+	s_game_input_state* input_state
+)
 {
 	g_updating_gamepad_index = controller_index;
 
@@ -673,18 +678,26 @@ static void input_abstraction_apply_raw_mouse_update(e_controller_index controll
 		real32 raw_mouse_sensitivity = (cartographer_player_profile->raw_mouse_sensitivity / 100.f);
 
 		input_abstraction_set_mouse_look_sensitivity(controller, 1.0f);
-		input_state->mouse.yaw = (real32)-mouse_state->state.lX;
-		input_state->mouse.pitch = (real32)-mouse_state->state.lY;
 
-		// multiply by 0.016 milliseconds, while this is likely wrong
-		// emulate current behaviour at all tickrates, instead of scaling with tick length lol
-		// which is a higher value at 30 tick, resulting in higher mouse sensitivity
-		input_state->mouse.yaw *= raw_mouse_sensitivity * (1.f / 60.f);
-		input_state->mouse.pitch *= raw_mouse_sensitivity * (1.f / 60.f);
-
-		if (preference->mouse_invert_look)
+		if (!input_shell_supressing())
 		{
-			input_state->mouse.pitch = -0.0f - input_state->mouse.pitch;
+			input_state->mouse.yaw = (real32)-mouse_state->state.lX;
+			input_state->mouse.pitch = (real32)-mouse_state->state.lY;
+
+			// multiply by 1/60 "seconds", TODO FIX THIS but likely won't 
+			// since it has been like this for this long
+			input_state->mouse.yaw *= raw_mouse_sensitivity * (1.f / 60.f);
+			input_state->mouse.pitch *= raw_mouse_sensitivity * (1.f / 60.f);
+
+			if (preference->mouse_invert_look)
+			{
+				input_state->mouse.pitch = -0.0f - input_state->mouse.pitch;
+			}
+		}
+		else
+		{
+			input_state->mouse.yaw = 0.0f;
+			input_state->mouse.pitch = 0.0f;
 		}
 	}
 	else

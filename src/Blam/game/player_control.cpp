@@ -96,11 +96,6 @@ int16 player_control_get_zoom_level(int32 user_index)
 	return player_control_get(user_index)->control_state.desired_zoom_level;
 }
 
-void player_control_disable_local_camera(bool state)
-{
-	player_control_globals_get()->disable_camera = state;
-}
-
 real32 local_player_held_zoom_delta_time[4]
 {
 	0.f, 0.f, 0.f, 0.f

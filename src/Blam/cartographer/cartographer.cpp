@@ -5,6 +5,8 @@
 
 #include "game/game.h"
 
+#include "H2MOD\GUI\imgui_integration\imgui_handler.h"
+
 /* public code */
 bool cartographer_allow_action_during_networked_game()
 {
@@ -14,3 +16,4 @@ bool cartographer_allow_action_during_networked_game()
 	return true;
 #endif
 }
+

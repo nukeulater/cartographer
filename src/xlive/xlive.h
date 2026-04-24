@@ -14,13 +14,13 @@ struct XLIVE_MODULE_VERSION
 	const char* pszVersion;
 };
 
-HRESULT XLiveInitialize(XLIVE_INITIALIZE_INFO* pXii);
-HRESULT XLiveOnResetDevice(VOID* pD3DPP);
-DWORD XNotifyDelayUI(ULONG ulMilliSeconds);
-HRESULT XLivePBufferAllocate(ULONG ulSize, VOID** pxebBuffer);
-HRESULT XLivePBufferSetByte(VOID* xebBuffer, ULONG ulOffset, UCHAR ucValue);
-DWORD XUserGetXUID(DWORD dwUserIndex, XUID* pxuid);
+HRESULT WINAPI XLiveInitialize(XLIVE_INITIALIZE_INFO* pXii);
+HRESULT WINAPI XLiveOnResetDevice(VOID* pD3DPP);
+DWORD WINAPI XNotifyDelayUI(ULONG ulMilliSeconds);
+HRESULT WINAPI XLivePBufferAllocate(ULONG ulSize, VOID** pxebBuffer);
+HRESULT WINAPI XLivePBufferSetByte(VOID* xebBuffer, ULONG ulOffset, UCHAR ucValue);
+DWORD WINAPI XUserGetXUID(DWORD dwUserIndex, XUID* pxuid);
 
-DWORD XShowSigninUI(DWORD cPanes, DWORD dwFlags);
+DWORD WINAPI XShowSigninUI(DWORD cPanes, DWORD dwFlags);
 
-XUSER_SIGNIN_STATE XUserGetSigninState(DWORD dwUserIndex);
+XUSER_SIGNIN_STATE WINAPI XUserGetSigninState(DWORD dwUserIndex);

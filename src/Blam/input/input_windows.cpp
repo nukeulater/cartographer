@@ -6,9 +6,12 @@
 #include "input_xinput.h"
 
 #include "interface/user_interface_controller.h"
+#include "interface/user_interface_guide.h"
 #include "main/main_time.h"
 #include "main/game_preferences.h"
 #include "shell/shell_windows.h"
+
+#include "cartographer/cartographer.h"
 
 #include "H2MOD/Modules/Shell/Config.h"
 
@@ -415,6 +418,15 @@ void input_suppress(void)
 	return;
 }
 
+bool __cdecl input_shell_supressing(void)
+{
+	const s_window_globals* main_window_globals = window_globals_get();
+	return user_interface_guide_state_manager_get()->m_guide_open
+		|| main_window_globals->hWnd != ::GetFocus() 
+		|| main_window_globals->hWnd != ::GetForegroundWindow()
+		|| main_time_is_throttled();
+}
+
 void input_add_key(int32 msg, uint32 wParam, uint32 lParam, bool fHandled)
 {
 	if (input_globals->active_flag)
@@ -724,7 +736,6 @@ void __cdecl input_update_main_device_state()
 		XINPUT_STATE state;
 		s_gamepad_input_state* gamepad = input_get_gamepad(device_index);
 		uint32 error_code = ERROR_DEVICE_NOT_CONNECTED;
-
 
 		if (!device
 			|| (error_code = device->XGetState(&state)) == ERROR_SEVERITY_SUCCESS

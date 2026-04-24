@@ -2,7 +2,7 @@
 
 /* enums */
 
-enum e_weapon_offset_weapon : int8
+enum e_weapon_offset_weapon : int32
 {
 	_weapon_offset_weapon_battle_rifle,
 	_weapon_offset_weapon_beam_rifle,

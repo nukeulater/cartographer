@@ -15,7 +15,7 @@ class c_user_interface_guide_state_manager
 {
 public:
 	HANDLE m_xnotify_listener;
-	bool m_block_game_input;
+	bool m_guide_open;
 	char m_pad_5[3];
 	XUSER_SIGNIN_STATE m_sign_in_state;
 	char m_field_C;
@@ -42,6 +42,11 @@ public:
 	XUSER_SIGNIN_STATE get_signin_state() const;
 
 	void add_user_signin_task(bool sign_to_live, void* signin_callback);
+
+	void set_xlive_capturing_input(bool state);
+
+	bool should_keep_input_captured_by_shell();
+	void set_input_captured_by_shell(bool state);
 };
 #pragma pack(pop)
 ASSERT_STRUCT_SIZE(c_user_interface_guide_state_manager, 1552);

@@ -418,7 +418,7 @@ void CartographerConsole::Draw(const char* title, bool* p_open)
 		{
 			if (ImGui::MenuItem("Clear")) { ClearMainOutput(); }
 			if (ImGui::MenuItem(m_docked ? "Undock console" : "Dock console", NULL)) { m_docked = !m_docked; }
-			if (ImGui::MenuItem("Close Window")) { ImGuiHandler::ToggleWindow(k_cartographer_console_window_name); }
+			if (ImGui::MenuItem("Close Window")) { ImGuiHandler::WindowToggle(_imgui_window_console); }
 			ImGui::EndMenu();
 		}
 
@@ -428,7 +428,7 @@ void CartographerConsole::Draw(const char* title, bool* p_open)
 	// Poput Context Window
 	if (ImGui::BeginPopupContextWindow(NULL, ImGuiPopupFlags_NoOpenOverItems | ImGuiPopupFlags_MouseButtonRight))
 	{
-		if (ImGui::MenuItem("Close Window")) { ImGuiHandler::ToggleWindow(k_cartographer_console_window_name); }
+		if (ImGui::MenuItem("Close Window")) { ImGuiHandler::WindowToggle(_imgui_window_console); }
 		ImGui::EndPopup();
 	}
 
@@ -486,7 +486,7 @@ void CartographerConsole::Draw(const char* title, bool* p_open)
 	{
 		if (GetMainOutput()->GetHeaderCount() > 0)
 			if (ImGui::MenuItem("Clear")) { ClearMainOutput(); }
-		if (ImGui::MenuItem("Close Window")) { ImGuiHandler::ToggleWindow(k_cartographer_console_window_name); }
+		if (ImGui::MenuItem("Close Window")) { ImGuiHandler::WindowToggle(_imgui_window_console); }
 		ImGui::EndPopup();
 	}
 

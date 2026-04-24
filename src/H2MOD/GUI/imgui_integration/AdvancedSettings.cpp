@@ -984,7 +984,7 @@ namespace ImGuiHandler {
 
 			if (!open)
 			{
-				ImGuiHandler::ToggleWindow(k_advanced_settings_window_name);
+				ImGuiHandler::WindowToggle(_imgui_window_advanced_settings);
 			}
 		}
 
@@ -1006,7 +1006,7 @@ namespace ImGuiHandler {
 		{
 			if (g_advanced_settings_current_controller_index == k_no_controller)
 			{
-				ImGuiHandler::ToggleWindow(k_advanced_settings_window_name);
+				ImGuiHandler::WindowToggle(_imgui_window_advanced_settings);
 				return;
 			}
 
@@ -1060,7 +1060,7 @@ static void advanced_settings_create_weapon_offsets_button(real32 height)
 	//Ingame Change Display
 	if (ImGui::Button(advanced_settings_get_string(_advanced_string_weaponoffsets, "WeaponOffsets"), b3_size))
 	{
-		ImGuiHandler::ToggleWindow(k_weapon_offsets_window_name);
+		ImGuiHandler::WindowToggle(_imgui_window_weapon_offsets);
 	}
 
 	ImGui::Columns(2, NULL, false);

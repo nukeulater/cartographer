@@ -20,8 +20,7 @@ do \
 	DetourAttach(&(PVOID&)(_ptr_func), _target_ptr); \
 } while (0)
 
-#define DETOUR_COMMIT() \
-	DetourTransactionCommit();
+#define DETOUR_COMMIT() DetourTransactionCommit()
 
 /* prototypes */
 

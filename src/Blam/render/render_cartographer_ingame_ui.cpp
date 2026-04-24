@@ -303,7 +303,6 @@ void render_main_game_time_debug(void)
 
 void render_netdebug_text(void)
 {
-
 	if (
 #ifndef IMGUI_DISABLE
 		ImGuiHandler::g_network_stats_overlay != _network_stats_display_none

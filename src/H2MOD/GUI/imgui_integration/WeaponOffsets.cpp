@@ -92,7 +92,7 @@ namespace ImGuiHandler {
 			ImGui::End();
 			if (!open)
 			{
-				ImGuiHandler::ToggleWindow(k_weapon_offsets_window_name);
+				ImGuiHandler::WindowToggle(_imgui_window_weapon_offsets);
 			}
 		}
 

@@ -331,8 +331,7 @@ static int WINAPI H2WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR 
 	ustrncpy(window_globals->window_name, L"Halo 2 - Project Cartographer", NUMBEROF(window_globals->window_name));
 	window_globals->wnd_proc = H2WndProc;
 
-	bool pcc_result = shell_windows_pcc_initialize();
-	if (!pcc_result)
+	if (!shell_windows_pcc_initialize())
 	{
 		error(_error_delayed, "Failed to get PCC info / insufficient system resources");
 		

@@ -8,7 +8,6 @@ void _Shell::OpenMessageBox(HWND hWnd, UINT uType, const char* caption,  const c
 
 	/* get the formatted buffer size */
 	int stringLength = _vscprintf(format, valist) + 1; // +1 adds null characeter, "_vscwprintf" doesn't add it
-
 	if (stringLength == -1)
 	{
 		LOG_TRACE_GAME("{} - error trying to get string length size", __FUNCTION__);

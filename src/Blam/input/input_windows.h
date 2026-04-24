@@ -203,6 +203,7 @@ void __cdecl input_dispose();
 void __cdecl input_windows_update(void);
 
 void input_suppress(void);
+bool input_shell_supressing(void);
 
 void input_add_key(int32 msg, uint32 wParam, uint32 lParam, bool fHandled);
 

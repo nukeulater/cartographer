@@ -3,6 +3,9 @@
 
 /* public code */
 
+static bool g_xlive_capturing_input = false;
+static int g_input_shell_capturing_count = 0;
+
 c_user_interface_guide_state_manager* user_interface_guide_state_manager_get(void)
 {
 	return Memory::GetAddress<c_user_interface_guide_state_manager*>(0x9712C8, 0x994A18);
@@ -31,4 +34,32 @@ void c_user_interface_guide_state_manager::add_user_signin_task(bool sign_to_liv
 
 	XShowSigninUI(1, flags);
 	return;
+}
+
+bool c_user_interface_guide_state_manager::should_keep_input_captured_by_shell()
+{
+	return g_xlive_capturing_input || g_input_shell_capturing_count > 0;
+}
+
+void c_user_interface_guide_state_manager::set_xlive_capturing_input(bool state)
+{
+	g_xlive_capturing_input = state;
+}
+
+void c_user_interface_guide_state_manager::set_input_captured_by_shell(bool state)
+{
+	g_input_shell_capturing_count += state ? 1 : -1;
+	ASSERT(g_input_shell_capturing_count >= 0);
+
+	if (!g_xlive_capturing_input)
+	{
+		if (g_input_shell_capturing_count == 0)
+		{
+			m_guide_open = false;
+		}
+		else
+		{
+			m_guide_open = true;
+		}
+	}
 }

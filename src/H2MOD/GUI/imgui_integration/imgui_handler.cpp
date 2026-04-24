@@ -17,155 +17,51 @@
 
 #include "imgui_ProdigyCleanTTF.h"
 
-const char* k_advanced_settings_window_name = "advanced_settings";
-const char* k_weapon_offsets_window_name = "Weapon Offsets";
-const char* k_debug_overlay_window_name = "debug_overlay";
-const char* k_message_box_window_name = "messagebox";
+ImFont*											g_im_font_ProdigyClean = NULL;
+c_static_flags_no_init<k_imgui_window_count>	g_imgui_window_should_render = {};
 
-c_static_flags_no_init<k_imgui_window_type_count> g_imgui_window_should_render = {};
+struct s_imgui_window
+{
+	const char* name;
+	void(* const pDraw)(bool*);
+	void(* const pOpen)(void);
+	void(* const pClose)(void);
+	const uint32 flags;
+};
+
+enum e_im_window_handler_flags
+{
+	_im_window_no_input_bit = 0,
+	_im_window_flag_count = 32
+};
 
 namespace ImGuiHandler
 {
-	enum e_im_window_handler_flags
-	{
-		_im_window_no_input_bit = 0,
-	};
-
-	struct s_imgui_window
-	{
-		const char *const name;
-		void(*const renderFunc)(bool*);
-		void(*const openFunc)(void);
-		void(*const closeFunc)(void);
-		const e_im_window_handler_flags flags;
-	};
-
-	const s_imgui_window imgui_windows[k_imgui_window_type_count] =
-	{
-		{ k_weapon_offsets_window_name, WeaponOffsets::Render, WeaponOffsets::Open, WeaponOffsets::Close, (e_im_window_handler_flags)0},
-		{ k_message_box_window_name, ImMessageBox::Render, ImMessageBox::Open, ImMessageBox::Close, (e_im_window_handler_flags)0},
-		{ k_advanced_settings_window_name, ImAdvancedSettings::Render, ImAdvancedSettings::Open, ImAdvancedSettings::Close, (e_im_window_handler_flags)0},
+	const s_imgui_window k_weapon_offsets_window =
+		{ "Weapon Offsets", WeaponOffsets::Render, WeaponOffsets::Open, WeaponOffsets::Close, 0 };
+	const s_imgui_window k_message_box_window =
+		{ "Message Box", ImMessageBox::Render, ImMessageBox::Open, ImMessageBox::Close, 0 };
+	const s_imgui_window k_advanced_settings_window =
+		{ "Advanced Settings", ImAdvancedSettings::Render, ImAdvancedSettings::Open, ImAdvancedSettings::Close, 0};
 #ifdef TERMINAL_ENABLED
-		{ k_cartographer_console_window_name, CartographerConsole::Render, CartographerConsole::Open, CartographerConsole::Close, (e_im_window_handler_flags)0 }
+	const s_imgui_window k_cartographer_console_window =
+		{ "Cartographer Console", CartographerConsole::Render, CartographerConsole::Open, CartographerConsole::Close, 0};
+#else
+#define k_cartographer_console_window
 #endif
+
+	const s_imgui_window k_imgui_windows[k_imgui_window_count] =
+	{
+		k_weapon_offsets_window, k_message_box_window, k_advanced_settings_window, k_cartographer_console_window
 	};
 
-	PDIRECT3DTEXTURE9			g_patch_notes_texture = NULL;
-
-	namespace {
-		bool					handle_window_input = false;
-
-		// need to update ImGui state at least one more tick
-		// otherwise the enter key gets stuck when ImGui input is disabled, breaking the console
-		bool					last_frame_update = true;
+	namespace 
+	{
+		bool				capturing_input = false;
+		bool				clear_imgui_input_state = true;
 	}
 
 	int						g_network_stats_overlay = _network_stats_display_none;
-
-	ImFont*					g_im_font_ProdigyClean = NULL;
-
-	bool ImGuiShouldHandleInput()
-	{
-		return handle_window_input;
-	}
-	void ImGuiToggleInput(bool state)
-	{
-		handle_window_input = state;
-	}
-	void SetGameInputState(bool enable)
-	{
-		// ### TODO move this function somewhere else
-		user_interface_guide_state_manager_get()->m_block_game_input = !enable;
-	}
-
-	void DrawImgui()
-	{
-		// clear keyboard/mouse input state if we are about to close the ImGui windows
-		if (last_frame_update)
-		{
-			ImGuiIO& io = ImGui::GetIO();
-			io.ClearInputKeys();
-			io.ClearInputMouse();
-			io.ClearInputCharacters();
-			last_frame_update = false;
-		}
-
-		ImGui_ImplDX9_NewFrame();
-		ImGui_ImplWin32_NewFrame();
-		ImGui::NewFrame();
-
-		ImGui::PushFont(g_im_font_ProdigyClean);
-
-		static bool display_network_stats = false;
-		display_network_stats = g_network_stats_overlay == _network_stats_display_complete;
-		ShowNetworkStatsOverlay(&display_network_stats);
-		for (int8 i = 0; i < k_imgui_window_type_count; ++i)
-		{
-			bool should_render = g_imgui_window_should_render.test(i);
-			if (should_render)
-			{
-				const s_imgui_window *const window = &imgui_windows[i];
-				window->renderFunc(&should_render);
-			}
-		}
-
-		ImGui::PopFont();
-
-		// Rendering
-		ImGui::Render();
-		ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
-	}
-
-	void ToggleWindow(const char* name)
-	{
-		bool keep_game_input_blocked = false;
-
-		for (int8 i = 0; i < k_imgui_window_type_count; ++i)
-		{
-			const s_imgui_window *const window = &imgui_windows[i];
-			if (strncmp(window->name, name, 256) == 0)
-			{
-				// Toggle render
-				g_imgui_window_should_render.set(i, !g_imgui_window_should_render.test(i));
-				
-				if (g_imgui_window_should_render.test(i))
-				{
-					window->openFunc();
-				}
-				else
-				{
-					window->closeFunc();
-				}
-			}
-
-			// check if we still need to block the input of the game
-			if (g_imgui_window_should_render.test(i) && !TEST_BIT(window->flags, _im_window_no_input_bit))
-			{
-				keep_game_input_blocked = true;
-			}
-		}
-
-		last_frame_update = !keep_game_input_blocked;
-		SetGameInputState(!keep_game_input_blocked);
-		ImGuiToggleInput(keep_game_input_blocked);
-		player_control_disable_local_camera(keep_game_input_blocked);
-	}
-
-	bool IsWindowActive(const char* name)
-	{
-		if (strncmp(name, "net_metrics", 16) == 0 && g_network_stats_overlay)
-			return true;
-
-		for (int8 i = 0; i < k_imgui_window_type_count; ++i)
-		{
-			const s_imgui_window *const window = &imgui_windows[i];
-			if (strncmp(window->name, name, 256) == 0)
-			{
-				return g_imgui_window_should_render.test(i);
-			}
-		}
-		return false;
-	}
 
 	void Initalize(HWND hWnd)
 	{
@@ -192,31 +88,108 @@ namespace ImGuiHandler
 			ImGui::DestroyContext();
 		});
 	}
+
+	bool TakingInput()
+	{
+		bool result = false;
+
+		for (int32 i = 0; i < k_imgui_window_count; i++)
+		{
+			const s_imgui_window* const imWindow = &k_imgui_windows[i];
+			if (g_imgui_window_should_render.test(i) && !TEST_BIT(imWindow->flags, _im_window_no_input_bit))
+			{
+				result = true;
+				break;
+			}
+		}
+
+		return result;
+	}
+
+	bool InputIsCaptured()
+	{
+		return capturing_input;
+	}
+
+	void DrawUpdate()
+	{
+		// clear keyboard/mouse input state if we are about to close the ImGui windows
+		if (clear_imgui_input_state)
+		{
+			ImGuiIO& io = ImGui::GetIO();
+			io.ClearInputKeys();
+			io.ClearInputMouse();
+			clear_imgui_input_state = false;
+		}
+
+		ImGui_ImplDX9_NewFrame();
+		ImGui_ImplWin32_NewFrame();
+		ImGui::NewFrame();
+
+		ImGui::PushFont(g_im_font_ProdigyClean);
+
+		static bool display_network_stats = false;
+		display_network_stats = g_network_stats_overlay == _network_stats_display_complete;
+		ShowNetworkStatsOverlay(&display_network_stats);
+		for (int32 i = 0; i < k_imgui_window_count; ++i)
+		{
+			bool should_render = g_imgui_window_should_render.test(i);
+			if (should_render)
+			{
+				const s_imgui_window* const window = &k_imgui_windows[i];
+				window->pDraw(&should_render);
+			}
+		}
+
+		ImGui::PopFont();
+
+		// Rendering
+		ImGui::Render();
+		ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
+	}
+
+	void WindowToggle(e_imgui_window window)
+	{
+		ASSERT(IN_RANGE(window, _imgui_window_weapon_offsets, k_imgui_window_count));
+
+		const s_imgui_window* const imWindow = &k_imgui_windows[window];
+
+		// Toggle render
+		g_imgui_window_should_render.set(window, !g_imgui_window_should_render.test(window));
+		if (g_imgui_window_should_render.test(window))
+		{
+			imWindow->pOpen();
+		}
+		else
+		{
+			imWindow->pClose();
+		}
+
+		// check if the window blocks the input of the game
+		bool block_game_input = TakingInput();
+		capturing_input = block_game_input;
+		clear_imgui_input_state = !block_game_input;
+		user_interface_guide_state_manager_get()->set_input_captured_by_shell(block_game_input);
+	}
+
+	bool WindowIsActive(e_imgui_window window)
+	{
+		return g_imgui_window_should_render.test(window);
+	}
+
 	float WidthPercentage(float percent)
 	{
-		auto Width = ImGui::GetWindowContentRegionMax().x - ImGui::GetWindowContentRegionMin().x;
+		auto width = ImGui::GetWindowContentRegionMax().x - ImGui::GetWindowContentRegionMin().x;
 		if (ImGui::GetColumnsCount() > 1)
-			Width = ImGui::GetColumnWidth();
+			width = ImGui::GetColumnWidth();
 
-		return Width * (percent / 100.0f);
+		return width * (percent / 100.0f);
 	}
 
 	void TextVerticalPad(const char* label)
 	{
 		ImGui::AlignTextToFramePadding();
 		ImGui::Text(label);
-	}
-
-	e_imgui_aspect_ratio GetAspectRatio(const real_point2d* display_size)
-	{
-		if (display_size->x / display_size->y >= 1.6f)
-		{
-			return sixten_nine;
-		}
-		else
-		{
-			return four_three;
-		}
 	}
 }
 

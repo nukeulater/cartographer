@@ -283,10 +283,10 @@ void c_tag_injecting_manager::load_raw_data_from_cache(datum injected_index) con
 
 		case _tag_group_bitmap:
 		{
-			int old_list_field = *Memory::GetAddress<DWORD*>(0xA49270 + 0x1FC);
+			int32 old_list_field = *Memory::GetAddress<int32*>(0xA49270 + 0x1FC);
 			bitmap_group* bitmap_definition = (bitmap_group*)tag_data;
 
-			for (int i = 0; i < bitmap_definition->bitmaps.count; i++)
+			for (int32 i = 0; i < bitmap_definition->bitmaps.count; i++)
 			{
 				bitmap_data* bitmap_item = bitmap_definition->bitmaps[i];
 
@@ -296,7 +296,7 @@ void c_tag_injecting_manager::load_raw_data_from_cache(datum injected_index) con
 				pc_texture_cache_preload_bitmap(bitmap_item, 1, 0, nullptr);
 				pc_texture_cache_preload_bitmap(bitmap_item, 0, 0, nullptr);
 			}
-			*Memory::GetAddress<DWORD*>(0xA49270 + 0x1FC) = old_list_field;
+			*Memory::GetAddress<int32*>(0xA49270 + 0x1FC) = old_list_field;
 			break;
 		}
 		case _tag_group_weather_system:

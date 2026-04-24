@@ -223,7 +223,7 @@ void c_screen_xbox_live_task_progress_dialog::apply_patches_on_map_load()
 	{
 		point2d fixed_bitmaps_placements[4] = { {-288, 218}, {148, -66}, {-278, 208}, {-234, 306} };
 
-		for (int i = 0; i < 4; ++i)
+		for (int32 i = 0; i < 4; ++i)
 		{
 			// fix the ui bitmap elements position
 			pane_definition->bitmap_blocks[i]->topleft = fixed_bitmaps_placements[i];

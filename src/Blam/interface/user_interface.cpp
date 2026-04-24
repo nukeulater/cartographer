@@ -11,6 +11,7 @@
 #include "user_interface_text_chat_receiver.h"
 #include "user_interface_text_chat_sender.h"
 #include "user_interface_widget_window.h"
+#include "user_interface_guide.h"
 
 #include "cache/cache_files.h"
 #include "cutscene/cinematics.h"
@@ -512,6 +513,9 @@ void __cdecl user_interface_update(real32 dt)
 	}
 
 	INVOKE(0x20CA7D, 0x0, user_interface_update, dt);
+
+	c_user_interface_guide_state_manager* guide_state_manager = user_interface_guide_state_manager_get();
+	guide_state_manager->m_guide_open = guide_state_manager->should_keep_input_captured_by_shell();
 
 	// move to user_interface_networking_update when rewritten
 	user_interface_networking_update_auto_join();

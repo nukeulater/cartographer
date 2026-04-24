@@ -7,11 +7,6 @@
 
 /* constants */
 
-extern const char* k_advanced_settings_window_name;
-extern const char* k_weapon_offsets_window_name;
-extern const char* k_debug_overlay_window_name;
-extern const char* k_message_box_window_name;
-
 /* enums */
 
 enum e_network_stats_display_type : int32
@@ -21,15 +16,13 @@ enum e_network_stats_display_type : int32
 	_network_stats_display_complete,
 };
 
-enum e_imgui_window_type
+enum e_imgui_window
 {
 	_imgui_window_weapon_offsets,
 	_imgui_window_message_box,
 	_imgui_window_advanced_settings,
-#ifdef TERMINAL_ENABLED
 	_imgui_window_console,
-#endif
-	k_imgui_window_type_count
+	k_imgui_window_count
 };
 
 /* globals */
@@ -41,30 +34,17 @@ namespace ImGuiHandler
 {
 	extern int g_network_stats_overlay;
 
-	enum s_imgui_images
-	{
-		patch_notes
-	};
-
-	enum e_imgui_aspect_ratio : byte
-	{
-		four_three,
-		sixten_nine
-	};
-
-	bool ImGuiShouldHandleInput();
-	void ImGuiToggleInput(bool state);
-	void SetGameInputState(bool enable);
-	bool CanDrawImgui();
-	void DrawImgui();
-	
-	bool IsWindowActive(const char* name);
-	void ToggleWindow(const char* name);
-
 	void Initalize(HWND hWnd);
+	void DrawUpdate();
+
+	bool InputIsCaptured();
+	
+	bool WindowIsActive(e_imgui_window window);
+	void WindowToggle(e_imgui_window window);
+
 	float WidthPercentage(float percent);
 	void TextVerticalPad(const char* label);
-	e_imgui_aspect_ratio GetAspectRatio(const real_point2d* display_size);
+
 	namespace ImMOTD {
 		void Render(bool* p_open);
 		void Open();

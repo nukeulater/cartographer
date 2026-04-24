@@ -98,9 +98,9 @@ void hotkeyFuncHelp() {
 	addDebugText("------------------------------");
 
 #ifdef TERMINAL_ENABLED
-	if (!ImGuiHandler::IsWindowActive(k_cartographer_console_window_name))
+	if (!ImGuiHandler::WindowIsActive(_imgui_window_console))
 	{
-		ImGuiHandler::ToggleWindow(k_cartographer_console_window_name);
+		ImGuiHandler::WindowToggle(_imgui_window_console);
 	}
 	GetMainConsoleInstance()->SwitchToTab(_console_tab_logs);
 #endif
@@ -117,21 +117,21 @@ void hotkeyFuncToggleHideIngameChat() {
 }
 void hotkeyFuncImGuide() {
 #ifndef IMGUI_DISABLE
-	ImGuiHandler::ImAdvancedSettings::set_controller_index(_controller0);
-	ImGuiHandler::ToggleWindow(k_advanced_settings_window_name);
+	ImGuiHandler::ImAdvancedSettings::set_controller_index(_controller_index_0);
+	ImGuiHandler::WindowToggle(_imgui_window_advanced_settings);
 #endif
 }
 
 void hotkeyFuncConsole() {
 #ifdef TERMINAL_ENABLED
-	ImGuiHandler::ToggleWindow(k_cartographer_console_window_name);
+	ImGuiHandler::WindowToggle(_imgui_window_console);
 #endif
 }
 
 void KeyboardInput::Initialize()
 {
 	if (!enableKeyboard3[0]) {
-		for (int i = 0; i < 6; i++) {
+		for (int32 i = 0; i < 6; i++) {
 			enableKeyboard3[i] = *((BYTE*)Memory::GetAddress() + 0x2FA67 + i);
 		}
 	}

@@ -244,8 +244,8 @@ void c_cartographer_guide_edit_list::handle_item_pressed_event(s_event_record* c
 	if (button_id == _item_cartographer_guide_advanced_settings) 
 	{
 #ifndef IMGUI_DISABLE
-		ImGuiHandler::ImAdvancedSettings::set_controller_index(_controller0);
-		ImGuiHandler::ToggleWindow(k_advanced_settings_window_name);
+		ImGuiHandler::ImAdvancedSettings::set_controller_index(_controller_index_0);
+		ImGuiHandler::WindowToggle(_imgui_window_advanced_settings);
 #endif
 	}
 	else if (button_id == _item_cartographer_guide_website) 
