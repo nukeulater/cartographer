@@ -649,7 +649,7 @@ void CartographerReadConfiguration()
 #endif
 
 				CONFIG_GET(&ini, "force_off_d3d9ex", "false", &H2Config_force_off_d3d9ex);
-				CONFIG_GET(&ini, "force_off_sm3", "false", &H2Config_force_off_sm3);
+				CONFIG_GET(&ini, "force_off_sm3", "true", &H2Config_force_off_sm3);
 				CONFIG_GET(&ini, "use_d3d9on12", "false", &g_rasterizer_dx9on12_enabled);
 				CONFIG_GET(
 					&ini,

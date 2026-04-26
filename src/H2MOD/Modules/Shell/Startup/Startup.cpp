@@ -51,7 +51,7 @@ void InitLocalAppData()
 	}
 	
 	// Run folder checks if we're using dev preview paths
-#if USE_DEV_PREVIEW_CONFIG_FILE_PATHS
+#if CARTOGRAPHER_USE_DEV_PREVIEW_CONFIG_PATH
 	ustrncat(appdata_path, k_appdata_dev_preview_path, NUMBEROF(appdata_path));
 
 	// Make sure dev preview folder exists and create if not

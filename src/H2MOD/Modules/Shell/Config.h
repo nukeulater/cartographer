@@ -10,7 +10,7 @@ bool config_use_instance_name(const wchar_t** instance_name);
 #ifndef _CARTOGRAPHER_DLL_CONF
 // temporary config files 
 // for testing purposes
-#define USE_DEV_PREVIEW_CONFIG_FILE_PATHS 1
+#define CARTOGRAPHER_USE_DEV_PREVIEW_CONFIG_PATH 1
 #endif
 
 struct _H2Config_language {

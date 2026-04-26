@@ -156,7 +156,6 @@ namespace ImGuiHandler
 		}
 		else
 		{
-			
 			imWindow->pClose();
 		}
 
@@ -168,7 +167,6 @@ namespace ImGuiHandler
 		// check if the window blocks the input of the game
 		bool block_game_input = ShouldCaptureInput();
 		clear_imgui_input_state = !block_game_input;
-		
 	}
 
 	bool WindowIsActive(e_imgui_window window)
