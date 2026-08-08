@@ -43,8 +43,6 @@ static void add_simulation_table_entries(s_game_globals_custom_representation_re
 
 static void (*const k_game_globals_custom_representation_function_table[k_cartographer_custom_representation_count])(s_game_globals_custom_representation_result*)
 {
-	game_globals_prepare_flood_representation,
-	game_globals_prepare_lmao_representation
 };
 
 /* public code */
@@ -106,10 +104,10 @@ static void game_globals_remove_singleplayer_representation(void)
 static void game_globals_add_new_player_representations(void)
 {
 	s_game_globals_custom_representation_result representations[k_cartographer_custom_representation_count]{};
-	for (uint32 i = 0; i < k_cartographer_custom_representation_count; ++i)
+	for (int32 i = 0; i < k_cartographer_custom_representation_count; ++i)
 	{
-		ASSERT(k_game_globals_custom_representation_function_table[i]);
-		k_game_globals_custom_representation_function_table[i](&representations[i]);
+		if (k_game_globals_custom_representation_function_table[i] != NULL)
+			k_game_globals_custom_representation_function_table[i](&representations[i]);
 	}
 
 	add_new_representations(representations);

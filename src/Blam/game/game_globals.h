@@ -92,15 +92,13 @@ enum e_character_type : int8
 	_character_type_spartan = 2,
 	_character_type_elite = 3,
 
-	k_player_character_type_count_original,	// Original count of characters that shipped with the game
+	k_player_character_type_count_original = _character_type_elite + 1,	// Original count of characters that shipped with the game
 
-	// cartographer added characters
 	_character_type_skeleton = 4,
 	_character_type_flood = 5,
 	_character_type_lmao = 6,
 	k_player_character_type_count,
-
-	k_cartographer_custom_representation_count = k_player_character_type_count - k_player_character_type_count_original
+	k_cartographer_custom_representation_count = k_player_character_type_count - k_player_character_type_count_original,
 };
 
 enum e_player_color_index
