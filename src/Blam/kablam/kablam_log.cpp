@@ -96,7 +96,7 @@ static void kablam_error_log_initialize(void)
 	}
 	else
 	{
-		csprintf(subdirectory, NUMBEROF(subdirectory), "%d", shell_get_instance_num());
+		cssnprintf(subdirectory, NUMBEROF(subdirectory), "%d", shell_get_instance_num());
 	}
 
 	errors_set_log_subdirectory(subdirectory);

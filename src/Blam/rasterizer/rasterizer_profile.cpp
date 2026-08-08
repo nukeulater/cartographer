@@ -77,7 +77,7 @@ static void rasterizer_profile_warning(
 
 			if (index!=NONE)
 			{
-				csprintf(string, NUMBEROF(string), "%s (index=%d, frame=%d)", message, index&SHORT_MAX, (index & 2147450880) >> 15);
+				cssnprintf(string, NUMBEROF(string), "%s (index=%d, frame=%d)", message, index&SHORT_MAX, (index & 2147450880) >> 15);
 			}
 			else
 			{

@@ -11,7 +11,7 @@
 #include "tag_files/tag_loader/tag_injection.h"
 
 
-// TODO Move to Blam/Engine/main/levels once the below are complete
+// TODO Move to Blam/main/levels once the below are complete
 // TODO Cleanup this code
 // TODO Add support for singleplayer maps in the future
 

@@ -5,8 +5,6 @@
 #include "interface/user_interface.h"
 #include "interface/user_interface_controller.h"
 
-#include "H2MOD/Modules/Accounts/AccountLogin.h"
-
 decltype(c_screen_error_dialog_ok::show_dialog)* p_error_ok_dialog_show;
 decltype(c_screen_error_dialog_ok_cancel::show_dialog)* p_ok_cancel_dialog_show;
 
@@ -34,9 +32,6 @@ void* c_screen_error_dialog_ok::show_dialog(
 		return NULL;
 	case _ui_error_booted_from_session:
 	{
-		// boot them offline.
-		XUserSignOut(0);
-		UpdateMasterLoginStatus();
 	}
 	}
 

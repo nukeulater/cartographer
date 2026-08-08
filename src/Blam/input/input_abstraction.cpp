@@ -569,7 +569,7 @@ void __cdecl input_abstraction_update_input_state(
 
 	INVOKE(0x61EA2, 0x0, input_abstraction_update_input_state, controller_index, preference, gamepad_state, left_stick_analog, right_stick_analog, input_state);
 	
-	// Rewritten function: https://github.com/pnill/cartographer/blob/development-patches/xlive/H2MOD/Modules/Splitscreen/InputFixes.cpp#L311
+	// Rewritten function: https://github.com/pnill/cartographer/blob/development-patches/src/H2MOD/Modules/Splitscreen/InputFixes.cpp#L311
 	return;
 }
 

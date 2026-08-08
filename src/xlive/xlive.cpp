@@ -131,6 +131,13 @@ XLIVE_DEFINE_FUNC(XNotifyGetNext_t,
 	return result;
 }
 
+XLIVE_DEFINE_FUNC(XCancelOverlapped_t,
+	DWORD, XCancelOverlapped, (PXOVERLAPPED pOverlapped)
+)
+{
+	return pXCancelOverlapped(pOverlapped);
+}
+
 bool XLiveGetIsSupportedVersion(DWORD dwVersion, const XLIVE_MODULE_VERSION** dwOutSupportedVerIndex)
 {
 	for (int i = 0; i < ARRAYSIZE(g_XLiveSupportedList); i++)
@@ -185,6 +192,8 @@ bool XLiveModInitialize()
 		XLIVE_RESOLVE_FUNCTION(g_hModuleXLive, XShowSigninUI,			XLIVE_ORDINAL_XSHOWSIGNINUI, false);
 
 		XLIVE_RESOLVE_FUNCTION(g_hModuleXLive, XNotifyGetNext,			XLIVE_ORDINAL_XNOTIFYGETNEXT, true);
+
+		XLIVE_RESOLVE_FUNCTION(g_hModuleXLive, XNotifyGetNext,			XLIVE_ORDINAL_XCANCELOVERLAPPED, false);
 	}
 	DETOUR_COMMIT();
 

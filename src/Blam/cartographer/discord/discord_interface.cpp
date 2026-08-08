@@ -576,7 +576,7 @@ static void discord_interface_encode_xsession_info(
 	// Encode the data into hex string
 	for (uint32 i = 0; i < sizeof(XSESSION_INFO); ++i)
 	{
-		csprintf(
+		cssnprintf(
 			&g_discord_globals.activity.secrets.join[2 * i],
 			NUMBEROF(g_discord_globals.activity.secrets.join)-2*i,
 			"%02hhX",

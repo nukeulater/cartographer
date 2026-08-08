@@ -1,5 +1,4 @@
 #pragma once
-#include <XLive/xbox/xbox.h>
 
 /* enums */
 

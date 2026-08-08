@@ -23,4 +23,6 @@ DWORD WINAPI XUserGetXUID(DWORD dwUserIndex, XUID* pxuid);
 
 DWORD WINAPI XShowSigninUI(DWORD cPanes, DWORD dwFlags);
 
+DWORD WINAPI XCancelOverlapped(PXOVERLAPPED pxOverlapped);
+
 XUSER_SIGNIN_STATE WINAPI XUserGetSigninState(DWORD dwUserIndex);

@@ -7,7 +7,7 @@ GOTO:MAIN
 :compile_shader
 	SETLOCAL ENABLEDELAYEDEXPANSION
 		:: The part where we compile the shader bytecode
-		.\bin\fxc.exe /O3 /Gis /nologo /T %~1 %~3 /Fo ./xlive/Blam/Engine/rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/%~2_%~1.vso ./xlive/Blam/Engine/rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/%~2.fx 2> nul
+		.\bin\fxc.exe /O3 /Gis /nologo /T %~1 %~3 /Fo ./src/Blam/rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/%~2_%~1.vso ./src/Blam/rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/%~2.fx 2> nul
     ENDLOCAL
 EXIT /B 0
 
@@ -16,14 +16,14 @@ EXIT /B 0
 		:: Instead of "unsigned char" we want "static const unsigned char"
 		:: Also, remove __compiled prefix
 		:: Remove _vso suffix
-		.\bin\w64devkit\bin\sed.exe -b -i -e "s/_vso\[/\[/g" -e "s/unsigned char __xlive_Blam_Engine_rasterizer_dx9_vertex_shaders_dx9_preprocessed_hlsl_from_tool_compiled_/static const unsigned char k_/g" %~1
+		.\bin\w64devkit\bin\sed.exe -b -i -e "s/_vso\[/\[/g" -e "s/unsigned char __src_Blam_rasterizer_dx9_vertex_shaders_dx9_preprocessed_hlsl_from_tool_compiled_/static const unsigned char k_/g" %~1
 	ENDLOCAL
 EXIT /B 0
 
 :add_shader_bytecode_to_file
 	SETLOCAL ENABLEDELAYEDEXPANSION
 		:: Get a C array of file data for our compiled shader
-		.\bin\w64devkit\bin\xxd.exe -i ./xlive/Blam/Engine/rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/%~2_%~1.vso >> %~3
+		.\bin\w64devkit\bin\xxd.exe -i ./src/Blam/rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/%~2_%~1.vso >> %~3
 		:: Delete the last line in the file to remove length global
 		.\bin\w64devkit\bin\sed.exe -b -i "$d" %~3						
 	ENDLOCAL
@@ -34,7 +34,7 @@ EXIT /B 0
 		call:compile_shader "vs_2_0" %~1 %~2
 		call:compile_shader "vs_3_0" %~1 %~2
 		
-		set file="./xlive/Blam/Engine/rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/%~1.h"
+		set file="./src/Blam/rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/%~1.h"
 		
 		echo #pragma once > %file%
 		echo. >> %file%
@@ -48,21 +48,21 @@ EXIT /B 0
 
 :add_vertex_shaders
 	SETLOCAL ENABLEDELAYEDEXPANSION
-		for %%i in (./xlive/Blam/Engine/rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/*.fx) do call::add_shader %%~ni
-		for %%i in (./xlive/Blam/Engine/rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/*.h) do call::replace_content ./xlive/Blam/Engine/rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/%%i
+		for %%i in (./src/Blam/rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/*.fx) do call::add_shader %%~ni
+		for %%i in (./src/Blam/rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/*.h) do call::replace_content ./src/Blam/rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/%%i
     ENDLOCAL
 EXIT /B 0
 
 :cleanup
 	SETLOCAL ENABLEDELAYEDEXPANSION
-		del xlive\Blam\Engine\rasterizer\dx9\vertex_shaders_dx9\preprocessed_hlsl_from_tool\compiled\*.vso
+		del src\Blam\rasterizer\dx9\vertex_shaders_dx9\preprocessed_hlsl_from_tool\compiled\*.vso
     ENDLOCAL
 EXIT /B 0
 
 :add_includes_to_file
 	SETLOCAL ENABLEDELAYEDEXPANSION
 		echo 	adding includes...
-		for %%i in (./xlive/Blam/Engine/rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/*.fx) do echo #include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/%%~ni.h" >> %~1
+		for %%i in (./src/Blam/rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/*.fx) do echo #include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/%%~ni.h" >> %~1
 		echo. >> %file%
     ENDLOCAL
 EXIT /B 0
@@ -70,7 +70,7 @@ EXIT /B 0
 
 :add_bytecode_reference_to_table:
 	SETLOCAL ENABLEDELAYEDEXPANSION
-		set hfile=".\xlive\Blam\Engine\rasterizer\dx9\vertex_shaders_dx9\preprocessed_hlsl_from_tool\compiled\%~2_%~4.h"
+		set hfile=".\src\Blam\rasterizer\dx9\vertex_shaders_dx9\preprocessed_hlsl_from_tool\compiled\%~2_%~4.h"
 		:: if the file exists and we find static in the header then we know we can add this to the table
 		:: if the file exists and we don't find static in the header we add NULL since this shader does not exist
 		if exist %hfile% ( findstr static %hfile% > nul && ( echo 	^(DWORD^*^)k_%~2_%~4_%~3, >> %~1 ) || ( echo 	NULL, >> %~1 ) )
@@ -80,7 +80,7 @@ EXIT /B 0
 
 :add_bytecode_size_reference_to_table:
 	SETLOCAL ENABLEDELAYEDEXPANSION
-		set hfile=".\xlive\Blam\Engine\rasterizer\dx9\vertex_shaders_dx9\preprocessed_hlsl_from_tool\compiled\%~2_%~4.h"
+		set hfile=".\src\Blam\rasterizer\dx9\vertex_shaders_dx9\preprocessed_hlsl_from_tool\compiled\%~2_%~4.h"
 		:: if the file exists and we find static in the header then we know we can add this to the table
 		:: if the file exists and we don't find static in the header we add 0 since this shader does not exist
 		if exist %hfile% ( findstr static %hfile% > nul && ( echo 	sizeof^(k_%~2_%~4_%~3^), >> %~1 ) || ( echo 	0, >> %~1 ) )
@@ -170,7 +170,7 @@ EXIT /B 0
 		echo Building CPP file...
 		
 		:: Cpp
-		set file="./xlive/Blam/Engine/rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/_compiled_shader_table.cpp"
+		set file="./src/Blam/rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/_compiled_shader_table.cpp"
 
 		echo #include "stdafx.h" > %file%
 		echo #include "_compiled_shader_table.h" >> %file%
@@ -188,7 +188,7 @@ EXIT /B 0
 		echo Building Header file...
 		
 		:: Header
-		set file="./xlive/Blam/Engine/rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/_compiled_shader_table.h"
+		set file="./src/Blam/rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/_compiled_shader_table.h"
 
 		:: Add structure
 		echo #pragma once > %file%
@@ -215,7 +215,7 @@ EXIT /B 0
 :dump_vertex_shaders
 	SETLOCAL ENABLEDELAYEDEXPANSION
 		echo Running Python script to dump vertex shaders from tags
-		python "./xlive/Blam/Engine/rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/_vertex_shader_dump.py"
+		python "./src/Blam/rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/_vertex_shader_dump.py"
     ENDLOCAL
 EXIT /B 0
 

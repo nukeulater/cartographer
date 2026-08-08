@@ -506,7 +506,7 @@ static void status_string_internal(const char* format_string, char* string)
 static void status_printf_va(const char* format, char* argument_list)
 {
 	char string[1024];
-	vsprintf(string, NUMBEROF(string), format, argument_list);
+	vsnprintf(string, NUMBEROF(string), format, argument_list);
 	status_string_internal(format, string);
 	return;
 }

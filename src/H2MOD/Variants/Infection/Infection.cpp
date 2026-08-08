@@ -248,7 +248,7 @@ void Infection::preSpawnServerSetup() {
 		}
 		else 
 		{
-			player->configuration.profile_traits.profile.player_character_type = _character_type_spartan;
+			player->configuration.appearance.player_character_type = _character_type_spartan;
 		}
 	}
 }
@@ -256,7 +256,7 @@ void Infection::preSpawnServerSetup() {
 void Infection::setPlayerAsHuman(int32 player_index)
 {
 	player_datum* player = player_get(player_index);
-	player->configuration.profile_traits.profile.player_character_type = _character_type_spartan;
+	player->configuration.appearance.player_character_type = _character_type_spartan;
 	player->unit_speed = k_human_unit_speed;
 }
 
