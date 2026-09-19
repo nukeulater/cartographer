@@ -142,7 +142,7 @@ void GunGame::OnPlayerSpawn(ExecTime execTime, datum player_index)
 			{
 				int level = 0;
 				uint64 id;
-				s_player_identifier identifier = NetworkSession::GetPlayerId(player_abs_index);
+				s_player_identifier identifier = NetworkSession::GetPlayerId(player_index);
 				csmemcpy(&id, &identifier, sizeof(uint64));
 
 				auto gungamePlayer = gungamePlayers.find(id);
@@ -172,7 +172,7 @@ void GunGame::OnPlayerSpawn(ExecTime execTime, datum player_index)
 				}
 				else
 				{
-					call_give_player_weapon(player_abs_index, (datum)k_level_weapons[level], 1);
+					call_give_player_weapon(player_index, (datum)k_level_weapons[level], 1);
 				}
 			}
 		}
@@ -188,7 +188,10 @@ void GunGame::OnPlayerSpawn(ExecTime execTime, datum player_index)
 
 bool GunGame::c_game_statborg__adjust_player_stat(ExecTime execTime, c_game_statborg* statborg, datum player_index, e_statborg_entry statistic, short count, int game_results_statistic, bool adjust_team_stat)
 {
-	player_datum const* player = player_get(player_index);
+	player_datum const* player = player_try_and_get_absolute(player_index);
+
+	if (!player)
+		return false;
 
 	uint64 id;
 	s_player_identifier identifier = NetworkSession::GetPlayerId(player_index);
@@ -251,7 +254,7 @@ bool GunGame::c_game_statborg__adjust_player_stat(ExecTime execTime, c_game_stat
 					simulation_action_object_update(player->unit_index, FLAG(_simulation_action_update_grenade_count_bit));
 
 					unit_delete_all_weapons(player->unit_index);
-					call_give_player_weapon(player_index, (datum)k_level_weapons[level], 1);
+					call_give_player_weapon(DATUM_INDEX_NEW(player_index, player->identifier), (datum)k_level_weapons[level], 1);
 				}
 			}
 		}

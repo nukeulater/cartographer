@@ -115,6 +115,38 @@ void* datum_get_absolute(const data_array* data, int32 index)
 	return header;
 }
 
+void* datum_try_and_get_absolute(const data_array* data, int32 absolute_index)
+{
+	s_datum_header* result = NULL;
+
+	ASSERT(data);
+	ASSERT(data->valid);
+
+	if (absolute_index != NONE)
+	{
+		vassert(
+			DATUM_INDEX_TO_IDENTIFIER(absolute_index) == 0,
+			"tried to access %s using datum_try_and_get_absolute() with a non absolute index #%d (0x%x)",
+			data->name,
+			DATUM_INDEX_TO_ABSOLUTE_INDEX(absolute_index),
+			absolute_index
+		);
+
+		if (VALID_INDEX(absolute_index, data->first_free_absolute_index))
+		{
+			s_datum_header* header = DATA_HEADER_GET(data, absolute_index);
+			if (header->identifier)
+			{
+				result = header;
+			}
+		}
+	}
+
+	ASSERT(result == align_pointer(result, data->alignment_bits));
+
+	return result;
+}
+
 void __cdecl datum_delete(data_array* data, datum datum_index)
 {
 	INVOKE(0x6693E, 0x3262A, datum_delete, data, datum_index);
