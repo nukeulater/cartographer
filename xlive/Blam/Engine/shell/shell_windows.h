@@ -47,19 +47,17 @@ void shell_windows_initialize();
 
 uint32 __cdecl system_milliseconds(void);
 
-LARGE_INTEGER shell_time_counter_freq();
+uint64 shell_time_counter_freq();
 
-LARGE_INTEGER shell_time_counter_now(LARGE_INTEGER* freq);
+uint64 shell_time_counter_now();
 
-LARGE_INTEGER shell_time_counter_diff(LARGE_INTEGER c1, LARGE_INTEGER c2);
+uint64 shell_time_now_sec();
 
-unsigned long long shell_time_now_sec();
+uint64 shell_time_now_msec();
 
-unsigned long long shell_time_now_msec();
+uint64 shell_time_now(uint64 denominator);
 
-unsigned long long shell_time_now(unsigned long long denominator);
-
-void shell_windows_throttle_framerate(LARGE_INTEGER last_counter, int desired_framerate);
+void shell_windows_throttle_framerate(uint64 last_counter, int32 desired_framerate);
 
 bool __cdecl gfwl_gamestore_initialize(void);
 

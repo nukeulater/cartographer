@@ -64,17 +64,17 @@ struct s_main_time_debug
 
 static s_main_time_globals* main_time_globals_get(void);
 
-static real32 main_time_get_delta_sec_precise(LARGE_INTEGER counter_now, LARGE_INTEGER freq);
+static real32 main_time_get_delta_sec_precise(uint64 freq);
 
 static uint64 main_time_get_absolute_milliseconds(void);
 
-static real32 main_time_delta_calculate(LARGE_INTEGER counter_now, LARGE_INTEGER freq);
+static real32 main_time_delta_calculate(uint64 freq);
 
 /* globals */
 
 static real32 last_framerate_time = 0.f;
 
-static LARGE_INTEGER g_main_game_time_counter_last_time;
+static uint64 g_main_game_time_counter_last_time;
 #ifdef MAIN_TIME_DEBUG
 static s_main_time_debug g_main_game_time_debug;
 #endif
@@ -113,7 +113,7 @@ void __cdecl main_time_initialize(void)
 
 	csmemset(g_flip_deltas, 0, sizeof(g_flip_deltas));
 
-	g_main_game_time_counter_last_time = shell_time_counter_now(NULL);
+	g_main_game_time_counter_last_time = shell_time_counter_now();
 	return;
 }
 
@@ -122,7 +122,7 @@ void __cdecl main_time_reset(void)
 	s_main_time_globals* main_time_globals = main_time_globals_get();
 	main_time_globals->last_milliseconds = system_milliseconds();
 	main_time_globals->should_reset = true;
-	g_main_game_time_counter_last_time = shell_time_counter_now(NULL);
+	g_main_game_time_counter_last_time = shell_time_counter_now();
 	return;
 }
 
@@ -178,11 +178,11 @@ real32 __cdecl main_time_update(void)
 	
 	real32 dt_sec = 0.f;
 	const int32 game_time = game_in_progress() ? game_time_get() : 0;
-	const LARGE_INTEGER freq = shell_time_counter_freq();
+	const uint64 freq = shell_time_counter_freq();
 
 	shell_idle();
 	
-	dt_sec = main_time_delta_calculate(shell_time_counter_now(NULL), freq);
+	dt_sec = main_time_delta_calculate(freq);
 
 	// don't run the frame limiter when time step is fixed, because the code doesn't support it
 	// in case of fixed time step, frame limiter should be handled by the other frame limiter
@@ -213,7 +213,7 @@ real32 __cdecl main_time_update(void)
 					Sleep((DWORD)system_yield_msec);
 				}
 
-				while (dt_sec = main_time_delta_calculate(shell_time_counter_now(NULL), freq), 
+				while (dt_sec = main_time_delta_calculate(freq), 
 					dt_sec < desired_frame_time)
 				{
 				}
@@ -222,13 +222,13 @@ real32 __cdecl main_time_update(void)
 		else
 		{
 			Sleep(15u);
-			dt_sec = main_time_delta_calculate(shell_time_counter_now(NULL), freq);
+			dt_sec = main_time_delta_calculate(freq);
 		}
 	}
 	else
 	{
 		shell_windows_throttle_framerate(g_main_game_time_counter_last_time, H2Config_fps_limit);
-		dt_sec = main_time_delta_calculate(shell_time_counter_now(NULL), freq);
+		dt_sec = main_time_delta_calculate(freq);
 	}
 	
 	s_main_time_globals* main_time_globals = main_time_globals_get();
@@ -247,7 +247,7 @@ real32 __cdecl main_time_update(void)
 	}
 #endif
 
-	g_main_game_time_counter_last_time = shell_time_counter_now(NULL);
+	g_main_game_time_counter_last_time = shell_time_counter_now();
 
 	dt_sec = movie_recording() ? movie_recording_timestep() : dt_sec;
 
@@ -371,9 +371,9 @@ static s_main_time_globals* main_time_globals_get(void)
 	return Memory::GetAddress<s_main_time_globals*>(0x479E90, 0x4A2980);
 }
 
-static real32 main_time_get_delta_sec_precise(LARGE_INTEGER counter_now, LARGE_INTEGER freq)
+static real32 main_time_get_delta_sec_precise(uint64 freq)
 {
-	real32 result = (real32)(((real64)shell_time_counter_diff(counter_now, g_main_game_time_counter_last_time).QuadPart) / (real64)freq.QuadPart);
+	real32 result = (real32)((real64)(shell_time_counter_now() - g_main_game_time_counter_last_time) / (real64)freq);
 	return result;
 }
 
@@ -395,7 +395,7 @@ static uint64 main_time_get_absolute_milliseconds(void)
 	return milliseconds;
 }
 
-static real32 main_time_delta_calculate(LARGE_INTEGER counter_now, LARGE_INTEGER freq)
+static real32 main_time_delta_calculate(uint64 freq)
 {
 	const s_main_time_globals* main_time_globals = main_time_globals_get();
 
@@ -404,7 +404,7 @@ static real32 main_time_delta_calculate(LARGE_INTEGER counter_now, LARGE_INTEGER
 	if (k_use_precise_counters)
 	{
 		// Precise dt
-		dt = main_time_get_delta_sec_precise(counter_now, freq);
+		dt = main_time_get_delta_sec_precise(freq);
 	}
 	else
 	{

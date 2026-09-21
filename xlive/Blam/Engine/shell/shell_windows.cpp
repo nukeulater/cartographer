@@ -47,7 +47,7 @@ enum : ULONG
 
 /* globals */
 
-static LARGE_INTEGER g_startup_counter;
+static uint64 g_startup_counter;
 static DWORD(WINAPI* p_timeGetTime)() = timeGetTime;
 
 static bool(__cdecl* p_shell_set_game_cursor_state)(bool enabled);
@@ -72,17 +72,17 @@ static void __cdecl show_fatal_error(int32 error_id);
 
 static LRESULT WINAPI H2WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-static LARGE_INTEGER shell_get_startup_counter(void);
+static uint64 shell_get_startup_counter(void);
 
-static unsigned long long shell_time_from_counter(LARGE_INTEGER counter, LARGE_INTEGER freq, unsigned long long denominator);
+static uint64 shell_time_from_counter(uint64 counter, uint64 freq, uint64 denominator);
 
 static void shell_system_set_timer_resolution_max(bool enable);
 
-static unsigned long long shell_time_diff(LARGE_INTEGER t2, unsigned long long denominator);
+static uint64 shell_time_diff(uint64 t2, uint64 denominator);
 
 static void shell_windows_throttle_framerate_initialize();
 
-static void shell_windows_yield_thread(LARGE_INTEGER last_time, real32 desired_framerate);
+static void shell_windows_yield_thread(uint64 last_time, int32 desired_framerate);
 
 // Adjust name of window to display the instance number when we have more than 1 window open
 static void shell_windows_adjust_name(void);
@@ -225,7 +225,9 @@ void shell_windows_apply_patches(void)
 
 void shell_windows_initialize(void)
 {
-	QueryPerformanceCounter(&g_startup_counter);
+	LARGE_INTEGER counter;
+	QueryPerformanceCounter(&counter);
+	g_startup_counter = (uint64)counter.QuadPart;
 	return;
 }
 
@@ -234,44 +236,31 @@ uint32 __cdecl system_milliseconds(void)
 	return INVOKE(0x37E51, 0x2B4CE, system_milliseconds);
 }
 
-LARGE_INTEGER shell_time_counter_freq()
+uint64 shell_time_counter_freq()
 {
 	LARGE_INTEGER freq;
 	QueryPerformanceFrequency(&freq);
-	return freq;
+	return (uint64)freq.QuadPart;
 }
 
-LARGE_INTEGER shell_time_counter_now(LARGE_INTEGER* freq)
+uint64 shell_time_counter_now()
 {
 	LARGE_INTEGER counter;
-	if (freq)
-	{
-		*freq = shell_time_counter_freq();
-	}
 	QueryPerformanceCounter(&counter);
-	counter.QuadPart -= shell_get_startup_counter().QuadPart;
-	return counter;
+	return (uint64)counter.QuadPart - shell_get_startup_counter();
 }
 
-LARGE_INTEGER shell_time_counter_diff(LARGE_INTEGER c1, LARGE_INTEGER c2)
+uint64 shell_time_now(uint64 denominator)
 {
-	c1.QuadPart -= c2.QuadPart;
-	return c1;
+	return shell_time_from_counter(shell_time_counter_now(), shell_time_counter_freq(), denominator) + (k_process_system_time_startup_offset_sec * denominator);
 }
 
-unsigned long long shell_time_now(unsigned long long denominator)
-{
-	LARGE_INTEGER counter, freq;
-	counter = shell_time_counter_now(&freq);
-	return shell_time_from_counter(counter, freq, denominator) + (k_process_system_time_startup_offset_sec * denominator);
-}
-
-unsigned long long shell_time_now_sec()
+uint64 shell_time_now_sec()
 {
 	return shell_time_now(k_shell_time_sec_denominator);
 }
 
-unsigned long long shell_time_now_msec()
+uint64 shell_time_now_msec()
 {
 	return shell_time_now(k_shell_time_msec_denominator);
 }
@@ -280,12 +269,11 @@ void shell_windows_throttle_framerate_initialize()
 {
 }
 
-void shell_windows_throttle_framerate(LARGE_INTEGER last_time, int desired_framerate)
+void shell_windows_throttle_framerate(uint64 last_counter, int32 desired_framerate)
 {
 	if (desired_framerate > 0)
 	{
-		desired_framerate = MAX(desired_framerate, 15);
-		shell_windows_yield_thread(last_time, (real32)desired_framerate);
+		shell_windows_yield_thread(last_counter, MAX(desired_framerate, 15));
 	}
 
 	return;
@@ -334,7 +322,7 @@ void shell_windows_calculate_instance_num(void)
 
 DWORD WINAPI timeGetTime_hook()
 {
-	unsigned long long current_time_msec = shell_time_now_msec();
+	uint64 current_time_msec = shell_time_now_msec();
 	return (DWORD)current_time_msec;
 }
 static_assert(std::is_same_v<decltype(timeGetTime), decltype(timeGetTime_hook)>, "Invalid timeGetTime_hook signature");
@@ -511,17 +499,17 @@ static LRESULT WINAPI H2WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 	return result;
 }
 
-static LARGE_INTEGER shell_get_startup_counter(void)
+static uint64 shell_get_startup_counter(void)
 {
 	return g_startup_counter;
 }
 
-static unsigned long long shell_time_from_counter(LARGE_INTEGER counter, LARGE_INTEGER freq, unsigned long long denominator)
+static uint64 shell_time_from_counter(uint64 counter, uint64 freq, uint64 denominator)
 {
-	unsigned long long _Whole, _Part;
+	uint64 _Whole, _Part;
 
-	_Whole = (counter.QuadPart / freq.QuadPart) * denominator;
-	_Part = (counter.QuadPart % freq.QuadPart) * denominator / freq.QuadPart;
+	_Whole = (counter / freq) * denominator;
+	_Part = (counter % freq) * denominator / freq;
 
 	return _Whole + _Part;
 }
@@ -533,28 +521,25 @@ static void shell_system_set_timer_resolution_max(bool enable)
 	NtSetTimerResolutionHelper(ulMaximumResolution, enable, &ulCurrentResolution);
 }
 
-static unsigned long long shell_time_diff(LARGE_INTEGER t2, unsigned long long denominator)
+static uint64 shell_time_diff(uint64 t2, uint64 denominator)
 {
-	LARGE_INTEGER counter, freq;
-	counter = shell_time_counter_now(&freq);
-	counter = shell_time_counter_diff(counter, t2);
-	return shell_time_from_counter(counter, freq, denominator);
+	return shell_time_from_counter(shell_time_counter_now() - t2, shell_time_counter_freq(), denominator);
 }
 
-static void shell_windows_yield_thread(LARGE_INTEGER last_counter, real32 desired_framerate)
+static void shell_windows_yield_thread(uint64 last_counter, int32 desired_framerate)
 {
-	const int k_thread_sleep_api_time_slice_percentage = 70; // 70% of the time
-	const int k_thread_sleep_api_min_time_to_sleep_usec = 3000; // 3ms
+	const int32 k_thread_sleep_api_time_slice_percentage = 70; // 70% of the time
+	const int32 k_thread_sleep_api_min_time_to_sleep_usec = 3000; // 3ms
 
-	unsigned long long min_frametime_usec = (unsigned long long)((real32)k_shell_time_usec_denominator / desired_framerate);
-	unsigned long long dt_usec = shell_time_diff(last_counter, k_shell_time_usec_denominator);
+	uint64 desired_frame_time_usec = (uint64)((real32)k_shell_time_usec_denominator / (real32)desired_framerate);
+	uint64 dt_usec = shell_time_diff(last_counter, k_shell_time_usec_denominator);
 
-	if (dt_usec < min_frametime_usec)
+	if (dt_usec < desired_frame_time_usec)
 	{
-		unsigned long long sleep_time_usec = min_frametime_usec - dt_usec;
+		uint64 sleep_time_usec = desired_frame_time_usec - dt_usec;
 
 		// sleep threadWaitTimePercentage out of the target render time using thread sleep or timer wait
-		unsigned long long system_yield_time_usec = (k_thread_sleep_api_time_slice_percentage * sleep_time_usec) / 100;
+		uint64 system_yield_time_usec = (k_thread_sleep_api_time_slice_percentage * sleep_time_usec) / 100;
 
 		// sleep just milliseconds
 		system_yield_time_usec = system_yield_time_usec - (system_yield_time_usec % 1000);
@@ -576,23 +561,12 @@ static void shell_windows_yield_thread(LARGE_INTEGER last_counter, real32 desire
 				// Wait for the timer.
 				NtWaitForSingleObjectHelper(GetCurrentThread(), FALSE, &liDueTime);
 			}
-
-			/*int sleepTimeMs = system_yield_time_usec / 1000ll;
-			if (sleepTimeMs >= 0)
-				Sleep(sleepTimeMs);*/
 		}
 
 		// spin-lock the remaining time slice
-		while (true)
+		while (shell_time_diff(last_counter, k_shell_time_usec_denominator) < desired_frame_time_usec)
 		{
-			if (shell_time_diff(last_counter, k_shell_time_usec_denominator) >= min_frametime_usec)
-			{
-				break;
-			}
-			else
-			{
-				_mm_pause();
-			}
+			_mm_pause();
 		}
 	}
 }
