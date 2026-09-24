@@ -17,7 +17,7 @@ const wchar_t* halo_playlist_item_collection_get_name(s_halo_playlist_item_colle
 
 int32 halo_playlist_item_collection_get_value(s_halo_playlist_item_collection* collection, wchar_t const* value)
 {
-	return INVOKE_TYPE(0, 0xF1E9, int32(*)(s_halo_playlist_item_collection*, wchar_t const*), collection, value);
+	return INVOKE_TYPE(0, 0xF591, int32(*)(s_halo_playlist_item_collection*, wchar_t const*), collection, value);
 }
 
 bool halo_playlist_item_collection_get_boolean_value(wchar_t const* value, bool* out_result)
